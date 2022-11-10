@@ -1,0 +1,9 @@
+services:
+  python3:
+    build: .
+    container_name: python3
+    working_dir: /app
+    volumes:
+      - ${PWD}/src:/app
+    restart: on-failure
+    command: ['sleep', 'infinity']
