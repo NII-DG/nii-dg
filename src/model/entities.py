@@ -1,3 +1,5 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import const
 
 class Entity():
@@ -30,12 +32,13 @@ class RootDataEntity(DataEntity):
         super().__init__()
 
     def _empty(self):
-            val = {
-                "@id": self.id,
-                "@type": "Dataset",
-                # "datePublished": iso_now(),
-            }
-            return val
+
+        val = {
+            "@id": self.id,
+            "@type": "Dataset",
+            "datePublished": datetime.now(ZoneInfo("Asia/Tokyo")).isoformat(),
+        }
+        return val
 
 
 class Metadata(Entity):
