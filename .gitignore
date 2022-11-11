@@ -1,6 +1,3 @@
-# input file for debug
-sample_inputs/ 
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
