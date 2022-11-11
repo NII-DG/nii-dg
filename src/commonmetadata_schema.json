@@ -1,0 +1,21 @@
+{
+    "title": "DMP_common_metadata",
+    "type": "object",
+    "additionalProperties": false,
+    "required":["dmp_format","project_name"],
+    "properties": {
+        "dmp_format":{
+            "type":"string",
+            "enum":["common metadata"]
+        },
+        "funding_agency":{
+            "type":"string"
+        },
+        "project_name":{
+            "type":"string"
+        },
+        "e-Rad_project_id":{
+            "type":"string"
+        }
+    }
+}
