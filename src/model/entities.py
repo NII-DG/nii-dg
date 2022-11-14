@@ -1,6 +1,5 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
-import const
 
 class Entity():
 
@@ -42,13 +41,15 @@ class RootDataEntity(DataEntity):
 
 
 class Metadata(Entity):
+    BASENAME = "ro-crate-metadata.json"
+    PROFILE = "https://w3id.org/ro/crate/1.1"
 
     def __init__(self):
         super().__init__()
     
     def _empty(self):
-        val = {"@id": const.BASENAME,
+        val = {"@id": self.BASENAME,
                 "@type": "CreativeWork",
-                "conformsTo": {"@id": const.PROFILE},
+                "conformsTo": {"@id": self.PROFILE},
                 "about": {"@id": "./"}}
         return val

@@ -1,5 +1,6 @@
 import json
 import jsonschema
+from model.rocrate import NIIROCrate
 
 class ValidationError(Exception):
     pass
@@ -25,12 +26,12 @@ def set_dmp_format(dict):
     for error in v.iter_errors(dict):
         error_messages.append(error.message)
     
-    if len(error_messages) == 0:
-        print("Successfull submitted!")
-    else:
+    if len(error_messages) > 0:
         raise ValidationError('\n'.join(error_messages))
 
-if __name__ == "__main__":
+    return NIIROCrate(dict)
+
+def generate_rocrate():
     path = input('dmp.json path:')
     metadata = read_dmp(path)
     try:
