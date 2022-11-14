@@ -32,9 +32,13 @@ def set_dmp_format(dict):
     return NIIROCrate(dict)
 
 def generate_rocrate():
-    path = input('dmp.json path:')
-    metadata = read_dmp(path)
-    try:
-        set_dmp_format(metadata)
-    except Exception as e:
-        print(e)
+    dmp_path = input('dmp.json path:')
+    metadata = read_dmp(dmp_path)
+
+    crate = set_dmp_format(metadata)    
+    crate.set_project_name()
+    crate.set_funder()
+    roc = crate.generate()
+    
+    with open('ro-crate-metadata.json', 'w') as f:
+        json.dump(roc, f, indent = 4)

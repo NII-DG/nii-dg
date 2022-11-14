@@ -1,6 +1,8 @@
 from .entities import Entity, DataEntity, ContextEntity, RootDataEntity, Metadata
 import json
 
+class ValidationError(Exception):
+    pass
 
 class ROCrate():
 
@@ -30,3 +32,23 @@ class NIIROCrate(ROCrate):
         super().__init__()
         self.extra_terms = self.EXTRA_TERMS
         self.dmp = dmp
+
+    def set_project_name(self):
+        self.rootdataentity._jsonld["project_name"] = self.dmp["project_name"]
+
+    def set_funder(self):
+        funders = self.dmp["funding_agency"]
+        funder_list = []
+
+        for fa in funders:
+            ids = [item for item in [fa.get("ror"), fa.get("url")] if item]
+            if len(ids) == 0:
+                raise ValidationError('Either property "ror" or "url" is required for funding agancy')
+
+            funder = ContextEntity(ids[0], 'Organization')
+            funder.set_name(fa["name"])
+            funder.add_properties({'identifier':ids})
+            self.entities.append(funder)
+            funder_list.append({"@id":ids[0]})
+
+        self.rootdataentity.add_properties({'funder':funder_list})

@@ -9,7 +9,23 @@
             "enum":["common metadata"]
         },
         "funding_agency":{
-            "type":"string"
+            "type":"array",
+            "items":{
+                "type":"object",
+                "required":["name"],
+                "properties":{
+                    "name":{"type":"string"},
+                    "url":{
+                        "type":"string",
+                        "format":"url"
+                    },
+                    "ror":{
+                        "type":"string",
+                        "format":"url"
+                    }
+
+                }
+            }
         },
         "project_name":{
             "type":"string"
