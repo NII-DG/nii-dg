@@ -32,6 +32,9 @@
         },
         "e-Rad_project_id":{
             "type":"string"
+        },
+        "research_filed":{
+            "type":"string"
         }
     }
 }

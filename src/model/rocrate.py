@@ -37,28 +37,28 @@ class NIIROCrate(ROCrate):
         self.rootdataentity._jsonld["project_name"] = self.dmp["project_name"]
 
     def set_funder(self):
-        funders = self.dmp["funding_agency"]
-        funder_list = []
+        funders = self.dmp.get("funding_agency")
 
-        for fa in funders:
-            ids = [item for item in [fa.get("ror"), fa.get("url")] if item]
-            if len(ids) == 0:
-                raise ValidationError('Either property "ror" or "url" is required for funding agancy')
+        if funders:
+            funder_list = []
 
-            funder = ContextEntity(ids[0], 'Organization')
-            funder.set_name(fa["name"])
-            funder.add_properties({'identifier':ids})
-            self.entities.append(funder)
-            funder_list.append({"@id":ids[0]})
+            for fa in funders:
+                ids = [item for item in [fa.get("ror"), fa.get("url")] if item]
+                if len(ids) == 0:
+                    raise ValidationError('Either property "ror" or "url" is required for funding agancy')
 
-        self.rootdataentity.add_properties({'funder':funder_list})
+                funder = ContextEntity(ids[0], 'Organization')
+                funder.set_name(fa["name"])
+                funder.add_properties({'identifier':ids})
+                self.entities.append(funder)
+                funder_list.append({"@id":ids[0]})
+
+            self.rootdataentity.add_properties({'funder':funder_list})
 
     def set_erad(self):
         erad = self.dmp.get("e-Rad_project_id")
 
-        if erad is None:
-            pass
-        else:
+        if erad:
             erad_e = ContextEntity(f'#e-Rad:{erad}', 'PropertyValue')
             erad_e.set_name('e-Rad Project ID')
             erad_e.add_properties({'value':erad})
@@ -68,4 +68,11 @@ class NIIROCrate(ROCrate):
             if ids:
                 ids.append({"@id":erad_e.id})
             else:
-                self.rootdataentity.add_properties({"identifier":[{"@id":erad_e.id}]})
+                ids = []
+            self.rootdataentity.add_properties({"identifier":ids})
+
+    def set_field(self):
+        field = self.dmp.get('research_filed')
+
+        if field:
+            self.rootdataentity.add_properties({'keywords':field})
