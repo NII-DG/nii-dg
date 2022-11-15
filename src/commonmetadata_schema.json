@@ -55,7 +55,11 @@
                         "type":"string",
                         "format":"email"
                     },
-                    "affiliation":{"type":"string"}
+                    "affiliation":{"type":"string"},
+                    "e-Rad_researcher_number":{
+                        "type":"string",
+                        "pattern":"[0-9]{8}"
+                    }
                 }
             }
         },

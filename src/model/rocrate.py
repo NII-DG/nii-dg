@@ -97,6 +97,15 @@ class NIIROCrate(ROCrate):
             ids = [item for item in [creator.get("orcid"), creator.get("url")] if item]
             if len(ids) == 0:
                     raise ValidationError('Either property "orcid" or "url" is required for creators')
+
+            erad = creator.get('e-Rad_researcher_number')
+            if erad:
+                ids.append({"@id": f"#e-Rad:{erad}"})
+                erad_e = ContextEntity(f'#e-Rad:{erad}', 'PropertyValue')
+                erad_e.set_name('e-Rad researcher number')
+                erad_e.add_properties({'value':erad})
+                self.entities.append(erad_e)
+
             person = ContextEntity(ids[0], 'Person')
             person.set_name(creator["name"])
             person.add_properties({
