@@ -131,7 +131,6 @@ class NIIROCrate(ROCrate):
 
     def set_affiliations(self):
         affiliations = self.dmp.get("affiliations")
-        affiliation_list = []
 
         for affiliation in affiliations:
             ids = [item for item in [affiliation.get("ror"), affiliation.get("url")] if item]
@@ -143,7 +142,6 @@ class NIIROCrate(ROCrate):
                 "identifier":ids
             }
             self.add_entity(ids[0], 'Organization', properties)
-            affiliation_list.append({"@id":ids[0]})
 
     def overwrite(self):
         persons = self.get_by_type("Person")
