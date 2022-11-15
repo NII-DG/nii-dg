@@ -10,6 +10,19 @@ class ROCrate():
         self.metadata = Metadata()
         self.rootdataentity = RootDataEntity()
         self.entities = [self.metadata, self.rootdataentity]
+
+    def get_by_type(self, e_type):
+        ents = []
+        for e in self.entities:
+            if e.get("@type") == e_type:
+                ents.append(e)
+        return ents
+
+    def get_by_name(self, e_name):
+        for e in self.entities:
+            if e.get("name") == e_name:
+                return e
+        raise ValidationError(f'entity with name "{e_name}" is not found')
     
     def generate(self):
         graph = []
@@ -65,10 +78,9 @@ class NIIROCrate(ROCrate):
             self.entities.append(erad_e)
 
             ids = self.rootdataentity.get("identifier")
-            if ids:
-                ids.append({"@id":erad_e.id})
-            else:
+            if ids is None:
                 ids = []
+            ids.append({"@id":erad_e.id})
             self.rootdataentity.add_properties({"identifier":ids})
 
     def set_field(self):
@@ -76,3 +88,50 @@ class NIIROCrate(ROCrate):
 
         if field:
             self.rootdataentity.add_properties({'keywords':field})
+    
+    def set_creators(self):
+        creators = self.dmp.get("creators")
+        creator_list = []
+
+        for creator in creators:
+            ids = [item for item in [creator.get("orcid"), creator.get("url")] if item]
+            if len(ids) == 0:
+                    raise ValidationError('Either property "orcid" or "url" is required for creators')
+            person = ContextEntity(ids[0], 'Person')
+            person.set_name(creator["name"])
+            person.add_properties({
+                "email":creator["email"],
+                "affiliation":creator["affiliation"],
+                "identifier":ids}
+                )
+            self.entities.append(person)
+            creator_list.append({"@id":ids[0]})
+
+        self.rootdataentity.add_properties({'creator':creator_list})
+
+    def set_affiliations(self):
+        affiliations = self.dmp.get("affiliations")
+        affiliation_list = []
+
+        for affiliation in affiliations:
+            ids = [item for item in [affiliation.get("ror"), affiliation.get("url")] if item]
+            if len(ids) == 0:
+                    raise ValidationError('Either property "ror" or "url" is required for affiliations')
+            organization = ContextEntity(ids[0], 'Organization')
+            organization.set_name(affiliation["name"])
+            organization.add_properties({"identifier":ids})
+            self.entities.append(organization)
+            affiliation_list.append({"@id":ids[0]})
+
+    def overwrite(self):
+        persons = self.get_by_type("Person")
+
+        if len(persons) == 0:
+            return
+        
+        for p in persons:
+            aff = p.get("affiliation")
+            if type(aff) is str:
+                aff_e = self.get_by_name(aff)
+                aff_id = aff_e.get('@id')
+                p.add_properties({'affiliation':{"@id":aff_id}})

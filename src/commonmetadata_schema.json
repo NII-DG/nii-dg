@@ -2,7 +2,7 @@
     "title": "DMP_common_metadata",
     "type": "object",
     "additionalProperties": false,
-    "required":["dmp_format","project_name"],
+    "required":["dmp_format","project_name","creators"],
     "properties": {
         "dmp_format":{
             "type":"string",
@@ -35,6 +35,47 @@
         },
         "research_filed":{
             "type":"string"
+        },
+        "creators":{
+            "type":"array",
+            "items":{
+                "type":"object",
+                "required":["name", "email","affiliation"],
+                "properties":{
+                    "name":{"type":"string"},
+                    "orcid":{
+                        "type":"string",
+                        "format":"url"
+                    },
+                    "url":{
+                        "type":"string",
+                        "format":"url"
+                    },
+                    "email":{
+                        "type":"string",
+                        "format":"email"
+                    },
+                    "affiliation":{"type":"string"}
+                }
+            }
+        },
+        "affiliations":{
+            "type":"array",
+            "items":{
+                "type":"object",
+                "required":["name"],
+                "properties":{
+                    "name":{"type":"string"},
+                    "ror":{
+                        "type":"string",
+                        "format":"url"
+                    },
+                    "url":{
+                        "type":"string",
+                        "format":"url"
+                    }
+                }
+            }
         }
     }
 }
