@@ -24,6 +24,9 @@ class Entity():
     def add_properties(self, properties):
         self._jsonld |= properties
 
+    def get(self, property_name):
+        return self._jsonld.get(property_name)
+
 class ContextEntity(Entity):
 
     def __init__(self, id_ = None, type_ = None):

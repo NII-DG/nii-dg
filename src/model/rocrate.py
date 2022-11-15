@@ -52,3 +52,20 @@ class NIIROCrate(ROCrate):
             funder_list.append({"@id":ids[0]})
 
         self.rootdataentity.add_properties({'funder':funder_list})
+
+    def set_erad(self):
+        erad = self.dmp.get("e-Rad_project_id")
+
+        if erad is None:
+            pass
+        else:
+            erad_e = ContextEntity(f'#e-Rad:{erad}', 'PropertyValue')
+            erad_e.set_name('e-Rad Project ID')
+            erad_e.add_properties({'value':erad})
+            self.entities.append(erad_e)
+
+            ids = self.rootdataentity.get("identifier")
+            if ids:
+                ids.append({"@id":erad_e.id})
+            else:
+                self.rootdataentity.add_properties({"identifier":[{"@id":erad_e.id}]})

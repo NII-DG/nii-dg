@@ -31,13 +31,15 @@ def set_dmp_format(dict):
 
     return NIIROCrate(dict)
 
-def generate_rocrate():
-    dmp_path = input('dmp.json path:')
+def generate_rocrate(dmp_path = None):
+    if dmp_path is None:
+        dmp_path = input('dmp.json path:')
     metadata = read_dmp(dmp_path)
 
     crate = set_dmp_format(metadata)    
     crate.set_project_name()
     crate.set_funder()
+    crate.set_erad()
     roc = crate.generate()
     
     with open('ro-crate-metadata.json', 'w') as f:
