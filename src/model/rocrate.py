@@ -24,6 +24,11 @@ class ROCrate():
                 return e
         raise ValidationError(f'entity with name "{e_name}" is not found')
     
+    def add_entity(self, id, e_type, properties):
+        e = ContextEntity(id, e_type)
+        e.add_properties(properties)
+        self.entities.append(e)
+
     def generate(self):
         graph = []
         for entity in self.entities:
@@ -60,22 +65,32 @@ class NIIROCrate(ROCrate):
                 if len(ids) == 0:
                     raise ValidationError('Either property "ror" or "url" is required for funding agancy')
 
-                funder = ContextEntity(ids[0], 'Organization')
-                funder.set_name(fa["name"])
-                funder.add_properties({'identifier':ids})
-                self.entities.append(funder)
+                properties = {
+                    "name":fa["name"],
+                    "identifier":ids
+                }
+                self.add_entity(ids[0], 'Organization', properties)
                 funder_list.append({"@id":ids[0]})
 
             self.rootdataentity.add_properties({'funder':funder_list})
+
+    def add_erad(self, erad, erad_type):
+            erad_e = ContextEntity(f'#e-Rad:{erad}', 'PropertyValue')
+            if erad_type == 'project':
+                erad_e.set_name('e-Rad Project ID')
+            elif erad_type == 'researcher':
+                erad_e.set_name('e-Rad researcher number')
+            else:
+                raise ValidationError('e-rad type should be "project" or "researcher".')
+            erad_e.add_properties({'value':erad})
+            self.entities.append(erad_e)
+            return erad_e
 
     def set_erad(self):
         erad = self.dmp.get("e-Rad_project_id")
 
         if erad:
-            erad_e = ContextEntity(f'#e-Rad:{erad}', 'PropertyValue')
-            erad_e.set_name('e-Rad Project ID')
-            erad_e.add_properties({'value':erad})
-            self.entities.append(erad_e)
+            erad_e = self.add_erad(erad, 'project')
 
             ids = self.rootdataentity.get("identifier")
             if ids is None:
@@ -101,19 +116,15 @@ class NIIROCrate(ROCrate):
             erad = creator.get('e-Rad_researcher_number')
             if erad:
                 ids.append({"@id": f"#e-Rad:{erad}"})
-                erad_e = ContextEntity(f'#e-Rad:{erad}', 'PropertyValue')
-                erad_e.set_name('e-Rad researcher number')
-                erad_e.add_properties({'value':erad})
-                self.entities.append(erad_e)
+                self.add_erad(erad, 'researcher')
 
-            person = ContextEntity(ids[0], 'Person')
-            person.set_name(creator["name"])
-            person.add_properties({
+            properties = {
+                "name":creator["name"],
                 "email":creator["email"],
                 "affiliation":creator["affiliation"],
-                "identifier":ids}
-                )
-            self.entities.append(person)
+                "identifier":ids
+            }
+            self.add_entity(ids[0], 'Person', properties)
             creator_list.append({"@id":ids[0]})
 
         self.rootdataentity.add_properties({'creator':creator_list})
@@ -126,10 +137,12 @@ class NIIROCrate(ROCrate):
             ids = [item for item in [affiliation.get("ror"), affiliation.get("url")] if item]
             if len(ids) == 0:
                     raise ValidationError('Either property "ror" or "url" is required for affiliations')
-            organization = ContextEntity(ids[0], 'Organization')
-            organization.set_name(affiliation["name"])
-            organization.add_properties({"identifier":ids})
-            self.entities.append(organization)
+
+            properties = {
+                "name":affiliation["name"],
+                "identifier":ids
+            }
+            self.add_entity(ids[0], 'Organization', properties)
             affiliation_list.append({"@id":ids[0]})
 
     def overwrite(self):
