@@ -1,17 +1,18 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+
 class Entity():
 
-    def __init__(self, id_ = None, type_ = None):
+    def __init__(self, id_=None, type_=None):
         self.id = id_
         self.type = type_
         self._jsonld = self._empty()
 
     def _empty(self):
         val = {
-            "@id":self.id,
-            "@type":self.type
+            "@id": self.id,
+            "@type": self.type
         }
         return val
 
@@ -27,15 +28,16 @@ class Entity():
     def get(self, property_name):
         return self._jsonld.get(property_name)
 
+
 class ContextEntity(Entity):
 
-    def __init__(self, id_ = None, type_ = None):
-        super().__init__(id_, type_)    
+    def __init__(self, id_=None, type_=None):
+        super().__init__(id_, type_)
 
 
 class DataEntity(Entity):
 
-    def __init__(self, id_ = None, type_ = None):
+    def __init__(self, id_=None, type_=None):
         super().__init__(id_, type_)
 
 
@@ -57,13 +59,13 @@ class Metadata(Entity):
     BASENAME = "ro-crate-metadata.json"
     PROFILE = "https://w3id.org/ro/crate/1.1"
 
-    def __init__(self, id_ = None, type_='CreativeWork'):
+    def __init__(self, id_=None, type_='CreativeWork'):
         super().__init__(id_, type_)
         self.id = self.BASENAME
-    
+
     def _empty(self):
         val = {"@id": self.BASENAME,
-                "@type": self.type,
-                "conformsTo": {"@id": self.PROFILE},
-                "about": {"@id": "./"}}
+               "@type": self.type,
+               "conformsTo": {"@id": self.PROFILE},
+               "about": {"@id": "./"}}
         return val
