@@ -2,7 +2,7 @@
     "title": "DMP_common_metadata",
     "type": "object",
     "additionalProperties": false,
-    "required":["dmp_format","project_name","creators"],
+    "required":["dmp_format","project_name","creators","affiliations","dataset"],
     "properties": {
         "dmp_format":{
             "type":"string",
@@ -23,7 +23,6 @@
                         "type":"string",
                         "format":"url"
                     }
-
                 }
             }
         },
@@ -80,6 +79,70 @@
                     }
                 }
             }
+        },
+        "dataset":{
+            "type":"array",
+            "items":{
+                "type":"object",
+                "required":["data_number","title"],
+                "properties":{
+                    "data_number":{"type":"integer"},
+                    "title":{"type":"string"},
+                    "description":{"type":"string"},
+                    "free_or_consideration":{
+                        "type":"string",
+                        "enum":["free","consideration"]
+                    },
+                    "license":{
+                        "type":"object",
+                        "required":["name","url"],
+                        "properties":{
+                            "name":{"type":"string"},
+                            "url":{
+                                "type":"string",
+                                "format":"url"
+                            }
+                        }
+                    },
+                    "citation_info":{"type":"string"},
+                    "access_rights":{
+                        "type":"string",
+                        "enum":[
+                            "open access",
+                            "restricted access",
+                            "embargoed access",
+                            "metadata only access"            
+                        ]
+                    },
+                    "size":{"type":"string"},
+                    "hosting_institution":{"type":"string"},
+                    "data_manager":{
+                        "type":"object",
+                        "required":["name"],
+                        "properties":{
+                            "name":{"type":"string"},
+                            "orcid":{
+                                "type":"string",
+                                "format":"url"
+                            },
+                            "url":{
+                                "type":"string",
+                                "format":"url"
+                            },
+                            "email":{
+                                "type":"string",
+                                "format":"email"
+                            },        
+                            "e-Rad_researcher_number":{
+                                "type":"string",
+                                "pattern":"[0-9]{8}"        
+                            },
+                            "tel_number":{"type":"string"}
+                        }
+                    }
+                }
+            }
+
         }
     }
 }
