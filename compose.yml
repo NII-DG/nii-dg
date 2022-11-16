@@ -1,9 +1,13 @@
+version: "3.5"
 services:
-  python3:
-    build: .
-    container_name: python3
-    working_dir: /app
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nii-dg
+    container_name: nii-dg
     volumes:
-      - ${PWD}/src:/app
+      - ${PWD}:/app
     restart: on-failure
-    command: ['sleep', 'infinity']
+    working_dir: /app
+    command: [ 'sleep', 'infinity' ]
