@@ -66,9 +66,11 @@ class NIIROCrate(ROCrate):
                     raise ValidationError('Either property "ror" or "url" is required for funding agancy')
 
                 properties = {
-                    "name":fa["name"],
-                    "identifier":ids
+                    "name":fa["name"]
                 }
+                if len(ids) == 2:
+                    properties["sameAs"] = ids[1]
+
                 self.add_entity(ids[0], 'Organization', properties)
                 funder_list.append({"@id":ids[0]})
 
@@ -113,17 +115,20 @@ class NIIROCrate(ROCrate):
             if len(ids) == 0:
                     raise ValidationError('Either property "orcid" or "url" is required for creators')
 
-            erad = creator.get('e-Rad_researcher_number')
-            if erad:
-                ids.append({"@id": f"#e-Rad:{erad}"})
-                self.add_erad(erad, 'researcher')
-
             properties = {
                 "name":creator["name"],
                 "email":creator["email"],
-                "affiliation":creator["affiliation"],
-                "identifier":ids
+                "affiliation":creator["affiliation"]
             }
+
+            erad = creator.get('e-Rad_researcher_number')
+            if erad:
+                properties["identifier"]= {"@id": f"#e-Rad:{erad}"}
+                self.add_erad(erad, 'researcher')
+
+            if len(ids) == 2:
+                properties["sameAs"] = ids[1]
+
             self.add_entity(ids[0], 'Person', properties)
             creator_list.append({"@id":ids[0]})
 
@@ -138,9 +143,11 @@ class NIIROCrate(ROCrate):
                     raise ValidationError('Either property "ror" or "url" is required for affiliations')
 
             properties = {
-                "name":affiliation["name"],
-                "identifier":ids
+                "name":affiliation["name"]
             }
+            if len(ids) == 2:
+                properties["sameAs"] = ids[1]
+
             self.add_entity(ids[0], 'Organization', properties)
 
     def overwrite(self):

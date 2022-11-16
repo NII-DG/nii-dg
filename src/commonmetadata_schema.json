@@ -137,7 +137,10 @@
                                 "type":"string",
                                 "pattern":"[0-9]{8}"        
                             },
-                            "tel_number":{"type":"string"}
+                            "tel_number":{
+                                "type":"string",
+                                "pattern":"[0-9]{10,11}"
+                            }
                         }
                     }
                 }
