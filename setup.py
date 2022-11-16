@@ -25,6 +25,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "jsonschema",
+        # "zoneinfo",
     ],
     tests_require=[
         "flake8",
@@ -34,10 +35,10 @@ setup(
     ],
     extras_require={
         "tests": [
-        "flake8",
-        "isort",
-        "mypy",
-        "pytest",
+            "flake8",
+            "isort",
+            "mypy",
+            "pytest",
         ],
     },
     entry_points={

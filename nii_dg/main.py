@@ -1,7 +1,7 @@
 import json
 
 import jsonschema
-from model.rocrate import NIIROCrate
+from nii_dg.model.rocrate import NIIROCrate
 
 
 class ValidationError(Exception):

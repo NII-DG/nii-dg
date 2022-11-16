@@ -1,7 +1,7 @@
 import json
 
-from .entities import (ContextEntity, DataEntity, Entity, Metadata,
-                       RootDataEntity)
+from nii_dg.entities import (ContextEntity, DataEntity, Entity, Metadata,
+                             RootDataEntity)
 
 
 class ValidationError(Exception):
@@ -10,7 +10,7 @@ class ValidationError(Exception):
 
 class ROCrate():
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.metadata = Metadata()
         self.rootdataentity = RootDataEntity()
         self.entities = [self.metadata, self.rootdataentity]
