@@ -35,6 +35,17 @@
         "research_filed":{
             "type":"string"
         },
+        "repository":{
+            "type":"object",
+            "required":["name","url"],
+            "properties":{
+                "name":{"type":"string"},
+                "url":{
+                    "type":"string",
+                    "format":"url"
+                }
+            }
+        },
         "creators":{
             "type":"array",
             "items":{
