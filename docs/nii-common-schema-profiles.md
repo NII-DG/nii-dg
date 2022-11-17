@@ -381,7 +381,7 @@
     </tr>
     <tr>
         <td>address</td>
-        <td>MUST with common metadata</td>
+        <td>MUST with common metadata if organization is data maintainer</td>
         <td>string</td>
         <td>組織の住所</td>
         <td>common metadata:14.データ管理者の連絡先</td>
@@ -450,65 +450,108 @@
     </tr>
         <tr>
         <td>@id</td>
-        <td>MAY</td>
+        <td>MUST if add this entity</td>
         <td><code>#usageInfo:{number}</code></td>
         <td></td>
         <td></td>
     </tr>
     <tr>
         <td>@type</td>
-        <td>MAY</td>
+        <td>MUST if add this entity</td>
         <td>MUST be <i>CreativeWork</i></td>
         <td></td>
         <td></td>
     </tr>
     <tr>
         <td>description</td>
-        <td>MAY</td>
+        <td>MUST if add this entity</td>
         <td>string</td>
         <td>データ利用方法詳細</td>
         <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
     <tr>
-       <th colspan="4">Repository</th>
+       <th colspan="5">Repository</th>
     </tr>
         <tr>
         <td>@id</td>
-        <td>must</td>
+        <td>MUST</td>
+        <td>URI</td>
+        <td></td>
+        <td>common metadata:12.リポジトリURL・DOIリンク</td>
+    </tr>
+    <tr>
+        <td>@type</td>
+        <td>MUST</td>
+        <td>MUST be <i>RepositoryObject</i></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>MUST</td>
+        <td>string</td>
+        <td>リポジトリ名</td>
+        <td>common metadata:12.リポジトリ情報</td>
+    </tr>
+    <tr>
+        <td>description</td>
+        <td>MAY</td>
+        <td>string</td>
+        <td>リポジトリ概要</td>
+        <td></td>
+    </tr>
+    <tr>
+       <th colspan="5">File Distribution</th>
+    </tr>
+        <tr>
+        <td>@id</td>
+        <td>MUST if add this entity</td>
+        <td>URI</td>
         <td></td>
         <td></td>
     </tr>
     <tr>
         <td>@type</td>
-        <td>must</td>                <td></td>
+        <td>MUST if add this entity</td>
+        <td>MUST be <i>DataDownload</i></td>
+        <td></td>
         <td></td>
     </tr>
     <tr>
-       <th colspan="4">File Distribution</th>
+        <td>downloadUrl</td>
+        <td>MUST if add this entity</td>
+        <td>URI, which is the same as @id property</i></td>
+        <td>データを取得可能なURL</td>
+        <td></td>
+    <tr>
+       <th colspan="5">e-Rad ID</th>
     </tr>
         <tr>
         <td>@id</td>
-        <td>must</td>
+        <td>MUST if add this entity</td>
+        <td><code>#e-Rad:{e-Rad ID}</code></td>
         <td></td>
         <td></td>
     </tr>
     <tr>
         <td>@type</td>
-        <td>must</td>                <td></td>
-        <td></td>
-    </tr>
-    <tr>
-       <th colspan="4">e-Rad ID</th>
-    </tr>
-        <tr>
-        <td>@id</td>
-        <td>must</td>
+        <td>MUST if add this entity</td>
+        <td>MUST be <i>PropertyValue</i></td>
         <td></td>
         <td></td>
     </tr>
     <tr>
-        <td>@type</td>
-        <td>must</td>                <td></td>
-        <td></td>
+        <td>name</td>
+        <td>MUST</td>
+        <td>Select <code>Project ID</code> or <code>Researcher Number</code></td>
+        <td>e-Rad番号の種別</td>
+        <td>common metadata:2.e-Radの課題番号, 13.データ作成者のe-Rad研究番号, 14.データ管理者のe-Rad研究番号</td>
+    </tr>
+    <tr>
+        <td>value</td>
+        <td>MUST</td>
+        <td>e-Rad ID</td>
+        <td>e-RadのID</td>
+        <td>common metadata:2.e-Radの課題番号, 13.データ作成者のe-Rad研究番号, 14.データ管理者のe-Rad研究番号</td>
     </tr>
 </table>
 
