@@ -75,7 +75,7 @@
     <tr>
         <td>funder</td>
         <td>MUST</td>
-        <td>Array of <i>Organization</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://orcid.com/0000-0001-2345-6789"}]</code></td>
+        <td>Array of <i>Funding Agency</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://orcid.com/0000-0001-2345-6789"}]</code></td>
         <td>研究費用の出資者</td>
         <td>common metadata<br>1: 資金配分機関情報</td>
     </tr>
@@ -88,56 +88,56 @@
     </tr>
     <tr>
         <td>maintainer</td>
-        <td>Can be added to root data entity if commons to all dataset</td>
-        <td>Array of <i>Organization</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://orcid.com/0000-0001-2345-6789"}]</code></td>
+        <td>MUST</td>
+        <td>Array of <i> Hosting Instituion</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://orcid.com/0000-0001-2345-6789"}]</code></td>
         <td>データ管理機関・管理者</td>
-        <td>common metadata<br>14: データ管理機関, データ管理者</td>
+        <td>common metadata:14.データ管理機関, 14.データ管理者<br>JST:研究責任者</td>
     </tr>
     <tr>
         <td>contactPoint</td>
         <td>Set with <i>maintainer</i> property</td>
         <td>Array of <i>ContactPoint</i> entities, represented by each @id property. e.g. <code>[{"@id":"#mailto:contact@example.com"}]</code></td>
         <td>データ管理機関・管理者への連絡先</td>
-        <td>common metadata<br>14: データ管理者の連絡先</td>
+        <td>common metadata:14.データ管理者の連絡先</td>
     </tr>
     <tr>
         <td>isAccessibleForFree</td>
-        <td>Can be added to root data entity if commons to all dataset</td>
+        <td>MUST if accessRights has <i>open access</i></td>
         <td>boolean</td>
         <td>データ利用時の有償・無償</td>
-        <td>common metadata<br>11: 管理対象データの利活用・提供方針 </td>
+        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
     </tr>
     <tr>
         <td>license</td>
-        <td>Can be added to root data entity if commons to all dataset</td>
+        <td>MUST</td>
         <td>Array of <i>CreativeWork</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://creativecommons.org/licenses/by/4.0"}]</code></td>
         <td>ライセンス情報</td>
-        <td>common metadata<br>11: 管理対象データの利活用・提供方針 </td>
+        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
     </tr>
     <tr>
         <td>usageInfo</td>
         <td>Can be added to root data entity if commons to all dataset</td>
         <td>Array of <i>CreativeWork</i> entities, represented by each @id property. e.g. <code>[{"@id":"#usageInfo:1"}]</code></td>
         <td>その他引用時条件等</td>
-        <td>common metadata<br>11: 管理対象データの利活用・提供方針 </td>
+        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
     </tr>
     <tr>
         <td>accessRights</td>
-        <td>Can be added to root data entity if commons to all dataset</td>
+        <td>MUST</td>
         <td>Choose one from the [list](#accessrights-list)</td>
         <td>データセットへのアクセス状況</td>
         <td>common metadata<br>11: アクセス権 </td>
     </tr>
     <tr>
         <td>availabilityStarts</td>
-        <td>MUST if accessRights is <i>embargoed access</i></td>
+        <td>MUST if accessRights has <i>embargoed access</i></td>
         <td>Date</td>
         <td>公開猶予の場合の公開予定日</td>
         <td>common metadata<br>11: 公開予定日 </td>
     </tr>
     <tr>
         <td>distribution</td>
-        <td>MUST if accessRights is <i>open access</i></td>
+        <td>MUST if accessRights has <i>open access</i></td>
         <td>Array of <i>DataDownload</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://github.com"}]</code></td>
         <td>データセットの配布情報</td>
         <td> </td>
@@ -181,6 +181,13 @@
         <td></td>
     </tr>
     <tr>
+        <td>dmpDataNumber</td>
+        <td>MUST</td>
+        <td>Array of <i>Datalist on DMP</i> entities, represented by each @id property. e.g. <code>[{"@id":"#dmp:1"}]</code></td>
+        <td>DMPにおけるデータNo.</td>
+        <td>common metadata:4.データNo.</td>
+    </tr>
+    <tr>
         <td>contentSize</td>
         <td>SHOULD</td>
         <td>string</td>
@@ -201,77 +208,266 @@
         <td>外部ファイルの取得日時</td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html#web-based-data-entities>researchobject.org</a></td>
     </tr>
+    </tr>
     <tr>
        <th colspan="5">Datalist on DMP</th>
     </tr>
         <tr>
         <td>@id</td>
         <td>must</td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>data No. of dmp documents, e.g. <code>"#dmp:1"</code></td>
+        <td>DMPにおけるデータNo.</td>
+        <td>common metadata:4.データNo.</td>
     </tr>
     <tr>
         <td>@type</td>
-        <td>must</td>                <td></td>
+        <td>MUST</td>
+        <td>MUST be <i>CreativeWork</i></td>
+        <td></td>
         <td></td>
     </tr>
     <tr>
-       <th colspan="4">Creator</th>
+        <td>name</td>
+        <td>MUST</td>
+        <td>string</td>
+        <td>DMPにおけるデータ名称</td>
+        <td>common metadata:5.データの名称<br>JST:研究開発データ名称</td>
+    </tr>
+    <tr>
+        <td>description</td>
+        <td>MUST</td>
+        <td>string</td>
+        <td>DMPにおけるデータの説明</td>
+        <td>common metadata:7.データの説明<br>JST:データ概要</td>
+    </tr>
+    <tr>
+        <td>creator</td>
+        <td>MUST</td>
+        <td>With dmp of common metadata, array of <i>Person</i> entities.<br>With dmp of JST, array of <i>Affiliation</i> entities.</td>
+        <td>データ作成者</td>
+        <td>common metadata:13.データ作成者<br>JST:データ取得者</td>
+    </tr>
+    <tr>
+        <td>maintainer</td>
+        <td>MUST</td>
+        <td>Array of <i> Hosting Instituion</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://orcid.com/0000-0001-2345-6789"}]</code></td>
+        <td>データ管理機関・管理者</td>
+        <td>common metadata:14.データ管理機関, 14.データ管理者<br>JST:データ取得者</td>
+    </tr>
+    <tr>
+        <td>contactPoint</td>
+        <td>MUST with common metadata</td>
+        <td>Array of <i>ContactPoint</i> entities, represented by each @id property. e.g. <code>[{"@id":"#mailto:contact@example.com"}]</code></td>
+        <td>データ管理機関・管理者への連絡先</td>
+        <td>common metadata:14.データ管理者の連絡先</td>
+    </tr>
+    <tr>
+        <td>isAccessibleForFree</td>
+        <td>MUST if accessRights has <i>open access</i> and different from the root data entity</td>
+        <td>boolean</td>
+        <td>データ利用時の有償・無償</td>
+        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
+    </tr>
+    <tr>
+        <td>license</td>
+        <td>MUST if different from the root data entity</td>
+        <td>Array of <i>CreativeWork</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://creativecommons.org/licenses/by/4.0"}]</code></td>
+        <td>ライセンス情報</td>
+        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
+    </tr>
+    <tr>
+        <td>usageInfo</td>
+        <td>MAY</td>
+        <td>Array of <i>CreativeWork</i> entities, represented by each @id property. e.g. <code>[{"@id":"#usageInfo:1"}]</code></td>
+        <td>その他引用時条件等</td>
+        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
+    </tr>
+    <tr>
+        <td>accessRights</td>
+        <td>MUST if different from the root data entity</td>
+        <td>Choose one from the <a id=accessrights-list>list</a></td>
+        <td>データセットへのアクセス状況</td>
+        <td>common metadata:11.アクセス権<br>JST:研究開発データの公開/非公開の方針</td>
+    </tr>
+    <tr>
+        <td>availabilityStarts</td>
+        <td>MUST if accessRights has <i>embargoed access</i> and different from the root data entity</td>
+        <td>Date</td>
+        <td>公開猶予の場合の公開予定日</td>
+        <td>common metadata:11.公開予定日 </td>
+    </tr>
+    <tr>
+        <td>contentSize</td>
+        <td>SHOULD</td>
+        <td>string</td>
+        <td>ファイルサイズ</td>
+        <td>common metadata:12.概略データ量</td>
+    </tr>
+    <tr>
+       <th colspan="5">Creator / Data Manager</th>
     </tr>
         <tr>
         <td>@id</td>
-        <td>must</td>
+        <td>MUST</td>
+        <td>URI, ORCID is recommended</td>
         <td></td>
-        <td></td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#people>researchobject.org</a></td>
     </tr>
     <tr>
         <td>@type</td>
-        <td>must</td>                <td></td>
+        <td>MUST</td>
+        <td>MUST be <i>Person</i></td>
+        <td></td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#people>researchobject.org</a></td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>MUST</td>
+        <td>string<br>In order of firstname, familyname</td>
+        <td>研究者氏名</td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#people>researchobject.org</a><br>common metadata:13.データ作成者</td>
+    </tr>
+    <tr>
+        <td>identifier</td>
+        <td>MUST with data manager</td>
+        <td>Array of <i>PropertyValue</i> entities represented by each @id property. e.g. <code>[{"@id":"#e-Rad:123456"}]</code>. </td>
+        <td>人物固有のID (e-Rad課題番号を含む)</td>
+        <td>common metadata:13.データ作成者のe-Rad研究者番号</td>
+    </tr>
+    <tr>
+        <td>affiliation</td>
+        <td>MUST</td>
+        <td>Array of <i>Affiliation</i> entities represented by each @id property. e.g. <code>[{"@id":"https://ror.org/04ksd4g47"}]</code>. </td>
+        <td>研究者の所属先機関</td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#people>researchobject.org</a></td>
+    </tr>
+    <tr>
+        <td>contactPoint</td>
+        <td>SHOULD with data manager</td>
+        <td>Array of <i>ContactPoint</i> entities, represented by each @id property. e.g. <code>[{"@id":"#mailto:contact@example.com"}]</code></td>
+        <td>データ管理者の連絡先</td>
+        <td>common metadata:14.データ管理者の連絡先</td>
+    </tr>
+    <tr>
+        <td>email</td>
+        <td>SHOULD</td>
+        <td>email</td>
+        <td>研究者のメールアドレス</td>
         <td></td>
     </tr>
     <tr>
-       <th colspan="4">Affiliation / Hosting Institution / Funding Agency</th>
+       <th colspan="5">Affiliation / Hosting Institution / Funding Agency</th>
     </tr>
         <tr>
         <td>@id</td>
-        <td>must</td>
+        <td>MUST</td>
+        <td>URI, ROR is recommended</td>
         <td></td>
-        <td></td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#organizations-as-values>researchobject.org</a></td>
     </tr>
     <tr>
         <td>@type</td>
-        <td>must</td>                <td></td>
+        <td>MUST</td>
+        <td>MUST be <i>Organization</i></td>
         <td></td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#organizations-as-values>researchobject.org</a></td>
     </tr>
     <tr>
-       <th colspan="4">ContactPoint</th>
+        <td>name</td>
+        <td>MUST</td>
+        <td>string</td>
+        <td>組織名</td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#organizations-as-values>researchobject.org</a></td>
+    </tr>
+    <tr>
+        <td>address</td>
+        <td>MUST with common metadata</td>
+        <td>string</td>
+        <td>組織の住所</td>
+        <td>common metadata:14.データ管理者の連絡先</td>
+    </tr>    <tr>
+       <th colspan="5">ContactPoint</th>
     </tr>
         <tr>
         <td>@id</td>
-        <td>must</td>
+        <td>MUST</td>
+        <td><code>#mailto:{email}</code> or <code>#callto:{tel_number}</code></td>
         <td></td>
         <td></td>
     </tr>
     <tr>
         <td>@type</td>
-        <td>must</td>                <td></td>
+        <td>MUST</td>
+        <td>MUST be <i>ContactType</i></td>
         <td></td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#contact-information>researchobject.org</a></td>
     </tr>
     <tr>
-       <th colspan="4">License</th>
+        <td>email</td>
+        <td>Either <i>email</i> or <i>telephone</i> is REQUIRED</td>
+        <td>email</td>
+        <td>メールアドレス</td>
+        <td>common metadata:14.データ管理者の連絡先</td>
+    <tr>
+        <td>telephone</td>
+        <td>Either <i>email</i> or <i>telephone</i> is REQUIRED</td>
+        <td>Phone number</td>
+        <td>電話番号</td>
+        <td>common metadata:14.データ管理者の連絡先</td>
+    <tr>
+       <th colspan="5">License</th>
     </tr>
         <tr>
         <td>@id</td>
-        <td>must</td>
+        <td>MUST</td>
+        <td>URI</td>
         <td></td>
         <td></td>
     </tr>
     <tr>
         <td>@type</td>
-        <td>must</td>                <td></td>
+        <td>MUST</td>
+        <td>MUST be <i>CreativeWork</i></td>
+        <td></td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#licensing-access-control-and-copyright>researchobject.org</a></td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>MUST</td>
+        <td>string</td>
+        <td>ライセンス名</td>
+        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
+    </tr>
+    <tr>
+        <td>description</td>
+        <td>MAY</td>
+        <td>string</td>
+        <td>ライセンス概要</td>
         <td></td>
     </tr>
+    <tr>
+       <th colspan="5">Data Usage Infomation</th>
+    </tr>
+        <tr>
+        <td>@id</td>
+        <td>MAY</td>
+        <td><code>#usageInfo:{number}</code></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>@type</td>
+        <td>MAY</td>
+        <td>MUST be <i>CreativeWork</i></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>description</td>
+        <td>MAY</td>
+        <td>string</td>
+        <td>データ利用方法詳細</td>
+        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
     <tr>
        <th colspan="4">Repository</th>
     </tr>
@@ -302,20 +498,6 @@
     </tr>
     <tr>
        <th colspan="4">e-Rad ID</th>
-    </tr>
-        <tr>
-        <td>@id</td>
-        <td>must</td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>@type</td>
-        <td>must</td>                <td></td>
-        <td></td>
-    </tr>
-    <tr>
-       <th colspan="4">Data Usage Infomation</th>
     </tr>
         <tr>
         <td>@id</td>
