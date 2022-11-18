@@ -28,7 +28,7 @@
     <tr>
         <td>@id</td>
         <td>MUST</td>
-        <td>MUST end with / and SHOULD be the string ./</td>
+        <td>MUST end with <code>/</code> and SHOULD be the string <code>./</code></td>
         <td></td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#direct-properties-of-the-root-data-entity>researchobject.org</a></td>
     </tr>
@@ -58,7 +58,7 @@
         <td>MUST</td>
         <td>Array of <i>RepositoryObject</i> and <i>PropertyValue</i> entities represented by each @id property. e.g. <code>[{"@id":"https://rdm.nii.ac.jp/abcde/"},{"@id":"#e-Rad:123456"}]</code>. </td>
         <td>データ識別子 (リポジトリ情報とe-Rad課題番号を含む)</td>
-        <td>common metadata:2.e-Radの課題番号, 12.リポジトリURL・DOIリンク<br>JST:研究開発データ保存・管理の方針<br>AMED:リポジトリ情報,臨床研究情報の登録内容<br>METI:リポジトリ</td>
+        <td>common metadata:2.e-Radの課題番号, 12.リポジトリURL・DOIリンク<br>JST:研究データの所在場所<br>AMED:リポジトリ情報,臨床研究情報の登録内容<br>METI:リポジトリ</td>
     </tr>
      <tr>
         <td>dateCreated</td>
@@ -84,7 +84,7 @@
     <tr>
         <td>funder</td>
         <td>MUST</td>
-        <td>Array of <i>Funding Agency</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://orcid.com/0000-0001-2345-6789"}]</code></td>
+        <td>Array of <i>Funding Agency</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://ror.org/00097mb19"}]</code></td>
         <td>研究費用の出資者</td>
         <td>common metadata<br>1: 資金配分機関情報</td>
     </tr>
@@ -107,7 +107,7 @@
         <td>Set with <i>maintainer</i> property</td>
         <td>Array of <i>ContactPoint</i> entities, represented by each @id property. e.g. <code>[{"@id":"#mailto:contact@example.com"}]</code></td>
         <td>データ管理機関・管理者への連絡先</td>
-        <td>common metadata:14.データ管理者の連絡先<br>AMED:データ管理者の連絡先</td>
+        <td>common metadata:14.データ管理者の連絡先<br>JST:研究データの管理者の連絡先<br>AMED:データ管理者の連絡先</td>
     </tr>
     <tr>
         <td>isAccessibleForFree</td>
@@ -128,14 +128,14 @@
         <td>MUST</td>
         <td>Choose one from the [list](#accessrights-list)</td>
         <td>データセットへのアクセス状況</td>
-        <td>common metadata:11.アクセス権<br>AMED:アクセス権<br>METI:公開レベル</td>
+        <td>common metadata:11.アクセス権<br>JST:研究データの取扱い方法<br>AMED:アクセス権<br>METI:公開レベル</td>
     </tr>
     <tr>
         <td>availabilityStarts</td>
         <td>MUST if accessRights has <i>embargoed access</i></td>
         <td>Date</td>
         <td>公開猶予の場合の公開予定日</td>
-        <td>common metadata:11.公開予定日<br>AMED:公開予定日<br>METI:秘匿期間</td>
+        <td>common metadata:11.公開予定日<br>JST:公開までの猶予期間<br>AMED:公開予定日<br>METI:秘匿期間</td>
     </tr>
     <tr>
         <td>usageInfo</td>
@@ -146,17 +146,17 @@
     </tr>
     <tr>
         <td>distribution</td>
-        <td>MUST if accessRights has <i>open access</i></td>
+        <td>MAY</i></td>
         <td>Array of <i>DataDownload</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://github.com"}]</code></td>
         <td>データセットの配布情報</td>
-        <td> </td>
+        <td>JST:公開の方法<br>METI:プロジェクト終了後のリポジトリ</td>
     </tr>
     <tr>
         <td>keyword</td>
         <td>MUST</td>
         <td>string<br>Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property.</td>
         <td>分野情報, キーワード</td>
-        <td>common metadata:8.データの分野</td>
+        <td>common metadata:8.データの分野<br>AMED:データの種別</td>
     </tr>
     <tr>
         <td>hasPart</td>
@@ -171,7 +171,7 @@
     <tr>
         <td>@id</td>
         <td>MUST</td>
-        <td>MUST be either a URI Path relative to the RO Crate root, or an absolute URI. With directory, the id SHOULD end with /.<br>File Data Entries with an @id URI outside the RO-Crate Root SHOULD at the time of RO-Crate creation be directly downloadable by a simple retrieval (e.g. HTTP GET), permitting redirections and HTTP/HTTPS authentication.</td>
+        <td>MUST be either a URI Path relative to the RO Crate root, or an absolute URI. With directory, the name SHOULD end with <code>/.</code><br>File Data Entries with an @id URI outside the RO-Crate Root SHOULD at the time of RO-Crate creation be directly downloadable by a simple retrieval (e.g. HTTP GET), permitting redirections and HTTP/HTTPS authentication.</td>
         <td>対象ファイル・ディレクトリのパス</td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html#core-metadata-for-data-entities>researchobject.org</a></td>
     </tr>
@@ -194,7 +194,7 @@
         <td>MUST</td>
         <td>Array of <i>Datalist on DMP</i> entities, represented by each @id property. e.g. <code>[{"@id":"#dmp:1"}]</code></td>
         <td>DMPにおけるデータNo.</td>
-        <td>common metadata:4.データNo.</td>
+        <td>common metadata:4.データNo.<br>AMED:研究開発データ<br>METI:研究開発データNo.</td>
     </tr>
     <tr>
         <td>contentSize</td>
@@ -208,7 +208,7 @@
         <td>MAY</td>
         <td>url</td>
         <td>ファイル・ディレクトリ自体への直接URL</td>
-        <td>common metadata:12.リポジトリURL・DOIリンク</td>
+        <td></td>
     </tr>
     <tr>
         <td>sdDatePublished</td>
@@ -223,13 +223,6 @@
         <td>string<br>Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property.</td>
         <td>分野情報, キーワード</td>
         <td>AMED:データの種別</td>
-    </tr>
-    <tr>
-        <td>identifier</td>
-        <td>MAY</td>
-        <td>Array of <i>PropertyValue</i> entities represented by each @id property. e.g. <code>[{"@id":"#e-Rad:123456"}]</code>. </td>
-        <td>データ識別子</td>
-        <td>AMED:臨床研究情報の登録内容</td>
     </tr>
     <tr>
        <th colspan="5">Datalist on DMP</th>
@@ -261,6 +254,13 @@
         <td>string</td>
         <td>DMPにおけるデータの説明</td>
         <td>common metadata:7.データの説明<br>JST:データ概要<br>AMED:データの説明<br>METI:研究開発データの説明</td>
+    </tr>
+    <tr>
+        <td>identifier</td>
+        <td>MAY</td>
+        <td>Array of <i>PropertyValue</i> entities represented by each @id property. e.g. <code>[{"@id":"#e-Rad:123456"}]</code>. </td>
+        <td>データ識別子</td>
+        <td>AMED:臨床研究情報の登録内容</td>
     </tr>
     <tr>
         <td>creator</td>
@@ -327,7 +327,7 @@
     </tr>
     <tr>
         <td>measurementTechnique</td>
-        <td>SHOULD</td>
+        <td>MUST with METI</td>
         <td>string</td>
         <td>データの取得方法</td>
         <td>METI:取得方法</td>
@@ -360,12 +360,12 @@
         <td>name</td>
         <td>MUST</td>
         <td>string<br>In order of firstname, familyname</td>
-        <td>研究者氏名</td>
-        <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#people>researchobject.org</a><br>common metadata:13.データ作成者<br>AMED:研究開発代表者,データ管理者,データ関連人材</td>
+        <td>研究者氏名, データ管理者氏名</td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#people>researchobject.org</a><br>common metadata:13.データ作成者<br>JST:研究代表者<br>AMED:研究開発代表者,データ管理者,データ関連人材</td>
     </tr>
     <tr>
         <td>identifier</td>
-        <td>MUST with data manager</td>
+        <td>MUST with data manager(common metadata)</td>
         <td>Array of <i>PropertyValue</i> entities represented by each @id property. e.g. <code>[{"@id":"#e-Rad:123456"}]</code>. </td>
         <td>人物固有のID (e-Rad課題番号を含む)</td>
         <td>common metadata:13.データ作成者のe-Rad研究者番号</td>
@@ -396,7 +396,7 @@
         <td>MUST with AMED research representative</td>
         <td>string, e.g. <code>"representative"</code></td>
         <td>研究者の肩書き</td>
-        <td>AMED:研究開発代表者</td>
+        <td>JST:研究代表者<br>AMED:研究開発代表者</td>
     </tr>    <tr>
        <th colspan="5">Affiliation / Hosting Institution / Funding Agency</th>
     </tr>
@@ -426,7 +426,7 @@
         <td>MUST with common metadata if organization is data maintainer</td>
         <td>string</td>
         <td>組織の住所</td>
-        <td>common metadata:14.データ管理者の連絡先</td>
+        <td>common metadata:14.データ管理者の連絡先<br>AMED:データ管理者の所属先の住所</td>
     </tr>   
      <tr>
        <th colspan="5">ContactPoint</th>
@@ -533,7 +533,7 @@
         <td>MUST</td>
         <td>string</td>
         <td>リポジトリ名</td>
-        <td>common metadata:12.リポジトリ情報<br>JST:研究開発データ保存・管理の方針<br><br>AMED:リポジトリ情報<br>METI:リポジトリ</td>
+        <td>common metadata:12.リポジトリ情報<br>JST:研究開発データ保存・管理の方針<br>AMED:リポジトリ情報<br>METI:リポジトリ</td>
     </tr>
     <tr>
         <td>description</td>
@@ -550,7 +550,7 @@
         <td>MUST if add this entity</td>
         <td>URI</td>
         <td></td>
-        <td>METI:プロジェクト終了後のリポジトリ</td>
+        <td>JST:公開の方法<br>METI:プロジェクト終了後のリポジトリ</td>
     </tr>
     <tr>
         <td>@type</td>
@@ -564,7 +564,7 @@
         <td>MUST if add this entity</td>
         <td>URI, which is the same as @id property</i></td>
         <td>データを取得可能なURL</td>
-        <td>METI:プロジェクト終了後のリポジトリ</td>
+        <td>JST:公開の方法<br>METI:プロジェクト終了後のリポジトリ</td>
     <tr>
        <th colspan="5">e-Rad ID</th>
     </tr>
@@ -585,7 +585,7 @@
     <tr>
         <td>name</td>
         <td>MUST</td>
-        <td>Select <code>Project ID</code> or <code>Researcher Number</code></td>
+        <td>Select <code>e-Rad Project ID</code> or <code>e-Rad Researcher Number</code></td>
         <td>e-Rad番号の種別</td>
         <td>common metadata:2.e-Radの課題番号, 13.データ作成者のe-Rad研究番号, 14.データ管理者のe-Rad研究番号</td>
     </tr>
@@ -655,7 +655,7 @@
         <td>result</td>
         <td>MUST if add this entity</td>
         <td>@id property of <i>dmp Datalist</i> entity</td>
-        <td>対応するdmp</td>
+        <td>対応するdmpのデータNo.</td>
         <td></td>
     </tr>
     <tr>
@@ -685,7 +685,8 @@
     </table>
 
 ## dmpFormat List
-- common_metadata
+- common metadata
+    - 2022/11現在, GRDMで選択可能なものはこれのみ
 - JST
 - AMED
 - METI
