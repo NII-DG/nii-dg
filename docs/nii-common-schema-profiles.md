@@ -1,8 +1,14 @@
 # NII Common Schema Profiles
 ## 対象としたdmp定義
-- 「公的資金による研究データの管理・利活用に関する基本的な考え方」におけるメタデータの共通項目
+- 内閣府「[公的資金による研究データの管理・利活用](https://www8.cao.go.jp/cstp/kenkyudx.html)に関する基本的な考え方」におけるメタデータの共通項目
     - 以下 `common metadata`とする
     - 参考: [PDF](https://www8.cao.go.jp/cstp/common_metadata_elements.pdf)
+- 科学技術振興機構
+    - 以下`JST`とする
+    - 参考:[PDF](https://www.jst.go.jp/pr/intro/openscience/guideline_openscience_r4.pdf)
+- 日本医療研究開発機構
+    - 以下 `AMED`とする
+    - 参考: [AMED HP](https://www.amed.go.jp/koubo/datamanagement.html)
 
 ## profiles
 <table>
@@ -35,7 +41,7 @@
         <td>MUST</td>
         <td>string<br>SHOULD identify the dataset to humans well enough to disambiguate it from other RO-Crates</td>
         <td>title of research project</td>
-        <td><a href=https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#direct-properties-of-the-root-data-entity>researchobject.org</a><br>common metadata:3.プロジェクト名</td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#direct-properties-of-the-root-data-entity>researchobject.org</a><br>common metadata:3.プロジェクト名<br>AMED:研究開発課題名</td>
     </tr>
     <tr>
         <td>description</td>
@@ -49,7 +55,7 @@
         <td>MUST</td>
         <td>Array of <i>RepositoryObject</i> and <i>PropertyValue</i> entities represented by each @id property. e.g. <code>[{"@id":"https://rdm.nii.ac.jp/abcde/"},{"@id":"#e-Rad:123456"}]</code>. </td>
         <td>データ識別子 (リポジトリ情報とe-Rad課題番号を含む)</td>
-        <td>common metadata:2.e-Radの課題番号, 12.リポジトリURL・DOIリンク</td>
+        <td>common metadata:2.e-Radの課題番号, 12.リポジトリURL・DOIリンク<br>AMED:リポジトリ情報,臨床研究情報の登録内容</td>
     </tr>
      <tr>
         <td>dateCreated</td>
@@ -70,7 +76,7 @@
         <td>MUST</td>
         <td>Array of <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://orcid.com/0000-0001-2345-6789"}]</code></td>
         <td>データ作成者の一覧</td>
-        <td>common metadata<br>13: データ作成者</td>
+        <td>common metadata:13.データ作成者<br>AMED:データ関連人材</td>
     </tr>
     <tr>
         <td>funder</td>
@@ -91,14 +97,14 @@
         <td>MUST</td>
         <td>Array of <i> Hosting Instituion</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://orcid.com/0000-0001-2345-6789"}]</code></td>
         <td>データ管理機関・管理者</td>
-        <td>common metadata:14.データ管理機関, 14.データ管理者<br>JST:研究責任者</td>
+        <td>common metadata:14.データ管理機関, 14.データ管理者<br>JST:研究責任者<br>AMED:データ管理機関, データ管理者</td>
     </tr>
     <tr>
         <td>contactPoint</td>
         <td>Set with <i>maintainer</i> property</td>
         <td>Array of <i>ContactPoint</i> entities, represented by each @id property. e.g. <code>[{"@id":"#mailto:contact@example.com"}]</code></td>
         <td>データ管理機関・管理者への連絡先</td>
-        <td>common metadata:14.データ管理者の連絡先</td>
+        <td>common metadata:14.データ管理者の連絡先<br>AMED:データ管理者の連絡先</td>
     </tr>
     <tr>
         <td>isAccessibleForFree</td>
@@ -112,13 +118,6 @@
         <td>MUST</td>
         <td>Array of <i>CreativeWork</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://creativecommons.org/licenses/by/4.0"}]</code></td>
         <td>ライセンス情報</td>
-        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
-    </tr>
-    <tr>
-        <td>usageInfo</td>
-        <td>Can be added to root data entity if commons to all dataset</td>
-        <td>Array of <i>CreativeWork</i> entities, represented by each @id property. e.g. <code>[{"@id":"#usageInfo:1"}]</code></td>
-        <td>その他引用時条件等</td>
         <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
     </tr>
     <tr>
@@ -136,18 +135,25 @@
         <td>common metadata<br>11: 公開予定日 </td>
     </tr>
     <tr>
+        <td>usageInfo</td>
+        <td>Can be added to root data entity if commons to all dataset</td>
+        <td>Array of <i>CreativeWork</i> entities, represented by each @id property. e.g. <code>[{"@id":"#usageInfo:1"}]</code></td>
+        <td>その他引用時条件もしくは非公開の理由</td>
+        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
+    </tr>
+    <tr>
         <td>distribution</td>
         <td>MUST if accessRights has <i>open access</i></td>
         <td>Array of <i>DataDownload</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://github.com"}]</code></td>
         <td>データセットの配布情報</td>
         <td> </td>
     </tr>
-  <tr>
+    <tr>
         <td>keyword</td>
         <td>MUST</td>
         <td>string<br>Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property.</td>
         <td>分野情報, キーワード</td>
-        <td>common metadata<br>8: データの分野</td>
+        <td>common metadata:8.データの分野</td>
     </tr>
     <tr>
         <td>hasPart</td>
@@ -192,7 +198,7 @@
         <td>SHOULD</td>
         <td>string</td>
         <td>ファイルサイズ</td>
-        <td>common metadata:12.概略データ量</td>
+        <td>ガバナンスに利用</td>
     </tr>
     <tr>
         <td>url</td>
@@ -208,6 +214,19 @@
         <td>外部ファイルの取得日時</td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html#web-based-data-entities>researchobject.org</a></td>
     </tr>
+    <tr>
+        <td>keyword</td>
+        <td>MUST with AMED</td>
+        <td>string<br>Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property.</td>
+        <td>分野情報, キーワード</td>
+        <td>AMED:データの種別</td>
+    </tr>
+    <tr>
+        <td>identifier</td>
+        <td>MAY</td>
+        <td>Array of <i>PropertyValue</i> entities represented by each @id property. e.g. <code>[{"@id":"#e-Rad:123456"}]</code>. </td>
+        <td>データ識別子</td>
+        <td>AMED:臨床研究情報の登録内容</td>
     </tr>
     <tr>
        <th colspan="5">Datalist on DMP</th>
@@ -231,32 +250,32 @@
         <td>MUST</td>
         <td>string</td>
         <td>DMPにおけるデータ名称</td>
-        <td>common metadata:5.データの名称<br>JST:研究開発データ名称</td>
+        <td>common metadata:5.データの名称<br>JST:研究開発データ名称<br>AMED:データの名称</td>
     </tr>
     <tr>
         <td>description</td>
         <td>MUST</td>
         <td>string</td>
         <td>DMPにおけるデータの説明</td>
-        <td>common metadata:7.データの説明<br>JST:データ概要</td>
+        <td>common metadata:7.データの説明<br>JST:データ概要<br>AMED:データの説明</td>
     </tr>
     <tr>
         <td>creator</td>
-        <td>MUST</td>
+        <td>MUST if different from the root data entity</td>
         <td>With dmp of common metadata, array of <i>Person</i> entities.<br>With dmp of JST, array of <i>Affiliation</i> entities.</td>
         <td>データ作成者</td>
         <td>common metadata:13.データ作成者<br>JST:データ取得者</td>
     </tr>
     <tr>
         <td>maintainer</td>
-        <td>MUST</td>
+        <td>MUST if different from the root data entity</td>
         <td>Array of <i> Hosting Instituion</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://orcid.com/0000-0001-2345-6789"}]</code></td>
         <td>データ管理機関・管理者</td>
         <td>common metadata:14.データ管理機関, 14.データ管理者<br>JST:データ取得者</td>
     </tr>
     <tr>
         <td>contactPoint</td>
-        <td>MUST with common metadata</td>
+        <td>MUST with common metadata and if different from the root data entity</td>
         <td>Array of <i>ContactPoint</i> entities, represented by each @id property. e.g. <code>[{"@id":"#mailto:contact@example.com"}]</code></td>
         <td>データ管理機関・管理者への連絡先</td>
         <td>common metadata:14.データ管理者の連絡先</td>
@@ -276,32 +295,32 @@
         <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
     </tr>
     <tr>
-        <td>usageInfo</td>
-        <td>MAY</td>
-        <td>Array of <i>CreativeWork</i> entities, represented by each @id property. e.g. <code>[{"@id":"#usageInfo:1"}]</code></td>
-        <td>その他引用時条件等</td>
-        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
-    </tr>
-    <tr>
         <td>accessRights</td>
         <td>MUST if different from the root data entity</td>
         <td>Choose one from the <a id=accessrights-list>list</a></td>
         <td>データセットへのアクセス状況</td>
-        <td>common metadata:11.アクセス権<br>JST:研究開発データの公開/非公開の方針</td>
+        <td>common metadata:11.アクセス権<br>JST:研究開発データの公開/非公開の方針<br>AMED:アクセス権</td>
     </tr>
     <tr>
         <td>availabilityStarts</td>
         <td>MUST if accessRights has <i>embargoed access</i> and different from the root data entity</td>
         <td>Date</td>
         <td>公開猶予の場合の公開予定日</td>
-        <td>common metadata:11.公開予定日 </td>
+        <td>common metadata:11.公開予定日<br>AMED:公開予定日</td>
+    </tr>
+    <tr>
+        <td>usageInfo</td>
+        <td>MAY</td>
+        <td>Array of <i>CreativeWork</i> entities, represented by each @id property. e.g. <code>[{"@id":"#usageInfo:1"}]</code></td>
+        <td>その他引用時条件もしくは非公開の理由</td>
+        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制</td>
     </tr>
     <tr>
         <td>contentSize</td>
         <td>SHOULD</td>
         <td>string</td>
         <td>ファイルサイズ</td>
-        <td>common metadata:12.概略データ量</td>
+        <td>common metadata:12.概略データ量<br>AMED:概略データ量</td>
     </tr>
     <tr>
        <th colspan="5">Creator / Data Manager</th>
@@ -356,6 +375,12 @@
         <td></td>
     </tr>
     <tr>
+        <td>jobTitle</td>
+        <td>MUST with AMED research representative</td>
+        <td>string, e.g. <code>"representative"</code></td>
+        <td>研究者の肩書き</td>
+        <td>AMED:研究開発代表者</td>
+    </tr>    <tr>
        <th colspan="5">Affiliation / Hosting Institution / Funding Agency</th>
     </tr>
         <tr>
@@ -490,7 +515,7 @@
         <td>MUST</td>
         <td>string</td>
         <td>リポジトリ名</td>
-        <td>common metadata:12.リポジトリ情報</td>
+        <td>common metadata:12.リポジトリ情報<br>AMED:リポジトリ情報</td>
     </tr>
     <tr>
         <td>description</td>
@@ -553,7 +578,93 @@
         <td>e-RadのID</td>
         <td>common metadata:2.e-Radの課題番号, 13.データ作成者のe-Rad研究番号, 14.データ管理者のe-Rad研究番号</td>
     </tr>
-</table>
+   <tr>
+       <th colspan="5">Other Idenrifier</th>
+    </tr>
+        <tr>
+        <td>@id</td>
+        <td>MUST if add this entity</td>
+        <td>ID category and number, e.g.<code>#jRCT:{jRCT ID}</code></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>@type</td>
+        <td>MUST if add this entity</td>
+        <td>MUST be <i>PropertyValue</i></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>MUST</td>
+        <td>name of data registry system</td>
+        <td>データ登録システムの名称</td>
+        <td>AMED:臨床研究情報の登録内容</td>
+    </tr>
+    <tr>
+        <td>value</td>
+        <td>MUST</td>
+        <td>string</td>
+        <td>登録しているID</td>
+        <td>AMED:臨床研究情報の登録内容</td>
+    </tr>
+    <tr>
+       <th colspan="5">Informed Consent</th>
+    </tr>
+        <tr>
+        <td>@id</td>
+        <td>MUST if add this entity</td>
+        <td><code>#IC:{number}</code></td>
+        <td></td>
+        <td>AMED:個人同意（IC）の有無</td>
+    </tr>
+    <tr>
+        <td>@type</td>
+        <td>MUST if add this entity</td>
+        <td>MUST be <i>AgreeAction</i></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>object</td>
+        <td>MUST if add this entity</td>
+        <td>@id property of <i>Consent Form</i> entity<br>If the form is included in data entities, can be @id property of the entity</td>
+        <td>同意書</td>
+        <td>AMED:同意事項の範囲</td>
+    </tr>
+    <tr>
+        <td>result</td>
+        <td>MUST if add this entity</td>
+        <td>@id property of <i>dmp Datalist</i> entity</td>
+        <td>対応するdmp</td>
+        <td></td>
+    </tr>
+    <tr>
+       <th colspan="5">Consent Form</th>
+    </tr>
+        <tr>
+        <td>@id</td>
+        <td>MUST if add this entity</td>
+        <td>If use AMED format <code>"https://www.amed.go.jp/content/000091653.pdf"</code> else <code>"#consentform:{number}"</code> or its URI</td>
+        <td></td>
+        <td>AMED:同意事項の範囲</td>
+    </tr>
+    <tr>
+        <td>@type</td>
+        <td>MUST if add this entity</td>
+        <td>MUST be <i>CreativeWork</i></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>MUST if add this entity</td>
+        <td>string</td>
+        <td>同意書名</td>
+        <td></td>
+    </tr>
+    </table>
 
 ## dmpFormat List
 - common_metadata
@@ -561,6 +672,7 @@
 - AMED
 - NEDO
 - BRAIN
+- METI
 
 ## accessRights List
 - open access
