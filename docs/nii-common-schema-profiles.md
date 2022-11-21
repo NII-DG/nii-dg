@@ -86,12 +86,12 @@
         <td>MUST</td>
         <td>Array of <i>Funding Agency</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://ror.org/00097mb19"}]</code></td>
         <td>研究費用の出資者</td>
-        <td>common metadata<br>1: 資金配分機関情報</td>
+        <td>common metadata:1.資金配分機関情報</td>
     </tr>
      <tr>
         <td>dmpFormat</td>
         <td>MUST</td>
-        <td>Choose one from the [list](#dmpformat-list)</td>
+        <td>Choose one from the list</td>
         <td>DMPの様式</td>
         <td>ガバナンスに利用</td>
     </tr>
@@ -104,7 +104,7 @@
     </tr>
     <tr>
         <td>contactPoint</td>
-        <td>Set with <i>maintainer</i> property</td>
+        <td>MUST</td>
         <td>Array of <i>ContactPoint</i> entities, represented by each @id property. e.g. <code>[{"@id":"#mailto:contact@example.com"}]</code></td>
         <td>データ管理機関・管理者への連絡先</td>
         <td>common metadata:14.データ管理者の連絡先<br>JST:研究データの管理者の連絡先<br>AMED:データ管理者の連絡先</td>
@@ -126,7 +126,7 @@
     <tr>
         <td>accessRights</td>
         <td>MUST</td>
-        <td>Choose one from the [list](#accessrights-list)</td>
+        <td>Choose one from the list</td>
         <td>データセットへのアクセス状況</td>
         <td>common metadata:11.アクセス権<br>JST:研究データの取扱い方法<br>AMED:アクセス権<br>METI:公開レベル</td>
     </tr>
@@ -300,7 +300,7 @@
     <tr>
         <td>accessRights</td>
         <td>MUST if different from the root data entity</td>
-        <td>Choose one from the <a id=accessrights-list>list</a></td>
+        <td>Choose one from the list</td>
         <td>データセットへのアクセス状況</td>
         <td>common metadata:11.アクセス権<br>JST:研究開発データの公開/非公開の方針<br>AMED:アクセス権<br>METI:公開レベル</td>
     </tr>
