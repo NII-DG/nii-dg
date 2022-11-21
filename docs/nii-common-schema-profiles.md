@@ -20,11 +20,10 @@
         <td>Required?</td>
         <td>Format</td>
         <td>Description</td>
-        <td>Data Source</td>
-        <td>ガバナンスでの利用</td>
+        <td>Why needed</td>
     </tr>
     <tr>
-       <th colspan="6">RootDataEntity</th>
+       <th colspan="5">RootDataEntity</th>
     </tr>
     <tr>
         <td>@id</td>
@@ -32,7 +31,6 @@
         <td>MUST end with <code>/</code> and SHOULD be the string <code>./</code></td>
         <td></td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#direct-properties-of-the-root-data-entity>researchobject.org</a></td>
-        <td></td>
     </tr>
     <tr>
         <td>@type</td>
@@ -40,7 +38,6 @@
         <td>MUST be <i>Dataset</i></td>
         <td></td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#direct-properties-of-the-root-data-entity>researchobject.org</a></td>
-        <td></td>
     </tr>
     <tr>
         <td>name</td>
@@ -48,7 +45,6 @@
         <td>string<br>SHOULD identify the dataset to humans well enough to disambiguate it from other RO-Crates</td>
         <td>title of research project</td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#direct-properties-of-the-root-data-entity>researchobject.org</a><br>common metadata:3.プロジェクト名<br>AMED:研究開発課題名<br>METI:契約件名</td>
-        <td></td>
     </tr>
     <tr>
         <td>description</td>
@@ -56,7 +52,6 @@
         <td>string<br>SHOULD further elaborate on the name to provide a summary of the context in which the dataset is important.</td>
         <td>description of research project</td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#direct-properties-of-the-root-data-entity>researchobject.org</a><br>Gakunin RDM:プロジェクトの説明</td>
-        <td></td>
     </tr>
     <tr>
         <td>identifier</td>
@@ -64,7 +59,6 @@
         <td>Array of <i>RepositoryObject</i> and <i>PropertyValue</i> entities represented by each @id property. e.g. <code>[{"@id":"https://rdm.nii.ac.jp/abcde/"},{"@id":"#e-Rad:123456"}]</code>. </td>
         <td>データ識別子 (リポジトリ情報とe-Rad課題番号を含む)</td>
         <td>common metadata:2.e-Radの課題番号, 12.リポジトリURL・DOIリンク<br>JST:研究データの所在場所<br>AMED:リポジトリ情報,臨床研究情報の登録内容<br>METI:リポジトリ</td>
-        <td>リポジトリ情報が含まれているか</td>
     </tr>
      <tr>
         <td>dateCreated</td>
