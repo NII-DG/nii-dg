@@ -1,5 +1,4 @@
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime,timezone, timedelta
 
 
 class Entity():
@@ -23,7 +22,7 @@ class Entity():
         self._jsonld['name'] = name
 
     def add_properties(self, properties):
-        self._jsonld |= properties
+        self._jsonld.update(properties)
 
     def get(self, property_name):
         return self._jsonld.get(property_name)
@@ -50,7 +49,7 @@ class RootDataEntity(DataEntity):
         val = {
             "@id": self.id,
             "@type": self.type,
-            "datePublished": datetime.now(ZoneInfo("Asia/Tokyo")).isoformat(),
+            "datePublished": datetime.now(timezone(timedelta(hours=9))).isoformat(),
         }
         return val
 

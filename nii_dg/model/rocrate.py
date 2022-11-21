@@ -1,6 +1,6 @@
 import json
 
-from nii_dg.entities import (ContextEntity, DataEntity, Entity, Metadata,
+from nii_dg.model.entities import (ContextEntity, DataEntity, Entity, Metadata,
                              RootDataEntity)
 
 
@@ -47,7 +47,7 @@ class NIIROCrate(ROCrate):
     EXTRA_TERMS = {
         "accessRights": "http://purl.org/dc/terms/accessRights",
         "dmpFormat": "https://example.com/dmpFormat",  # to be updated
-        "dataManagementPlan": "https://example.com/dataManagementPlan"  # to be updated
+        "dmpDataNumber": "https://example.com/dataManagementPlan"  # to be updated
     }
 
     def __init__(self, dmp):

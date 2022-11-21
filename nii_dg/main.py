@@ -20,7 +20,7 @@ def set_dmp_format(dict):
     dmp_f = dict.get('dmp_format')
     if (dmp_f is None):
         raise ValidationError('property "dmp_format" is missing.')
-    dmp_f = dmp_f.replace(' ', '')
+    dmp_f = dmp_f.replace(' ', '_')
 
     input_schema = dmp_f + '_schema.json'
     with open(input_schema) as js:
