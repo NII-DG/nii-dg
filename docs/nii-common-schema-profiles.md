@@ -367,7 +367,7 @@
         <td>identifier</td>
         <td>MUST with data manager(common metadata)</td>
         <td>Array of <i>PropertyValue</i> entities represented by each @id property. e.g. <code>[{"@id":"#e-Rad:123456"}]</code>. </td>
-        <td>人物固有のID (e-Rad課題番号を含む)</td>
+        <td>人物固有のID (e-Rad研究者番号を含む)</td>
         <td>common metadata:13.データ作成者のe-Rad研究者番号</td>
     </tr>
     <tr>
@@ -597,7 +597,7 @@
         <td>common metadata:2.e-Radの課題番号, 13.データ作成者のe-Rad研究番号, 14.データ管理者のe-Rad研究番号</td>
     </tr>
    <tr>
-       <th colspan="5">Other Idenrifier</th>
+       <th colspan="5">Other Identifier</th>
     </tr>
         <tr>
         <td>@id</td>
