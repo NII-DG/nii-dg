@@ -1,5 +1,5 @@
 import json
-
+import os
 import jsonschema
 from nii_dg.model.rocrate import NIIROCrate
 
@@ -22,8 +22,8 @@ def set_dmp_format(dict):
         raise ValidationError('property "dmp_format" is missing.')
     dmp_f = dmp_f.replace(' ', '_')
 
-    input_schema = dmp_f + '_schema.json'
-    with open(input_schema) as js:
+    input_schema = '/' + dmp_f + '_schema.json'
+    with open(os.path.dirname(__file__) +input_schema) as js:
         schema = json.load(js)
 
     error_messages = []
@@ -37,7 +37,7 @@ def set_dmp_format(dict):
     return NIIROCrate(dict)
 
 
-def generate_rocrate(dmp_path=None):
+def generate_rocrate(dmp_path=None, dir_path=None):
     if dmp_path is None:
         dmp_path = input('dmp.json path:')
     metadata = read_dmp(dmp_path)
@@ -49,6 +49,7 @@ def generate_rocrate(dmp_path=None):
     crate.set_creators()
     crate.set_affiliations()
     crate.overwrite()
+    crate.load_data_dir(dir_path)
     roc = crate.generate()
 
     with open('ro-crate-metadata.json', 'w') as f:

@@ -1,8 +1,18 @@
 import json
+import os
 
-from nii_dg.model.entities import (ContextEntity, DataEntity, Entity, Metadata,
+from nii_dg.model.entities import (ContextEntity, DataEntity, Metadata,
                              RootDataEntity)
 
+def get_dir_size(path='.'):
+    total = 0
+    with os.scandir(path) as it:
+        for entry in it:
+            if entry.is_file():
+                total += entry.stat().st_size
+            elif entry.is_dir():
+                total += get_dir_size(entry.path)
+    return total
 
 class ValidationError(Exception):
     pass
@@ -14,6 +24,7 @@ class ROCrate():
         self.metadata = Metadata()
         self.rootdataentity = RootDataEntity()
         self.entities = [self.metadata, self.rootdataentity]
+        self.data_entities = []
 
     def get_by_type(self, e_type):
         ents = []
@@ -33,11 +44,19 @@ class ROCrate():
         e.add_properties(properties)
         self.entities.append(e)
 
+    def add_dataentity(self, id, e_type, properties):
+        e = DataEntity(id, e_type)
+        e.add_properties(properties)
+        self.data_entities.append(e)
+
     def generate(self):
         graph = []
         for entity in self.entities:
             graph.append(entity.get_jsonld())
         context = f'{self.metadata.PROFILE}/context'
+        if self.data_entities:
+            for entity in self.data_entities:
+                graph.append(entity.get_jsonld())
         if self.extra_terms:
             context = [context, self.extra_terms]
         return {'@context': context, '@graph': graph}
@@ -54,6 +73,31 @@ class NIIROCrate(ROCrate):
         super().__init__()
         self.extra_terms = self.EXTRA_TERMS
         self.dmp = dmp
+
+    def load_data_dir(self, data_dir):
+        file_list = []
+
+        if data_dir is None:
+            return
+
+        for root, dirs, files in os.walk(data_dir, topdown=False):
+
+            for f in files:
+                if f == 'ro-crate-metadata.json':
+                    continue
+                f_path = os.path.join(root, f)
+                abs_path = f_path.replace(data_dir +'/', '')
+                self.add_dataentity(abs_path, 'File', {"fileSize":os.path.getsize(f_path)})
+                file_list.append({"@id": abs_path})
+                
+            for dir in dirs:
+                d_path = os.path.join(root, dir)
+                abs_path = d_path.replace(data_dir, '') + '/'
+                self.add_dataentity(abs_path, 'Dataset', {"fileSize":get_dir_size(d_path)})
+                file_list.append({"@id": abs_path})        
+
+        self.rootdataentity.add_properties({'hasPart': file_list})
+
 
     def set_project_name(self):
         self.rootdataentity._jsonld["project_name"] = self.dmp["project_name"]
