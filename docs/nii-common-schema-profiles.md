@@ -574,21 +574,21 @@
     </tr>
         <tr>
         <td>@id</td>
-        <td>MUST</td>
+        <td>MUST if add this entity</td>
         <td>SHOULD be PRONUM identifier</td>
         <td>ファイルタイプのPRONUM</td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html#adding-detailed-descriptions-of-encodings>researchobject.org</a></td>
     </tr>
     <tr>
         <td>@type</td>
-        <td>MUST</td>
+        <td>MUST if add this entity</td>
         <td>SHOULD be <i>Website</i></td>
         <td></td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html#adding-detailed-descriptions-of-encodings>researchobject.org</a></td>
     </tr>
     <tr>
         <td>name</td>
-        <td>MUST</td>
+        <td>MUST if add this entity</td>
         <td>string</td>
         <td>ファイルタイプの名称</td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html#adding-detailed-descriptions-of-encodings>researchobject.org</a></td>

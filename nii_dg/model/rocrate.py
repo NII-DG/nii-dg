@@ -1,5 +1,6 @@
 import json
 import os
+import mimetypes
 
 from nii_dg.model.entities import (ContextEntity, DataEntity, Metadata,
                              RootDataEntity)
