@@ -88,8 +88,9 @@ class NIIROCrate(ROCrate):
                     continue
                 f_path = os.path.join(root, f)
                 abs_path = f_path.replace(data_dir +'/', '')
+                mime = mimetypes.guess_type(f_path)
                 self.add_dataentity(abs_path, 'File', 
-                {"name":f, "fileSize": str(os.path.getsize(f_path))+'B'})
+                {"name":f, "fileSize": str(os.path.getsize(f_path))+'B', "encodingFormat":mime[0]})
                 file_list.append({"@id": abs_path})
                 
             for dir in dirs:
