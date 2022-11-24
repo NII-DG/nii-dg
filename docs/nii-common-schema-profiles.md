@@ -111,7 +111,7 @@
     </tr>
     <tr>
         <td>isAccessibleForFree</td>
-        <td>MUST if accessRights has <i>open access</i></td>
+        <td>MUST if accessRights has <i>restricted access</i></td>
         <td>boolean</td>
         <td>データ利用時の有償・無償</td>
         <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制<br>METI:研究開発データの利活用・提供方針</td>
@@ -139,7 +139,7 @@
     </tr>
     <tr>
         <td>usageInfo</td>
-        <td>Can be added to root data entity if commons to all dataset</td>
+        <td>SHOULD</td>
         <td>Array of <i>CreativeWork</i> entities, represented by each @id property. e.g. <code>[{"@id":"#usageInfo:1"}]</code></td>
         <td>その他引用時条件もしくは非公開の理由</td>
         <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制<br>METI:秘匿理由</td>
@@ -147,13 +147,13 @@
     <tr>
         <td>distribution</td>
         <td>MAY</i></td>
-        <td>Array of <i>DataDownload</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://github.com"}]</code></td>
+        <td>Array of <i>DataDownload</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://github.com/github/gitignore"}]</code></td>
         <td>データセットの配布情報</td>
         <td>JST:公開の方法<br>METI:プロジェクト終了後のリポジトリ</td>
     </tr>
     <tr>
         <td>keyword</td>
-        <td>MUST</td>
+        <td>MUST with common metadata</td>
         <td>string<br>Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property.</td>
         <td>分野情報, キーワード</td>
         <td>common metadata:8.データの分野<br>AMED:データの種別</td>
@@ -161,7 +161,7 @@
     <tr>
         <td>hasPart</td>
         <td>MUST</td>
-        <td>Array of <i>data entities</i>, represented by each @id property. e.g. <code>[{"@id":"input/"},{"@id":"input/parametors.txt"}]</code></td>
+        <td>Array of <i>data entities</i>, represented by each @id property. e.g. <code>[{"@id":"input/"},{"@id":"input/parameters.txt"}]</code></td>
         <td>対象ファイル・ディレクトリの一覧</td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html>reserachobject.org</td>
     </tr>
@@ -198,7 +198,7 @@
     </tr>
     <tr>
         <td>contentSize</td>
-        <td>SHOULD</td>
+        <td>MUST</td>
         <td>string</td>
         <td>ファイルサイズ</td>
         <td>ガバナンスに利用</td>
@@ -229,10 +229,10 @@
     </tr>
         <tr>
         <td>@id</td>
-        <td>must</td>
+        <td>MUST</td>
         <td>data No. of dmp documents, e.g. <code>"#dmp:1"</code></td>
         <td>DMPにおけるデータNo.</td>
-        <td>common metadata:4.データNo.</td>
+        <td>common metadata:4.データNo.<br>AMED:研究開発データ<br>METI:研究開発データNo.</td>
     </tr>
     <tr>
         <td>@type</td>
@@ -562,4 +562,141 @@
     <tr>
         <td>downloadUrl</td>
         <td>MUST if add this entity</td>
-        <td>URI, which is the same as @id
+        <td>URI, which is the same as @id property</i></td>
+        <td>データを取得可能なURL</td>
+        <td>JST:公開の方法<br>METI:プロジェクト終了後のリポジトリ</td>
+    <tr>
+       <th colspan="5">e-Rad ID</th>
+    </tr>
+        <tr>
+        <td>@id</td>
+        <td>MUST if add this entity</td>
+        <td><code>#e-Rad:{e-Rad ID}</code></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>@type</td>
+        <td>MUST if add this entity</td>
+        <td>MUST be <i>PropertyValue</i></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>MUST</td>
+        <td>Select <code>e-Rad Project ID</code> or <code>e-Rad Researcher Number</code></td>
+        <td>e-Rad番号の種別</td>
+        <td>common metadata:2.e-Radの課題番号, 13.データ作成者のe-Rad研究番号, 14.データ管理者のe-Rad研究番号</td>
+    </tr>
+    <tr>
+        <td>value</td>
+        <td>MUST</td>
+        <td>e-Rad ID</td>
+        <td>e-RadのID</td>
+        <td>common metadata:2.e-Radの課題番号, 13.データ作成者のe-Rad研究番号, 14.データ管理者のe-Rad研究番号</td>
+    </tr>
+   <tr>
+       <th colspan="5">Other Identifier</th>
+    </tr>
+        <tr>
+        <td>@id</td>
+        <td>MUST if add this entity</td>
+        <td>ID category and number, e.g.<code>#jRCT:{jRCT ID}</code></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>@type</td>
+        <td>MUST if add this entity</td>
+        <td>MUST be <i>PropertyValue</i></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>MUST</td>
+        <td>name of data registry system</td>
+        <td>データ登録システムの名称</td>
+        <td>AMED:臨床研究情報の登録内容</td>
+    </tr>
+    <tr>
+        <td>value</td>
+        <td>MUST</td>
+        <td>string</td>
+        <td>登録しているID</td>
+        <td>AMED:臨床研究情報の登録内容</td>
+    </tr>
+    <tr>
+       <th colspan="5">Informed Consent</th>
+    </tr>
+        <tr>
+        <td>@id</td>
+        <td>MUST if add this entity</td>
+        <td><code>#IC:{number}</code></td>
+        <td></td>
+        <td>AMED:個人同意（IC）の有無</td>
+    </tr>
+    <tr>
+        <td>@type</td>
+        <td>MUST if add this entity</td>
+        <td>MUST be <i>AgreeAction</i></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>object</td>
+        <td>MUST if add this entity</td>
+        <td>@id property of <i>Consent Form</i> entity<br>If the form is included in data entities, can be @id property of the entity</td>
+        <td>同意書</td>
+        <td>AMED:同意事項の範囲</td>
+    </tr>
+    <tr>
+        <td>result</td>
+        <td>MUST if add this entity</td>
+        <td>@id property of <i>dmp Datalist</i> entity</td>
+        <td>対応するdmpのデータNo.</td>
+        <td></td>
+    </tr>
+    <tr>
+       <th colspan="5">Consent Form</th>
+    </tr>
+        <tr>
+        <td>@id</td>
+        <td>MUST if add this entity</td>
+        <td>If use AMED format <code>"https://www.amed.go.jp/content/000091653.pdf"</code> else <code>"#consentform:{number}"</code> or its URI</td>
+        <td></td>
+        <td>AMED:同意事項の範囲</td>
+    </tr>
+    <tr>
+        <td>@type</td>
+        <td>MUST if add this entity</td>
+        <td>MUST be <i>CreativeWork</i></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>MUST if add this entity</td>
+        <td>string</td>
+        <td>同意書名</td>
+        <td></td>
+    </tr>
+    </table>
+
+## dmpFormat List
+
+- common metadata
+    -  2022/11現在, GRDMで選択可能なものはこれのみ
+- JST
+- AMED
+- METI
+    - 新エネルギー・産業技術総合開発機構(NEDO),生物系特定産業技術研究支援センター(BRAIN)はこれを選択
+
+## accessRights List
+
+- open access
+- restricted access
+- embargoed access
+- metadata only access
+- 参考: [JPCOARスキーマガイドライン](https://schema.irdb.nii.ac.jp/ja/access_rights_vocabulary)
