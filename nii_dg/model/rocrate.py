@@ -87,13 +87,15 @@ class NIIROCrate(ROCrate):
                     continue
                 f_path = os.path.join(root, f)
                 abs_path = f_path.replace(data_dir +'/', '')
-                self.add_dataentity(abs_path, 'File', {"fileSize":os.path.getsize(f_path)})
+                self.add_dataentity(abs_path, 'File', 
+                {"name":f, "fileSize":os.path.getsize(f_path)})
                 file_list.append({"@id": abs_path})
                 
             for dir in dirs:
                 d_path = os.path.join(root, dir)
                 abs_path = d_path.replace(data_dir, '') + '/'
-                self.add_dataentity(abs_path, 'Dataset', {"fileSize":get_dir_size(d_path)})
+                self.add_dataentity(abs_path, 'Dataset', 
+                {"name":dir,"fileSize":get_dir_size(d_path)})
                 file_list.append({"@id": abs_path})        
 
         self.rootdataentity.add_properties({'hasPart': file_list})
