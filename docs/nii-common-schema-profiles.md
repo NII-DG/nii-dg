@@ -13,6 +13,26 @@
     - 以下`METI`とする
     - 参考:[Web Page](https://www.meti.go.jp/policy/innovation_policy/datamanagement.html)
 
+## vocabulary
+### dmpFormat
+オリジナル語彙のため、語彙定義が必要
+- common metadata
+    -  2022/11現在, GRDMで選択可能なものはこれのみ
+- JST
+- AMED
+- METI
+    - 新エネルギー・産業技術総合開発機構(NEDO),生物系特定産業技術研究支援センター(BRAIN)はこれを選択
+
+### dmpDataNumber
+オリジナル語彙のため、語彙定義が必要
+
+### accessRights
+- open access
+- restricted access
+- embargoed access
+- metadata only access
+- 参考: [JPCOARスキーマガイドライン](https://schema.irdb.nii.ac.jp/ja/access_rights_vocabulary)
+
 ## profiles
 <table>
     <tr>
@@ -204,6 +224,13 @@
         <td>ガバナンスに利用</td>
     </tr>
     <tr>
+        <td>encodingFormat</td>
+        <td>SHOULD</td>
+        <td>Array of <i>MIME type</i> and <i>PRONOM identifier</i> entity, e.g. <code> ["application/pdf", {"@id": "https://www.nationalarchives.gov.uk/PRONOM/fmt/19"}]</code></td>
+        <td>ファイルタイプ</td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html#adding-detailed-descriptions-of-encodings>researchobject.org</a></td>
+    </tr>
+    <tr>
         <td>url</td>
         <td>MAY</td>
         <td>url</td>
@@ -258,14 +285,14 @@
     <tr>
         <td>identifier</td>
         <td>MAY</td>
-        <td>Array of <i>PropertyValue</i> entities represented by each @id property. e.g. <code>[{"@id":"#e-Rad:123456"}]</code>. </td>
+        <td>Array of <i>PropertyValue</i> entities represented by each @id property. e.g. <code>[{"@id":"#jRCT:jRCT1234567890"}]</code>. </td>
         <td>データ識別子</td>
         <td>AMED:臨床研究情報の登録内容</td>
     </tr>
     <tr>
         <td>creator</td>
         <td>MUST if different from the root data entity</td>
-        <td>Array of <i>Person</i> entities.<br>With dmp of JST, array of <i>Affiliation</i> entities.</td>
+        <td>Array of <i>Person</i> entities with common metadata.<br>Array of <i>Affiliation</i> entities with JST and METI.</td>
         <td>データ作成者</td>
         <td>common metadata:13.データ作成者<br>JST:データ取得者<br>METI:取得者</td>
     </tr>
@@ -285,7 +312,7 @@
     </tr>
     <tr>
         <td>isAccessibleForFree</td>
-        <td>MUST if accessRights has <i>open access</i> and different from the root data entity</td>
+        <td>MUST if accessRights has <i>restricted access</i> and different from the root data entity</td>
         <td>boolean</td>
         <td>データ利用時の有償・無償</td>
         <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制<br>METI:研究開発データの利活用・提供方針</td>
@@ -393,7 +420,7 @@
     </tr>
     <tr>
         <td>jobTitle</td>
-        <td>MUST with AMED research representative</td>
+        <td>MUST with research representative in JST, AMED</td>
         <td>string, e.g. <code>"representative"</code></td>
         <td>研究者の肩書き</td>
         <td>JST:研究代表者<br>AMED:研究開発代表者</td>
@@ -543,6 +570,30 @@
         <td></td>
     </tr>
     <tr>
+       <th colspan="5">Encoding Description</th>
+    </tr>
+        <tr>
+        <td>@id</td>
+        <td>MUST</td>
+        <td>SHOULD be PRONUM identifier</td>
+        <td>ファイルタイプのPRONUM</td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html#adding-detailed-descriptions-of-encodings>researchobject.org</a></td>
+    </tr>
+    <tr>
+        <td>@type</td>
+        <td>MUST</td>
+        <td>SHOULD be <i>Website</i></td>
+        <td></td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html#adding-detailed-descriptions-of-encodings>researchobject.org</a></td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>MUST</td>
+        <td>string</td>
+        <td>ファイルタイプの名称</td>
+        <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html#adding-detailed-descriptions-of-encodings>researchobject.org</a></td>
+    </tr>
+    <tr>
        <th colspan="5">File Distribution</th>
     </tr>
         <tr>
@@ -683,20 +734,3 @@
         <td></td>
     </tr>
     </table>
-
-## dmpFormat List
-
-- common metadata
-    -  2022/11現在, GRDMで選択可能なものはこれのみ
-- JST
-- AMED
-- METI
-    - 新エネルギー・産業技術総合開発機構(NEDO),生物系特定産業技術研究支援センター(BRAIN)はこれを選択
-
-## accessRights List
-
-- open access
-- restricted access
-- embargoed access
-- metadata only access
-- 参考: [JPCOARスキーマガイドライン](https://schema.irdb.nii.ac.jp/ja/access_rights_vocabulary)
