@@ -3,7 +3,7 @@ import os
 from nii_dg.model.entities import (ContextEntity, DataEntity, Metadata,
                              RootDataEntity)
 
-def get_dir_size(path):
+def get_dir_size(path:str) -> int:
     total = 0
     with os.scandir(path) as it:
         for entry in it:
@@ -25,7 +25,7 @@ class ROCrate():
         self.entities = [self.metadata, self.rootdataentity]
         self.data_entities = []
 
-    def get_by_type(self, e_type):
+    def get_by_type(self, e_type:str):
         ents = []
         for e in self.entities:
             if e.get("@type") == e_type:
@@ -38,15 +38,18 @@ class ROCrate():
                 return e
         raise ValidationError(f'entity with name "{e_name}" is not found')
 
-    def add_entity(self, id, e_type, properties):
+    def add_entity(self, id, e_type, properties) ->None:
         e = ContextEntity(id, e_type)
         e.add_properties(properties)
         self.entities.append(e)
 
-    def add_dataentity(self, id, e_type, properties):
+    def add_dataentity(self, id, e_type, properties) ->None:
         e = DataEntity(id, e_type)
         e.add_properties(properties)
         self.data_entities.append(e)
+
+    def update_entity(self, entity, properties) ->None:
+        entity.add_properties(properties)
 
     def generate(self):
         graph = []
@@ -163,18 +166,18 @@ class NIIROCrate(ROCrate):
             ids = [item for item in [creator.get("orcid"), creator.get("url")] if item]
             if len(ids) == 0:
                 raise ValidationError('Either property "orcid" or "url" is required for creators')
-            if type(creator["affiliation"]) =="str":
-                aff_name = creator["affiliation"]
-                try:
-                    self.get_by_name(aff_name)
-                except ValidationError:
-                    print('Either property "ror" or "url" is required for affiliation')
-                    return
+            aff_name = creator["affiliation"].get("name")
+            try:
+                aff_e = self.get_by_name(aff_name)
+                aff_id = aff_e.get("@id")
+                aff_name = {"@id":aff_id}
+            except ValidationError:
+                pass
 
             properties = {
                 "name": creator["name"],
                 "email": creator["email"],
-                "affiliation": creator["affiliation"]
+                "affiliation": aff_name
             }
 
             erad = creator.get('e-Rad_researcher_number')
