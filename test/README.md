@@ -1,5 +1,12 @@
 # Test
 
+## common_sample.json
+- ライブラリの入力データサンプル
+- 公的資金による研究データの管理・利活用に関する基本的な考え方に基づいて、GRDMから取得できるメタデータをベースにしている
+
+## ro-crate-metadata.json
+- 上記`common_sample.json`を入力としてライブラリを利用した場合に生成されるRO-Crate
+
 ## GRDM Metadata
 
 [`./grdm_metadata.csv`](./grdm_metadata.csv)
