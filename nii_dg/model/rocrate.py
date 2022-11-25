@@ -156,13 +156,20 @@ class NIIROCrate(ROCrate):
             self.rootdataentity.add_properties({'keywords': field})
 
     def set_creators(self):
-        creators = self.dmp.get("creators")
+        creators = self.dmp.get("creator")
         creator_list = []
 
         for creator in creators:
             ids = [item for item in [creator.get("orcid"), creator.get("url")] if item]
             if len(ids) == 0:
                 raise ValidationError('Either property "orcid" or "url" is required for creators')
+            if type(creator["affiliation"]) =="str":
+                aff_name = creator["affiliation"]
+                try:
+                    self.get_by_name(aff_name)
+                except ValidationError:
+                    print('Either property "ror" or "url" is required for affiliation')
+                    return
 
             properties = {
                 "name": creator["name"],
@@ -189,7 +196,7 @@ class NIIROCrate(ROCrate):
         for affiliation in affiliations:
             ids = [item for item in [affiliation.get("ror"), affiliation.get("url")] if item]
             if len(ids) == 0:
-                raise ValidationError('Either property "ror" or "url" is required for affiliations')
+                raise ValidationError('Either property "ror" or "url" is required for affiliation')
 
             properties = {
                 "name": affiliation["name"]
