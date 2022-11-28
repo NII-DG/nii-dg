@@ -45,11 +45,13 @@ def generate_rocrate(dmp_path=None, dir_path=None):
     crate = set_dmp_format(metadata)
     crate.set_project_name()
     crate.set_funder()
+    crate.set_repo()
     crate.set_erad()
     crate.set_creators()
     crate.set_affiliations()
+    crate.set_field()
     crate.overwrite()
-    crate.load_data_dir(dir_path)
+    # crate.load_data_dir(dir_path)
     roc = crate.generate()
 
     with open('ro-crate-metadata.json', 'w') as f:

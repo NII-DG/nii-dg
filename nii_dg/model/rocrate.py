@@ -104,7 +104,7 @@ class NIIROCrate(ROCrate):
 
 
     def set_project_name(self):
-        self.rootdataentity._jsonld["project_name"] = self.dmp["project_name"]
+        self.rootdataentity._jsonld["name"] = self.dmp["project_name"]
 
     def set_funder(self):
         funders = self.dmp.get("funding_agency")
@@ -127,6 +127,21 @@ class NIIROCrate(ROCrate):
                 funder_list.append({"@id": ids[0]})
 
             self.rootdataentity.add_properties({'funder': funder_list})
+    
+    def set_repo(self):
+        repo = self.dmp.get("repository")
+
+        id_ = repo.get("url")
+        properties = repo.pop("url")
+
+        self.add_entity(id_, "RepositoryObject",repo)
+
+        ids = self.rootdataentity.get("identifier")
+        if ids is None:
+            ids = []
+        ids.append({"@id": id_})
+        self.rootdataentity.add_properties({"identifier": ids})
+
 
     def add_erad(self, erad, erad_type):
         erad_e = ContextEntity(f'#e-Rad:{erad}', 'PropertyValue')
@@ -194,7 +209,7 @@ class NIIROCrate(ROCrate):
         self.rootdataentity.add_properties({'creator': creator_list})
 
     def set_affiliations(self):
-        affiliations = self.dmp.get("affiliations")
+        affiliations = self.dmp.get("affiliation")
 
         for affiliation in affiliations:
             ids = [item for item in [affiliation.get("ror"), affiliation.get("url")] if item]
