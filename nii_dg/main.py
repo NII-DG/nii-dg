@@ -7,9 +7,6 @@ from nii_dg.model.rocrate import NIIROCrate
 class ValidationError(Exception):
     pass
 
-# input file should be json
-
-
 def read_dmp(path):
     with open(path) as f:
         metadata = json.load(f)
@@ -34,7 +31,7 @@ def set_dmp_format(dict):
     if len(error_messages) > 0:
         raise ValidationError('\n'.join(error_messages))
 
-    return NIIROCrate(dict)
+    return NIIROCrate(dict, dmp_f)
 
 
 def generate_rocrate(dmp_path=None, dir_path=None):
@@ -47,6 +44,7 @@ def generate_rocrate(dmp_path=None, dir_path=None):
     crate.set_publisheddate()
     crate.set_funder()
     crate.set_repo()
+    crate.set_license()
     crate.set_erad()
     crate.set_creators()
     crate.set_affiliations()

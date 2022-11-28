@@ -71,10 +71,11 @@ class NIIROCrate(ROCrate):
         "dmpDataNumber": "https://example.com/dataManagementPlan"  # to be updated
     }
 
-    def __init__(self, dmp):
+    def __init__(self, dmp, dmpf):
         super().__init__()
         self.extra_terms = self.EXTRA_TERMS
         self.dmp = dmp
+        self.update_entity(self.rootdataentity,{"dmpFormat":dmpf})
 
     def load_data_dir(self, data_dir):
         file_list = []
@@ -139,7 +140,7 @@ class NIIROCrate(ROCrate):
         repo = self.dmp.get("repository")
 
         id_ = repo.get("url")
-        properties = repo.pop("url")
+        repo.pop("url")
 
         self.add_entity(id_, "RepositoryObject",repo)
 
@@ -219,17 +220,46 @@ class NIIROCrate(ROCrate):
         affiliations = self.dmp.get("affiliation")
 
         for affiliation in affiliations:
-            ids = [item for item in [affiliation.get("ror"), affiliation.get("url")] if item]
-            if len(ids) == 0:
-                raise ValidationError('Either property "ror" or "url" is required for affiliation')
+            try:
+                aff_name = affiliation.get("name")
+                aff_e = self.get_by_name(aff_name)
+                properties = {k: v for k, v in affiliation.items() if v != affiliation["@id"]}
+                self.update_entity(aff_e, properties)
+            except Exception:
+                ids = [item for item in [affiliation.get("ror"), affiliation.get("url")] if item]
+                if len(ids) == 0:
+                    raise ValidationError('Either property "ror" or "url" is required for affiliation')
 
-            properties = {
-                "name": affiliation["name"]
-            }
-            if len(ids) == 2:
-                properties["sameAs"] = ids[1]
+                properties = {k: v for k, v in affiliation.items() if v != ids[0]}
+                if len(ids) == 2:
+                    properties.pop("url")
+                    properties["sameAs"] = ids[1]
 
-            self.add_entity(ids[0], 'Organization', properties)
+                self.add_entity(ids[0], 'Organization', properties)
+    
+    def set_license(self):
+        licenses = self.dmp.get("license")
+        license_list = []
+
+        for license_ in licenses:
+            id_ = license_.get('url')
+            properties = {k: v for k, v in license_.items() if v != id_}
+            self.add_entity(id_, "CreativeWork", properties)
+            license_list.append({"@id":id_})
+
+        self.rootdataentity.add_properties({'license': license_list})
+
+    def set_dmplist(self):
+        if self.dmp.get("repository").get("name") == 'Gakunin RDM':
+            self.set_grdm()
+        else:
+            pass
+    
+    def set_grdm(self):
+        dmpset = self.dmp.get("dataset")
+
+        for dmp in dmpset:
+            
 
     def overwrite(self):
         persons = self.get_by_type("Person")
