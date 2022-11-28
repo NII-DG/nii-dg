@@ -35,6 +35,10 @@
     "project_name": {
       "type": "string"
     },
+    "publish_date":{
+      "type":"string",
+      "format":"date"
+    },
     "e-Rad_project_id": {
       "type": "string"
     },

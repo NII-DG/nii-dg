@@ -102,6 +102,13 @@ class NIIROCrate(ROCrate):
 
         self.rootdataentity.add_properties({'hasPart': file_list})
 
+    def set_publisheddate(self):
+        pd = self.dmp.get("published_date")
+        cd = self.rootdataentity.get("datePublished")
+        self.update_entity(self.rootdataentity,{"dateCreated":cd})
+
+        if pd:
+            self.update_entity(self.rootdataentity,{"datePublished":cd})
 
     def set_project_name(self):
         self.rootdataentity._jsonld["name"] = self.dmp["project_name"]
@@ -127,7 +134,7 @@ class NIIROCrate(ROCrate):
                 funder_list.append({"@id": ids[0]})
 
             self.rootdataentity.add_properties({'funder': funder_list})
-    
+
     def set_repo(self):
         repo = self.dmp.get("repository")
 
@@ -234,5 +241,7 @@ class NIIROCrate(ROCrate):
             aff = p.get("affiliation")
             if type(aff) is str:
                 aff_e = self.get_by_name(aff)
+                if aff_e is None:
+                    raise ValidationError(f'affiliation {aff} input is not found')
                 aff_id = aff_e.get('@id')
                 p.add_properties({'affiliation': {"@id": aff_id}})
