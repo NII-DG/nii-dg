@@ -49,6 +49,7 @@ def generate_rocrate(dmp_path=None, dir_path=None):
     crate.set_creators()
     crate.set_affiliations()
     crate.set_field()
+    crate.set_grdm()
     crate.overwrite()
     # crate.load_data_dir(dir_path)
     roc = crate.generate()

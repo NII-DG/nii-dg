@@ -3,6 +3,8 @@ import os
 from nii_dg.model.entities import (ContextEntity, DataEntity, Metadata,
                              RootDataEntity)
 
+FREEACCESS = {"free":"true", "consideration":"false"}
+
 def get_dir_size(path:str) -> int:
     total = 0
     with os.scandir(path) as it:
@@ -76,6 +78,11 @@ class NIIROCrate(ROCrate):
         self.extra_terms = self.EXTRA_TERMS
         self.dmp = dmp
         self.update_entity(self.rootdataentity,{"dmpFormat":dmpf})
+
+    def convert_name_to_id(self, namedict):
+        e = self.get_by_name(namedict["name"])
+        e_id = e.get("@id")
+        return {"@id" : e_id} 
 
     def load_data_dir(self, data_dir):
         file_list = []
@@ -197,11 +204,20 @@ class NIIROCrate(ROCrate):
             except ValidationError:
                 pass
 
+            em = creator["email"]
             properties = {
                 "name": creator["name"],
-                "email": creator["email"],
+                "email": em,
                 "affiliation": aff_name
             }
+
+            if creator.get("phone_number"):
+                contact ={
+                    "email": em,
+                    "telephone":creator["phone_number"]
+                }
+                self.add_entity(f"#mailto:{em}","ContactPoint", contact)
+                properties["contactPoint"] = {"@id":f"#mailto:{em}"}
 
             erad = creator.get('e-Rad_researcher_number')
             if erad:
@@ -257,9 +273,53 @@ class NIIROCrate(ROCrate):
     
     def set_grdm(self):
         dmpset = self.dmp.get("dataset")
+        i = 0
 
         for dmp in dmpset:
-            
+            id_ = "#dmp:" + str(dmp.get("data_number"))
+
+            creators = dmp.get('creator')
+            c_list = []
+            for creator in creators:
+                c_id = self.convert_name_to_id(creator)
+                c_list.append(c_id)
+
+            hi = self.convert_name_to_id(dmp["hosting_institution"])
+            dm = self.convert_name_to_id(dmp["data_manager"])
+            dm_e = self.get_by_name(dmp["data_manager"].get("name"))
+            cp = dm_e.get("contactPoint")
+            if cp is None:
+                em = df_e.get("email")
+                self.add_entity(f"#mailto:{em}","ContactPoint", {"email":em})
+                cp = {"@id": f"#mailto:{em}"}
+
+            iaf = dmp["free_or_consideration"]
+            try:
+                lic = self.convert_name_to_id(dmp["license"])
+            except Exception:
+                id_ = dmp["license"].get('url')
+                properties = {k: v for k, v in dmp["license"].items() if v != id_}
+                self.add_entity(id_, "CreativeWork", properties)
+                lic = {"@id":id_}
+
+            ui = dmp.get("citation_info")
+            if ui:
+                i += 1
+                self.add_entity(f"#usageInfo:{i}", "CreativeWork", {"description":ui})
+
+            properties = {
+                "name":dmp.get("title"),
+                "description":dmp.get("description"),
+                "creator":c_list,
+                "maintainer":[hi, dm],
+                "contactPoint":cp,
+                "isAccessibleForFree":FREEACCESS.get(iaf),
+                "license":lic,
+                "accessRights":dmp.get("access_rights"),
+                "usageInfo":{"@id":f"#usageInfo:{i}"},
+                "contentSize":dmp.get("max_filesize")
+            }
+            self.add_entity(id_, "CreativeWork", properties)
 
     def overwrite(self):
         persons = self.get_by_type("Person")
