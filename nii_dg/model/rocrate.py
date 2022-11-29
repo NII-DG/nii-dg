@@ -273,53 +273,84 @@ class NIIROCrate(ROCrate):
     
     def set_grdm(self):
         dmpset = self.dmp.get("dataset")
-        i = 0
+        i = 1
 
         for dmp in dmpset:
             id_ = "#dmp:" + str(dmp.get("data_number"))
-
-            creators = dmp.get('creator')
-            c_list = []
-            for creator in creators:
-                c_id = self.convert_name_to_id(creator)
-                c_list.append(c_id)
-
-            hi = self.convert_name_to_id(dmp["hosting_institution"])
-            dm = self.convert_name_to_id(dmp["data_manager"])
-            dm_e = self.get_by_name(dmp["data_manager"].get("name"))
-            cp = dm_e.get("contactPoint")
-            if cp is None:
-                em = df_e.get("email")
-                self.add_entity(f"#mailto:{em}","ContactPoint", {"email":em})
-                cp = {"@id": f"#mailto:{em}"}
-
-            iaf = dmp["free_or_consideration"]
-            try:
-                lic = self.convert_name_to_id(dmp["license"])
-            except Exception:
-                id_ = dmp["license"].get('url')
-                properties = {k: v for k, v in dmp["license"].items() if v != id_}
-                self.add_entity(id_, "CreativeWork", properties)
-                lic = {"@id":id_}
-
-            ui = dmp.get("citation_info")
-            if ui:
-                i += 1
-                self.add_entity(f"#usageInfo:{i}", "CreativeWork", {"description":ui})
+            maintainer = []
 
             properties = {
                 "name":dmp.get("title"),
                 "description":dmp.get("description"),
-                "creator":c_list,
-                "maintainer":[hi, dm],
-                "contactPoint":cp,
-                "isAccessibleForFree":FREEACCESS.get(iaf),
-                "license":lic,
-                "accessRights":dmp.get("access_rights"),
-                "usageInfo":{"@id":f"#usageInfo:{i}"},
                 "contentSize":dmp.get("max_filesize")
             }
+
+            creators = dmp.get('creator')
+            if creators:
+                c_list = []
+                for creator in creators:
+                    c_id = self.convert_name_to_id(creator)
+                    c_list.append(c_id)
+                properties["creator"] = c_list
+
+            if dmp.get("hosting_institution"):
+                hi = self.convert_name_to_id(dmp["hosting_institution"])
+                maintainer.append(hi)
+            if dmp.get("data_manager"):
+                dm = self.convert_name_to_id(dmp["data_manager"])
+                maintainer.append(dm)
+
+                dm_e = self.get_by_name(dmp["data_manager"].get("name"))
+                cp = dm_e.get("contactPoint")
+                if cp is None:
+                    em = dm_e.get("email")
+                    self.add_entity(f"#mailto:{em}","ContactPoint", {"email":em})
+                    cp = {"@id": f"#mailto:{em}"}
+                properties["contactPoint"] = cp
+
+            if len(maintainer) > 0:
+                properties["maintainer"] = maintainer
+
+            iaf = dmp.get("free_or_consideration")
+            if iaf:
+                properties["isAccessibleForFree"] = FREEACCESS.get(iaf)
+
+            if dmp.get("license"):
+                try:
+                    lic = self.convert_name_to_id(dmp["license"])
+                except Exception:
+                    id_ = dmp["license"].get('url')
+                    properties = {k: v for k, v in dmp["license"].items() if v != id_}
+                    self.add_entity(id_, "CreativeWork", properties)
+                    lic = {"@id":id_}
+                properties["license"] = lic
+
+            if dmp.get("access_rights"):
+                properties["accessRights"] = dmp.get("access_rights")
+
+            ui = dmp.get("citation_info")
+            if ui:
+                self.add_entity(f"#usageInfo:{i}", "CreativeWork", {"description":ui})
+                properties["usageInfo"] = {"@id":f"#usageInfo:{i}"},
+                i += 1
+
+            filepath = dmp.get("url")
+            dir = filepath[filepath.find('osfstorage')+11:]
+            data_properties = {
+                "name":dir[:-1],
+                "contentSize":dmp.get("size"),
+                "dmpDataNumber":{"@id":id_}
+            }
+
             self.add_entity(id_, "CreativeWork", properties)
+            self.add_entity(dir, "Dataset", data_properties)
+
+            if self.rootdataentity.get('hasPart'):
+                self.rootdataentity.get('hasPart').append({"@id":dir})
+            else:
+                haspart = []
+                haspart.append({"@id":dir})
+                self.rootdataentity.add_properties({"hasPart":haspart})
 
     def overwrite(self):
         persons = self.get_by_type("Person")
