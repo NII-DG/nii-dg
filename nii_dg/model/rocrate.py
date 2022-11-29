@@ -183,7 +183,7 @@ class NIIROCrate(ROCrate):
             self.rootdataentity.add_properties({"identifier": ids})
 
     def set_field(self):
-        field = self.dmp.get('research_filed')
+        field = self.dmp.get('research_fieled')
 
         if field:
             self.rootdataentity.add_properties({'keywords': field})

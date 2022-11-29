@@ -42,7 +42,7 @@
     "e-Rad_project_id": {
       "type": "string"
     },
-    "research_filed": {
+    "research_fieled": {
       "type": "string"
     },
     "repository": {
