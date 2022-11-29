@@ -40,6 +40,12 @@ class ROCrate():
                 return e
         raise ValidationError(f'entity with name "{e_name}" is not found')
 
+    def get_by_id(self, e_id):
+        for e in self.entities:
+            if e.get("@id") == e_id:
+                return e
+        return None
+
     def add_entity(self, id, e_type, properties) ->None:
         e = ContextEntity(id, e_type)
         e.add_properties(properties)
@@ -83,6 +89,18 @@ class NIIROCrate(ROCrate):
         e = self.get_by_name(namedict["name"])
         e_id = e.get("@id")
         return {"@id" : e_id} 
+
+    def add_entity_by_url(self, dict_, type_):
+        id_ = dict_.get('url')
+        if id_ is None:
+            raise ValidationError('property "url" is missing.')
+        properties = {k: v for k, v in dict_.items() if v != id_}
+        
+        if self.get_by_id(id_):
+            self.get_by_id(id_).add_properties(properties)
+        else:
+            self.add_entity(id_, type_, properties)
+        return {"@id":id_}
 
     def load_data_dir(self, data_dir):
         file_list = []
@@ -146,15 +164,12 @@ class NIIROCrate(ROCrate):
     def set_repo(self):
         repo = self.dmp.get("repository")
 
-        id_ = repo.get("url")
-        repo.pop("url")
-
-        self.add_entity(id_, "RepositoryObject",repo)
+        id_ = self.add_entity_by_url(repo, "RepositoryObject")
 
         ids = self.rootdataentity.get("identifier")
         if ids is None:
             ids = []
-        ids.append({"@id": id_})
+        ids.append(id_)
         self.rootdataentity.add_properties({"identifier": ids})
 
 
@@ -254,16 +269,10 @@ class NIIROCrate(ROCrate):
                 self.add_entity(ids[0], 'Organization', properties)
     
     def set_license(self):
-        licenses = self.dmp.get("license")
-        license_list = []
+        license_ = self.dmp.get("license")
+        id_ = self.add_entity_by_url(license_, "CreativeWork")
 
-        for license_ in licenses:
-            id_ = license_.get('url')
-            properties = {k: v for k, v in license_.items() if v != id_}
-            self.add_entity(id_, "CreativeWork", properties)
-            license_list.append({"@id":id_})
-
-        self.rootdataentity.add_properties({'license': license_list})
+        self.rootdataentity.add_properties({'license': id_})
 
     def set_dmplist(self):
         if self.dmp.get("repository").get("name") == 'Gakunin RDM':
@@ -319,10 +328,8 @@ class NIIROCrate(ROCrate):
                 try:
                     lic = self.convert_name_to_id(dmp["license"])
                 except Exception:
-                    id_ = dmp["license"].get('url')
-                    properties = {k: v for k, v in dmp["license"].items() if v != id_}
-                    self.add_entity(id_, "CreativeWork", properties)
-                    lic = {"@id":id_}
+                    lic = self.add_entity_by_url(dmp["license"], "CreativeWork")
+
                 properties["license"] = lic
 
             if dmp.get("access_rights"):
@@ -334,23 +341,24 @@ class NIIROCrate(ROCrate):
                 properties["usageInfo"] = {"@id":f"#usageInfo:{i}"},
                 i += 1
 
-            filepath = dmp.get("url")
-            dir = filepath[filepath.find('osfstorage')+11:]
-            data_properties = {
-                "name":dir[:-1],
-                "contentSize":dmp.get("size"),
-                "dmpDataNumber":{"@id":id_}
-            }
-
             self.add_entity(id_, "CreativeWork", properties)
-            self.add_entity(dir, "Dataset", data_properties)
 
-            if self.rootdataentity.get('hasPart'):
-                self.rootdataentity.get('hasPart').append({"@id":dir})
-            else:
-                haspart = []
-                haspart.append({"@id":dir})
-                self.rootdataentity.add_properties({"hasPart":haspart})
+            filepath = dmp.get("url")
+            if filepath.find('/dir/osfstorage') > 0:
+                dir = filepath[filepath.find('osfstorage')+11:]
+                data_properties = {
+                    "name":dir[:-1],
+                    "contentSize":dmp.get("size"),
+                    "dmpDataNumber":{"@id":id_}
+                }
+                self.add_entity(dir, "Dataset", data_properties)
+
+                if self.rootdataentity.get('hasPart'):
+                    self.rootdataentity.get('hasPart').append({"@id":dir})
+                else:
+                    haspart = []
+                    haspart.append({"@id":dir})
+                    self.rootdataentity.add_properties({"hasPart":haspart})
 
     def overwrite(self):
         persons = self.get_by_type("Person")

@@ -51,7 +51,8 @@ def generate_rocrate(dmp_path=None, dir_path=None):
     crate.set_field()
     crate.set_grdm()
     crate.overwrite()
-    # crate.load_data_dir(dir_path)
+    if dir_path:
+        crate.load_data_dir(dir_path)
     roc = crate.generate()
 
     with open('ro-crate-metadata.json', 'w') as f:

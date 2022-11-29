@@ -176,16 +176,13 @@
       }
     },
     "license":{
-      "type":"array",
-      "items":{
-        "type":"object",
-        "required":["name","url"],
-        "properties":{
-          "name":{"type":"string"},
-          "url":{
-            "type":"string",
-            "format":"url"
-          }
+      "type":"object",
+      "required":["name","url"],
+      "properties":{
+        "name":{"type":"string"},
+        "url":{
+          "type":"string",
+          "format":"url"
         }
       }
     }
