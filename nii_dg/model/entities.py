@@ -27,6 +27,9 @@ class Entity():
     def get(self, property_name):
         return self._jsonld.get(property_name)
 
+    def get_id_dict(self) -> dict:
+        return {"@id":self.get("@id")}
+
 
 class ContextEntity(Entity):
 
