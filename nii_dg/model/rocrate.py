@@ -320,11 +320,10 @@ class NIIROCrate(ROCrate):
         '''
         Add "license" entity
         '''
-        license_ = self.dmp.get("license")
-        if license_:
-            id_ = self.add_entity_by_url(license_, "CreativeWork")
+        licenses = self.dmp.get("license")
+        for license_ in licenses:
+            self.add_entity_by_url(license_, "CreativeWork")
 
-            self.rootdataentity.add_properties({'license': id_})
 
     def set_dmplist(self) -> None:
         '''
@@ -400,6 +399,7 @@ class NIIROCrate(ROCrate):
 
             self.add_entity(id_, "CreativeWork", properties)
 
+            # add data entity
             filepath = dmp.get("url")
             if filepath.find('/dir/osfstorage') > 0:
                 dir_ = filepath[filepath.find('osfstorage')+11:]

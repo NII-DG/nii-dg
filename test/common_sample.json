@@ -48,10 +48,10 @@
             "url":"https://www.mlb.com/mariners"
         }
     ],
-    "license":{
+    "license":[{
             "name":"Apache License 2.0",
             "url":"https://www.apache.org/licenses/LICENSE-2.0"
-        },
+        }],
     "dataset":[
         {
             "data_number":1,
