@@ -28,7 +28,8 @@
           "ror": {
             "type": "string",
             "format": "url"
-          }
+          },
+          "address": { "type": "string" }
         }
       }
     },
@@ -85,7 +86,8 @@
           "e-Rad_researcher_number": {
             "type": "string",
             "pattern": "[0-9]{8}"
-          }
+          },
+          "telephone": {"type": "string"}
         }
       }
     },
@@ -103,7 +105,8 @@
           "url":{
             "type":"string",
             "format":"url"
-          }
+          },
+          "address": { "type": "string" }
         }
       }
     },
@@ -142,7 +145,8 @@
             "type": "object",
             "required":["name"],
             "properties":{
-              "name":{"type":"string"}
+              "name":{"type":"string"},
+              "address": { "type": "string" }
             } 
           },
           "data_manager": {
@@ -166,10 +170,7 @@
                 "type": "string",
                 "pattern": "[0-9]{8}"
               },
-              "telephone": {
-                "type": "string",
-                "pattern": "[0-9]{10,11}"
-              }
+              "telephone": {"type": "string"}
             }
           }
         }
