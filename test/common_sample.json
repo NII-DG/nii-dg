@@ -26,7 +26,7 @@
             "orcid":"https://orcid.org/0000-0001-2345-6789",
             "affiliation":{ "name":"University of Tokyo"},
             "email":"jiro@example.com",
-            "phone_number":"03-1234-5678",
+            "telephone":"03-1234-5678",
             "e-Rad_researcher_number": "00123456"
         },
         {

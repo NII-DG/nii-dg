@@ -1,6 +1,6 @@
 import os
-
-from nii_dg.model.entities import (ContextEntity, DataEntity, Metadata, RootDataEntity)
+from typing import Optional
+from nii_dg.model.entities import (Entity, ContextEntity, DataEntity, Metadata, RootDataEntity)
 
 def get_dir_size(path:str) -> int:
     total = 0
@@ -32,36 +32,37 @@ class ROCrate():
                 ents.append(e)
         return ents
 
-    def get_by_name(self, e_name) -> (dict | None):
+    def get_by_name(self, e_name:str) -> Optional[Entity]:
         for e in self.entities:
             if e.get("name") == e_name:
                 return e
         return None
 
-    def get_by_id(self, e_id) -> (dict | None):
+    def get_by_id(self, e_id:str) -> Optional[Entity]:
         for e in self.entities:
             if e.get("@id") == e_id:
                 return e
         return None
 
-    def convert_name_to_id(self, namedict) -> (dict | None):
+    def convert_name_to_id(self, namedict:dict) -> dict:
         e = self.get_by_name(namedict["name"])
         return e.get_id_dict() 
 
-    def add_entity(self, id_, e_type, properties) ->None:
+    def add_entity(self, id_:str, e_type:str, properties:dict) -> dict:
         if self.get_by_id(id_):
             e = self.get_by_id(id_)
         else:
             e = ContextEntity(id_, e_type)
+            self.entities.append(e)
         e.add_properties(properties)
-        self.entities.append(e)
+        return {"@id":id_}
 
-    def add_dataentity(self, id_, e_type, properties) ->None:
+    def add_dataentity(self, id_:str, e_type:str, properties:dict) ->None:
         e = DataEntity(id_, e_type)
         e.add_properties(properties)
         self.data_entities.append(e)
 
-    def update_entity(self, entity, properties) ->None:
+    def update_entity(self, entity:Entity, properties:dict) -> None:
         entity.add_properties(properties)
 
     def generate(self) -> dict:
@@ -85,27 +86,30 @@ class NIIROCrate(ROCrate):
     }
     FREEACCESS = {"free":"true", "consideration":"false"}
 
-    def __init__(self, dmp, dmpf):
+    def __init__(self, dmp:str, dmpf:str):
         super().__init__()
         self.extra_terms = self.EXTRA_TERMS
         self.dmp = dmp
         self.update_entity(self.rootdataentity,{"dmpFormat":dmpf})
 
 
-    def add_entity_by_url(self, dict_, type_):
+    def add_entity_by_url(self, dict_:dict, type_:str) -> dict:
+        '''
+        generate entity by dict. @id is from url value of the dict.
+        '''
+
         id_ = dict_.get('url')
         if id_ is None:
             raise ValidationError('property "url" is missing.')
         properties = {k: v for k, v in dict_.items() if v != id_}
         
-        if self.get_by_id(id_):
-            self.get_by_id(id_).add_properties(properties)
-        else:
-            self.add_entity(id_, type_, properties)
-        return {"@id":id_}
+        return self.add_entity(id_, type_, properties)
 
 
-    def add_erad(self, erad, erad_type) -> dict:
+    def add_erad(self, erad:str, erad_type:str) -> dict:
+        '''
+        generate e-rad entity
+        '''
         properties = {'value': erad}
 
         if erad_type == 'project':
@@ -115,49 +119,38 @@ class NIIROCrate(ROCrate):
         else:
             raise ValidationError('e-rad type should be "project" or "researcher".')
 
-        self.add_entity(f'#e-Rad:{erad}', 'PropertyValue', properties)
-
-        return {"@id":f'#e-Rad:{erad}'}
+        return self.add_entity(f'#e-Rad:{erad}', 'PropertyValue', properties)
 
 
-    def add_person(self, person) -> dict:
+    def add_person(self, person:dict) -> dict:
+        properties = {k: v for k, v in person.items() if k in ["name","email"]}
+
         ids = [item for item in [person.get("orcid"), person.get("url")] if item]
         if len(ids) == 0:
             raise ValidationError('Either property "orcid" or "url" is required for creators')
-        aff_name = person["affiliation"].get("name")
-        aff_e = self.get_by_name(aff_name)
-        if aff_e:
-            aff_name = aff_e.get_id_dict()
+        if len(ids) == 2:
+            properties["sameAs"] = ids[1]
 
-        em = person["email"]
-        properties = {
-            "name": person["name"],
-            "email": em,
-            "affiliation": aff_name
-        }
+        affiliation = person.get("affiliation")
+        aff_name = affiliation.get("name")
+        if self.get_by_name(aff_name):
+            aff_name = self.get_by_name(aff_name).get_id_dict()
+        properties["affiliation"] = aff_name
 
-        if person.get("phone_number"):
-            contact ={
-                "email": em,
-                "telephone":person["phone_number"]
-            }
-            self.add_entity(f"#mailto:{em}","ContactPoint", contact)
-            properties["contactPoint"] = {"@id":f"#mailto:{em}"}
+        if person.get("telephone"):
+            em = person.get("email")
+            contact = {k: v for k, v in person.items() if k in ["email", "telephone"]}
+            properties["contactPoint"] = self.add_entity(f"#mailto:{em}","ContactPoint", contact)
 
         erad = person.get('e-Rad_researcher_number')
         if erad:
             properties["identifier"] = {"@id": f"#e-Rad:{erad}"}
             self.add_erad(erad, 'researcher')
 
-        if len(ids) == 2:
-            properties["sameAs"] = ids[1]
-
-        self.add_entity(ids[0], 'Person', properties)
+        return self.add_entity(ids[0], 'Person', properties)
         
-        return {"@id": ids[0]}
 
-
-    def add_organization(self, org) -> dict:
+    def add_organization(self, org:dict) -> dict:
         ids = [item for item in [org.get("ror"), org.get("url")] if item]
         if len(ids) == 0:
             raise ValidationError('Either property "ror" or "url" is required for organization entity')
@@ -167,12 +160,10 @@ class NIIROCrate(ROCrate):
             properties.pop("url")
             properties["sameAs"] = ids[1]
 
-        self.add_entity(ids[0], 'Organization', properties)
-
-        return {"@id": ids[0]}
+        return self.add_entity(ids[0], 'Organization', properties)
 
 
-    def load_data_dir(self, data_dir):
+    def load_data_dir(self, data_dir:str):
         file_list = []
 
         if data_dir is None:
@@ -198,7 +189,7 @@ class NIIROCrate(ROCrate):
 
         self.rootdataentity.add_properties({'hasPart': file_list})
 
-    def set_publisheddate(self):
+    def set_publisheddate(self) -> None:
         pd = self.dmp.get("published_date")
         cd = self.rootdataentity.get("datePublished")
         self.update_entity(self.rootdataentity,{"dateCreated":cd})
@@ -206,10 +197,10 @@ class NIIROCrate(ROCrate):
         if pd:
             self.update_entity(self.rootdataentity,{"datePublished":cd})
 
-    def set_project_name(self):
+    def set_project_name(self) -> None:
         self.rootdataentity.set_name(self.dmp["project_name"])
 
-    def set_funder(self):
+    def set_funder(self) -> None:
         funders = self.dmp.get("funding_agency")
 
         if funders:
@@ -221,7 +212,7 @@ class NIIROCrate(ROCrate):
 
             self.rootdataentity.add_properties({'funder': funder_list})
 
-    def set_repo(self, repository, **kwargs):
+    def set_repo(self, repository:str, **kwargs) -> None:
         id_ = self.add_entity_by_url(repository, "RepositoryObject")
 
         ids = self.rootdataentity.get("identifier")
@@ -231,7 +222,7 @@ class NIIROCrate(ROCrate):
         self.rootdataentity.add_properties({"identifier": ids})
 
 
-    def set_erad(self):
+    def set_erad(self) -> None:
         erad = self.dmp.get("e-Rad_project_id")
 
         if erad:
@@ -243,13 +234,13 @@ class NIIROCrate(ROCrate):
             ids.append(erad_id)
             self.rootdataentity.add_properties({"identifier": ids})
 
-    def set_field(self):
+    def set_field(self) -> None:
         field = self.dmp.get('research_fieled')
 
         if field:
             self.rootdataentity.add_properties({'keywords': field})
 
-    def set_creators(self):
+    def set_creators(self) -> None:
         creators = self.dmp.get("creator")
         creator_list = []
 
@@ -262,7 +253,7 @@ class NIIROCrate(ROCrate):
 
         self.rootdataentity.add_properties({'creator': creator_list})
 
-    def set_affiliations(self):
+    def set_affiliations(self) -> None:
         affiliations = self.dmp.get("affiliation")
 
         for affiliation in affiliations:
@@ -274,19 +265,19 @@ class NIIROCrate(ROCrate):
                 self.add_organization(affiliation)
 
 
-    def set_license(self):
+    def set_license(self) -> None:
         license_ = self.dmp.get("license")
         id_ = self.add_entity_by_url(license_, "CreativeWork")
 
         self.rootdataentity.add_properties({'license': id_})
 
-    def set_dmplist(self):
+    def set_dmplist(self) -> None:
         if self.dmp.get("repository").get("name") == 'Gakunin RDM':
             self.set_grdm()
         else:
             pass
     
-    def set_grdm(self):
+    def set_grdm(self) -> None:
         dmpset = self.dmp.get("dataset")
         i = 1
 
@@ -367,7 +358,7 @@ class NIIROCrate(ROCrate):
                     haspart.append({"@id":dir_})
                     self.rootdataentity.add_properties({"hasPart":haspart})
 
-    def overwrite(self):
+    def overwrite(self) -> None:
         persons = self.get_by_type("Person")
 
         if len(persons) == 0:
