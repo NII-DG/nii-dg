@@ -122,6 +122,12 @@ class NIIROCrate(ROCrate):
         return self.add_entity(f'#e-Rad:{erad}', 'PropertyValue', properties)
 
 
+    def add_contactpoint(self, cp:dict) -> dict:
+        properties = {k: v for k, v in cp.items() if k in ["email", "telephone","contactType"]}
+        em = properties["email"]
+        return self.add_entity(f"#mailto:{em}","ContactPoint", properties)
+
+
     def add_person(self, person:dict) -> dict:
         properties = {k: v for k, v in person.items() if k in ["name","email"]}
 
@@ -138,9 +144,7 @@ class NIIROCrate(ROCrate):
         properties["affiliation"] = aff_name
 
         if person.get("telephone"):
-            em = person.get("email")
-            contact = {k: v for k, v in person.items() if k in ["email", "telephone"]}
-            properties["contactPoint"] = self.add_entity(f"#mailto:{em}","ContactPoint", contact)
+            properties["contactPoint"] = self.add_contactpoint(person)
 
         erad = person.get('e-Rad_researcher_number')
         if erad:
@@ -311,9 +315,8 @@ class NIIROCrate(ROCrate):
                 dm_e = self.get_by_name(dmp["data_manager"].get("name"))
                 cp = dm_e.get("contactPoint")
                 if cp is None:
-                    em = dm_e.get("email")
-                    self.add_entity(f"#mailto:{em}","ContactPoint", {"email":em})
-                    cp = {"@id": f"#mailto:{em}"}
+                    cp = self.add_contactpoint(dm_e.get_jsonld())
+                    dm_e.add_properties({"contactPoint":cp})
                 properties["contactPoint"] = cp
 
             if len(maintainer) > 0:
@@ -335,8 +338,7 @@ class NIIROCrate(ROCrate):
 
             ui = dmp.get("citation_info")
             if ui:
-                self.add_entity(f"#usageInfo:{i}", "CreativeWork", {"description":ui})
-                properties["usageInfo"] = {"@id":f"#usageInfo:{i}"},
+                properties["usageInfo"] = self.add_entity(f"#usageInfo:{i}", "CreativeWork", {"description":ui})
                 i += 1
 
             self.add_entity(id_, "CreativeWork", properties)
