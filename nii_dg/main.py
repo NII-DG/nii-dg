@@ -43,7 +43,7 @@ def generate_rocrate(dmp_path=None, dir_path=None):
     crate.set_project_name()
     crate.set_publisheddate()
     crate.set_funder()
-    crate.set_repo()
+    crate.set_repo(**metadata)
     crate.set_license()
     crate.set_erad()
     crate.set_creators()

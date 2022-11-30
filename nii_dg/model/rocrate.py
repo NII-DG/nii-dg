@@ -25,24 +25,28 @@ class ROCrate():
         self.data_entities = []
         self.extra_terms = None
 
-    def get_by_type(self, e_type:str):
+    def get_by_type(self, e_type:str) -> list:
         ents = []
         for e in self.entities:
             if e.get("@type") == e_type:
                 ents.append(e)
         return ents
 
-    def get_by_name(self, e_name):
+    def get_by_name(self, e_name) -> (dict | None):
         for e in self.entities:
             if e.get("name") == e_name:
                 return e
         return None
 
-    def get_by_id(self, e_id):
+    def get_by_id(self, e_id) -> (dict | None):
         for e in self.entities:
             if e.get("@id") == e_id:
                 return e
         return None
+
+    def convert_name_to_id(self, namedict) -> (dict | None):
+        e = self.get_by_name(namedict["name"])
+        return e.get_id_dict() 
 
     def add_entity(self, id_, e_type, properties) ->None:
         if self.get_by_id(id_):
@@ -60,7 +64,7 @@ class ROCrate():
     def update_entity(self, entity, properties) ->None:
         entity.add_properties(properties)
 
-    def generate(self):
+    def generate(self) -> dict:
         graph = []
         for entity in self.entities:
             graph.append(entity.get_jsonld())
@@ -87,9 +91,6 @@ class NIIROCrate(ROCrate):
         self.dmp = dmp
         self.update_entity(self.rootdataentity,{"dmpFormat":dmpf})
 
-    def convert_name_to_id(self, namedict):
-        e = self.get_by_name(namedict["name"])
-        return e.get_id_dict() 
 
     def add_entity_by_url(self, dict_, type_):
         id_ = dict_.get('url')
@@ -220,10 +221,8 @@ class NIIROCrate(ROCrate):
 
             self.rootdataentity.add_properties({'funder': funder_list})
 
-    def set_repo(self):
-        repo = self.dmp.get("repository")
-
-        id_ = self.add_entity_by_url(repo, "RepositoryObject")
+    def set_repo(self, repository, **kwargs):
+        id_ = self.add_entity_by_url(repository, "RepositoryObject")
 
         ids = self.rootdataentity.get("identifier")
         if ids is None:
@@ -334,9 +333,8 @@ class NIIROCrate(ROCrate):
                 properties["isAccessibleForFree"] = self.FREEACCESS.get(iaf)
 
             if dmp.get("license"):
-                try:
-                    lic = self.convert_name_to_id(dmp["license"])
-                except Exception:
+                lic = self.convert_name_to_id(dmp["license"])
+                if lic is None:
                     lic = self.add_entity_by_url(dmp["license"], "CreativeWork")
 
                 properties["license"] = lic
