@@ -38,7 +38,7 @@
     <tr>
         <td>Property</td>
         <td>Required?</td>
-        <td>Format</td>
+        <td>Format and Rules</td>
         <td>Description</td>
         <td>Why needed</td>
     </tr>
@@ -83,7 +83,7 @@
      <tr>
         <td>dateCreated</td>
         <td>MUST</td>
-        <td>Date</td>
+        <td>MUST be a string in ISO 8601 date format and MAY be a timestamp down to the millisecond. Time zone is in UTC</td>
         <td>RO-Crate作成日</td>
         <td></td>
     </tr>

@@ -52,7 +52,7 @@ class RootDataEntity(DataEntity):
         val = {
             "@id": self.id,
             "@type": self.type,
-            "datePublished": datetime.now(timezone(timedelta(hours=9))).isoformat(),
+            "datePublished": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
         }
         return val
 
