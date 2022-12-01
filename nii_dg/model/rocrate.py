@@ -92,6 +92,7 @@ class NIIROCrate(ROCrate):
         super().__init__()
         self.extra_terms = self.EXTRA_TERMS
         self.dmp = dmp
+        self.dmpf = dmpf
         self.update_entity(self.rootdataentity,{"dmpFormat":dmpf})
 
 
@@ -227,28 +228,25 @@ class NIIROCrate(ROCrate):
         if pd:
             self.update_entity(self.rootdataentity,{"datePublished":cd})
 
-    def set_project_name(self) -> None:
+    def set_project_name(self, name:str) -> None:
         '''
         Set "name" property at root
         '''
-        self.rootdataentity.set_name(self.dmp["project_name"])
+        self.rootdataentity.set_name(name)
 
-    def set_funder(self) -> None:
+    def set_funder(self, funders:list) -> None:
         '''
         Set "funder" property at root
         '''
-        funders = self.dmp.get("funding_agency")
+        funder_list = []
 
-        if funders:
-            funder_list = []
+        for fa in funders:
+            fa_id = self.add_organization(fa)
+            funder_list.append(fa_id)
 
-            for fa in funders:
-                fa_id = self.add_organization(fa)
-                funder_list.append(fa_id)
+        self.rootdataentity.add_properties({'funder': funder_list})
 
-            self.rootdataentity.add_properties({'funder': funder_list})
-
-    def set_repo(self, repository:str, **kwargs) -> None:
+    def set_repo(self, repository:dict) -> None:
         '''
         Set repository url at root
         '''
@@ -261,35 +259,29 @@ class NIIROCrate(ROCrate):
         self.rootdataentity.add_properties({"identifier": ids})
 
 
-    def set_erad(self) -> None:
+    def set_erad(self, erad) -> None:
         '''
         Set e-Rad project id at root
         '''
-        erad = self.dmp.get("e-Rad_project_id")
+        erad_id = self.add_erad(erad, 'project')
 
-        if erad:
-            erad_id = self.add_erad(erad, 'project')
+        ids = self.rootdataentity.get("identifier")
+        if ids is None:
+            ids = []
+        ids.append(erad_id)
+        self.rootdataentity.add_properties({"identifier": ids})
 
-            ids = self.rootdataentity.get("identifier")
-            if ids is None:
-                ids = []
-            ids.append(erad_id)
-            self.rootdataentity.add_properties({"identifier": ids})
 
-    def set_field(self) -> None:
+    def set_field(self, field:str) -> None:
         '''
         Set research field at root
         '''
-        field = self.dmp.get('research_fieled')
+        self.rootdataentity.add_properties({'keywords': field})
 
-        if field:
-            self.rootdataentity.add_properties({'keywords': field})
-
-    def set_creators(self) -> None:
+    def set_creators(self, creators:list) -> None:
         '''
         Set "creator" property at root
         '''
-        creators = self.dmp.get("creator")
         creator_list = []
 
         for creator in creators:
@@ -301,11 +293,10 @@ class NIIROCrate(ROCrate):
 
         self.rootdataentity.add_properties({'creator': creator_list})
 
-    def set_affiliations(self) -> None:
+    def set_affiliations(self, affiliations:list) -> None:
         '''
         Add "affiliation" entity
         '''
-        affiliations = self.dmp.get("affiliation")
 
         for affiliation in affiliations:
             aff_e = self.get_by_name(affiliation["name"])
@@ -316,11 +307,10 @@ class NIIROCrate(ROCrate):
                 self.add_organization(affiliation)
 
 
-    def set_license(self) -> None:
+    def set_license(self, licenses:list) -> None:
         '''
         Add "license" entity
         '''
-        licenses = self.dmp.get("license")
         for license_ in licenses:
             self.add_entity_by_url(license_, "CreativeWork")
 

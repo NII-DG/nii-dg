@@ -9,7 +9,7 @@
         ],
     "e-Rad_project_id":"123456",
     "project_name":"Sample Research",
-    "research_fieled":"Informatics",
+    "research_field":"Informatics",
     "repository":{
         "name":"Gakunin RDM",
         "url":"https://rdm.nii.ac.jp/mcsdj/"

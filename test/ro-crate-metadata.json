@@ -21,7 +21,15 @@
         {
             "@id": "./",
             "@type": "Dataset",
+            "datePublished": "2022-12-01T14:54:55.183280+09:00",
+            "dmpFormat": "common_metadata",
+            "dateCreated": "2022-12-01T14:54:55.183280+09:00",
             "name": "Sample Research",
+            "funder": [
+                {
+                    "@id": "https://ror.org/00097mb19"
+                }
+            ],
             "identifier": [
                 {
                     "@id": "https://rdm.nii.ac.jp/mcsdj/"
@@ -30,8 +38,6 @@
                     "@id": "#e-Rad:123456"
                 }
             ],
-            "dateCreated": "2022-11-24T19:37:29.141940+09:00",
-            "datePublished": "2022-11-24T19:37:29.141940+09:00",
             "creator": [
                 {
                     "@id": "https://en.wikipedia.org/wiki/Ichiro_Suzuki"
@@ -43,64 +49,15 @@
                     "@id": "https://orcid.org/0000-0002-3456-7890"
                 }
             ],
-            "funder": [
-                {
-                    "@id": "https://ror.org/00097mb19"
-                }
-            ],
-            "dmpFormat":"common metadata",
-            "maintainer":[
-                {
-                    "@id":"https://ror.org/057zh3y96"
-                },
-                {
-                    "@id": "https://orcid.org/0000-0001-2345-6789"
-                }
-            ],
-            "contactPont":{
-                "@id":"#mailto:jiro@example.com"
-            },
-            "isAccessibleForFree":"true",
-            "license":{
-                "@id":"https://www.apache.org/licenses/LICENSE-2.0"
-            },
-            "accessRights":"open access",
-            "keyword":"Infomatics",
+            "keywords": "Informatics",
             "hasPart": [
                 {
-                    "@id": "exe/"
+                    "@id": "configs/"
                 },
                 {
-                    "@id": "configs/"
+                    "@id": "exe/"
                 }
             ]
-        },
-        {
-            "@id":"#dmp:1",
-            "@type":"CreativeWork",
-            "name":"parameters",
-            "desctiprion":"input parameter files",
-            "creator":[
-                {
-                    "@id": "https://en.wikipedia.org/wiki/Ichiro_Suzuki"
-                },
-                {
-                    "@id": "https://orcid.org/0000-0002-3456-7890"
-                }
-            ],
-            "contentSize":"1GB"
-        },
-        {
-            "@id":"#dmp:2",
-            "@type":"CreativeWork",
-            "name":"execution file",
-            "description":"python script",
-            "creator":[
-            {
-                "@id": "https://orcid.org/0000-0001-2345-6789"
-            }
-        ],
-            "contentSize":"1GB"
         },
         {
             "@id": "https://ror.org/00097mb19",
@@ -109,15 +66,32 @@
             "sameAs": "https://www.jst.go.jp/"
         },
         {
-            "@id": "#e-Rad:123456",
-            "@type": "PropertyValue",
-            "name": "e-Rad Project ID",
-            "value": "123456"
+            "@id": "https://rdm.nii.ac.jp/mcsdj/",
+            "@type": "RepositoryObject",
+            "name": "Gakunin RDM"
         },
         {
-            "@id": "https://rdm.nii.ac.jp/mcsdj/",
-            "@type":"RepositoryObject",
-            "name":"Gakunin RDM"
+            "@id": "https://www.apache.org/licenses/LICENSE-2.0",
+            "@type": "CreativeWork",
+            "name": "Apache License 2.0"
+        },
+        {
+            "@id": "#e-Rad:123456",
+            "@type": "PropertyValue",
+            "value": "123456",
+            "name": "e-Rad Project ID"
+        },
+        {
+            "@id": "https://ror.org/057zh3y96",
+            "@type": "Organization",
+            "name": "University of Tokyo",
+            "address": "7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan",
+            "sameAs": "https://www.u-tokyo.ac.jp/"
+        },
+        {
+            "@id": "https://www.mlb.com/mariners",
+            "@type": "Organization",
+            "name": "Seattle Mariners"
         },
         {
             "@id": "https://en.wikipedia.org/wiki/Ichiro_Suzuki",
@@ -129,6 +103,18 @@
             }
         },
         {
+            "@id": "#mailto:jiro@example.com",
+            "@type": "ContactPoint",
+            "email": "jiro@example.com",
+            "telephone": "03-1234-5678"
+        },
+        {
+            "@id": "#e-Rad:00123456",
+            "@type": "PropertyValue",
+            "value": "00123456",
+            "name": "e-Rad researcher number"
+        },
+        {
             "@id": "https://orcid.org/0000-0001-2345-6789",
             "@type": "Person",
             "name": "Jiro Suzuki",
@@ -136,12 +122,18 @@
             "affiliation": {
                 "@id": "https://ror.org/057zh3y96"
             },
+            "contactPoint": {
+                "@id": "#mailto:jiro@example.com"
+            },
             "identifier": {
                 "@id": "#e-Rad:00123456"
-            },
-            "contactPoint":{
-                "@id":"#mailto:jiro@example.com"
             }
+        },
+        {
+            "@id": "#e-Rad:00123457",
+            "@type": "PropertyValue",
+            "value": "00123457",
+            "name": "e-Rad researcher number"
         },
         {
             "@id": "https://orcid.org/0000-0002-3456-7890",
@@ -156,44 +148,97 @@
             }
         },
         {
-            "@id": "#e-Rad:00123456",
-            "@type": "PropertyValue",
-            "name": "e-Rad researcher number",
-            "value": "00123456"
+            "@id": "#usageInfo:1",
+            "@type": "CreativeWork",
+            "description": "following the license"
         },
         {
-            "@id": "#e-Rad:00123457",
-            "@type": "PropertyValue",
-            "name": "e-Rad researcher number",
-            "value": "00123457"
+            "@id": "#dmp:1",
+            "@type": "CreativeWork",
+            "name": "parameters",
+            "description": "input parameter files",
+            "contentSize": "1GB",
+            "creator": [
+                {
+                    "@id": "https://en.wikipedia.org/wiki/Ichiro_Suzuki"
+                },
+                {
+                    "@id": "https://orcid.org/0000-0002-3456-7890"
+                }
+            ],
+            "contactPoint": {
+                "@id": "#mailto:jiro@example.com"
+            },
+            "maintainer": [
+                {
+                    "@id": "https://ror.org/057zh3y96"
+                },
+                {
+                    "@id": "https://orcid.org/0000-0001-2345-6789"
+                }
+            ],
+            "isAccessibleForFree": "true",
+            "license": {
+                "@id": "https://www.apache.org/licenses/LICENSE-2.0"
+            },
+            "accessRights": "open access",
+            "usageInfo": {
+                "@id": "#usageInfo:1"
+            }
         },
         {
-            "@id": "https://ror.org/057zh3y96",
-            "@type": "Organization",
-            "name": "University of Tokyo",
-            "sameAs": "https://www.u-tokyo.ac.jp/"
-        },
-        {
-            "@id": "https://www.mlb.com/mariners",
-            "@type": "Organization",
-            "name": "Seattle Mariners"
-        },
-        {
-            "@id":"https://www.apache.org/licenses/LICENSE-2.0",
-            "@type":"CreativeWork",
-            "name":"Apache License 2.0"
-        },
-        {
-            "@id": "config/",
+            "@id": "configs/",
             "@type": "Dataset",
-            "name": "config",
-            "fileSize": "30B"
+            "name": "configs",
+            "contentSize": "30B",
+            "dmpDataNumber": {
+                "@id": "#dmp:1"
+            }
+        },
+        {
+            "@id": "#usageInfo:2",
+            "@type": "CreativeWork",
+            "description": "following the license"
+        },
+        {
+            "@id": "#dmp:2",
+            "@type": "CreativeWork",
+            "name": "execution file",
+            "description": "python script",
+            "contentSize": "1GB",
+            "creator": [
+                {
+                    "@id": "https://orcid.org/0000-0001-2345-6789"
+                }
+            ],
+            "contactPoint": {
+                "@id": "#mailto:jiro@example.com"
+            },
+            "maintainer": [
+                {
+                    "@id": "https://ror.org/057zh3y96"
+                },
+                {
+                    "@id": "https://orcid.org/0000-0001-2345-6789"
+                }
+            ],
+            "isAccessibleForFree": "true",
+            "license": {
+                "@id": "https://www.apache.org/licenses/LICENSE-2.0"
+            },
+            "accessRights": "open access",
+            "usageInfo": {
+                "@id": "#usageInfo:2"
+            }
         },
         {
             "@id": "exe/",
             "@type": "Dataset",
             "name": "exe",
-            "fileSize": "1150B"
+            "contentSize": "1150B",
+            "dmpDataNumber": {
+                "@id": "#dmp:2"
+            }
         }
     ]
 }

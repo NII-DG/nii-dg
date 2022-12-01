@@ -34,24 +34,35 @@ def set_dmp_format(dict):
     return NIIROCrate(dict, dmp_f)
 
 
-def generate_rocrate(dmp_path=None, dir_path=None):
-    if dmp_path is None:
-        dmp_path = input('dmp.json path:')
-    metadata = read_dmp(dmp_path)
-
-    crate = set_dmp_format(metadata)
-    crate.set_project_name()
+def add_entities_to_crate(crate:NIIROCrate) -> None:
     crate.set_publisheddate()
-    crate.set_funder()
-    crate.set_repo(**metadata)
-    crate.set_license()
-    crate.set_erad()
-    crate.set_affiliations()
-    crate.set_creators()
-    crate.set_field()
-    crate.set_grdm()
-    if dir_path:
+
+    key_func = {
+        "project_name": crate.set_project_name,
+        "funding_agency":crate.set_funder,
+        "repository":crate.set_repo,
+        "research_field":crate.set_field,
+        "e-Rad_project_id":crate.set_erad,
+        "license":crate.set_license,
+        "affiliation":crate.set_affiliations,
+        "creator":crate.set_creators
+        }
+    funcs = {k: v for k, v in key_func.items() if k in crate.dmp}
+    for k, v in funcs.items():
+        if crate.dmp.get(k):
+            v(crate.dmp.get(k))
+    
+    crate.set_dmplist()
+
+def generate_rocrate(dmp_path=None, dir_path=None):
+    metadata = read_dmp(dmp_path)
+    crate = set_dmp_format(metadata)
+
+    add_entities_to_crate(crate)
+
+    if dir_path is None:
         crate.load_data_dir(dir_path)
+
     roc = crate.generate()
 
     with open('ro-crate-metadata.json', 'w') as f:
