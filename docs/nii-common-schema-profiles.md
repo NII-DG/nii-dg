@@ -84,14 +84,14 @@
         <td>dateCreated</td>
         <td>MUST</td>
         <td>MUST be a string in ISO 8601 date format and MAY be a timestamp down to the millisecond. Time zone is in UTC</td>
-        <td>RO-Crate作成日</td>
+        <td>RO-Crate作成日 (ライブラリ利用の場合自動生成)</td>
         <td></td>
     </tr>
      <tr>
         <td>datePublished</td>
         <td>MUST</td>
-        <td>Date</td>
-        <td>メタデータ掲載日<br>指定しない場合はRO-Crate作成日と同じとする</td>
+        <td>MUST be a string in ISO 8601 date format and SHOULD be specified to at least the precision of a day</td>
+        <td>メタデータ掲載日<br>指定しない場合はdateCreatedと同値とする</td>
         <td>common metadata<br>6: 掲載日・掲載更新日</td>
     </tr>
     <tr>
@@ -111,13 +111,13 @@
      <tr>
         <td>dmpFormat</td>
         <td>MUST</td>
-        <td>Choose one from the list</td>
+        <td>Choose one from the list: common metadata; JST; AMED; METI</td>
         <td>DMPの様式</td>
-        <td>ガバナンスに利用</td>
+        <td>ガバナンス時、ルールセット呼び出しに利用</td>
     </tr>
     <tr>
         <td>maintainer</td>
-        <td>MUST</td>
+        <td>MUST if common to all dmp entities</td>
         <td>Array of <i> Hosting Instituion</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://orcid.com/0000-0001-2345-6789"}]</code></td>
         <td>データ管理機関・管理者</td>
         <td>common metadata:14.データ管理機関, 14.データ管理者<br>JST:研究責任者<br>AMED:データ管理機関, データ管理者<br>METI:管理者</td>
@@ -132,28 +132,28 @@
     <tr>
         <td>isAccessibleForFree</td>
         <td>MUST if accessRights has <i>restricted access</i></td>
-        <td>boolean</td>
+        <td>boolean<br>ガバナンス: <code>false</code>の場合、<i>restricted access</i>になっているか</td>
         <td>データ利用時の有償・無償</td>
         <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制<br>METI:研究開発データの利活用・提供方針</td>
     </tr>
     <tr>
         <td>license</td>
-        <td>MUST</td>
+        <td>MUST if common to all dmp entities</td>
         <td>Array of <i>CreativeWork</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://creativecommons.org/licenses/by/4.0"}]</code></td>
         <td>ライセンス情報</td>
         <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制<br>METI:研究開発データの利活用・提供方針</td>
     </tr>
     <tr>
         <td>accessRights</td>
-        <td>MUST</td>
-        <td>Choose one from the list</td>
+        <td>MUST if common to all dmp entities</td>
+        <td>Choose one from the list: open access; restricted access; embargoed access; metadata only access</td>
         <td>データセットへのアクセス状況</td>
         <td>common metadata:11.アクセス権<br>JST:研究データの取扱い方法<br>AMED:アクセス権<br>METI:公開レベル</td>
     </tr>
     <tr>
         <td>availabilityStarts</td>
         <td>MUST if accessRights has <i>embargoed access</i></td>
-        <td>Date</td>
+        <td>MUST be a string in ISO 8601 date format<br>ガバナンス: 検証時点よりも未来の日付になっているか, アクセス権は限定公開か</td>
         <td>公開猶予の場合の公開予定日</td>
         <td>common metadata:11.公開予定日<br>JST:公開までの猶予期間<br>AMED:公開予定日<br>METI:秘匿期間</td>
     </tr>
@@ -166,7 +166,7 @@
     </tr>
     <tr>
         <td>distribution</td>
-        <td>MAY</i></td>
+        <td>MUST if accessRights has <i>open access</i></i></td>
         <td>Array of <i>DataDownload</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://github.com/github/gitignore"}]</code></td>
         <td>データセットの配布情報</td>
         <td>JST:公開の方法<br>METI:プロジェクト終了後のリポジトリ</td>
@@ -226,7 +226,7 @@
     <tr>
         <td>encodingFormat</td>
         <td>SHOULD</td>
-        <td>Array of <i>MIME type</i> and <i>PRONOM identifier</i> entity, e.g. <code> ["application/pdf", {"@id": "https://www.nationalarchives.gov.uk/PRONOM/fmt/19"}]</code></td>
+        <td><i>MIME type</i>  e.g. <code> "application/pdf"</code><br>Can be added PRONUM entity</td>
         <td>ファイルタイプ</td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html#adding-detailed-descriptions-of-encodings>researchobject.org</a></td>
     </tr>
@@ -240,7 +240,7 @@
     <tr>
         <td>sdDatePublished</td>
         <td>MUST if file from URI outside the RO-Crate Root</td>
-        <td>date</td>
+        <td>MUST be a string in ISO 8601 date format</td>
         <td>外部ファイルの取得日時</td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/data-entities.html#web-based-data-entities>researchobject.org</a></td>
     </tr>
@@ -327,14 +327,14 @@
     <tr>
         <td>accessRights</td>
         <td>MUST if different from the root data entity</td>
-        <td>Choose one from the list</td>
+        <td>Choose one from the list: open access; restricted access; embargoed access; metadata only access</td>
         <td>データセットへのアクセス状況</td>
         <td>common metadata:11.アクセス権<br>JST:研究開発データの公開/非公開の方針<br>AMED:アクセス権<br>METI:公開レベル</td>
     </tr>
     <tr>
         <td>availabilityStarts</td>
         <td>MUST if accessRights has <i>embargoed access</i> and different from the root data entity</td>
-        <td>Date</td>
+        <td>MUST be a string in ISO 8601 date format<br>ガバナンス: 検証時点よりも未来の日付になっているか, アクセス権は限定公開か</td>
         <td>公開猶予の場合の公開予定日</td>
         <td>common metadata:11.公開予定日<br>AMED:公開予定日<br>METI:秘匿期間</td>
     </tr>
@@ -347,9 +347,9 @@
     </tr>
     <tr>
         <td>contentSize</td>
-        <td>SHOULD</td>
-        <td>string</td>
-        <td>ファイルサイズ</td>
+        <td>MUST with AMED</td>
+        <td>Choose one from the list: 1GB; 10GB; 100GB; 1TB; 1PB</td>
+        <td>想定される最大ファイルサイズ</td>
         <td>common metadata:12.概略データ量<br>AMED:概略データ量<br>METI:想定データ量</td>
     </tr>
     <tr>
@@ -362,8 +362,8 @@
     <tr>
         <td>encodingFormat</td>
         <td>MAY</td>
-        <td>string, MIME Format</td>
-        <td>ファイル形式</td>
+        <td><i>MIME type</i>  e.g. <code> "application/pdf"</code></td>
+        <td>ファイルフォーマット</td>
         <td>METI:加工方針</td>
     </tr>
     <tr>
@@ -372,7 +372,7 @@
         <tr>
         <td>@id</td>
         <td>MUST</td>
-        <td>URI, ORCID is recommended</td>
+        <td>Must be reachable URL, ORCID is recommended</td>
         <td></td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#people>researchobject.org</a></td>
     </tr>
@@ -386,7 +386,7 @@
     <tr>
         <td>name</td>
         <td>MUST</td>
-        <td>string<br>In order of firstname, familyname</td>
+        <td>string<br>In order of firstname, familyname<br>ガバナンス: @idのURLから得られる情報と一致しているか</td>
         <td>研究者氏名, データ管理者氏名</td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#people>researchobject.org</a><br>common metadata:13.データ作成者<br>JST:研究代表者<br>AMED:研究開発代表者,データ管理者,データ関連人材</td>
     </tr>
@@ -413,7 +413,7 @@
     </tr>
     <tr>
         <td>email</td>
-        <td>SHOULD</td>
+        <td>MUST</td>
         <td>email</td>
         <td>研究者のメールアドレス</td>
         <td></td>
@@ -430,7 +430,7 @@
         <tr>
         <td>@id</td>
         <td>MUST</td>
-        <td>URI, ROR is recommended</td>
+        <td>Must be reachable URI, ROR is recommended</td>
         <td></td>
         <td><a href=https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#organizations-as-values>researchobject.org</a></td>
     </tr>
@@ -444,7 +444,7 @@
     <tr>
         <td>name</td>
         <td>MUST</td>
-        <td>string</td>
+        <td>string<br>ガバナンス: @idのURIから取得できる情報と一致しているか</td>
         <td>組織名</td>
         <td>common metadata:1.資金配分機関情報, データ管理機関<br>AMED:所属,データ管理機関</td>
     </tr>
@@ -481,7 +481,7 @@
     <tr>
         <td>telephone</td>
         <td>Either <i>email</i> or <i>telephone</i> is REQUIRED</td>
-        <td>Phone number</td>
+        <td>Phone number<br>ガバナンス: 桁数が正しいか</td>
         <td>電話番号</td>
         <td>common metadata:14.データ管理者の連絡先<br>AMED:データ管理者の連絡先<br>METI:連絡先</td>
     <tr>
@@ -490,7 +490,7 @@
         <tr>
         <td>@id</td>
         <td>MUST</td>
-        <td>URI</td>
+        <td>Must be reachable URI</td>
         <td></td>
         <td></td>
     </tr>
@@ -504,7 +504,7 @@
     <tr>
         <td>name</td>
         <td>MUST</td>
-        <td>string</td>
+        <td>string<br>Should be in <a href="https://spdx.org/licenses/">SPDX License List</a></td>
         <td>ライセンス名</td>
         <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制<br>METI:研究開発データの利活用・提供方針</td>
     </tr>
@@ -599,7 +599,7 @@
         <tr>
         <td>@id</td>
         <td>MUST if add this entity</td>
-        <td>URI</td>
+        <td>Accessible URI</td>
         <td></td>
         <td>JST:公開の方法<br>METI:プロジェクト終了後のリポジトリ</td>
     </tr>
@@ -613,7 +613,7 @@
     <tr>
         <td>downloadUrl</td>
         <td>MUST if add this entity</td>
-        <td>URI, which is the same as @id property</i></td>
+        <td>Accessible URL, which is the same as @id property</i></td>
         <td>データを取得可能なURL</td>
         <td>JST:公開の方法<br>METI:プロジェクト終了後のリポジトリ</td>
     <tr>
@@ -643,7 +643,7 @@
     <tr>
         <td>value</td>
         <td>MUST</td>
-        <td>e-Rad ID</td>
+        <td>e-Rad ID<br>ガバナンス: 研究者番号の場合チェックデジットを確認</td>
         <td>e-RadのID</td>
         <td>common metadata:2.e-Radの課題番号, 13.データ作成者のe-Rad研究番号, 14.データ管理者のe-Rad研究番号</td>
     </tr>
