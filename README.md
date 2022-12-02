@@ -9,14 +9,14 @@ nii_dg
 ### RO-Crate生成 
 JSONファイルに対象データ情報が含まれる場合、それを引数に指定する。現在のディレクトリに`ro-crate-metadata.json`が生成される。
 ```python
-from nii_dg import generate_rocrate
+import nii_dg
 
-generate_rocrate('path/to/input.json')
+nii_dg.generate_rocrate('path/to/input.json')
 ```
 
 対象データ情報をローカルから読み込む場合、そのディレクトリパスを第二引数に置く。同様に`ro-crate-metadata.json`が生成される。
 ```python
-from nii_dg import generate_rocrate
+import nii_dg
 
-generate_rocrate('path/to/input.json', 'path/to/dir')
+nii_dg.generate_rocrate('path/to/input.json', 'path/to/dir')
 ```
