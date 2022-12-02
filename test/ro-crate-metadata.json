@@ -55,7 +55,13 @@
                     "@id": "configs/"
                 },
                 {
+                    "@id": "configs/input.json"
+                },
+                {
                     "@id": "exe/"
+                },
+                {
+                    "@id": "exe/sample.py"
                 }
             ]
         },
@@ -187,15 +193,6 @@
             }
         },
         {
-            "@id": "configs/",
-            "@type": "Dataset",
-            "name": "configs",
-            "contentSize": "30B",
-            "dmpDataNumber": {
-                "@id": "#dmp:1"
-            }
-        },
-        {
             "@id": "#usageInfo:2",
             "@type": "CreativeWork",
             "description": "following the license"
@@ -232,13 +229,46 @@
             }
         },
         {
+            "@id": "configs/",
+            "@type": "Dataset",
+            "name": "configs",
+            "contentSize": "30B",
+            "dmpDataNumber": {
+                "@id": "#dmp:1"
+            },
+            "url":"https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/configs/"
+        },
+        {
+            "@id": "configs/input.json",
+            "@type": "File",
+            "name": "input.json",
+            "contentSize": "30B",
+            "dmpDataNumber": {
+                "@id": "#dmp:1"
+            },
+            "url":"https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/636c521f4fa1910010825ee1",
+            "encodingFormat":"application/json"
+        },
+        {
             "@id": "exe/",
             "@type": "Dataset",
             "name": "exe",
             "contentSize": "1150B",
             "dmpDataNumber": {
                 "@id": "#dmp:2"
-            }
+            },
+            "url":"https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/exe/"
+        },
+        {
+            "@id": "exe/sample.py",
+            "@type": "File",
+            "name": "sample.py",
+            "contentSize": "1150B",
+            "dmpDataNumber": {
+                "@id": "#dmp:2"
+            },
+            "url":"https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/636c52304fa1910010825ef9",
+            "encodingFormat":"text/x-python"
         }
     ]
 }

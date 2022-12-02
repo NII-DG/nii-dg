@@ -110,7 +110,7 @@
         }
       }
     },
-    "dataset": {
+    "dmp": {
       "type": "array",
       "items": {
         "type": "object",
@@ -140,7 +140,6 @@
               "metadata only access"
             ]
           },
-          "size": { "type": "string" },
           "hosting_institution": { 
             "type": "object",
             "required":["name"],
@@ -173,6 +172,16 @@
               "telephone": {"type": "string"}
             }
           }
+        }
+      }
+    },
+    "dataset":{
+      "type":"array",
+      "items":{
+        "type":"object",
+        "required":["name","url"],
+        "properties":{
+          "size": { "type": "string" }
         }
       }
     },

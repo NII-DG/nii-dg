@@ -52,7 +52,7 @@
             "name":"Apache License 2.0",
             "url":"https://www.apache.org/licenses/LICENSE-2.0"
         }],
-    "dataset":[
+    "dmp":[
         {
             "data_number":1,
             "title":"parameters",
@@ -68,15 +68,13 @@
             },
             "access_rights":"open access",
             "citation_info":"following the license",
-            "size":"30B",
             "max_filesize":"1GB",
             "hosting_institution":{
                 "name":"University of Tokyo"
             },
             "data_manager":{
                 "name":"Jiro Suzuki"
-            },
-            "url":"https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/configs/"
+            }
         },
         {
             "data_number":2,
@@ -92,15 +90,45 @@
             },
             "access_rights":"open access",
             "citation_info":"following the license",
-            "size":"1150B",
             "max_filesize":"1GB",
             "hosting_institution":{
                 "name":"University of Tokyo"
             },
             "data_manager":{
                 "name":"Jiro Suzuki"
-            },
-            "url":"https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/exe/"
+            }
+        }
+    ],
+    "dataset":[
+        {
+            "path":"configs/",
+            "url":"https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/configs/",
+            "size":"30B",
+            "name":"configs",
+            "dmp":1
+        },
+        {
+            "path":"configs/input.json",
+            "url":"https://rdm.nii.ac.jp/mcsdj/files/osfstorage/636c521f4fa1910010825ee1",
+            "size":"30B",
+            "name":"input.json",
+            "dmp":2,
+            "format":"application/json"
+        },
+        {
+            "path":"exe/",
+            "url":"https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/exe/",
+            "size":"1150B",
+            "name":"exe",
+            "dmp":2
+        },
+        {
+            "path":"exe/sample.py",
+            "url":"https://rdm.nii.ac.jp/mcsdj/files/osfstorage/636c52304fa1910010825ef9",
+            "size":"1150B",
+            "name":"sample.py",
+            "dmp":2,
+            "format":"application/json"
         }
     ]
 }
