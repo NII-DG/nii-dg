@@ -53,17 +53,3 @@ def add_entities_to_crate(crate:NIIROCrate) -> None:
             v(crate.dmp.get(k))
     
     crate.set_dmplist()
-
-def generate_rocrate(dmp_path=None, dir_path=None):
-    metadata = read_dmp(dmp_path)
-    crate = set_dmp_format(metadata)
-
-    add_entities_to_crate(crate)
-
-    if dir_path is None:
-        crate.load_data_dir(dir_path)
-
-    roc = crate.generate()
-
-    with open('ro-crate-metadata.json', 'w') as f:
-        json.dump(roc, f, indent=4)
