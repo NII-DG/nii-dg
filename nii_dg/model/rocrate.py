@@ -53,11 +53,12 @@ class ROCrate():
         return e.get_id_dict() 
 
     def add_entity(self, id_:str, e_type:str, properties:dict) -> dict:
-        if self.get_by_id(id_):
-            e = self.get_by_id(id_)
-        else:
+        if self.get_by_id(id_) is None:
             e = ContextEntity(id_, e_type)
             self.entities.append(e)
+        else:
+            e = self.get_by_id(id_)
+
         e.add_properties(properties)
         return {"@id":id_}
 
@@ -74,10 +75,10 @@ class ROCrate():
         for entity in self.entities:
             graph.append(entity.get_jsonld())
         context = f'{const.PROFILE}/context'
-        if self.data_entities:
+        if self.data_entities is not None:
             for entity in self.data_entities:
                 graph.append(entity.get_jsonld())
-        if self.extra_terms:
+        if self.extra_terms is not None:
             context = [context, self.extra_terms]
         return {'@context': context, '@graph': graph}
 
@@ -138,7 +139,7 @@ class NIIROCrate(ROCrate):
         '''
 
         # when "ror" is missing, "url" is adopted as @id property
-        ids = [item for item in [org.get("ror"), org.get("url")] if item]
+        ids = [item for item in [org.get("ror"), org.get("url")] if item is not None]
         if len(ids) == 0:
             raise ValidationError('Either property "ror" or "url" is required for organization entity')
 
@@ -158,7 +159,7 @@ class NIIROCrate(ROCrate):
         properties = {k: v for k, v in person.items() if k in ["name","email"]}
 
         # when "orcid" is missing, "url" is adopted as @id property
-        ids = [item for item in [person.get("orcid"), person.get("url")] if item]
+        ids = [item for item in [person.get("orcid"), person.get("url")] if item is not None]
         if len(ids) == 0:
             raise ValidationError('Either property "orcid" or "url" is required for person entity')
         if len(ids) == 2:
@@ -166,18 +167,18 @@ class NIIROCrate(ROCrate):
 
         # add affiliation entity
         affiliation = person.get("affiliation")
-        if self.convert_name_to_id(affiliation):
-            properties["affiliation"] = self.convert_name_to_id(affiliation)
-        else:
+        if self.convert_name_to_id(affiliation) is None:
             properties["affiliation"] = self.add_organization(affiliation)
+        else:
+            properties["affiliation"] = self.convert_name_to_id(affiliation)
 
         # when there is "telephone", add ContactPoint entity
-        if person.get("telephone"):
+        if person.get("telephone") is not None:
             properties["contactPoint"] = self.add_contactpoint(person)
 
         # when there is e-rad ID, add an entity
         erad = person.get('e-Rad_researcher_number')
-        if erad:
+        if erad is not None:
             properties["identifier"] = self.add_erad(erad, 'researcher')
 
         return self.add_entity(ids[0], 'Person', properties)
@@ -221,7 +222,7 @@ class NIIROCrate(ROCrate):
         cd = self.rootdataentity.get("datePublished")
         self.update_entity(self.rootdataentity,{"dateCreated":cd})
 
-        if pd:
+        if pd is not None:
             self.update_entity(self.rootdataentity,{"datePublished":cd})
 
     def set_project_name(self, name:str) -> None:
@@ -281,9 +282,7 @@ class NIIROCrate(ROCrate):
         creator_list = []
 
         for creator in creators:
-            if self.get_by_name(creator["name"]):
-                pass
-            else:
+            if self.get_by_name(creator["name"]) is None:
                 id_ = self.add_person(creator)
                 creator_list.append(id_)
 
@@ -296,11 +295,11 @@ class NIIROCrate(ROCrate):
 
         for affiliation in affiliations:
             aff_e = self.get_by_name(affiliation["name"])
-            if aff_e:
+            if aff_e is None:
+                self.add_organization(affiliation)
+            else:
                 properties = {k: v for k, v in affiliation.items() if k not in ["ror", "url"]}
                 self.update_entity(aff_e, properties)
-            else:
-                self.add_organization(affiliation)
 
 
     def set_license(self, licenses:list) -> None:
@@ -337,7 +336,7 @@ class NIIROCrate(ROCrate):
                 "contentSize":dmp.get("max_filesize")
             }
 
-            if dmp.get('creator'):
+            if dmp.get('creator') is not None:
                 c_list = []
                 for creator in dmp.get('creator'):
                     if self.get_by_name(creator["name"]):
@@ -347,10 +346,10 @@ class NIIROCrate(ROCrate):
                     c_list.append(c_id)
                 properties["creator"] = c_list
 
-            if dmp.get("hosting_institution"):
+            if dmp.get("hosting_institution") is not None:
                 hi = self.convert_name_to_id(dmp["hosting_institution"])
                 maintainer.append(hi)
-            if dmp.get("data_manager"):
+            if dmp.get("data_manager") is not None:
                 dm = self.convert_name_to_id(dmp["data_manager"])
                 maintainer.append(dm)
 
@@ -365,21 +364,21 @@ class NIIROCrate(ROCrate):
                 properties["maintainer"] = maintainer
 
             iaf = dmp.get("free_or_consideration")
-            if iaf:
+            if iaf is not None:
                 properties["isAccessibleForFree"] = const.FREEACCESS.get(iaf)
 
-            if dmp.get("license"):
+            if dmp.get("license") is not None:
                 lic = self.convert_name_to_id(dmp["license"])
                 if lic is None:
                     lic = self.add_entity_by_url(dmp["license"], "CreativeWork")
 
                 properties["license"] = lic
 
-            if dmp.get("access_rights"):
+            if dmp.get("access_rights") is not None:
                 properties["accessRights"] = dmp.get("access_rights")
 
             ui = dmp.get("citation_info")
-            if ui:
+            if ui is not None:
                 properties["usageInfo"] = self.add_entity(f"#usageInfo:{i}", "CreativeWork", {"description":ui})
                 i += 1
 
@@ -396,9 +395,9 @@ class NIIROCrate(ROCrate):
                 }
                 self.add_entity(dir_, "Dataset", data_properties)
 
-                if self.rootdataentity.get('hasPart'):
-                    self.rootdataentity.get('hasPart').append({"@id":dir_})
-                else:
+                if self.rootdataentity.get('hasPart') is None:
                     haspart = []
                     haspart.append({"@id":dir_})
                     self.rootdataentity.add_properties({"hasPart":haspart})
+                else:
+                    self.rootdataentity.get('hasPart').append({"@id":dir_})

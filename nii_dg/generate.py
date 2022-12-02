@@ -15,7 +15,7 @@ def read_dmp(path):
 
 def set_dmp_format(dict):
     dmp_f = dict.get('dmp_format')
-    if (dmp_f is None):
+    if dmp_f is None:
         raise ValidationError('property "dmp_format" is missing.')
     dmp_f = dmp_f.replace(' ', '_')
 
@@ -49,7 +49,7 @@ def add_entities_to_crate(crate:NIIROCrate) -> None:
         }
     funcs = {k: v for k, v in key_func.items() if k in crate.dmp}
     for k, v in funcs.items():
-        if crate.dmp.get(k):
+        if crate.dmp.get(k) is not None:
             v(crate.dmp.get(k))
     
     crate.set_dmplist()
