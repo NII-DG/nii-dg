@@ -1,6 +1,8 @@
 import os
 from typing import Optional
 from nii_dg.model.entities import (Entity, ContextEntity, DataEntity, Metadata, RootDataEntity)
+from nii_dg import const
+
 
 def get_dir_size(path:str) -> int:
     total = 0
@@ -71,7 +73,7 @@ class ROCrate():
         graph = []
         for entity in self.entities:
             graph.append(entity.get_jsonld())
-        context = f'{self.metadata.PROFILE}/context'
+        context = f'{const.PROFILE}/context'
         if self.data_entities:
             for entity in self.data_entities:
                 graph.append(entity.get_jsonld())
@@ -81,16 +83,10 @@ class ROCrate():
 
 
 class NIIROCrate(ROCrate):
-    EXTRA_TERMS = {
-        "accessRights": "http://purl.org/dc/terms/accessRights",
-        "dmpFormat": "https://example.com/dmpFormat",  # to be updated
-        "dmpDataNumber": "https://example.com/dataManagementPlan"  # to be updated
-    }
-    FREEACCESS = {"free":"true", "consideration":"false"}
 
     def __init__(self, dmp:str, dmpf:str):
         super().__init__()
-        self.extra_terms = self.EXTRA_TERMS
+        self.extra_terms = const.EXTRA_TERMS
         self.dmp = dmp
         self.dmpf = dmpf
         self.update_entity(self.rootdataentity,{"dmpFormat":dmpf})
@@ -370,7 +366,7 @@ class NIIROCrate(ROCrate):
 
             iaf = dmp.get("free_or_consideration")
             if iaf:
-                properties["isAccessibleForFree"] = self.FREEACCESS.get(iaf)
+                properties["isAccessibleForFree"] = const.FREEACCESS.get(iaf)
 
             if dmp.get("license"):
                 lic = self.convert_name_to_id(dmp["license"])

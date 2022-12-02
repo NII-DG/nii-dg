@@ -128,7 +128,7 @@
             "size":"1150B",
             "name":"sample.py",
             "dmp":2,
-            "format":"application/json"
+            "format":"text/x-python"
         }
     ]
 }

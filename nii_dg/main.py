@@ -1,6 +1,7 @@
 import json
 import sys
 from nii_dg.generate import add_entities_to_crate, read_dmp, set_dmp_format
+from nii_dg import const
 
 
 def generate_rocrate(dmp_path=None, dir_path=None):
@@ -15,7 +16,7 @@ def generate_rocrate(dmp_path=None, dir_path=None):
 
         roc = crate.generate()
 
-        with open('ro-crate-metadata.json', 'w') as f:
+        with open(const.BASENAME, 'w') as f:
             json.dump(roc, f, indent=4)
 
         sys.exit(0)

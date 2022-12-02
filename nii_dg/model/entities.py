@@ -1,4 +1,5 @@
 from datetime import datetime,timezone, timedelta
+from nii_dg import const
 
 
 class Entity():
@@ -58,16 +59,13 @@ class RootDataEntity(DataEntity):
 
 
 class Metadata(Entity):
-    BASENAME = "ro-crate-metadata.json"
-    PROFILE = "https://w3id.org/ro/crate/1.1"
 
-    def __init__(self, id_=None, type_='CreativeWork'):
+    def __init__(self, id_=const.BASENAME, type_='CreativeWork'):
         super().__init__(id_, type_)
-        self.id = self.BASENAME
 
     def _empty(self):
-        val = {"@id": self.BASENAME,
+        val = {"@id": self.id,
                "@type": self.type,
-               "conformsTo": {"@id": self.PROFILE},
+               "conformsTo": {"@id": const.PROFILE},
                "about": {"@id": "./"}}
         return val
