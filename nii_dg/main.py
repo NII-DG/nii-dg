@@ -1,4 +1,5 @@
 import json
+import sys
 from nii_dg.generate import add_entities_to_crate, read_dmp, set_dmp_format
 
 
@@ -16,8 +17,11 @@ def generate_rocrate(dmp_path=None, dir_path=None):
 
         with open('ro-crate-metadata.json', 'w') as f:
             json.dump(roc, f, indent=4)
+
+        sys.exit(0)
     except Exception as e:
         print('Error occured!: ' + e)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
