@@ -1,4 +1,4 @@
-from datetime import datetime,timezone, timedelta
+from datetime import datetime,timezone
 from nii_dg import const
 
 
@@ -32,19 +32,7 @@ class Entity():
         return {"@id":self.get("@id")}
 
 
-class ContextEntity(Entity):
-
-    def __init__(self, id_=None, type_=None):
-        super().__init__(id_, type_)
-
-
-class DataEntity(Entity):
-
-    def __init__(self, id_=None, type_=None):
-        super().__init__(id_, type_)
-
-
-class RootDataEntity(DataEntity):
+class RootDataEntity(Entity):
 
     def __init__(self, id_='./', type_='Dataset'):
         super().__init__(id_, type_)

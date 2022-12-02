@@ -110,6 +110,20 @@
         }
       }
     },
+    "license":{
+      "type":"array",
+      "items":{
+        "type":"object",
+        "required":["name","url"],
+        "properties":{
+          "name":{"type":"string"},
+          "url":{
+            "type":"string",
+            "format":"url"
+          }
+        }
+      }
+    },
     "dmp": {
       "type": "array",
       "items": {
@@ -179,19 +193,13 @@
       "type":"array",
       "items":{
         "type":"object",
-        "required":["name","url"],
+        "required":["name","path","dmp"],
         "properties":{
-          "size": { "type": "string" }
-        }
-      }
-    },
-    "license":{
-      "type":"array",
-      "items":{
-        "type":"object",
-        "required":["name","url"],
-        "properties":{
-          "name":{"type":"string"},
+          "name": { "type": "string" },
+          "path": { "type": "string" },
+          "size": { "type": "string" },
+          "format": { "type": "string" },
+          "dmp":{"type":"integer"},
           "url":{
             "type":"string",
             "format":"url"

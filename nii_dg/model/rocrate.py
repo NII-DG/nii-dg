@@ -1,6 +1,6 @@
 import os
 from typing import Optional
-from nii_dg.model.entities import (Entity, ContextEntity, DataEntity, Metadata, RootDataEntity)
+from nii_dg.model.entities import (Entity, Metadata, RootDataEntity)
 from nii_dg import const
 
 
@@ -54,7 +54,7 @@ class ROCrate():
 
     def add_entity(self, id_:str, e_type:str, properties:dict) -> dict:
         if self.get_by_id(id_) is None:
-            e = ContextEntity(id_, e_type)
+            e = Entity(id_, e_type)
             self.entities.append(e)
         else:
             e = self.get_by_id(id_)
@@ -62,10 +62,6 @@ class ROCrate():
         e.add_properties(properties)
         return {"@id":id_}
 
-    def add_dataentity(self, id_:str, e_type:str, properties:dict) ->None:
-        e = DataEntity(id_, e_type)
-        e.add_properties(properties)
-        self.data_entities.append(e)
 
     def update_entity(self, entity:Entity, properties:dict) -> None:
         entity.add_properties(properties)
@@ -323,7 +319,7 @@ class NIIROCrate(ROCrate):
         '''
         Add "dmp datalist" entity with grdm metadata
         '''
-        dmpset = self.dmp.get("dataset")
+        dmpset = self.dmp.get("dmp")
         i = 1
 
         for dmp in dmpset:
@@ -385,19 +381,50 @@ class NIIROCrate(ROCrate):
             self.add_entity(id_, "CreativeWork", properties)
 
             # add data entity
-            filepath = dmp.get("url")
-            if filepath.find('/dir/osfstorage') > 0:
-                dir_ = filepath[filepath.find('osfstorage')+11:]
-                data_properties = {
-                    "name":dir_[:-1],
-                    "contentSize":dmp.get("size"),
-                    "dmpDataNumber":{"@id":id_}
-                }
-                self.add_entity(dir_, "Dataset", data_properties)
+            # filepath = dmp.get("url")
+            # if filepath.find('/dir/osfstorage') > 0:
+            #     dir_ = filepath[filepath.find('osfstorage')+11:]
+            #     data_properties = {
+            #         "name":dir_[:-1],
+            #         "contentSize":dmp.get("size"),
+            #         "dmpDataNumber":{"@id":id_}
+            #     }
+            #     self.add_entity(dir_, "Dataset", data_properties)
 
-                if self.rootdataentity.get('hasPart') is None:
-                    haspart = []
-                    haspart.append({"@id":dir_})
-                    self.rootdataentity.add_properties({"hasPart":haspart})
-                else:
-                    self.rootdataentity.get('hasPart').append({"@id":dir_})
+            #     if self.rootdataentity.get('hasPart') is None:
+            #         haspart = []
+            #         haspart.append({"@id":dir_})
+            #         self.rootdataentity.add_properties({"hasPart":haspart})
+            #     else:
+            #         self.rootdataentity.get('hasPart').append({"@id":dir_})
+
+    def set_data(self, datalist:list = None) -> None:
+        '''
+        JSON内のディレクトリ・ファイル情報をデータエンティティとして追加
+        '''
+
+        if datalist is None:
+            datalist = self.dmp.get("dataset")
+
+        if self.rootdataentity.get('hasPart') is None:
+            self.rootdataentity.add_properties({"hasPart":[]})
+
+        for data in datalist:
+            properties = {k: v for k, v in data.items() if k in ["name", "url"]}
+            properties["contentSize"] = data.get("size")
+
+            dmp_id = "#dmp:" + str(data.get("dmp"))
+            dmp_id_dict = self.get_by_id(dmp_id).get_id_dict()
+            if dmp_id_dict is None:
+                raise ValidationError(f'The given dmp data number {dmp_id} is not found.')
+            properties["dmpDataNumber"] = dmp_id_dict
+
+            id_ = data.get("path")
+            if id_.endswith("/"):
+                data_id = self.add_entity(id_, "Dataset", properties)
+            else:
+                if data.get("format") is not None:
+                    properties["encodingFormat"] = data.get("format")
+                data_id = self.add_entity(id_, "File", properties)
+        
+            self.rootdataentity.get('hasPart').append(data_id)
