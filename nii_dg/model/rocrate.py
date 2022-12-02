@@ -5,6 +5,9 @@ from nii_dg import const
 
 
 def get_dir_size(path:str) -> int:
+    '''
+    ディレクトリに含まれるファイルサイズの合計を算出する
+    '''
     total = 0
     with os.scandir(path) as it:
         for entry in it:
@@ -19,15 +22,19 @@ class ValidationError(Exception):
 
 
 class ROCrate():
-
+    '''
+    基底クラス
+    '''
     def __init__(self) -> None:
         self.metadata = Metadata()
         self.rootdataentity = RootDataEntity()
         self.entities = [self.metadata, self.rootdataentity]
-        self.data_entities = []
         self.extra_terms = None
 
     def get_by_type(self, e_type:str) -> list:
+        '''
+        @typeが引数に一致するエンティティをリストで返す
+        '''
         ents = []
         for e in self.entities:
             if e.get("@type") == e_type:
@@ -35,24 +42,41 @@ class ROCrate():
         return ents
 
     def get_by_name(self, e_name:str) -> Optional[Entity]:
+        '''
+        nameが引数に一致するエンティティを返す
+        各エンティティでnameはユニークになる前提
+        '''
         for e in self.entities:
             if e.get("name") == e_name:
                 return e
         return None
 
     def get_by_id(self, e_id:str) -> Optional[Entity]:
+        '''
+        @idが引数に一致するエンティティを返す
+        各エンティティでpidはユニークになる前提
+        '''
         for e in self.entities:
             if e.get("@id") == e_id:
                 return e
         return None
 
     def convert_name_to_id(self, namedict:dict) -> Optional[dict]:
+        '''
+        {name: xxx} の辞書を引数として、nameが一致するエンティティが存在する時
+        そのエンティティの@idを辞書で返す
+        '''
         e = self.get_by_name(namedict["name"])
         if e is None:
             return None
-        return e.get_id_dict() 
+        return e.get_id_dict()
 
     def add_entity(self, id_:str, e_type:str, properties:dict) -> dict:
+        '''
+        @idが一致するエンティティが存在しない場合、エンティティを新規作成
+        存在する場合はプロパティを更新
+        いずれも該当するエンティティの@id key-valueを辞書で返す
+        '''
         if self.get_by_id(id_) is None:
             e = Entity(id_, e_type)
             self.entities.append(e)
@@ -60,43 +84,43 @@ class ROCrate():
             e = self.get_by_id(id_)
 
         e.add_properties(properties)
-        return {"@id":id_}
+        return e.get_id_dict()
 
-
-    def update_entity(self, entity:Entity, properties:dict) -> None:
-        entity.add_properties(properties)
 
     def generate(self) -> dict:
+        '''
+        各エンティティからRO-Crate形式のJSON-LDを作成
+        '''
         graph = []
         for entity in self.entities:
             graph.append(entity.get_jsonld())
         context = f'{const.PROFILE}/context'
-        if self.data_entities is not None:
-            for entity in self.data_entities:
-                graph.append(entity.get_jsonld())
         if self.extra_terms is not None:
             context = [context, self.extra_terms]
         return {'@context': context, '@graph': graph}
 
 
 class NIIROCrate(ROCrate):
+    '''
+    RO-Crateクラスを拡張しNII標準独自のメソッド・インスタンス変数を追加
+    '''
 
     def __init__(self, dmp:str, dmpf:str):
         super().__init__()
         self.extra_terms = const.EXTRA_TERMS
         self.dmp = dmp
         self.dmpf = dmpf
-        self.update_entity(self.rootdataentity,{"dmpFormat":dmpf})
+        self.rootdataentity.add_properties({"dmpFormat":dmpf})
 
 
     def add_entity_by_url(self, dict_:dict, type_:str) -> dict:
         '''
-        generate entity by dict. @id is from url value of the dict.
+        url キーを含む辞書から、urlのvalueを@idとしてエンティティ作成
         '''
 
         id_ = dict_.get('url')
         if id_ is None:
-            raise ValidationError('property "url" is missing.')
+            raise ValidationError('key "url" is not found.')
         properties = {k: v for k, v in dict_.items() if v != id_}
         
         return self.add_entity(id_, type_, properties)
@@ -104,7 +128,8 @@ class NIIROCrate(ROCrate):
 
     def add_erad(self, erad:str, erad_type:str) -> dict:
         '''
-        generate e-rad entity
+        e-Rad番号のエンティティを追加
+        プロジェクトIDか研究者番号かを引数で指定
         '''
         properties = {'value': erad}
 
@@ -120,8 +145,8 @@ class NIIROCrate(ROCrate):
 
     def add_contactpoint(self, cp:dict) -> dict:
         '''
-        Generate ContactPoint entity by dict. @id is from email value of the dict.
-        When the entity already exists, update it.
+        ContactPointエンティティを作成する
+        IDはemail valueから生成
         '''
 
         properties = {k: v for k, v in cp.items() if k in ["email", "telephone","contactType"]}
@@ -131,7 +156,8 @@ class NIIROCrate(ROCrate):
 
     def add_organization(self, org:dict) -> dict:
         '''
-        Generate Organization entity by dict. @id is from ror url of the dict.
+        Organizationエンティティを作成する
+        @idはrorもしくはurlのvalueとし、rorを優先
         '''
 
         # when "ror" is missing, "url" is adopted as @id property
@@ -149,7 +175,8 @@ class NIIROCrate(ROCrate):
 
     def add_person(self, person:dict) -> dict:
         '''
-        Generate Person entity by dict. @id is from orcid url of the dict.
+        Personエンティティを作成する
+        @idはorcidもしくはurlのvalueとし、rorを優先
         '''
 
         properties = {k: v for k, v in person.items() if k in ["name","email"]}
@@ -178,11 +205,11 @@ class NIIROCrate(ROCrate):
             properties["identifier"] = self.add_erad(erad, 'researcher')
 
         return self.add_entity(ids[0], 'Person', properties)
-        
+
 
     def load_data_dir(self, data_dir:str):
         '''
-        Generate data entities by reading indicated directory
+        ローカルのディレクトリを読み、データエンティティを作成
         '''
 
         file_list = []
@@ -192,44 +219,45 @@ class NIIROCrate(ROCrate):
 
         for root, dirs, files in os.walk(data_dir, topdown=False):
 
-            for f in files:
-                if f == 'ro-crate-metadata.json':
+            for file in files:
+                if file == 'ro-crate-metadata.json':
                     continue
-                f_path = os.path.join(root, f)
+                f_path = os.path.join(root, file)
                 abs_path = f_path.replace(data_dir +'/', '')
-                self.add_dataentity(abs_path, 'File', 
-                {"name":f, "fileSize": str(os.path.getsize(f_path))+'B'})
+                self.add_entity(abs_path, 'File',
+                {"name":file, "fileSize": str(os.path.getsize(f_path))+'B'})
                 file_list.append({"@id": abs_path})
-                
+
             for dir_ in dirs:
                 d_path = os.path.join(root, dir_)
                 abs_path = d_path.replace(data_dir, '') + '/'
-                self.add_dataentity(abs_path, 'Dataset', 
+                self.add_entity(abs_path, 'Dataset',
                 {"name":dir_,"fileSize": str(get_dir_size(d_path)) +'B'})
-                file_list.append({"@id": abs_path})        
+                file_list.append({"@id": abs_path})
 
         self.rootdataentity.add_properties({'hasPart': file_list})
 
+
     def set_publisheddate(self) -> None:
         '''
-        Set "publishedDate" property at root
+        publishedDate プロパティをルートエンティティに追加
         '''
         pd = self.dmp.get("published_date")
         cd = self.rootdataentity.get("datePublished")
-        self.update_entity(self.rootdataentity,{"dateCreated":cd})
+        self.rootdataentity.add_properties({"dateCreated":cd})
 
         if pd is not None:
-            self.update_entity(self.rootdataentity,{"datePublished":cd})
+            self.rootdataentity.add_properties({"datePublished":cd})
 
     def set_project_name(self, name:str) -> None:
         '''
-        Set "name" property at root
+        name プロパティをルートエンティティに追加
         '''
         self.rootdataentity.set_name(name)
 
     def set_funder(self, funders:list) -> None:
         '''
-        Set "funder" property at root
+        funder プロパティをルートエンティティに追加
         '''
         funder_list = []
 
@@ -241,7 +269,7 @@ class NIIROCrate(ROCrate):
 
     def set_repo(self, repository:dict) -> None:
         '''
-        Set repository url at root
+        リポジトリURLをルートエンティティにidentifierとして追加
         '''
         id_ = self.add_entity_by_url(repository, "RepositoryObject")
 
@@ -254,7 +282,7 @@ class NIIROCrate(ROCrate):
 
     def set_erad(self, erad) -> None:
         '''
-        Set e-Rad project id at root
+        e-Rad project プロジェクトIDをルートエンティティにidentifierとして追加
         '''
         erad_id = self.add_erad(erad, 'project')
 
@@ -267,13 +295,14 @@ class NIIROCrate(ROCrate):
 
     def set_field(self, field:str) -> None:
         '''
-        Set research field at root
+        研究分野をルートエンティティにkeywordsとして追加
         '''
         self.rootdataentity.add_properties({'keywords': field})
 
+
     def set_creators(self, creators:list) -> None:
         '''
-        Set "creator" property at root
+        creatorをルートエンティティに追加
         '''
         creator_list = []
 
@@ -295,12 +324,12 @@ class NIIROCrate(ROCrate):
                 self.add_organization(affiliation)
             else:
                 properties = {k: v for k, v in affiliation.items() if k not in ["ror", "url"]}
-                self.update_entity(aff_e, properties)
+                aff_e.add_properties(properties)
 
 
     def set_license(self, licenses:list) -> None:
         '''
-        Add "license" entity
+        ライセンスのエンティティを追加
         '''
         for license_ in licenses:
             self.add_entity_by_url(license_, "CreativeWork")
@@ -308,7 +337,7 @@ class NIIROCrate(ROCrate):
 
     def set_dmplist(self) -> None:
         '''
-        Add "dmp datalist" entity
+        DMPの内容を番号ごとにエンティティとして追加
         '''
         if self.dmp.get("repository").get("name") == 'Gakunin RDM':
             self.set_grdm()
@@ -317,7 +346,7 @@ class NIIROCrate(ROCrate):
     
     def set_grdm(self) -> None:
         '''
-        Add "dmp datalist" entity with grdm metadata
+        DMPの追加: common metadata形式でGRDMからDLしたcsvをベースにしている場合
         '''
         dmpset = self.dmp.get("dmp")
         i = 1
@@ -380,23 +409,6 @@ class NIIROCrate(ROCrate):
 
             self.add_entity(id_, "CreativeWork", properties)
 
-            # add data entity
-            # filepath = dmp.get("url")
-            # if filepath.find('/dir/osfstorage') > 0:
-            #     dir_ = filepath[filepath.find('osfstorage')+11:]
-            #     data_properties = {
-            #         "name":dir_[:-1],
-            #         "contentSize":dmp.get("size"),
-            #         "dmpDataNumber":{"@id":id_}
-            #     }
-            #     self.add_entity(dir_, "Dataset", data_properties)
-
-            #     if self.rootdataentity.get('hasPart') is None:
-            #         haspart = []
-            #         haspart.append({"@id":dir_})
-            #         self.rootdataentity.add_properties({"hasPart":haspart})
-            #     else:
-            #         self.rootdataentity.get('hasPart').append({"@id":dir_})
 
     def set_data(self, datalist:list = None) -> None:
         '''

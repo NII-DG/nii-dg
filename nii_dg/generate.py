@@ -8,12 +8,18 @@ class ValidationError(Exception):
     pass
 
 def read_dmp(path):
+    '''
+    入力となるJSONをdictとして読む
+    '''
     with open(path) as f:
         metadata = json.load(f)
     return metadata
 
 
 def set_dmp_format(dict):
+    '''
+    DMPの形式をインスタンス変数に追加
+    '''
     dmp_f = dict.get('dmp_format')
     if dmp_f is None:
         raise ValidationError('property "dmp_format" is missing.')
@@ -35,6 +41,9 @@ def set_dmp_format(dict):
 
 
 def add_entities_to_crate(crate:NIIROCrate) -> None:
+    '''
+    入力JSONのkeyに対して対応するメソッドを実行しコンテキストエンティティを追加
+    '''
     crate.set_publisheddate()
 
     key_func = {
