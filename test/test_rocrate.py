@@ -60,7 +60,7 @@ def test_get_by_name_02(crate):
     '''
     nameでエンティティを検索し、一致するエンティティがない場合はNoneを返す
     '''
-    assert crate.get_by_name("notfound") == None
+    assert crate.get_by_name("notfound") is None
 
 def test_get_by_id_01(crate):
     '''
@@ -74,7 +74,7 @@ def test_get_by_id_02(crate):
     '''
     @idでエンティティを検索し、一致するエンティティがない場合はNoneを返す
     '''
-    assert crate.get_by_id("notfound") == None
+    assert crate.get_by_id("notfound") is None
 
 @pytest.mark.parametrize(('namedict', 'expected'),[
     ({"name":"test"}, {"@id":"id"}),
