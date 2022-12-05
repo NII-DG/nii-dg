@@ -1,4 +1,4 @@
-# NII Common Schema Profiles
+# NII Data Governance Common Schema Profiles
 ## 対象としたdmp定義
 - 内閣府「[公的資金による研究データの管理・利活用](https://www8.cao.go.jp/cstp/kenkyudx.html)に関する基本的な考え方」におけるメタデータの共通項目
     - 以下 `common metadata`とする

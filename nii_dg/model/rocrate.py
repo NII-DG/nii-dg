@@ -66,7 +66,11 @@ class ROCrate():
         {name: xxx} の辞書を引数として、nameが一致するエンティティが存在する時
         そのエンティティの@idを辞書で返す
         '''
-        e = self.get_by_name(namedict["name"])
+        name = namedict.get("name")
+        if name is None:
+            raise TypeError("key 'name' is not found in the dictionary")
+
+        e = self.get_by_name(name)
         if e is None:
             return None
         return e.get_id_dict()
