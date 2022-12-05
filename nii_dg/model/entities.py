@@ -12,32 +12,32 @@ class Entity():
         self.type = type_
         self._jsonld = self._empty()
 
-    def _empty(self):
+    def _empty(self) -> dict:
         val = {
             "@id": self.id,
             "@type": self.type
         }
         return val
 
-    def get_jsonld(self):
+    def get_jsonld(self) -> dict:
         '''
         JSON-LDのインスタンス変数を返す
         '''
         return self._jsonld
 
-    def set_name(self, name):
+    def set_name(self, name:str) -> None:
         '''
         keyが"name"となるvalueをJSON-LDに追加する
         '''
         self._jsonld['name'] = name
 
-    def add_properties(self, properties):
+    def add_properties(self, properties:dict) -> None:
         '''
         JSON-LDに別のJSON-LDを合成する
         '''
         self._jsonld.update(properties)
 
-    def get(self, property_name):
+    def get(self, property_name:str) -> str:
         '''
         JSON-LDの指定されたkeyに対応するvalueを返す
         '''
@@ -59,7 +59,7 @@ class RootDataEntity(Entity):
     def __init__(self, id_='./', type_='Dataset'):
         super().__init__(id_, type_)
 
-    def _empty(self):
+    def _empty(self) -> dict:
         val = {
             "@id": self.id,
             "@type": self.type,
@@ -77,7 +77,7 @@ class Metadata(Entity):
     def __init__(self, id_=const.BASENAME, type_='CreativeWork'):
         super().__init__(id_, type_)
 
-    def _empty(self):
+    def _empty(self) -> dict:
         val = {"@id": self.id,
                "@type": self.type,
                "conformsTo": {"@id": const.PROFILE},
