@@ -15,13 +15,13 @@ def generate_rocrate(dmp_path=None, dir_path=None):
             crate.load_data_dir(dir_path)
 
         roc = crate.generate()
-        with open(const.BASENAME, 'w') as f:
+        with open(const.BASENAME, 'w', encoding="utf8") as f:
             json.dump(roc, f, indent=4)
 
         sys.exit(0)
 
     except Exception as e:
-        print('Error occured!: ' + e)
+        print('Error occured!: ' + str(e))
         sys.exit(1)
 
 
