@@ -8,61 +8,60 @@ class TestReadJson:
     JSON読み込みのテスト
     '''
 
-    @pytest.mark.parametrize('path',[
+    @pytest.mark.parametrize('filepath',[
         './common_sample.json',
         # 通る絶対path
     ])
-    def test_reading_json_normal(self, path):
+    def test_reading_json_normal(self, filepath):
         '''
         入力をdictとして読み込む, パスが通る
         '''
-        assert isinstance(generate.read_dmp(path), dict)
+        assert isinstance(generate.read_dmp(filepath), dict)
 
-    @pytest.mark.parametrize(('func','exception','path'),[
-        (generate.read_dmp, FileNotFoundError, './not_existing_file.json'),
-        (main.generate_rocrate, SystemExit, './not_existing_file.json'),
+    @pytest.mark.parametrize(('filepath', 'func','exception'),[
+        ('./not_existing_file.json', generate.read_dmp, FileNotFoundError ),
+        ('./not_existing_file.json', main.generate_rocrate, SystemExit ),
         # 通らない絶対path, False
     ])
-    def test_reading_json_error(self, func, exception, path):
+    def test_reading_json_error(self, filepath, func, exception):
         '''
         入力をdictとして読み込む,パスが見つからない場合にエラー
         '''
         with pytest.raises(exception):
-            func(path)
+            func(filepath)
 
+class TestSetDmp:
+    '''
+    dmpの形式抽出
+    '''
 
-@pytest.fixture
-def metadata() -> dict:
-    yield generate.read_dmp('/app/test/common_sample.json')
+    @pytest.fixture
+    def metadata(self) -> dict:
+        yield generate.read_dmp('/app/test/common_sample.json')
 
-def test_setting_dmp_normal(metadata):
-    '''
-    dmpの形式を抽出する
-    '''
-    assert isinstance(generate.set_dmp_format(metadata), NIIROCrate)
-    # common, JST, AMED, METI
+    def test_setting_dmp_normal(self, metadata):
+        '''
+        dmpの形式を抽出する
+        '''
+        assert isinstance(generate.set_dmp_format(metadata), NIIROCrate)
+        # common, JST, AMED, METI
 
-@pytest.fixture
-def metadata_error() -> dict:
-    yield generate.read_dmp('./test-data/test_error.json')
-def test_setting_dmp_error(metadata_error):
-    '''
-    dmpの形式を抽出する, 異常系
-    '''
-    with pytest.raises(FileNotFoundError):
-        generate.set_dmp_format(metadata_error)
-    # dmpがcommon, JST, AMED, METI以外
+    @pytest.mark.parametrize(('filepath','exception'), [
+        ('./test-data/test_error.json', FileNotFoundError),
+        ('./test-data/test_nokey.json', generate.ValidationError),
+    ])
+    def test_setting_dmp_error(self, filepath, exception):
+        '''
+        dmpの形式を抽出する, 異常系
+        - valueの値が規定値以外
+        - keyがない
+        '''
+        metadata_error = generate.read_dmp(filepath)
+        with pytest.raises(exception):
+            generate.set_dmp_format(metadata_error)
+        # dmpがcommon, JST, AMED, METI以外
+        # dmpのkeyがない
 
-@pytest.fixture
-def metadata_error2() -> dict:
-    yield generate.read_dmp('./test-data/test_nokey.json')
-def test_setting_dmp_error2(metadata_error2):
-    '''
-    dmpの形式を抽出する, 異常系
-    '''
-    with pytest.raises(generate.ValidationError):
-        generate.set_dmp_format(metadata_error2)
-    # dmpのkeyがない
 
 def test_jsonschema_normal():
     '''
