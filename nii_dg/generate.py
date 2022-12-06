@@ -16,9 +16,22 @@ def read_dmp(path):
     return metadata
 
 
+def validate_with_schema(dict, schema):
+    '''
+    JSON-Schemaで入力を検証
+    '''
+    error_messages = []
+    v = jsonschema.Draft202012Validator(schema)
+    for error in v.iter_errors(dict):
+        error_messages.append(error.message)
+
+    if len(error_messages) > 0:
+        raise ValidationError('\n'.join(error_messages))
+
 def set_dmp_format(dict):
     '''
-    DMPの形式をインスタンス変数に追加
+    DMPの形式からSchemaを呼び出しvalidation
+    エラーがなければインスタンス生成
     '''
     dmp_f = dict.get('dmp_format')
     if dmp_f is None:
@@ -29,13 +42,7 @@ def set_dmp_format(dict):
     with open(os.path.dirname(__file__) +input_schema) as js:
         schema = json.load(js)
 
-    error_messages = []
-    v = jsonschema.Draft202012Validator(schema)
-    for error in v.iter_errors(dict):
-        error_messages.append(error.message)
-
-    if len(error_messages) > 0:
-        raise ValidationError('\n'.join(error_messages))
+    validate_with_schema(dict, schema)
 
     return NIIROCrate(dict, dmp_f)
 
