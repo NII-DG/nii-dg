@@ -30,6 +30,7 @@ class TestReadJson:
         with pytest.raises(exception):
             func(filepath)
 
+
 class TestSetDmp:
     '''
     dmpの形式抽出
@@ -38,11 +39,18 @@ class TestSetDmp:
     @pytest.fixture
     def metadata(self) -> dict:
         yield generate.read_dmp('/app/test/common_sample.json')
-
-    def test_setting_dmp_normal(self, metadata):
+    @pytest.mark.parametrize('filepath', [
+        '/app/test/common_sample.json',
+        '/app/test/test-data/test_JST.json',
+        '/app/test/test-data/test_AMED.json',
+        '/app/test/test-data/test_METI.json',
+    ])
+    def test_setting_dmp_normal(self, filepath):
         '''
-        dmpの形式を抽出する
+        dmpの形式を抽出する, 正常系
+        - common metadata, JST, AMED, METIのいずれか
         '''
+        metadata = generate.read_dmp(filepath)
         assert isinstance(generate.set_dmp_format(metadata), NIIROCrate)
         # common, JST, AMED, METI
 
@@ -52,45 +60,34 @@ class TestSetDmp:
     ])
     def test_setting_dmp_error(self, filepath, exception):
         '''
-        dmpの形式を抽出する, 異常系
+        dmpの形式を抽出する
         - valueの値が規定値以外
         - keyがない
         '''
         metadata_error = generate.read_dmp(filepath)
         with pytest.raises(exception):
             generate.set_dmp_format(metadata_error)
-        # dmpがcommon, JST, AMED, METI以外
-        # dmpのkeyがない
 
 
 def test_jsonschema_normal():
     '''
-    入力JSONをJSON-Schemaに通す
+    入力JSONをJSON-Schemaでvalidation
     '''
     pass
-    # dmpが正しい
+    # dmp-jsonの必須項目が埋まっている (minimum)
+    # 必須項目+オプション全部乗せ (Maximum)
 
 def test_jsonschema_error():
     '''
-    入力JSONをJSON-Schemaに通す
+    入力JSONをJSON-Schemaでvalidation, 異常系
     '''
     pass
-    # dmpが該当していない
-    # dmpのkeyがない
+    # 必須項目がない
+    # 規定外のプロパティがある
+    # valueの型が違う
+    # 別エンティティでnameやURLに重複がある
+    # どちらか必須が欠けている
 
-def test_jsonschema_01():
-    '''
-    必須項目がない
-    あるが、型が違う 
-    別エンティティでnameやURLに重複がある
-    '''
-    pass
-
-def test_jsonschema_02():
-    '''
-    必須以外のあるなしで分岐 
-    '''
-    pass
-
-def test_filepath():
-    print(__file__)
+# データエンティティ
+# ディレクトリを読まないときはJSONに入力必須, OK/エラー
+# JSONを読んだ時の分岐

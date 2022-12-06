@@ -4,10 +4,7 @@
   "additionalProperties": false,
   "required": [
     "dmp_format",
-    "project_name",
-    "creator",
-    "affiliation",
-    "dataset"
+    "project_name"
   ],
   "properties": {
     "dmp_format": {
@@ -16,135 +13,58 @@
     },
     "funding_agency": {
       "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["name"],
-        "properties": {
-          "name": { "type": "string" },
-          "url": {
-            "type": "string",
-            "format": "url"
-          },
-          "ror": {
-            "type": "string",
-            "format": "url"
-          },
-          "address": { "type": "string" }
-        }
-      }
+      "items": { "$ref":"#/definitions/organization"}
     },
-    "project_name": {
-      "type": "string"
-    },
-    "publish_date":{
-      "type":"string",
-      "format":"date"
-    },
-    "e-Rad_project_id": {
-      "type": "string"
-    },
-    "research_field": {
-      "type": "string"
-    },
+    "project_name": { "type": "string"},
+    "publish_date":{ "$ref":"#/definitions/date"},
+    "description":{"type":"string"},
+    "e-Rad_project_id": {"type": "string"},
+    "research_field": {"type": "string"},
     "repository": {
       "type": "object",
+      "additionalProperties": false,
       "required": ["name", "url"],
       "properties": {
         "name": { "type": "string" },
-        "url": {
-          "type": "string",
-          "format": "url"
-        }
+        "url": { "$ref":"#/definitions/url"},
+        "description": { "type": "string" }
       }
     },
     "creator": {
       "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["name", "email", "affiliation"],
-        "properties": {
-          "name": { "type": "string" },
-          "orcid": {
-            "type": "string",
-            "format": "url"
-          },
-          "url": {
-            "type": "string",
-            "format": "url"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "affiliation": {
-            "type": "object",
-            "required":["name"],
-            "properties":{
-              "name":{"type":"string"}
-            }
-          },
-          "e-Rad_researcher_number": {
-            "type": "string",
-            "pattern": "[0-9]{8}"
-          },
-          "telephone": {"type": "string"}
-        }
-      }
+      "items": { "$ref":"#/definitions/person"}
     },
     "affiliation":{
       "type":"array",
-      "items":{
-        "type": "object",
-        "required": ["name"],
-        "properties": {
-          "name": { "type": "string" },
-          "ror":{
-            "type":"string",
-            "format":"url"
-          },
-          "url":{
-            "type":"string",
-            "format":"url"
-          },
-          "address": { "type": "string" }
-        }
-      }
+      "items":{ "$ref":"#/definitions/organization"}
     },
     "license":{
       "type":"array",
-      "items":{
-        "type":"object",
-        "required":["name","url"],
-        "properties":{
-          "name":{"type":"string"},
-          "url":{
-            "type":"string",
-            "format":"url"
-          }
-        }
-      }
+      "items":{ "$ref":"#/definitions/license"}
     },
+    "hosting_institution": { "$ref":"#/definitions/organization"},
+    "data_manager": { "$ref":"#/definitions/person"},
     "dmp": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["data_number", "title"],
+        "required": ["data_number", "title", "access_rights"],
+        "additionalProperties": false,
         "properties": {
           "data_number": { "type": "integer" },
           "title": { "type": "string" },
           "description": { "type": "string" },
+          "data_type": { "type": "string" },
+          "creator": {
+            "type": "array",
+            "items": { "$ref":"#/definitions/person"}
+          },
+          "max_filesize":{ "type": "string" },
           "free_or_consideration": {
             "type": "string",
             "enum": ["free", "consideration"]
           },
-          "license": {
-            "type": "object",
-            "required": ["name"],
-            "properties": {
-              "name": { "type": "string" }
-            }
-          },
-          "citation_info": { "type": "string" },
+          "license": { "$ref":"#/definitions/license"},
           "access_rights": {
             "type": "string",
             "enum": [
@@ -154,38 +74,10 @@
               "metadata only access"
             ]
           },
-          "hosting_institution": { 
-            "type": "object",
-            "required":["name"],
-            "properties":{
-              "name":{"type":"string"},
-              "address": { "type": "string" }
-            } 
-          },
-          "data_manager": {
-            "type": "object",
-            "required": ["name"],
-            "properties": {
-              "name": { "type": "string" },
-              "orcid": {
-                "type": "string",
-                "format": "url"
-              },
-              "url": {
-                "type": "string",
-                "format": "url"
-              },
-              "email": {
-                "type": "string",
-                "format": "email"
-              },
-              "e-Rad_researcher_number": {
-                "type": "string",
-                "pattern": "[0-9]{8}"
-              },
-              "telephone": {"type": "string"}
-            }
-          }
+          "embargo_date":{ "$ref":"#/definitions/date"},
+          "citation_info": { "type": "string" },
+          "hosting_institution": { "$ref":"#/definitions/organization"},
+          "data_manager": { "$ref":"#/definitions/person"}
         }
       }
     },
@@ -193,6 +85,7 @@
       "type":"array",
       "items":{
         "type":"object",
+        "additionalProperties": false,
         "required":["name","path","dmp"],
         "properties":{
           "name": { "type": "string" },
@@ -200,11 +93,59 @@
           "size": { "type": "string" },
           "format": { "type": "string" },
           "dmp":{"type":"integer"},
-          "url":{
-            "type":"string",
-            "format":"url"
-          }
+          "url":{ "$ref":"#/definitions/url"}
         }
+      }
+    }
+  },
+  "definitions":{
+    "url":{
+      "type":"string",
+      "format":"url"
+    },
+    "date":{
+      "type":"string",
+      "format":"date"
+    },
+    "organization":{
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "url": { "$ref":"#/definitions/url"},
+        "ror": { "$ref":"#/definitions/url"},
+        "address": { "type": "string" }
+      }
+    },
+    "person":{
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "orcid": { "$ref":"#/definitions/url"},
+        "url": { "$ref":"#/definitions/url"},
+        "email": { 
+          "type":"string",
+          "format":"email"
+        },
+        "affiliation": { "$ref":"#/definitions/organization"},
+        "e-Rad_researcher_number": {
+          "type": "string",
+          "pattern": "[0-9]{8}"
+        },
+        "telephone": {"type": "string"}
+      }
+    },
+    "license":{
+      "type":"object",
+      "additionalProperties": false,
+      "required":["name"],
+      "properties":{
+        "name":{"type":"string"},
+        "url":{ "$ref":"#/definitions/url"},
+        "description": {"type":"string"}
       }
     }
   }
