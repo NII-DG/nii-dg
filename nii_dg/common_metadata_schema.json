@@ -3,48 +3,40 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "dmp_format",
     "project_name",
-    "funding_agency"
+    "funding_agency",
+    "dmp_format"
   ],
   "properties": {
-    "dmp_format": {
-      "type": "string",
-      "enum": ["common metadata"]
-    },
+    "project_name": { "type": "string"},
+    "description":{"type":"string"},
     "funding_agency": {
       "type": "array",
       "items": { "$ref":"#/definitions/organization"}
     },
-    "project_name": { "type": "string"},
-    "publish_date":{ "$ref":"#/definitions/date"},
-    "description":{"type":"string"},
-    "e-Rad_project_id": {"type": "string"},
-    "research_field": {"type": "string"},
-    "repository": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["name", "url"],
-      "properties": {
-        "name": { "type": "string" },
-        "url": { "$ref":"#/definitions/url"},
-        "description": { "type": "string" }
-      }
+    "dmp_format": {
+      "type": "string",
+      "enum": ["common metadata"]
     },
+    "repository": { "$ref":"#/definitions/urlentity"},
+    "e-Rad_project_id": {"type": "string"},
+    "publish_date":{ "$ref":"#/definitions/date"},
     "creator": {
       "type": "array",
       "items": { "$ref":"#/definitions/person"}
     },
-    "affiliation":{
-      "type":"array",
-      "items":{ "$ref":"#/definitions/organization"}
-    },
+    "hosting_institution": { "$ref":"#/definitions/organization"},
+    "data_manager": { "$ref":"#/definitions/person"},
     "license":{
       "type":"array",
       "items":{ "$ref":"#/definitions/license"}
     },
-    "hosting_institution": { "$ref":"#/definitions/organization"},
-    "data_manager": { "$ref":"#/definitions/person"},
+    "access_rights": { "$ref":"#/definitions/access_rights"},
+    "free_or_consideration": { "$ref":"#/definitions/free_or_consideration"},
+    "available_from":{ "$ref":"#/definitions/date"},
+    "citation_info": { "type": "string" },
+    "download_url":{ "$ref":"#/definitions/urlentity"},
+    "research_field": {"type": "string"},
     "dmp": {
       "type": "array",
       "items": {
@@ -55,30 +47,21 @@
           "data_number": { "type": "integer" },
           "title": { "type": "string" },
           "description": { "type": "string" },
+          "repository": { "$ref":"#/definitions/urlentity"},
           "data_type": { "type": "string" },
           "creator": {
             "type": "array",
             "items": { "$ref":"#/definitions/person"}
           },
           "max_filesize":{ "type": "string" },
-          "free_or_consideration": {
-            "type": "string",
-            "enum": ["free", "consideration"]
-          },
-          "license": { "$ref":"#/definitions/license"},
-          "access_rights": {
-            "type": "string",
-            "enum": [
-              "open access",
-              "restricted access",
-              "embargoed access",
-              "metadata only access"
-            ]
-          },
-          "embargo_date":{ "$ref":"#/definitions/date"},
-          "citation_info": { "type": "string" },
           "hosting_institution": { "$ref":"#/definitions/organization"},
-          "data_manager": { "$ref":"#/definitions/person"}
+          "data_manager": { "$ref":"#/definitions/person"},
+          "license":{ "$ref":"#/definitions/license"},
+          "access_rights": { "$ref":"#/definitions/access_rights"},
+          "free_or_consideration": { "$ref":"#/definitions/free_or_consideration"},
+          "available_from":{ "$ref":"#/definitions/date"},
+          "citation_info": { "type": "string" },
+          "download_url":{ "$ref":"#/definitions/urlentity"},
         }
       }
     },
@@ -148,6 +131,28 @@
         "url":{ "$ref":"#/definitions/url"},
         "description": {"type":"string"}
       }
+    },
+    "access_rights":{
+      "type": "string",
+      "enum": [
+        "open access",
+        "restricted access",
+        "embargoed access",
+        "metadata only access"
+      ]
+    },
+    "free_or_consideration": {
+      "type": "string",
+      "enum": ["free", "consideration"]
+    },
+    "urlentity":{
+      "type":"object",
+      "additionalProperties": false,
+      "required":["name","url"],
+      "properties":{
+        "name":{"type":"string"},
+        "url":{ "$ref":"#/definitions/url"},
+        "description": {"type":"string"}
     }
   }
 }

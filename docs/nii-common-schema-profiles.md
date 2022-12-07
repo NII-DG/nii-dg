@@ -74,6 +74,20 @@
         <td><a href=https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#direct-properties-of-the-root-data-entity>researchobject.org</a><br>Gakunin RDM:プロジェクトの説明</td>
     </tr>
     <tr>
+        <td>funder</td>
+        <td>MUST</td>
+        <td>Array of <i>Funding Agency</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://ror.org/00097mb19"}]</code></td>
+        <td>研究費用の出資者</td>
+        <td>common metadata:1.資金配分機関情報</td>
+    </tr>
+     <tr>
+        <td>dmpFormat</td>
+        <td>MUST</td>
+        <td>Choose one from the list: common metadata; JST; AMED; METI</td>
+        <td>DMPの様式</td>
+        <td>検証時、ルールセット呼び出しに利用</td>
+    </tr>
+    <tr>
         <td>identifier</td>
         <td>MUST</td>
         <td>Array of <i>RepositoryObject</i> and <i>PropertyValue</i> entities represented by each @id property. e.g. <code>[{"@id":"https://rdm.nii.ac.jp/abcde/"},{"@id":"#e-Rad:123456"}]</code>. </td>
@@ -100,20 +114,6 @@
         <td>Array of <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://orcid.com/0000-0001-2345-6789"}]</code></td>
         <td>データ作成者の一覧</td>
         <td>common metadata:13.データ作成者<br>AMED:データ関連人材</td>
-    </tr>
-    <tr>
-        <td>funder</td>
-        <td>MUST</td>
-        <td>Array of <i>Funding Agency</i> or <i>Person</i> entities, represented by each @id property. e.g. <code>[{"@id":"https://ror.org/00097mb19"}]</code></td>
-        <td>研究費用の出資者</td>
-        <td>common metadata:1.資金配分機関情報</td>
-    </tr>
-     <tr>
-        <td>dmpFormat</td>
-        <td>MUST</td>
-        <td>Choose one from the list: common metadata; JST; AMED; METI</td>
-        <td>DMPの様式</td>
-        <td>ガバナンス時、ルールセット呼び出しに利用</td>
     </tr>
     <tr>
         <td>maintainer</td>
