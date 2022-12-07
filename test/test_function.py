@@ -36,9 +36,6 @@ class TestSetDmp:
     dmpの形式抽出
     '''
 
-    @pytest.fixture
-    def metadata(self) -> dict:
-        yield generate.read_dmp('/app/test/common_sample.json')
     @pytest.mark.parametrize('filepath', [
         '/app/test/test-data/test_common.json',
         '/app/test/test-data/test_JST.json',
@@ -51,7 +48,7 @@ class TestSetDmp:
         - common metadata, JST, AMED, METIのいずれか
         '''
         metadata = generate.read_dmp(filepath)
-        assert isinstance(generate.set_dmp_format(metadata), NIIROCrate)
+        assert isinstance(generate.generate_crate_instance(metadata), NIIROCrate)
         # common, JST, AMED, METI
 
     @pytest.mark.parametrize('filepath', [
@@ -66,7 +63,7 @@ class TestSetDmp:
         '''
         metadata_error = generate.read_dmp(filepath)
         with pytest.raises(generate.ValidationError):
-            generate.set_dmp_format(metadata_error)
+            generate.check_dmp_format(metadata_error)
 
 
 def test_jsonschema_normal():

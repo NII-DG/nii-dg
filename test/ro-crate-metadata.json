@@ -21,9 +21,9 @@
         {
             "@id": "./",
             "@type": "Dataset",
-            "datePublished": "2022-12-01T14:54:55.183280+09:00",
+            "datePublished": "2022-12-07T08:00:22.020+00:00",
             "dmpFormat": "common_metadata",
-            "dateCreated": "2022-12-01T14:54:55.183280+09:00",
+            "dateCreated": "2022-12-07T08:00:22.020+00:00",
             "name": "Sample Research",
             "funder": [
                 {
@@ -38,6 +38,7 @@
                     "@id": "#e-Rad:123456"
                 }
             ],
+            "keywords": "Informatics",
             "creator": [
                 {
                     "@id": "https://en.wikipedia.org/wiki/Ichiro_Suzuki"
@@ -49,7 +50,6 @@
                     "@id": "https://orcid.org/0000-0002-3456-7890"
                 }
             ],
-            "keywords": "Informatics",
             "hasPart": [
                 {
                     "@id": "configs/"
@@ -77,22 +77,15 @@
             "name": "Gakunin RDM"
         },
         {
-            "@id": "https://www.apache.org/licenses/LICENSE-2.0",
-            "@type": "CreativeWork",
-            "name": "Apache License 2.0"
-        },
-        {
             "@id": "#e-Rad:123456",
             "@type": "PropertyValue",
             "value": "123456",
             "name": "e-Rad Project ID"
         },
         {
-            "@id": "https://ror.org/057zh3y96",
-            "@type": "Organization",
-            "name": "University of Tokyo",
-            "address": "7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan",
-            "sameAs": "https://www.u-tokyo.ac.jp/"
+            "@id": "https://www.apache.org/licenses/LICENSE-2.0",
+            "@type": "CreativeWork",
+            "name": "Apache License 2.0"
         },
         {
             "@id": "https://www.mlb.com/mariners",
@@ -107,6 +100,13 @@
             "affiliation": {
                 "@id": "https://www.mlb.com/mariners"
             }
+        },
+        {
+            "@id": "https://ror.org/057zh3y96",
+            "@type": "Organization",
+            "name": "University of Tokyo",
+            "address": "7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan",
+            "sameAs": "https://www.u-tokyo.ac.jp/"
         },
         {
             "@id": "#mailto:jiro@example.com",
@@ -231,44 +231,44 @@
         {
             "@id": "configs/",
             "@type": "Dataset",
+            "url": "https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/configs/",
             "name": "configs",
             "contentSize": "30B",
             "dmpDataNumber": {
                 "@id": "#dmp:1"
-            },
-            "url":"https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/configs/"
+            }
         },
         {
             "@id": "configs/input.json",
             "@type": "File",
+            "url": "https://rdm.nii.ac.jp/mcsdj/files/osfstorage/636c521f4fa1910010825ee1",
             "name": "input.json",
             "contentSize": "30B",
             "dmpDataNumber": {
-                "@id": "#dmp:1"
+                "@id": "#dmp:2"
             },
-            "url":"https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/636c521f4fa1910010825ee1",
-            "encodingFormat":"application/json"
+            "encodingFormat": "application/json"
         },
         {
             "@id": "exe/",
             "@type": "Dataset",
+            "url": "https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/exe/",
             "name": "exe",
             "contentSize": "1150B",
             "dmpDataNumber": {
                 "@id": "#dmp:2"
-            },
-            "url":"https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/exe/"
+            }
         },
         {
             "@id": "exe/sample.py",
             "@type": "File",
+            "url": "https://rdm.nii.ac.jp/mcsdj/files/osfstorage/636c52304fa1910010825ef9",
             "name": "sample.py",
             "contentSize": "1150B",
             "dmpDataNumber": {
                 "@id": "#dmp:2"
             },
-            "url":"https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/636c52304fa1910010825ef9",
-            "encodingFormat":"text/x-python"
+            "encodingFormat": "text/x-python"
         }
     ]
 }

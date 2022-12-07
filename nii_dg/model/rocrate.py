@@ -109,12 +109,12 @@ class NIIROCrate(ROCrate):
     RO-Crateクラスを拡張しNII標準独自のメソッド・インスタンス変数を追加
     '''
 
-    def __init__(self, dmp:str, dmpf:str):
+    def __init__(self, dmp:str):
         super().__init__()
         self.extra_terms = const.EXTRA_TERMS
         self.dmp = dmp
-        self.dmpf = dmpf
-        self.rootdataentity.add_properties({"dmpFormat":dmpf})
+        self.dmp_format = dmp.get("dmp_format")
+        self.rootdataentity.add_properties({"dmpFormat":self.dmp_format})
 
 
     def add_entity_by_url(self, dict_:dict, type_:str) -> dict:
