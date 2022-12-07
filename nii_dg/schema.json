@@ -8,143 +8,152 @@
       "funding_agency"
     ],
     "properties": {
-      "dmp_format": {"type": "string"},
-      "funding_agency": {
-        "type": "array",
-        "items": { "$ref":"#/definitions/organization"}
-      },
-      "project_name": { "type": "string"},
-      "publish_date":{ "$ref":"#/definitions/date"},
-      "description":{"type":"string"},
-      "e-Rad_project_id": {"type": "string"},
-      "research_field": {"type": "string"},
-      "repository": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["name", "url"],
-        "properties": {
-          "name": { "type": "string" },
-          "url": { "$ref":"#/definitions/url"},
-          "description": { "type": "string" }
+        "dmp_format": {"type": "string"},
+        "project_name": { "type": "string"},
+        "description":{"type":"string"},
+        "funding_agency": {
+            "type": "array",
+            "items": { "$ref":"#/definitions/organization"}
+          },
+        "repository": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "url"],
+            "properties": { "$ref":"#/definitions/urlentity"}
+        },
+        "e-Rad_project_id": {"type": "string"},
+        "publish_date":{ "$ref":"#/definitions/date"},
+        "creator": {
+            "type": "array",
+            "items": { "$ref":"#/definitions/person"}
+        },
+        "hosting_institution": { "$ref":"#/definitions/organization"},
+        "data_manager": { "$ref":"#/definitions/person"},
+        "license":{
+            "type":"array",
+            "items":{ "$ref":"#/definitions/license"}
+        },
+        "access_rights": { "$ref":"#/definitions/access_rights"},
+        "free_or_consideration": {"$ref":"#/definitions/free_or_consideration"},
+        "available_from":{ "$ref":"#/definitions/date"},
+        "citation_info": { "type": "string" },
+        "download_url":{ "$ref":"#/definitions/urlentity"},
+        "research_field": {"type": "string"},
+        "dmp": {
+            "type": "array",
+            "items": {
+            "type": "object",
+            "required": ["data_number", "title"],
+            "additionalProperties": false,
+            "properties": {
+                "data_number": { "type": "integer" },
+                "title": { "type": "string" },
+                "description": { "type": "string" },
+                "data_type": { "type": "string" },
+                "creator": {
+                "type": "array",
+                "items": { "$ref":"#/definitions/person"}
+                },
+                "hosting_institution": { "$ref":"#/definitions/organization"},
+                "data_manager": { "$ref":"#/definitions/person"},
+                "max_filesize":{ "type": "string" },
+                "access_rights": { "$ref":"#/definitions/access_rights"},
+                "free_or_consideration": {"$ref":"#/definitions/free_or_consideration"},
+                "available_from":{ "$ref":"#/definitions/date"},
+                "citation_info": { "type": "string" },
+                "download_url":{ "$ref":"#/definitions/urlentity"}
+                }
+            }
+        },
+        "dataset":{
+            "type":"array",
+            "items":{
+            "type":"object",
+            "additionalProperties": false,
+            "required":["name","path","dmp"],
+            "properties":{
+                "name": { "type": "string" },
+                "path": { "type": "string" },
+                "size": { "type": "string" },
+                "format": { "type": "string" },
+                "dmp":{"type":"integer"},
+                "url":{ "$ref":"#/definitions/url"}
+                }
+            }
         }
-      },
-      "creator": {
-        "type": "array",
-        "items": { "$ref":"#/definitions/person"}
-      },
-      "affiliation":{
-        "type":"array",
-        "items":{ "$ref":"#/definitions/organization"}
-      },
-      "license":{
-        "type":"array",
-        "items":{ "$ref":"#/definitions/license"}
-      },
-      "hosting_institution": { "$ref":"#/definitions/organization"},
-      "data_manager": { "$ref":"#/definitions/person"},
-      "dmp": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "required": ["data_number", "title", "access_rights"],
-          "additionalProperties": false,
-          "properties": {
-            "data_number": { "type": "integer" },
-            "title": { "type": "string" },
-            "description": { "type": "string" },
-            "data_type": { "type": "string" },
-            "creator": {
-              "type": "array",
-              "items": { "$ref":"#/definitions/person"}
+    },
+    "definitions":{
+        "url":{
+            "type":"string",
+            "format":"url"
+        },
+        "date":{
+            "type":"string",
+            "format":"date"
+        },
+        "organization":{
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+            "name": { "type": "string" },
+            "url": { "$ref":"#/definitions/url"},
+            "ror": { "$ref":"#/definitions/url"},
+            "address": { "type": "string" }
+            }
+        },
+        "person":{
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+            "name": { "type": "string" },
+            "orcid": { "$ref":"#/definitions/url"},
+            "url": { "$ref":"#/definitions/url"},
+            "email": { 
+                "type":"string",
+                "format":"email"
             },
-            "max_filesize":{ "type": "string" },
-            "free_or_consideration": {
-              "type": "string",
-              "enum": ["free", "consideration"]
+            "affiliation": { "$ref":"#/definitions/organization"},
+            "e-Rad_researcher_number": {
+                "type": "string",
+                "pattern": "[0-9]{8}"
             },
-            "license": { "$ref":"#/definitions/license"},
-            "access_rights": {
-              "type": "string",
-              "enum": [
+            "telephone": {"type": "string"}
+            }
+        },
+        "license":{
+            "type":"object",
+            "additionalProperties": false,
+            "required":["name"],
+            "properties":{
+            "name":{"type":"string"},
+            "url":{ "$ref":"#/definitions/url"},
+            "description": {"type":"string"}
+            }
+        },
+        "urlentity":{
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "url"],
+            "properties": {
+            "name": { "type": "string" },
+            "url": { "$ref":"#/definitions/url"},
+            "description": { "type": "string" }
+            }
+        },
+        "access_rights":{
+            "type": "string",
+            "enum": [
                 "open access",
                 "restricted access",
                 "embargoed access",
                 "metadata only access"
-              ]
-            },
-            "embargo_date":{ "$ref":"#/definitions/date"},
-            "citation_info": { "type": "string" },
-            "hosting_institution": { "$ref":"#/definitions/organization"},
-            "data_manager": { "$ref":"#/definitions/person"}
-          }
-        }
-      },
-      "dataset":{
-        "type":"array",
-        "items":{
-          "type":"object",
-          "additionalProperties": false,
-          "required":["name","path","dmp"],
-          "properties":{
-            "name": { "type": "string" },
-            "path": { "type": "string" },
-            "size": { "type": "string" },
-            "format": { "type": "string" },
-            "dmp":{"type":"integer"},
-            "url":{ "$ref":"#/definitions/url"}
-          }
-        }
-      }
-    },
-    "definitions":{
-      "url":{
-        "type":"string",
-        "format":"url"
-      },
-      "date":{
-        "type":"string",
-        "format":"date"
-      },
-      "organization":{
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["name"],
-        "properties": {
-          "name": { "type": "string" },
-          "url": { "$ref":"#/definitions/url"},
-          "ror": { "$ref":"#/definitions/url"},
-          "address": { "type": "string" }
-        }
-      },
-      "person":{
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["name"],
-        "properties": {
-          "name": { "type": "string" },
-          "orcid": { "$ref":"#/definitions/url"},
-          "url": { "$ref":"#/definitions/url"},
-          "email": { 
-            "type":"string",
-            "format":"email"
-          },
-          "affiliation": { "$ref":"#/definitions/organization"},
-          "e-Rad_researcher_number": {
+            ]
+        },
+        "free_or_consideration": {
             "type": "string",
-            "pattern": "[0-9]{8}"
-          },
-          "telephone": {"type": "string"}
+            "enum": ["free", "consideration"]
         }
-      },
-      "license":{
-        "type":"object",
-        "additionalProperties": false,
-        "required":["name"],
-        "properties":{
-          "name":{"type":"string"},
-          "url":{ "$ref":"#/definitions/url"},
-          "description": {"type":"string"}
-        }
-      }
     }
-  }
+}

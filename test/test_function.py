@@ -19,8 +19,8 @@ class TestReadJson:
         assert isinstance(generate.read_dmp(filepath), dict)
 
     @pytest.mark.parametrize(('filepath', 'func','exception'),[
-        ('./not_existing_file.json', generate.read_dmp, FileNotFoundError ),
-        ('./not_existing_file.json', main.generate_rocrate, SystemExit ),
+        ('/test-data/not_existing_file.json', generate.read_dmp, FileNotFoundError ),
+        ('/test-data/not_existing_file.json', main.generate_rocrate, SystemExit ),
         # 通らない絶対path, False
     ])
     def test_reading_json_error(self, filepath, func, exception):
@@ -31,9 +31,10 @@ class TestReadJson:
             func(filepath)
 
 
-class TestSetDmp:
+class TestSetJSON:
     '''
-    dmpの形式抽出
+    JSONからdmpの形式抽出
+    全DMP共通の項目をJSON schemaでvalidation (dmpformat以外)
     '''
 
     @pytest.mark.parametrize('filepath', [
@@ -41,21 +42,25 @@ class TestSetDmp:
         '/app/test/test-data/test_JST.json',
         '/app/test/test-data/test_AMED.json',
         '/app/test/test-data/test_METI.json',
+        '/app/test/test-data/test_minimum_for_schema.json',
     ])
-    def test_setting_dmp_normal(self, filepath):
+    def test_generateing_normal(self, filepath):
         '''
-        dmpの形式を抽出する, 正常系
+        dmpの形式を抽出しJSON schemaでvalidation, 正常系
         - common metadata, JST, AMED, METIのいずれか
+        - 必須項目が存在し、型が正しい
+        - オプション項目が存在し、型が正しい
+        - 規定されていないkeyが存在しない
         '''
         metadata = generate.read_dmp(filepath)
         assert isinstance(generate.generate_crate_instance(metadata), NIIROCrate)
         # common, JST, AMED, METI
 
     @pytest.mark.parametrize('filepath', [
-        './test-data/test_error.json',
-        './test-data/test_nokey.json',
+        '/app/test/test-data/test_error.json',
+        '/app/test/test-data/test_nokey.json',
     ])
-    def test_setting_dmp_error(self, filepath):
+    def test_checking_dmp_error(self, filepath):
         '''
         dmpの形式を抽出する
         - valueの値が規定値以外
@@ -65,10 +70,30 @@ class TestSetDmp:
         with pytest.raises(generate.ValidationError):
             generate.check_dmp_format(metadata_error)
 
+    @pytest.mark.parametrize('filepath', [
+        '/app/test/test-data/schema_errors/lack_required_01.json',
+        '/app/test/test-data/schema_errors/lack_required_02.json',
+        '/app/test/test-data/schema_errors/lack_required_03.json',
+    ])
+    def test_json_validation_error(self, filepath):
+        '''
+        JSON-schemaでvalidation (dmpformat以外)
+        - 必須項目がない (第一階層, 第二階層)
+        - 必須項目があるが、型が不適当
+        - オプション項目の型が不適当
+        - 規定されていないkeyが存在する
+        '''
+        metadata_error = generate.read_dmp(filepath)
+        with pytest.raises(generate.ValidationError):
+            generate.validate_with_schema(metadata_error)
+        # - 必須項目がない (第一階層, 第二階層)
+        # - 必須項目があるが、型が不適当
+        # - オプション項目の型が不適当
+        # - 規定されていないkeyが存在する
 
 def test_jsonschema_normal():
     '''
-    入力JSONをJSON-Schemaでvalidation
+    入力JSONをJSON-Schemaでvalidation, 正常系
     '''
     pass
     # dmp-jsonの必須項目が埋まっている (minimum)

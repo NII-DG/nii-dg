@@ -26,4 +26,4 @@ def generate_rocrate(dmp_path=None, dir_path=None):
 
 
 if __name__ == "__main__":
-    generate_rocrate()
+    generate_rocrate(sys.argv[0], sys.argv[1])
