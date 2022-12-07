@@ -14,7 +14,7 @@ class TestReadJson:
     ])
     def test_reading_json_normal(self, filepath):
         '''
-        入力をdictとして読み込む, パスが通る
+        入力をdictとして読み込む, 正常系
         '''
         assert isinstance(generate.read_dmp(filepath), dict)
 
@@ -85,6 +85,8 @@ def test_jsonschema_error():
     # 必須項目がない
     # 規定外のプロパティがある
     # valueの型が違う
+        # dictがdictでない
+        # listがlistでない
     # 別エンティティでnameやURLに重複がある
     # どちらか必須が欠けている
 

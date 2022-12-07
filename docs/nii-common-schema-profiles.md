@@ -124,17 +124,10 @@
     </tr>
     <tr>
         <td>contactPoint</td>
-        <td>MUST</td>
+        <td>MUST if common to all dmp entities</td>
         <td>Array of <i>ContactPoint</i> entities, represented by each @id property. e.g. <code>[{"@id":"#mailto:contact@example.com"}]</code></td>
         <td>データ管理機関・管理者への連絡先</td>
         <td>common metadata:14.データ管理者の連絡先<br>JST:研究データの管理者の連絡先<br>AMED:データ管理者の連絡先</td>
-    </tr>
-    <tr>
-        <td>isAccessibleForFree</td>
-        <td>MUST if accessRights has <i>restricted access</i></td>
-        <td>boolean<br>ガバナンス: <code>false</code>の場合、<i>restricted access</i>になっているか</td>
-        <td>データ利用時の有償・無償</td>
-        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制<br>METI:研究開発データの利活用・提供方針</td>
     </tr>
     <tr>
         <td>license</td>
@@ -149,6 +142,13 @@
         <td>Choose one from the list: open access; restricted access; embargoed access; metadata only access</td>
         <td>データセットへのアクセス状況</td>
         <td>common metadata:11.アクセス権<br>JST:研究データの取扱い方法<br>AMED:アクセス権<br>METI:公開レベル</td>
+    </tr>
+    <tr>
+        <td>isAccessibleForFree</td>
+        <td>MUST if accessRights has <i>restricted access</i></td>
+        <td>boolean<br>ガバナンス: <code>false</code>の場合、<i>restricted access</i>になっているか</td>
+        <td>データ利用時の有償・無償</td>
+        <td>common metadata:11.管理対象データの利活用・提供方針<br>JST:公開可能な研究データの提供方法・体制<br>METI:研究開発データの利活用・提供方針</td>
     </tr>
     <tr>
         <td>availabilityStarts</td>
