@@ -1,5 +1,5 @@
 {
-    "dmp_format":"common metadata",
+    "dmp_format":"common_metadata",
     "funding_agency":[
         {
             "name":"Japan Science and Technology Agency",
@@ -18,13 +18,21 @@
         {
             "name":"Ichiro Suzuki",
             "url":"https://en.wikipedia.org/wiki/Ichiro_Suzuki",
-            "affiliation":{ "name":"Seattle Mariners"},
+            "affiliation": {
+                "name":"Seattle Mariners",
+                "url":"https://www.mlb.com/mariners"
+            },
             "email":"ichiro@example.com"
         },
         {
             "name":"Jiro Suzuki",
             "orcid":"https://orcid.org/0000-0001-2345-6789",
-            "affiliation":{ "name":"University of Tokyo"},
+            "affiliation": {
+                "name":"University of Tokyo",
+                "ror":"https://ror.org/057zh3y96",
+                "url":"https://www.u-tokyo.ac.jp/",
+                "address":"7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan"
+            },    
             "email":"jiro@example.com",
             "telephone":"03-1234-5678",
             "e-Rad_researcher_number": "00123456"
@@ -36,18 +44,6 @@
             "email":"ssuzuki@example.com",
             "e-Rad_researcher_number": "00123457"
         }],
-    "affiliation":[
-        {
-            "name":"University of Tokyo",
-            "ror":"https://ror.org/057zh3y96",
-            "url":"https://www.u-tokyo.ac.jp/",
-            "address":"7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan"
-        },
-        {
-            "name":"Seattle Mariners",
-            "url":"https://www.mlb.com/mariners"
-        }
-    ],
     "license":[{
             "name":"Apache License 2.0",
             "url":"https://www.apache.org/licenses/LICENSE-2.0"

@@ -14,3 +14,10 @@ EXTRA_TERMS = {
     "dmpDataNumber": "https://example.com/dataManagementPlan"  # to be updated
 }
 FREEACCESS = {"free":"true", "consideration":"false"}
+
+DMPSTYLES = [
+        "common_metadata",
+        "JST",
+        "AMED",
+        "METI"
+      ]

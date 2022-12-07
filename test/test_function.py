@@ -40,7 +40,7 @@ class TestSetDmp:
     def metadata(self) -> dict:
         yield generate.read_dmp('/app/test/common_sample.json')
     @pytest.mark.parametrize('filepath', [
-        '/app/test/common_sample.json',
+        '/app/test/test-data/test_common.json',
         '/app/test/test-data/test_JST.json',
         '/app/test/test-data/test_AMED.json',
         '/app/test/test-data/test_METI.json',
@@ -54,18 +54,18 @@ class TestSetDmp:
         assert isinstance(generate.set_dmp_format(metadata), NIIROCrate)
         # common, JST, AMED, METI
 
-    @pytest.mark.parametrize(('filepath','exception'), [
-        ('./test-data/test_error.json', FileNotFoundError),
-        ('./test-data/test_nokey.json', generate.ValidationError),
+    @pytest.mark.parametrize('filepath', [
+        './test-data/test_error.json',
+        './test-data/test_nokey.json',
     ])
-    def test_setting_dmp_error(self, filepath, exception):
+    def test_setting_dmp_error(self, filepath):
         '''
         dmpの形式を抽出する
         - valueの値が規定値以外
         - keyがない
         '''
         metadata_error = generate.read_dmp(filepath)
-        with pytest.raises(exception):
+        with pytest.raises(generate.ValidationError):
             generate.set_dmp_format(metadata_error)
 
 

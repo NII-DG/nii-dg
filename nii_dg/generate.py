@@ -2,6 +2,7 @@ import json
 import os
 import jsonschema
 from nii_dg.model.rocrate import NIIROCrate
+from nii_dg import const
 
 
 class ValidationError(Exception):
@@ -36,10 +37,10 @@ def set_dmp_format(dict):
     dmp_f = dict.get('dmp_format')
     if dmp_f is None:
         raise ValidationError('property "dmp_format" is missing.')
-    dmp_f = dmp_f.replace(' ', '_')
+    if dmp_f not in const.DMPSTYLES:
+        raise ValidationError(f'This library does not yet support {dmp_f}.')
 
-    input_schema = '/' + dmp_f + '_schema.json'
-    with open(os.path.dirname(__file__) +input_schema) as schemafile:
+    with open(os.path.dirname(__file__) +'/schema.json', encoding='utf-8') as schemafile:
         schema = json.load(schemafile)
 
     validate_with_schema(dict, schema)
