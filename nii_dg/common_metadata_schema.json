@@ -61,7 +61,7 @@
           "free_or_consideration": { "$ref":"#/definitions/free_or_consideration"},
           "available_from":{ "$ref":"#/definitions/date"},
           "citation_info": { "type": "string" },
-          "download_url":{ "$ref":"#/definitions/urlentity"},
+          "download_url":{ "$ref":"#/definitions/urlentity"}
         }
       }
     },
@@ -153,6 +153,7 @@
         "name":{"type":"string"},
         "url":{ "$ref":"#/definitions/url"},
         "description": {"type":"string"}
+      }
     }
   }
 }

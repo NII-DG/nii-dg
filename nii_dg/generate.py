@@ -39,8 +39,8 @@ def set_dmp_format(dict):
     dmp_f = dmp_f.replace(' ', '_')
 
     input_schema = '/' + dmp_f + '_schema.json'
-    with open(os.path.dirname(__file__) +input_schema) as js:
-        schema = json.load(js)
+    with open(os.path.dirname(__file__) +input_schema) as schemafile:
+        schema = json.load(schemafile)
 
     validate_with_schema(dict, schema)
 
