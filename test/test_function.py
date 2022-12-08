@@ -43,6 +43,7 @@ class TestSetJSON:
         '/app/test/test-data/test_AMED.json',
         '/app/test/test-data/test_METI.json',
         '/app/test/test-data/test_minimum_for_schema.json',
+        '/app/test/test-data/test_maximum_for_schema.json',
     ])
     def test_generateing_normal(self, filepath):
         '''

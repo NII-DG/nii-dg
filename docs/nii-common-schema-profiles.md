@@ -449,6 +449,20 @@
         <td>common metadata:1.資金配分機関情報, データ管理機関<br>AMED:所属,データ管理機関</td>
     </tr>
     <tr>
+        <td>alternateName</td>
+        <td>MAY</td>
+        <td>string</td>
+        <td>組織名の別名</td>
+        <td>複数言語利用時</td>
+    </tr>
+    <tr>
+        <td>description</td>
+        <td>MAY</td>
+        <td>string</td>
+        <td>組織の説明</td>
+        <td></td>
+    </tr>
+    <tr>
         <td>address</td>
         <td>MUST with common metadata if organization is data maintainer</td>
         <td>string</td>

@@ -96,10 +96,12 @@
             "additionalProperties": false,
             "required": ["name"],
             "properties": {
-            "name": { "type": "string" },
-            "url": { "$ref":"#/definitions/url"},
-            "ror": { "$ref":"#/definitions/url"},
-            "address": { "type": "string" }
+                "name": { "type": "string" },
+                "alias": { "type": "string" },
+                "description": {"type":"string"},
+                "url": { "$ref":"#/definitions/url"},
+                "ror": { "$ref":"#/definitions/url"},
+                "address": { "type": "string" }
             }
         },
         "person":{
@@ -108,6 +110,8 @@
             "required": ["name"],
             "properties": {
             "name": { "type": "string" },
+            "alias": { "type": "string" },
+            "description": {"type":"string"},
             "orcid": { "$ref":"#/definitions/url"},
             "url": { "$ref":"#/definitions/url"},
             "email": { 
