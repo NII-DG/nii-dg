@@ -1,0 +1,32 @@
+{
+    "dmp_format":"common_metadata",
+    "project_name":"Sample Research",
+    "funding_agency":[
+            {
+                "name":"Japan Science and Technology Agency",
+                "url":"https://www.jst.go.jp/",
+                "ror":"https://ror.org/00097mb19",
+                "alias":"国立研究開発法人 科学技術振興機構",
+                "description":"JST (Japan Science and Technology Agency) is a national research and development Agency that plays a central role in the Science, Technology and Innovation Basic Plan and aims to promote science and technology.",
+                "address":"Kawaguchi Center Building, 4-1-8, Honcho, Kawaguchi-shi, Saitama 332-0012 Japan"
+            },
+            {
+                "name":"Japan Agency for Medical Research and Development",
+                "url":"https://www.amed.go.jp/",
+                "ror":"https://ror.org/004rtk039",
+                "alias":"日本医療研究開発機構",
+                "description":"AMED promotes integrated research and development in the field of medicine, from basic research to clinical trials.",
+                "address":"20F Yomiuri Shimbun Bldg. 1-7-1 Otemachi, Chiyoda-ku, Tokyo 100-0004 Japan"
+            }
+        ],
+    "repository":{
+        "name":"Gakunin RDM",
+        "url":"https://rdm.nii.ac.jp/example/",
+        "description":"NIIが運営する研究データ管理基盤"
+    },
+    "download_url":{
+        "name":"Zenodo download link",
+        "url":"https://zenodo.org/record/example",
+        "description":"Uploaded Zenodo Files"
+    }
+}
