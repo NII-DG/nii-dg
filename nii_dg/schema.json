@@ -15,12 +15,7 @@
             "type": "array",
             "items": { "$ref":"#/definitions/organization"}
           },
-        "repository": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["name", "url"],
-            "properties": { "$ref":"#/definitions/urlentity"}
-        },
+        "repository": { "$ref":"#/definitions/urlentity"},
         "e-Rad_project_id": {"type": "string"},
         "publish_date":{ "$ref":"#/definitions/date"},
         "creator": {
@@ -49,10 +44,11 @@
                 "data_number": { "type": "integer" },
                 "title": { "type": "string" },
                 "description": { "type": "string" },
+                "repository": { "$ref":"#/definitions/urlentity"},
                 "data_type": { "type": "string" },
                 "creator": {
-                "type": "array",
-                "items": { "$ref":"#/definitions/person"}
+                    "type": "array",
+                    "items": { "$ref":"#/definitions/person"}
                 },
                 "hosting_institution": { "$ref":"#/definitions/organization"},
                 "data_manager": { "$ref":"#/definitions/person"},
@@ -68,16 +64,16 @@
         "dataset":{
             "type":"array",
             "items":{
-            "type":"object",
-            "additionalProperties": false,
-            "required":["name","path","dmp"],
-            "properties":{
-                "name": { "type": "string" },
-                "path": { "type": "string" },
-                "size": { "type": "string" },
-                "format": { "type": "string" },
-                "dmp":{"type":"integer"},
-                "url":{ "$ref":"#/definitions/url"}
+                "type":"object",
+                "additionalProperties": false,
+                "required":["name","path","dmp"],
+                "properties":{
+                    "name": { "type": "string" },
+                    "path": { "type": "string" },
+                    "size": { "type": "string" },
+                    "format": { "type": "string" },
+                    "dmp":{"type":"integer"},
+                    "url":{ "$ref":"#/definitions/url"}
                 }
             }
         }
@@ -141,9 +137,9 @@
             "additionalProperties": false,
             "required": ["name", "url"],
             "properties": {
-            "name": { "type": "string" },
-            "url": { "$ref":"#/definitions/url"},
-            "description": { "type": "string" }
+                "name": { "type": "string" },
+                "url": { "$ref":"#/definitions/url"},
+                "description": { "type": "string" }
             }
         },
         "access_rights":{

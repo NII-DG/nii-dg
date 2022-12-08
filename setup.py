@@ -32,6 +32,7 @@ setup(
         "isort",
         "mypy",
         "pytest",
+        "pytest-html",
     ],
     extras_require={
         "tests": [
@@ -39,6 +40,7 @@ setup(
             "isort",
             "mypy",
             "pytest",
+            "pytest-html",
         ],
     },
     entry_points={

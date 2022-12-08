@@ -75,6 +75,8 @@ class TestSetJSON:
         '/app/test/test-data/schema_errors/lack_required_01.json',
         '/app/test/test-data/schema_errors/lack_required_02.json',
         '/app/test/test-data/schema_errors/lack_required_03.json',
+        '/app/test/test-data/schema_errors/lack_required_04.json',
+        '/app/test/test-data/schema_errors/lack_required_05.json',
     ])
     def test_json_validation_error(self, filepath):
         '''
@@ -92,13 +94,6 @@ class TestSetJSON:
         # - オプション項目の型が不適当
         # - 規定されていないkeyが存在する
 
-def test_jsonschema_normal():
-    '''
-    入力JSONをJSON-Schemaでvalidation, 正常系
-    '''
-    pass
-    # dmp-jsonの必須項目が埋まっている (minimum)
-    # 必須項目+オプション全部乗せ (Maximum)
 
 def test_jsonschema_error():
     '''
@@ -113,6 +108,9 @@ def test_jsonschema_error():
     # 別エンティティでnameやURLに重複がある
     # どちらか必須が欠けている
 
+
+def test_data_entity():
 # データエンティティ
 # ディレクトリを読まないときはJSONに入力必須, OK/エラー
 # JSONを読んだ時の分岐
+    pass
