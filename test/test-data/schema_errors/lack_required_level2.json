@@ -1,0 +1,20 @@
+{
+    "dmp_format":"common_metadata",
+    "project_name":"Sample Research",
+    "funding_agency":[
+            {
+                "url":"https://www.jst.go.jp/",
+                "ror":"https://ror.org/00097mb19"    
+            }
+        ],
+    "repository":{
+        "description":"This is a repository for data"
+    },
+    "creator": [
+        {
+            "alias":"イチロー"
+        }
+    ],
+    "hosting_institution":{ "url":"https://www.jst.go.jp/"},
+    "data_manager":{"jobTitle":"Data Manager"}
+}

@@ -28,5 +28,32 @@
         "name":"Zenodo download link",
         "url":"https://zenodo.org/record/example",
         "description":"Uploaded Zenodo Files"
-    }
+    },
+    "creator":[
+        {
+            "name":"Ichiro Suzuki",
+            "alias":"イチロー",
+            "url":"https://en.wikipedia.org/wiki/Ichiro_Suzuki",
+            "affiliation": {
+                "name":"Seattle Mariners",
+                "url":"https://www.mlb.com/mariners"
+            },
+            "description":"one of the best Japanese baseball player",
+            "email":"ichiro@example.com",
+            "jobTitle":"special assistant and instructor with the current Mariners chairman"
+        },
+        {
+            "name":"Jiro Suzuki",
+            "orcid":"https://orcid.org/0000-0001-2345-6789",
+            "affiliation": {
+                "name":"University of Tokyo",
+                "ror":"https://ror.org/057zh3y96",
+                "url":"https://www.u-tokyo.ac.jp/",
+                "address":"7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan"
+            },    
+            "email":"jiro@example.com",
+            "telephone":"03-1234-5678",
+            "e-Rad_researcher_number": "00123456"
+        }
+    ]
 }
