@@ -1,6 +1,6 @@
 import json
 import sys
-from nii_dg.generate import add_entities_to_crate, read_dmp, generate_crate_instance
+from nii_dg.generate import add_entities_to_crate, read_dmp, generate_crate_instance, ValidationError
 from nii_dg import const
 
 
@@ -20,8 +20,8 @@ def generate_rocrate(dmp_path=None, dir_path=None):
 
         sys.exit(0)
 
-    except Exception as e:
-        print('Error occured!: ' + str(e))
+    except (FileNotFoundError, ValidationError) as e:
+        print(type(e).__name__ + ' occured!: ' + str(e))
         sys.exit(1)
 
 
