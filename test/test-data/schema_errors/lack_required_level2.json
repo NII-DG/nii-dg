@@ -16,5 +16,12 @@
         }
     ],
     "hosting_institution":{ "url":"https://www.jst.go.jp/"},
-    "data_manager":{"jobTitle":"Data Manager"}
+    "data_manager":{"job_title":"Data Manager"},
+    "download_url":{"size": "100MB"},
+    "license":{
+        "name":"Apache License 2.0",
+        "url":"https://www.apache.org/licenses/LICENSE-2.0",
+        "description":"approved by the ASF in 2004"
+    }
+
 }

@@ -44,10 +44,10 @@
             "email":"ssuzuki@example.com",
             "e-Rad_researcher_number": "00123457"
         }],
-    "license":[{
+    "license":{
             "name":"Apache License 2.0",
             "url":"https://www.apache.org/licenses/LICENSE-2.0"
-        }],
+        },
     "dmp":[
         {
             "data_number":1,
@@ -108,7 +108,7 @@
             "url":"https://rdm.nii.ac.jp/mcsdj/files/osfstorage/636c521f4fa1910010825ee1",
             "size":"30B",
             "name":"input.json",
-            "dmp":2,
+            "dmp":1,
             "format":"application/json"
         },
         {

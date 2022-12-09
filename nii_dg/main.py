@@ -4,7 +4,7 @@ from nii_dg.generate import add_entities_to_crate, read_dmp, generate_crate_inst
 from nii_dg import const
 
 
-def generate_rocrate(dmp_path=None, dir_path=None):
+def generate_rocrate(dmp_path, dir_path=None):
     try:
         crate = generate_crate_instance( read_dmp(dmp_path) )
         add_entities_to_crate(crate)

@@ -20,7 +20,7 @@ class TestReadJson:
 
     @pytest.mark.parametrize('filepath',[
         '/test-data/not_existing_file.json',
-        # 通らない絶対path, False
+        # 通らない相対path, False
     ])
     @pytest.mark.parametrize(('func','exception'),[
         (generate.read_dmp, FileNotFoundError ),
@@ -61,7 +61,6 @@ class TestSetJSON:
         '''
         metadata = generate.read_dmp(filepath)
         assert isinstance(generate.generate_crate_instance(metadata), NIIROCrate)
-        # common, JST, AMED, METI
 
     # dmp形式がエラー
     filepaths_1 = [
@@ -82,11 +81,8 @@ class TestSetJSON:
 
      # dmp形式以外がJSON-Schemaエラー
     filepaths_2 = [
-        '/app/test/test-data/schema_errors/lack_required_01.json',
-        '/app/test/test-data/schema_errors/lack_required_02.json',
-        '/app/test/test-data/schema_errors/lack_required_03.json',
-        '/app/test/test-data/schema_errors/lack_required_04.json',
-        '/app/test/test-data/schema_errors/lack_required_05.json',
+        '/app/test/test-data/schema_errors/lack_required_level1.json',
+        '/app/test/test-data/schema_errors/lack_required_level2.json',
     ]
    
     @pytest.mark.parametrize('metadata', filepaths_2, indirect = ['metadata'] )
@@ -100,10 +96,6 @@ class TestSetJSON:
         '''
         with pytest.raises(generate.ValidationError):
             generate.validate_with_schema(metadata)
-        # - 必須項目がない (第一階層, 第二階層)
-        # - 必須項目があるが、型が不適当 (dict, list含む)
-        # - オプション項目の型が不適当
-        # - 規定されていないkeyが存在する
 
 
     @pytest.mark.parametrize('filepath',filepaths_1 + filepaths_2)
@@ -117,17 +109,33 @@ class TestSetJSON:
 
 class TestSetJSONbyScript:
     '''
-    入力JSONをメソッド側でvalidation
+    入力JSONをメソッド側でvalidationしエンティティに変換
     '''
+    def test_checkbyscript_normal(self):
+        '''
+        入力JSONをスクリプトでvalidationし正常
+        '''
+        pass
+        # エンティティが正しく生成される
+        # RO-Crateが正しく生成される
+
 
     def test_checkbyscript_error(self):
         '''
         入力JSONをスクリプトでvalidationしエラー
         '''
         pass
+        # エンティティ単位：どちらか必須が欠けている
+        # 同種のエンティティ：同一エンティティを指すがプロパティの値が異なっている
         # 別エンティティでnameやURLに重複がある
-        # 同一エンティティを指すがプロパティの値が異なっている
-        # どちらか必須が欠けている
+
+    def test_errorcode(self):
+        '''
+        入力JSONをスクリプトでvalidationしエラー時に終了コードが1
+        '''
+        # with pytest.raises(SystemExit):
+        #     main.generate_rocrate(filepath)
+        pass
 
 
 class TestSetDataEntity:
@@ -136,7 +144,35 @@ class TestSetDataEntity:
     '''
 
     def test_data_entity(self):
-    # データエンティティ
-    # ディレクトリを読まないときはJSONに入力必須, OK/エラー
-    # JSONを読んだ時の分岐
+    # JSON-Schemaベースのvalidationは既にクリア
+    # JSONから生成, OK
+        pass
+
+    def test_data_entity_error(self):
+    # JSON-Schemaベースのvalidationは既にクリア
+    # JSONから生成, エラー
+    # ディレクトリなのに@idが/で終わっていない、など
+        pass
+
+    def test_load_data_dir(self):
+        #指定ディレクトリを読み込みエンティティ生成
+        pass
+
+    def test_load_data_dir_error(self):
+        #指定ディレクトリを読み込みエンティティ生成,エラー
+        # 指定ディレクトリがない
+        # 指定ディレクトリが空
+        pass
+
+class TestGenerateRocrate:
+    '''
+    JSON-LDとしてRO-Crateの生成
+    '''
+    def test_generate_rocrate(self):
+        # main.generate_rocrate(json)
+        pass
+
+    def test_generate_rocrate_error(self):
+        # 生成時エラー
+        # main.generate_rocrate(json)
         pass
