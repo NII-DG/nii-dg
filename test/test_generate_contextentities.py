@@ -7,7 +7,7 @@ from nii_dg.model.rocrate import NIIROCrate
 from nii_dg import generate, main
 
 
-def test_checkbyscript_normal(self):
+def test_checkbyscript_normal():
     '''
     入力JSONからコンテキストエンティティを正常に生成
     '''
@@ -16,7 +16,7 @@ def test_checkbyscript_normal(self):
     # RO-Crateが正しく生成される
 
 
-def test_checkbyscript_error(self):
+def test_checkbyscript_error():
     '''
     入力JSONに対して生成時にエラー
     '''
@@ -25,7 +25,7 @@ def test_checkbyscript_error(self):
     # 同種のエンティティ：同一エンティティを指すがプロパティの値が異なっている
     # 別エンティティでnameやURLに重複がある
 
-def test_errorcode(self):
+def test_errorcode():
     '''
     生成エラー時に終了コードが1
     '''

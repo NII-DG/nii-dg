@@ -253,7 +253,7 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
 }
 </script>
     <h1>report.html</h1>
-    <p>Report generated on 08-Dec-2022 at 07:21:45 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.2.0</p>
+    <p>Report generated on 09-Dec-2022 at 07:58:31 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.2.0</p>
     <h2>Environment</h2>
     <table id="environment">
       <tr>
@@ -269,8 +269,8 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
         <td>Python</td>
         <td>3.8.15</td></tr></table>
     <h2>Summary</h2>
-    <p>18 tests ran in 0.18 seconds. </p>
-    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">18 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <p>3 tests ran in 0.15 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">3 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
     <h2>Results</h2>
     <table id="results-table">
       <thead id="results-table-head">
@@ -285,250 +285,9 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestReadJson::test_reading_json_normal[./common_sample.json]</td>
+          <td class="col-name">test/test_readfile.py::test_reading_json_normal[./common_sample.json]</td>
           <td>
-        入力をdictとして読み込む, 正常系
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestReadJson::test_reading_json_error[/test-data/not_existing_file.json-read_dmp-FileNotFoundError]</td>
-          <td>
-        入力をdictとして読み込む,パスが見つからない場合にエラー
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestReadJson::test_reading_json_error[/test-data/not_existing_file.json-generate_rocrate-SystemExit]</td>
-          <td>
-        入力をdictとして読み込む,パスが見つからない場合にエラー
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>Error occured!: [Errno 2] No such file or directory: &#x27;/test-data/not_existing_file.json&#x27;
-<br/></div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_generateing_normal[/app/test/test-data/test_common.json]</td>
-          <td>
-        dmpの形式を抽出しJSON schemaでvalidation, 正常系
-        - common metadata, JST, AMED, METIのいずれか
-        - 必須項目が存在し、型が正しい
-        - オプション項目が存在し、型が正しい
-        - 規定されていないkeyが存在しない
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_generateing_normal[/app/test/test-data/test_JST.json]</td>
-          <td>
-        dmpの形式を抽出しJSON schemaでvalidation, 正常系
-        - common metadata, JST, AMED, METIのいずれか
-        - 必須項目が存在し、型が正しい
-        - オプション項目が存在し、型が正しい
-        - 規定されていないkeyが存在しない
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_generateing_normal[/app/test/test-data/test_AMED.json]</td>
-          <td>
-        dmpの形式を抽出しJSON schemaでvalidation, 正常系
-        - common metadata, JST, AMED, METIのいずれか
-        - 必須項目が存在し、型が正しい
-        - オプション項目が存在し、型が正しい
-        - 規定されていないkeyが存在しない
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_generateing_normal[/app/test/test-data/test_METI.json]</td>
-          <td>
-        dmpの形式を抽出しJSON schemaでvalidation, 正常系
-        - common metadata, JST, AMED, METIのいずれか
-        - 必須項目が存在し、型が正しい
-        - オプション項目が存在し、型が正しい
-        - 規定されていないkeyが存在しない
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_generateing_normal[/app/test/test-data/test_minimum_for_schema.json]</td>
-          <td>
-        dmpの形式を抽出しJSON schemaでvalidation, 正常系
-        - common metadata, JST, AMED, METIのいずれか
-        - 必須項目が存在し、型が正しい
-        - オプション項目が存在し、型が正しい
-        - 規定されていないkeyが存在しない
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_generateing_normal[/app/test/test-data/test_maximum_for_schema.json]</td>
-          <td>
-        dmpの形式を抽出しJSON schemaでvalidation, 正常系
-        - common metadata, JST, AMED, METIのいずれか
-        - 必須項目が存在し、型が正しい
-        - オプション項目が存在し、型が正しい
-        - 規定されていないkeyが存在しない
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_checking_dmp_error[/app/test/test-data/test_error.json]</td>
-          <td>
-        dmpの形式を抽出する
-        - valueの値が規定値以外
-        - keyがない
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_checking_dmp_error[/app/test/test-data/test_nokey.json]</td>
-          <td>
-        dmpの形式を抽出する
-        - valueの値が規定値以外
-        - keyがない
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_json_validation_error[/app/test/test-data/schema_errors/lack_required_01.json]</td>
-          <td>
-        JSON-schemaでvalidation (dmpformat以外)
-        - 必須項目がない (第一階層, 第二階層)
-        - 必須項目があるが、型が不適当
-        - オプション項目の型が不適当
-        - 規定されていないkeyが存在する
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_json_validation_error[/app/test/test-data/schema_errors/lack_required_02.json]</td>
-          <td>
-        JSON-schemaでvalidation (dmpformat以外)
-        - 必須項目がない (第一階層, 第二階層)
-        - 必須項目があるが、型が不適当
-        - オプション項目の型が不適当
-        - 規定されていないkeyが存在する
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_json_validation_error[/app/test/test-data/schema_errors/lack_required_03.json]</td>
-          <td>
-        JSON-schemaでvalidation (dmpformat以外)
-        - 必須項目がない (第一階層, 第二階層)
-        - 必須項目があるが、型が不適当
-        - オプション項目の型が不適当
-        - 規定されていないkeyが存在する
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_json_validation_error[/app/test/test-data/schema_errors/lack_required_04.json]</td>
-          <td>
-        JSON-schemaでvalidation (dmpformat以外)
-        - 必須項目がない (第一階層, 第二階層)
-        - 必須項目があるが、型が不適当
-        - オプション項目の型が不適当
-        - 規定されていないkeyが存在する
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::TestSetJSON::test_json_validation_error[/app/test/test-data/schema_errors/lack_required_05.json]</td>
-          <td>
-        JSON-schemaでvalidation (dmpformat以外)
-        - 必須項目がない (第一階層, 第二階層)
-        - 必須項目があるが、型が不適当
-        - オプション項目の型が不適当
-        - 規定されていないkeyが存在する
-        </td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::test_jsonschema_error</td>
-          <td>
-    入力JSONをJSON-Schemaでvalidation, 異常系
+    入力をdictとして読み込む, 正常系
     </td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
@@ -538,10 +297,25 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">test/test_function.py::test_data_entity</td>
-          <td>None</td>
+          <td class="col-name">test/test_readfile.py::test_reading_json_error[read_dmp-FileNotFoundError-/test-data/not_existing_file.json]</td>
+          <td>
+    入力をdictとして読み込む,パスが見つからない場合にエラー
+    </td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody></table></body></html>
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test/test_readfile.py::test_reading_json_error[generate_rocrate-SystemExit-/test-data/not_existing_file.json]</td>
+          <td>
+    入力をdictとして読み込む,パスが見つからない場合にエラー
+    </td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="5">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>FileNotFoundError occured!: [Errno 2] No such file or directory: &#x27;/test-data/not_existing_file.json&#x27;
+<br/></div></td></tr></tbody></table></body></html>

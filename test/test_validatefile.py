@@ -7,7 +7,7 @@ from nii_dg.model.rocrate import NIIROCrate
 from nii_dg import generate, main
 
 @pytest.fixture()
-def metadata(self, request):
+def metadata(request):
     return generate.read_dmp(request.param)
 
 @pytest.mark.parametrize('filepath', [
@@ -18,7 +18,7 @@ def metadata(self, request):
     '/app/test/test-data/test_minimum_for_schema.json',
     '/app/test/test-data/test_maximum_for_schema.json',
 ])
-def test_generateing_normal(self, filepath):
+def test_generateing_normal(filepath):
     '''
     dmpの形式を抽出しJSON schemaでvalidation, 正常系
     '''
@@ -32,7 +32,7 @@ filepaths_1 = [
 ]
 
 @pytest.mark.parametrize('metadata', filepaths_1, indirect=['metadata'])
-def test_checking_dmp_error(self, metadata):
+def test_checking_dmp_error(metadata):
     '''
     dmpの形式抽出エラー
     - valueの値が規定値以外
@@ -52,7 +52,7 @@ filepaths_2 = [
 ]
 
 @pytest.mark.parametrize('metadata', filepaths_2, indirect = ['metadata'] )
-def test_json_validation_error(self, metadata):
+def test_json_validation_error(metadata):
     '''
     JSON-schemaでvalidationエラー (dmpformat以外)
     '''
@@ -61,7 +61,7 @@ def test_json_validation_error(self, metadata):
 
 
 @pytest.mark.parametrize('filepath',filepaths_1 + filepaths_2)
-def test_errorcode(self, filepath):
+def test_errorcode(filepath):
     '''
     DMP形式抽出エラーもしくはJSON-schemaでvalidationエラー時に終了コードが1
     '''

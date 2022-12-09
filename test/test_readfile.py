@@ -9,7 +9,7 @@ from nii_dg import generate, main
     './common_sample.json',
     # 通る絶対path
 ])
-def test_reading_json_normal(self, filepath):
+def test_reading_json_normal(filepath):
     '''
     入力をdictとして読み込む, 正常系
     '''
@@ -23,7 +23,7 @@ def test_reading_json_normal(self, filepath):
     (generate.read_dmp, FileNotFoundError ),
     (main.generate_rocrate, SystemExit ),
 ])
-def test_reading_json_error(self, filepath, func, exception):
+def test_reading_json_error(filepath, func, exception):
     '''
     入力をdictとして読み込む,パスが見つからない場合にエラー
     '''
