@@ -1,13 +1,20 @@
 import json
 import sys
+<<<<<<< HEAD
 from typing import Optional
+=======
+>>>>>>> 23b1b8b... Add github action and update README
 
 from nii_dg import const
 from nii_dg.generate import (ValidationError, add_entities_to_crate,
                              generate_crate_instance, read_dmp)
 
 
+<<<<<<< HEAD
 def generate_rocrate(dmp_path: str, dir_path: Optional[str] = None) -> None:
+=======
+def generate_rocrate(dmp_path, dir_path=None) -> None:
+>>>>>>> 23b1b8b... Add github action and update README
     try:
         crate = generate_crate_instance(read_dmp(dmp_path))
         add_entities_to_crate(crate)

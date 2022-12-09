@@ -13,9 +13,15 @@ EXTRA_TERMS: dict[str, str] = {
     "dmpFormat": "https://example.com/dmpFormat",  # to be updated
     "dmpDataNumber": "https://example.com/dataManagementPlan"  # to be updated
 }
+<<<<<<< HEAD
 FREEACCESS: dict[str, str] = {"free": "true", "consideration": "false"}
 
 DMPSTYLES: list[str] = [
+=======
+FREEACCESS = {"free": "true", "consideration": "false"}
+
+DMPSTYLES = [
+>>>>>>> 23b1b8b... Add github action and update README
     "common_metadata",
     "JST",
     "AMED",

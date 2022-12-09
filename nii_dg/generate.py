@@ -1,6 +1,9 @@
 import json
 import os
+<<<<<<< HEAD
 from typing import Any
+=======
+>>>>>>> 23b1b8b... Add github action and update README
 
 import jsonschema
 
@@ -12,7 +15,11 @@ class ValidationError(Exception):
     pass
 
 
+<<<<<<< HEAD
 def read_dmp(path) -> dict[str, Any]:
+=======
+def read_dmp(path):
+>>>>>>> 23b1b8b... Add github action and update README
     '''
     入力となるJSONをdictとして読む
     '''
@@ -25,7 +32,11 @@ def validate_with_schema(dict_: dict[str, Any]) -> None:
     '''
     JSON-Schemaで入力を検証
     '''
+<<<<<<< HEAD
     with open(os.path.dirname(__file__) + "/schema.json", encoding="utf-8") as schemafile:
+=======
+    with open(os.path.dirname(__file__) + '/schema.json', encoding='utf-8') as schemafile:
+>>>>>>> 23b1b8b... Add github action and update README
         schema = json.load(schemafile)
 
     error_messages = []
@@ -37,7 +48,12 @@ def validate_with_schema(dict_: dict[str, Any]) -> None:
         raise ValidationError("\n".join(error_messages))
 
 
+<<<<<<< HEAD
 def check_dmp_format(dict_: dict[str, Any]) -> None:
+=======
+
+def check_dmp_format(dict_):
+>>>>>>> 23b1b8b... Add github action and update README
     '''
     入力からDMPの形式を抽出
     対応するものか確認
@@ -66,12 +82,22 @@ def add_entities_to_crate(crate: NIIROCrate) -> None:
     crate.set_publisheddate()
 
     key_func = {
+<<<<<<< HEAD
         "projectName": crate.set_project_name,
         "fundingAgency": crate.set_funder,
         "repository": crate.set_repo,
         "researchField": crate.set_field,
         "e-RadProjectId": crate.set_erad,
         "license": crate.set_license,
+=======
+        "project_name": crate.set_project_name,
+        "funding_agency": crate.set_funder,
+        "repository": crate.set_repo,
+        "research_field": crate.set_field,
+        "e-Rad_project_id": crate.set_erad,
+        "license": crate.set_license,
+        "affiliation": crate.set_affiliations,
+>>>>>>> 23b1b8b... Add github action and update README
         "creator": crate.set_creators
     }
     funcs = {k: v for k, v in key_func.items() if k in crate.dmp}
@@ -79,7 +105,11 @@ def add_entities_to_crate(crate: NIIROCrate) -> None:
         if crate.dmp.get(k) is not None:
             v(crate.dmp.get(k))
 
+<<<<<<< HEAD
     if crate.dmp_format == "common_metadata":
+=======
+    if crate.dmp_format == 'common_metadata':
+>>>>>>> 23b1b8b... Add github action and update README
         crate.set_dmp_common()
     else:
         pass  # tbd
