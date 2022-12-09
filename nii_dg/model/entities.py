@@ -27,6 +27,12 @@ class Entity():
         '''
         return self._jsonld
 
+    def set_id(self, id_:str) -> None:
+        '''
+        keyが"@id"となるvalueをJSON-LDに追加もしくは上書きする
+        '''
+        self._jsonld['@id'] = id_
+
     def set_name(self, name:str) -> None:
         '''
         keyが"name"となるvalueをJSON-LDに追加する
