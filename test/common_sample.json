@@ -1,15 +1,15 @@
 {
-    "dmp_format":"common_metadata",
-    "funding_agency":[
+    "dmpFormat":"common_metadata",
+    "fundingAgency":[
         {
             "name":"Japan Science and Technology Agency",
             "url":"https://www.jst.go.jp/",
             "ror":"https://ror.org/00097mb19"
             }
         ],
-    "e-Rad_project_id":"123456",
-    "project_name":"Sample Research",
-    "research_field":"Informatics",
+    "e-RadProjectId":"123456",
+    "projectName":"Sample Research",
+    "researchField":"Informatics",
     "repository":{
         "name":"Gakunin RDM",
         "url":"https://rdm.nii.ac.jp/mcsdj/"
@@ -35,14 +35,14 @@
             },    
             "email":"jiro@example.com",
             "telephone":"03-1234-5678",
-            "e-Rad_researcher_number": "00123456"
+            "e-RadResearcherNumber": "00123456"
         },
         {
             "name":"Saburo Suzuki",
             "orcid":"https://orcid.org/0000-0002-3456-7890",
             "affiliation":{ "name":"University of Tokyo"},
             "email":"ssuzuki@example.com",
-            "e-Rad_researcher_number": "00123457"
+            "e-RadResearcherNumber": "00123457"
         }],
     "license":{
             "name":"Apache License 2.0",
@@ -50,47 +50,47 @@
         },
     "dmp":[
         {
-            "data_number":1,
+            "dataNumber":1,
             "title":"parameters",
             "description":"input parameter files",
-            "data_type":"Dataset",
+            "dataType":"Dataset",
             "creator":[
                 {"name":"Ichiro Suzuki"},
                 {"name":"Saburo Suzuki"}
             ],
-            "free_or_consideration":"free",
+            "freeOrConsideration":"free",
             "license":{
                 "name":"Apache License 2.0"
             },
-            "access_rights":"open access",
-            "citation_info":"following the license",
-            "max_filesize":"1GB",
-            "hosting_institution":{
+            "accessRights":"open access",
+            "citationInfo":"following the license",
+            "maxFilesize":"1GB",
+            "hostingInstitution":{
                 "name":"University of Tokyo"
             },
-            "data_manager":{
+            "dataManager":{
                 "name":"Jiro Suzuki"
             }
         },
         {
-            "data_number":2,
+            "dataNumber":2,
             "title":"execution file",
             "description":"python script",
-            "data_type":"Dataset",
+            "dataType":"Dataset",
             "creator":[
                 {"name":"Jiro Suzuki"}
             ],
-            "free_or_consideration":"free",
+            "freeOrConsideration":"free",
             "license":{
                 "name":"Apache License 2.0"
             },
-            "access_rights":"open access",
-            "citation_info":"following the license",
-            "max_filesize":"1GB",
-            "hosting_institution":{
+            "accessRights":"open access",
+            "citationInfo":"following the license",
+            "maxFilesize":"1GB",
+            "hostingInstitution":{
                 "name":"University of Tokyo"
             },
-            "data_manager":{
+            "dataManager":{
                 "name":"Jiro Suzuki"
             }
         }

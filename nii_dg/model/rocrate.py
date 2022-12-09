@@ -113,7 +113,7 @@ class NIIROCrate(ROCrate):
         super().__init__()
         self.extra_terms = const.EXTRA_TERMS
         self.dmp = dmp
-        self.dmp_format = dmp.get("dmp_format")
+        self.dmp_format = dmp.get("dmpFormat")
         self.rootdataentity.add_properties({"dmpFormat":self.dmp_format})
 
 
@@ -161,7 +161,7 @@ class NIIROCrate(ROCrate):
     def add_organization(self, org:dict) -> dict:
         '''
         Organizationエンティティを作成する
-        @idはrorもしくはurlのvalueとし、rorを優先
+        @idはrorもしくはurlのvalueとし、両方ある場合はrorを優先
         '''
 
         # when "ror" is missing, "url" is adopted as @id property
@@ -183,7 +183,7 @@ class NIIROCrate(ROCrate):
         @idはorcidもしくはurlのvalueとし、rorを優先
         '''
 
-        properties = {k: v for k, v in person.items() if k in ["name","email"]}
+        properties = {k: v for k, v in person.items() if k in ["name","description","email","jobTitle"]}
 
         # when "orcid" is missing, "url" is adopted as @id property
         ids = [item for item in [person.get("orcid"), person.get("url")] if item is not None]
@@ -204,7 +204,7 @@ class NIIROCrate(ROCrate):
             properties["contactPoint"] = self.add_contactpoint(person)
 
         # when there is e-rad ID, add an entity
-        erad = person.get('e-Rad_researcher_number')
+        erad = person.get('e-RadResearcherNumber')
         if erad is not None:
             properties["identifier"] = self.add_erad(erad, 'researcher')
 
@@ -246,7 +246,7 @@ class NIIROCrate(ROCrate):
         '''
         publishedDate プロパティをルートエンティティに追加
         '''
-        pd = self.dmp.get("published_date")
+        pd = self.dmp.get("publishedDate")
         cd = self.rootdataentity.get("datePublished")
         self.rootdataentity.add_properties({"dateCreated":cd})
 
@@ -355,13 +355,13 @@ class NIIROCrate(ROCrate):
         i = 1
 
         for dmp in dmpset:
-            id_ = "#dmp:" + str(dmp.get("data_number"))
+            id_ = "#dmp:" + str(dmp.get("dataNumber"))
             maintainer = []
 
             properties = {
                 "name":dmp.get("title"),
                 "description":dmp.get("description"),
-                "contentSize":dmp.get("max_filesize")
+                "contentSize":dmp.get("maxFilesize")
             }
 
             if dmp.get('creator') is not None:
@@ -375,13 +375,13 @@ class NIIROCrate(ROCrate):
                 properties["creator"] = c_list
 
             if dmp.get("hosting_institution") is not None:
-                hi = self.convert_name_to_id(dmp["hosting_institution"])
+                hi = self.convert_name_to_id(dmp["hostingInstitution"])
                 maintainer.append(hi)
             if dmp.get("data_manager") is not None:
-                dm = self.convert_name_to_id(dmp["data_manager"])
+                dm = self.convert_name_to_id(dmp["dataManager"])
                 maintainer.append(dm)
 
-                dm_e = self.get_by_name(dmp["data_manager"].get("name"))
+                dm_e = self.get_by_name(dmp["dataManager"].get("name"))
                 cp = dm_e.get("contactPoint")
                 if cp is None:
                     cp = self.add_contactpoint(dm_e.get_jsonld())
@@ -391,7 +391,7 @@ class NIIROCrate(ROCrate):
             if len(maintainer) > 0:
                 properties["maintainer"] = maintainer
 
-            iaf = dmp.get("free_or_consideration")
+            iaf = dmp.get("freeOrConsideration")
             if iaf is not None:
                 properties["isAccessibleForFree"] = const.FREEACCESS.get(iaf)
 
@@ -402,10 +402,10 @@ class NIIROCrate(ROCrate):
 
                 properties["license"] = lic
 
-            if dmp.get("access_rights") is not None:
-                properties["accessRights"] = dmp.get("access_rights")
+            if dmp.get("accessRights") is not None:
+                properties["accessRights"] = dmp.get("accessRights")
 
-            ui = dmp.get("citation_info")
+            ui = dmp.get("citationInfo")
             if ui is not None:
                 properties["usageInfo"] = self.add_entity(f"#usageInfo:{i}", "CreativeWork", {"description":ui})
                 i += 1

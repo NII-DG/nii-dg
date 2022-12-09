@@ -3,59 +3,59 @@
     "type": "object",
     "additionalProperties": false,
     "required": [
-      "dmp_format",
-      "project_name",
-      "funding_agency"
+      "dmpFormat",
+      "projectName",
+      "fundingAgency"
     ],
     "properties": {
-        "dmp_format": {"type": "string"},
-        "project_name": { "type": "string"},
+        "dmpFormat": {"type": "string"},
+        "projectName": { "type": "string"},
         "description":{"type":"string"},
-        "funding_agency": {
+        "fundingAgency": {
             "type": "array",
             "items": { "$ref":"#/definitions/organization"}
           },
         "repository": { "$ref":"#/definitions/urlentity"},
-        "e-Rad_project_id": {"type": "string"},
-        "publish_date":{ "$ref":"#/definitions/date"},
+        "e-RadProjectId": {"type": "string"},
+        "publishedDate":{ "$ref":"#/definitions/date"},
         "creator": {
             "type": "array",
             "items": { "$ref":"#/definitions/person"}
         },
-        "hosting_institution": { "$ref":"#/definitions/organization"},
-        "data_manager": { "$ref":"#/definitions/person"},
+        "hostingInstitution": { "$ref":"#/definitions/organization"},
+        "dataManager": { "$ref":"#/definitions/person"},
         "license":{ "$ref":"#/definitions/license"},
-        "access_rights": { "$ref":"#/definitions/access_rights"},
-        "free_or_consideration": {"$ref":"#/definitions/free_or_consideration"},
-        "available_from":{ "$ref":"#/definitions/date"},
-        "citation_info": { "type": "string" },
-        "download_url":{ "$ref":"#/definitions/distribution"},
-        "research_field": {"type": "string"},
+        "accessRights": { "$ref":"#/definitions/access_rights"},
+        "freeOrConsideration": {"$ref":"#/definitions/free_or_consideration"},
+        "availableFrom":{ "$ref":"#/definitions/date"},
+        "citationInfo": { "type": "string" },
+        "downloadUrl":{ "$ref":"#/definitions/distribution"},
+        "researchField": {"type": "string"},
         "dmp": {
             "type": "array",
             "items": {
             "type": "object",
-            "required": ["data_number", "title"],
+            "required": ["dataNumber", "title"],
             "additionalProperties": false,
             "properties": {
-                "data_number": { "type": "integer" },
+                "dataNumber": { "type": "integer" },
                 "title": { "type": "string" },
                 "description": { "type": "string" },
                 "repository": { "$ref":"#/definitions/urlentity"},
-                "data_type": { "type": "string" },
+                "dataType": { "type": "string" },
                 "creator": {
                     "type": "array",
                     "items": { "$ref":"#/definitions/person"}
                 },
-                "hosting_institution": { "$ref":"#/definitions/organization"},
-                "data_manager": { "$ref":"#/definitions/person"},
-                "max_filesize":{ "type": "string" },
+                "hostingInstitution": { "$ref":"#/definitions/organization"},
+                "dataManager": { "$ref":"#/definitions/person"},
+                "maxFilesize":{ "type": "string" },
                 "license":{ "$ref":"#/definitions/license"},
-                "access_rights": { "$ref":"#/definitions/access_rights"},
-                "free_or_consideration": {"$ref":"#/definitions/free_or_consideration"},
-                "available_from":{ "$ref":"#/definitions/date"},
-                "citation_info": { "type": "string" },
-                "download_url":{ "$ref":"#/definitions/distribution"}
+                "accessRights": { "$ref":"#/definitions/access_rights"},
+                "freeOrConsideration": {"$ref":"#/definitions/free_or_consideration"},
+                "availableFrom":{ "$ref":"#/definitions/date"},
+                "citationInfo": { "type": "string" },
+                "downloadUrl":{ "$ref":"#/definitions/distribution"}
             }
             }
         },
@@ -113,12 +113,12 @@
                 "format":"email"
             },
             "affiliation": { "$ref":"#/definitions/organization"},
-            "e-Rad_researcher_number": {
+            "e-RadResearcherNumber": {
                 "type": "string",
                 "pattern": "[0-9]{8}"
             },
             "telephone": {"type": "string"},
-            "job_title": {"type": "string"}
+            "jobTitle": {"type": "string"}
             }
         },
         "license":{
@@ -168,7 +168,7 @@
                     "type": "string",
                     "pattern":"[0-9A-Fa-f]{64}"
                  },
-                "upload_date":{ "$ref":"#/definitions/date"}
+                "uploadDate":{ "$ref":"#/definitions/date"}
             }
         }
     }

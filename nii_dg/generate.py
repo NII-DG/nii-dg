@@ -37,9 +37,9 @@ def check_dmp_format(dict_):
     入力からDMPの形式を抽出
     対応するものか確認
     '''
-    dmp_f = dict_.get('dmp_format')
+    dmp_f = dict_.get('dmpFormat')
     if dmp_f is None:
-        raise ValidationError('property "dmp_format" is missing.')
+        raise ValidationError('property "dmpFormat" is missing.')
     if dmp_f not in const.DMPSTYLES:
         raise ValidationError(f'This library does not yet support {dmp_f} dmp.')
 
@@ -61,11 +61,11 @@ def add_entities_to_crate(crate:NIIROCrate) -> None:
     crate.set_publisheddate()
 
     key_func = {
-        "project_name": crate.set_project_name,
-        "funding_agency":crate.set_funder,
+        "projectName": crate.set_project_name,
+        "fundingAgency":crate.set_funder,
         "repository":crate.set_repo,
-        "research_field":crate.set_field,
-        "e-Rad_project_id":crate.set_erad,
+        "researchField":crate.set_field,
+        "e-RadProjectId":crate.set_erad,
         "license":crate.set_license,
         "affiliation":crate.set_affiliations,
         "creator":crate.set_creators
