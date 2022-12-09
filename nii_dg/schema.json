@@ -50,6 +50,7 @@
                 "hosting_institution": { "$ref":"#/definitions/organization"},
                 "data_manager": { "$ref":"#/definitions/person"},
                 "max_filesize":{ "type": "string" },
+                "license":{ "$ref":"#/definitions/license"},
                 "access_rights": { "$ref":"#/definitions/access_rights"},
                 "free_or_consideration": {"$ref":"#/definitions/free_or_consideration"},
                 "available_from":{ "$ref":"#/definitions/date"},

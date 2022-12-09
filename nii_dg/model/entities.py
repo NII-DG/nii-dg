@@ -1,6 +1,8 @@
 from datetime import datetime,timezone
 from nii_dg import const
 
+class ValidationError(Exception):
+    pass
 
 class Entity():
     '''
@@ -34,7 +36,14 @@ class Entity():
     def add_properties(self, properties:dict) -> None:
         '''
         JSON-LDに別のJSON-LDを合成する
+        同じkeyに対して異なるvalueがある場合、エラー
         '''
+        for k, v in properties.items():
+            if k not in  self._jsonld:
+                continue
+            if v != self._jsonld[k]:
+                raise ValidationError(f'Different values were found for the same key {k}')
+
         self._jsonld.update(properties)
 
     def get(self, property_name:str) -> str:

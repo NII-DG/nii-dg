@@ -331,12 +331,11 @@ class NIIROCrate(ROCrate):
                 aff_e.add_properties(properties)
 
 
-    def set_license(self, licenses:list) -> None:
+    def set_license(self, license_:dict) -> None:
         '''
         ライセンスのエンティティを追加
         '''
-        for license_ in licenses:
-            self.add_entity_by_url(license_, "CreativeWork")
+        self.add_entity_by_url(license_, "CreativeWork")
 
 
     def set_dmplist(self) -> None:
