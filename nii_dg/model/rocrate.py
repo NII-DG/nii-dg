@@ -90,6 +90,23 @@ class ROCrate():
         e.add_properties(properties)
         return e.get_id_dict()
 
+    def add_entity_by_name(self, e_type:str, properties:dict) -> dict:
+        '''
+        nameが一致するエンティティが存在しない場合、エンティティを新規作成
+        存在する場合はプロパティを更新
+        いずれも該当するエンティティの@id key-valueを辞書で返す
+        '''
+        name = properties.get("name")
+        if name is None:
+            raise ValidationError('key "name" is required.')
+        if self.get_by_name(name) is None:
+            e = Entity('#' + name, e_type)
+            self.entities.append(e)
+        else:
+            e = self.get_by_name(name)
+
+        e.add_properties(properties)
+        return e.get_id_dict()
 
     def generate(self) -> dict:
         '''
@@ -194,10 +211,10 @@ class NIIROCrate(ROCrate):
 
         # add affiliation entity
         affiliation = person.get("affiliation")
-        if self.convert_name_to_id(affiliation) is None:
+        if self.get_by_name(affiliation.get("name")) is None:
             properties["affiliation"] = self.add_organization(affiliation)
         else:
-            properties["affiliation"] = self.convert_name_to_id(affiliation)
+            properties["affiliation"] = self.add_entity_by_name("Organization",affiliation)
 
         # when there is "telephone", add ContactPoint entity
         if person.get("telephone") is not None:
@@ -331,11 +348,15 @@ class NIIROCrate(ROCrate):
                 aff_e.add_properties(properties)
 
 
-    def set_license(self, license_:dict) -> None:
+    def set_license(self, license_:dict, entity: Entity = None) -> None:
         '''
         ライセンスのエンティティを追加
         '''
-        self.add_entity_by_url(license_, "CreativeWork")
+        if entity is None:
+            entity = self.rootdataentity
+
+        license_id = self.add_entity_by_url(license_, "CreativeWork")
+        entity.add_properties({'license': license_id})
 
 
     def set_dmplist(self) -> None:
