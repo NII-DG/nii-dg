@@ -5,7 +5,7 @@ from nii_dg import generate, main
 
 class TestReadJson:
     '''
-    JSON読み込みのテスト
+    JSON読み込み
     '''
 
     @pytest.mark.parametrize('filepath',[
@@ -54,10 +54,6 @@ class TestSetJSON:
     def test_generateing_normal(self, filepath):
         '''
         dmpの形式を抽出しJSON schemaでvalidation, 正常系
-        - common metadata, JST, AMED, METIのいずれか
-        - 必須項目が存在し、型が正しい
-        - オプション項目が存在し、型が正しい
-        - 規定されていないkeyが存在しない
         '''
         metadata = generate.read_dmp(filepath)
         assert isinstance(generate.generate_crate_instance(metadata), NIIROCrate)
@@ -79,20 +75,19 @@ class TestSetJSON:
             generate.check_dmp_format(metadata)
 
 
-     # dmp形式以外がJSON-Schemaエラー
+    # dmp形式以外がJSON-Schemaエラー
     filepaths_2 = [
-        '/app/test/test-data/schema_errors/lack_required_level1.json',
-        '/app/test/test-data/schema_errors/lack_required_level2.json',
+        '/app/test/test-data/schema_errors/lack_required_level1.json', # 第一階層の必須項目がない
+        '/app/test/test-data/schema_errors/lack_required_level2.json', # 第二階層の必須項目がない
+        # 必須項目があるが、型が不適当
+        # オプション項目の型が不適当
+        # 規定されていないkeyが存在する
     ]
    
     @pytest.mark.parametrize('metadata', filepaths_2, indirect = ['metadata'] )
     def test_json_validation_error(self, metadata):
         '''
         JSON-schemaでvalidationエラー (dmpformat以外)
-        - 必須項目がない (第一階層, 第二階層)
-        - 必須項目があるが、型が不適当
-        - オプション項目の型が不適当
-        - 規定されていないkeyが存在する
         '''
         with pytest.raises(generate.ValidationError):
             generate.validate_with_schema(metadata)
@@ -109,11 +104,11 @@ class TestSetJSON:
 
 class TestSetJSONbyScript:
     '''
-    入力JSONをメソッド側でvalidationしエンティティに変換
+    入力JSONからコンテキストエンティティ生成
     '''
     def test_checkbyscript_normal(self):
         '''
-        入力JSONをスクリプトでvalidationし正常
+        入力JSONからコンテキストエンティティを正常に生成
         '''
         pass
         # エンティティが正しく生成される
@@ -122,16 +117,16 @@ class TestSetJSONbyScript:
 
     def test_checkbyscript_error(self):
         '''
-        入力JSONをスクリプトでvalidationしエラー
+        入力JSONに対してvalidationエラー
         '''
         pass
-        # エンティティ単位：どちらか必須が欠けている
-        # 同種のエンティティ：同一エンティティを指すがプロパティの値が異なっている
+        # エンティティ単位で「いずれか必須」全てが欠けている
+        # 同一エンティティを指すがプロパティの値が異なっている
         # 別エンティティでnameやURLに重複がある
 
     def test_errorcode(self):
         '''
-        入力JSONをスクリプトでvalidationしエラー時に終了コードが1
+        入力JSONのvalidationしエラー時に終了コードが1
         '''
         # with pytest.raises(SystemExit):
         #     main.generate_rocrate(filepath)
@@ -166,13 +161,14 @@ class TestSetDataEntity:
 
 class TestGenerateRocrate:
     '''
-    JSON-LDとしてRO-Crateの生成
+    JSON-LDとしてro-crate-metadata.jsonの生成
     '''
     def test_generate_rocrate(self):
+        # 正常系、終了コードが0
         # main.generate_rocrate(json)
         pass
 
     def test_generate_rocrate_error(self):
-        # 生成時エラー
+        # 生成時エラー、終了コードが1
         # main.generate_rocrate(json)
         pass
