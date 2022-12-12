@@ -21,6 +21,7 @@ NIIガバナンス用スキーマに沿ったRO-CrateをJSONから生成する�
 ・DMPの記載内容
 等
 ```
+[詳細ドキュメント](https://github.com/ascade/nii-dg/blob/9d56cba94da139bf5ec23d5432d48dbafc9d6097/test/README.md)
 
 ### RO-Crate生成 
 JSONファイルに対象データ情報が含まれる場合、それを引数に指定する。現在のディレクトリに`ro-crate-metadata.json`が生成される。
