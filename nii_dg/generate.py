@@ -67,7 +67,6 @@ def add_entities_to_crate(crate:NIIROCrate) -> None:
         "researchField":crate.set_field,
         "e-RadProjectId":crate.set_erad,
         "license":crate.set_license,
-        "affiliation":crate.set_affiliations,
         "creator":crate.set_creators
         }
     funcs = {k: v for k, v in key_func.items() if k in crate.dmp}
@@ -75,4 +74,7 @@ def add_entities_to_crate(crate:NIIROCrate) -> None:
         if crate.dmp.get(k) is not None:
             v(crate.dmp.get(k))
     
-    crate.set_dmplist()
+    if crate.dmp_format == 'common_metadata':
+        crate.set_dmp_common()
+    else:
+        pass #tbd

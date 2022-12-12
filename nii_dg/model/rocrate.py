@@ -359,18 +359,9 @@ class NIIROCrate(ROCrate):
         entity.add_properties({'license': license_id})
 
 
-    def set_dmplist(self) -> None:
+    def set_dmp_common(self) -> None:
         '''
-        DMPの内容を番号ごとにエンティティとして追加
-        '''
-        if self.dmp.get("repository").get("name") == 'Gakunin RDM':
-            self.set_grdm()
-        else:
-            pass #tbd
-    
-    def set_grdm(self) -> None:
-        '''
-        DMPの追加: common metadata形式でGRDMからDLしたcsvをベースにしている場合
+        DMPの内容を番号ごとにエンティティとして追加: common metadata形式
         '''
         dmpset = self.dmp.get("dmp")
         i = 1
