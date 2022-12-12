@@ -1,7 +1,7 @@
 {
-    "dmp_format":"common_metadata",
-    "project_name":"Sample Research",
-    "funding_agency":[
+    "dmpFormat":"common_metadata",
+    "projectName":"Sample Research",
+    "fundingAgency":[
             {
                 "name":"Japan Science and Technology Agency",
                 "url":"https://www.jst.go.jp/",
@@ -24,8 +24,8 @@
         "url":"https://rdm.nii.ac.jp/example/",
         "description":"NIIが運営する研究データ管理基盤"
     },
-    "e-Rad_project_id":"123456",
-    "publish_date":"2022-01-01",
+    "e-RadProjectId":"123456",
+    "publishedDate":"2022-01-01",
     "creator":[
         {
             "name":"Ichiro Suzuki",
@@ -37,7 +37,7 @@
             },
             "description":"one of the best Japanese baseball player",
             "email":"ichiro@example.com",
-            "job_title":"special assistant and instructor with the current Mariners chairman"
+            "jobTitle":"special assistant and instructor with the current Mariners chairman"
         },
         {
             "name":"Jiro Suzuki",
@@ -50,16 +50,16 @@
             },    
             "email":"jiro@example.com",
             "telephone":"03-1234-5678",
-            "e-Rad_researcher_number": "00123456"
+            "e-RadResearcherNumber": "00123456"
         }
     ],
-    "hosting_institution":{
+    "hostingInstitution":{
         "name":"University of Tokyo",
         "ror":"https://ror.org/057zh3y96",
         "url":"https://www.u-tokyo.ac.jp/",
         "address":"7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan"
     },
-    "data_manager":{
+    "dataManager":{
         "name":"Jiro Suzuki",
         "orcid":"https://orcid.org/0000-0001-2345-6789",
         "affiliation": {
@@ -70,16 +70,16 @@
         },    
         "email":"jiro@example.com",
         "telephone":"03-1234-5678",
-        "e-Rad_researcher_number": "00123456"
+        "e-RadResearcherNumber": "00123456"
     },
-    "download_url":{
+    "downloadUrl":{
         "name":"Zenodo download link",
         "url":"https://zenodo.org/record/example",
         "description":"Uploaded Zenodo Files",
         "size": "100MB",
         "format": "application/zip",
         "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
-        "upload_date":"2022-12-01"
+        "uploadDate":"2022-12-01"
     },
     "license":{"url":"https://www.apache.org/licenses/LICENSE-2.0"}
 }

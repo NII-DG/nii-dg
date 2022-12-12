@@ -1,7 +1,7 @@
 {
-    "dmp_format":"common_metadata",
-    "project_name":"Sample Research",
-    "funding_agency":[
+    "dmpFormat":"common_metadata",
+    "projectName":"Sample Research",
+    "fundingAgency":[
         {
             "name":"Japan Science and Technology Agency",
             "url":"https://www.jst.go.jp/",

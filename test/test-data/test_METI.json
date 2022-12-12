@@ -1,7 +1,7 @@
 {
-    "dmp_format":"METI",
-    "project_name":"Sample Research",
-    "funding_agency":[
+    "dmpFormat":"METI",
+    "projectName":"Sample Research",
+    "fundingAgency":[
         {
             "name":"Japan Science and Technology Agency",
             "url":"https://www.jst.go.jp/",
