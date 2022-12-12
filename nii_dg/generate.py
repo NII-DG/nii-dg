@@ -1,12 +1,15 @@
 import json
 import os
+
 import jsonschema
-from nii_dg.model.rocrate import NIIROCrate
+
 from nii_dg import const
+from nii_dg.model.rocrate import NIIROCrate
 
 
 class ValidationError(Exception):
     pass
+
 
 def read_dmp(path):
     '''
@@ -21,7 +24,7 @@ def validate_with_schema(dict_):
     '''
     JSON-Schemaで入力を検証
     '''
-    with open(os.path.dirname(__file__) +'/schema.json', encoding='utf-8') as schemafile:
+    with open(os.path.dirname(__file__) + '/schema.json', encoding='utf-8') as schemafile:
         schema = json.load(schemafile)
 
     error_messages = []
@@ -31,6 +34,7 @@ def validate_with_schema(dict_):
 
     if len(error_messages) > 0:
         raise ValidationError('\n'.join(error_messages))
+
 
 def check_dmp_format(dict_):
     '''
@@ -54,7 +58,7 @@ def generate_crate_instance(dict_):
     return NIIROCrate(dict_)
 
 
-def add_entities_to_crate(crate:NIIROCrate) -> None:
+def add_entities_to_crate(crate: NIIROCrate) -> None:
     '''
     入力JSONのkeyに対して対応するメソッドを実行しコンテキストエンティティを追加
     '''
@@ -62,19 +66,19 @@ def add_entities_to_crate(crate:NIIROCrate) -> None:
 
     key_func = {
         "projectName": crate.set_project_name,
-        "fundingAgency":crate.set_funder,
-        "repository":crate.set_repo,
-        "researchField":crate.set_field,
-        "e-RadProjectId":crate.set_erad,
-        "license":crate.set_license,
-        "creator":crate.set_creators
-        }
+        "fundingAgency": crate.set_funder,
+        "repository": crate.set_repo,
+        "researchField": crate.set_field,
+        "e-RadProjectId": crate.set_erad,
+        "license": crate.set_license,
+        "creator": crate.set_creators
+    }
     funcs = {k: v for k, v in key_func.items() if k in crate.dmp}
     for k, v in funcs.items():
         if crate.dmp.get(k) is not None:
             v(crate.dmp.get(k))
-    
+
     if crate.dmp_format == 'common_metadata':
         crate.set_dmp_common()
     else:
-        pass #tbd
+        pass  # tbd
