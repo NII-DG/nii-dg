@@ -17,7 +17,11 @@ def test_checkbyscript_normal(crate):
     入力JSONからコンテキストエンティティを正常に生成
     '''
     generate.add_entities_to_crate(crate)
-    assert len(crate.entities) > 2
+    assert len(crate.get_by_type('Person')) == 3 
+    assert len(crate.get_by_type('Organization')) == 3 
+    assert len(crate.get_by_type('RepositoryObject')) == 1
+    assert len(crate.get_by_type('PropertyValue')) == 3 
+
     # エンティティが正しく生成される
 
 
