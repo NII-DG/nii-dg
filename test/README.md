@@ -1,5 +1,69 @@
 # Test
 
+## 入力JSONの作成方法
+
+### 研究データ
+ライブラリ上で研究データのメタデータを取得しない場合は、JSONに以下を含める。
+- dataset: オブジェクトの配列
+    - name*: ファイル名, ディレクトリ名
+    - path*: リポジトリ内でのパス
+    - size*:ファイルサイズ
+    - format: ファイルフォーマット(ファイルのみ)
+    - dmp*: 該当するDMPのデータNo.
+    - url: ファイル, ディレクトリへの直接URL
+
+### common metadata様式
+*は必須項目
+
+**はいずれか必須
+- dmpFormat*: `common_metadata`
+- projectName*: プロジェクト名
+- description: プロジェクトの説明
+- fundingAgency*: 研究資金提供機関, オブジェクトの配列
+    - name*: 機関名
+    - ror**: RORレジストリのページ,urlとどちらか必須
+    - url**: 機関のURL, rorといずれか必須
+- e-RadProjectId: e-RadのプロジェクトID
+- publishedDate: メタデータ公開日
+- creator*: データ作成者, オブジェクトの配列
+    - name*: 氏名
+    - orcid**: ORCIDのページ,urlとどちらか必須
+    - url**: 研究者のURL, orcidといずれか必須
+    - email*: メールアドレス
+- researchField*: 研究分野
+- dmp情報*: オブジェクトの配列
+    - dataNumber*: dmp上のデータNo.
+    - title*: データの名称
+    - description: データの説明
+    - repository**: リポジトリ情報, オブジェクト
+    - dataType: データ種別
+    - creator*: データ作成者, オブジェクトの配列, 既に記載した人物と同一の場合はnameプロパティのみでよい
+    - hostingInstitution*: データ管理機関, オブジェクト
+        - name*: 機関名
+        - ror**: RORレジストリのページ,urlとどちらか必須
+        - url**: 機関のURL, rorといずれか必須
+        - address: 機関の住所
+    - dataManager*: データ管理者, オブジェクト, 既に記載した人物と同一の場合はnameプロパティのみでよい
+    - maxFileSize: 概略データ量
+    - license: ライセンス, オブジェクトで記載
+        - url*: ライセンスのURL
+        - name*: ライセンス名
+    - accessRights*: アクセス権
+    - freeOrConsideration: 有償/無償
+    - availableFrom: 公開猶予の場合の公開予定日
+    - citationInfo: その他データ利用のための情報
+    - downloadUrl: 公開の場合、データを入手できる場所。オブジェクトで記載
+        - url*: データを入手できるURL
+        - name*: 名称
+
+
+### AMED様式
+TBU
+### METI様式
+TBU
+
+
+
 ## common_sample.json
 - ライブラリの入力データサンプル
 - 公的資金による研究データの管理・利活用に関する基本的な考え方に基づいて、GRDMから取得できるメタデータをベースにしている
