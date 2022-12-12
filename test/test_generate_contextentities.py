@@ -6,14 +6,19 @@ import pytest
 from nii_dg.model.rocrate import NIIROCrate
 from nii_dg import generate, main
 
+@pytest.fixture()
+def crate(request):
+    return generate.generate_crate_instance( generate.read_dmp(request.param) )
 
-def test_checkbyscript_normal():
+
+@pytest.mark.parametrize('crate', ['/app/test/common_sample.json'], indirect=['crate'])
+def test_checkbyscript_normal(crate):
     '''
     入力JSONからコンテキストエンティティを正常に生成
     '''
-    pass
+    generate.add_entities_to_crate(crate)
+    assert len(crate.entities) > 2
     # エンティティが正しく生成される
-    # RO-Crateが正しく生成される
 
 
 def test_checkbyscript_error():
