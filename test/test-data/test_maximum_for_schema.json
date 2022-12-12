@@ -1,0 +1,156 @@
+{
+    "dmpFormat":"common_metadata",
+    "projectName":"Sample Research",
+    "fundingAgency":[
+            {
+                "name":"Japan Science and Technology Agency",
+                "url":"https://www.jst.go.jp/",
+                "ror":"https://ror.org/00097mb19",
+                "alias":"国立研究開発法人 科学技術振興機構",
+                "description":"JST (Japan Science and Technology Agency) is a national research and development Agency that plays a central role in the Science, Technology and Innovation Basic Plan and aims to promote science and technology.",
+                "address":"Kawaguchi Center Building, 4-1-8, Honcho, Kawaguchi-shi, Saitama 332-0012 Japan"
+            },
+            {
+                "name":"Japan Agency for Medical Research and Development",
+                "url":"https://www.amed.go.jp/",
+                "ror":"https://ror.org/004rtk039",
+                "alias":"日本医療研究開発機構",
+                "description":"AMED promotes integrated research and development in the field of medicine, from basic research to clinical trials.",
+                "address":"20F Yomiuri Shimbun Bldg. 1-7-1 Otemachi, Chiyoda-ku, Tokyo 100-0004 Japan"
+            }
+        ],
+    "repository":{
+        "name":"Gakunin RDM",
+        "url":"https://rdm.nii.ac.jp/example/",
+        "description":"NIIが運営する研究データ管理基盤"
+    },
+    "e-RadProjectId":"123456",
+    "publishedDate":"2022-01-01",
+    "creator":[
+        {
+            "name":"Ichiro Suzuki",
+            "alias":"イチロー",
+            "url":"https://en.wikipedia.org/wiki/Ichiro_Suzuki",
+            "affiliation": {
+                "name":"Seattle Mariners",
+                "url":"https://www.mlb.com/mariners"
+            },
+            "description":"one of the best Japanese baseball player",
+            "email":"ichiro@example.com",
+            "jobTitle":"special assistant and instructor with the current Mariners chairman"
+        },
+        {
+            "name":"Jiro Suzuki",
+            "orcid":"https://orcid.org/0000-0001-2345-6789",
+            "affiliation": {
+                "name":"University of Tokyo",
+                "ror":"https://ror.org/057zh3y96",
+                "url":"https://www.u-tokyo.ac.jp/",
+                "address":"7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan"
+            },    
+            "email":"jiro@example.com",
+            "telephone":"03-1234-5678",
+            "e-RadResearcherNumber": "00123456"
+        }
+    ],
+    "hostingInstitution":{
+        "name":"University of Tokyo",
+        "ror":"https://ror.org/057zh3y96",
+        "url":"https://www.u-tokyo.ac.jp/",
+        "address":"7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan"
+    },
+    "dataManager":{
+        "name":"Jiro Suzuki",
+        "orcid":"https://orcid.org/0000-0001-2345-6789",
+        "affiliation": {
+            "name":"University of Tokyo",
+            "ror":"https://ror.org/057zh3y96",
+            "url":"https://www.u-tokyo.ac.jp/",
+            "address":"7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan"
+        },    
+        "email":"jiro@example.com",
+        "telephone":"03-1234-5678",
+        "e-RadResearcherNumber": "00123456"
+    },
+    "license":{
+        "url":"https://www.apache.org/licenses/LICENSE-2.0",
+        "name":"Apache License 2.0"
+    },
+    "accessRights": "open access",
+    "freeOrConsideration": "free",
+    "availableFrom":"2023-01-01",
+    "citationInfo": "mail to data manager before use the data",
+    "downloadUrl":{
+        "name":"Zenodo download link",
+        "url":"https://zenodo.org/record/example",
+        "description":"Uploaded Zenodo Files",
+        "size": "100MB",
+        "format": "application/zip",
+        "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+        "uploadDate":"2022-12-01"
+    },
+    "researchField":"Informatics",
+    "dmp":[
+        {
+            "dataNumber": 1,
+            "title": "data collected by xxx",
+            "description": "this dataset was collected in experiment xxx",
+            "repository": {
+                "name":"Gakunin RDM",
+                "url":"https://rdm.nii.ac.jp/example/",
+                "description":"NIIが運営する研究データ管理基盤"
+            },
+            "dataType": "dataset",
+            "creator": [
+                {
+                    "name":"Ichiro Suzuki",
+                    "alias":"イチロー",
+                    "url":"https://en.wikipedia.org/wiki/Ichiro_Suzuki",
+                    "affiliation": {
+                        "name":"Seattle Mariners",
+                        "url":"https://www.mlb.com/mariners"
+                    },
+                    "description":"one of the best Japanese baseball player",
+                    "email":"ichiro@example.com",
+                    "jobTitle":"special assistant and instructor with the current Mariners chairman"
+                }
+            ],
+            "hostingInstitution": {
+                "name":"University of Tokyo",
+                "ror":"https://ror.org/057zh3y96",
+                "url":"https://www.u-tokyo.ac.jp/",
+                "address":"7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan"
+            },
+            "dataManager": {
+                "name":"Jiro Suzuki",
+                "orcid":"https://orcid.org/0000-0001-2345-6789",
+                "affiliation": {
+                    "name":"University of Tokyo",
+                    "ror":"https://ror.org/057zh3y96",
+                    "url":"https://www.u-tokyo.ac.jp/",
+                    "address":"7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan"
+                },    
+                "email":"jiro@example.com",
+                "telephone":"03-1234-5678",
+                "e-RadResearcherNumber": "00123456"
+            },
+            "maxFilesize":"10GB",
+            "license":{"url":"https://www.apache.org/licenses/LICENSE-2.0",
+            "name":"Apache License 2.0"
+            },
+            "accessRights": "open access",
+            "freeOrConsideration": "free",
+            "availableFrom":"2023-01-01",
+            "citationInfo": "mail to data manager before use the data",
+            "downloadUrl":{
+                "name":"Zenodo download link",
+                "url":"https://zenodo.org/record/example",
+                "description":"Uploaded Zenodo Files",
+                "size": "100MB",
+                "format": "application/zip",
+                "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+                "uploadDate":"2022-12-01"
+            }
+        }
+    ]
+}

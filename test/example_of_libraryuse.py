@@ -1,4 +1,5 @@
 # import library
-from nii_dg.main import generate_rocrate
+import nii_dg
 
-generate_rocrate('/app/test/common_sample.json')
+# input json_file path
+nii_dg.generate_rocrate("/app/test/common_sample.json")

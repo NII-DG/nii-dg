@@ -1,56 +1,126 @@
 {
-    "dmp_format":"common metadata",
-    "funding_agency":[
-        {
-            "name":"Japan Science and Technology Agency",
-            "url":"https://www.jst.go.jp/",
-            "ror":"https://ror.org/00097mb19"
-            }
-        ],
-    "e-Rad_project_id":"123456",
-    "project_name":"Sample Research",
-    "research_filed":"Informatics",
-    "repository":{
-        "name":"Gakunin RDM",
-        "url":"https://rdm.nii.ac.jp/mcsdj/files"
+  "dmpFormat": "common_metadata",
+  "fundingAgency": [
+    {
+      "name": "Japan Science and Technology Agency",
+      "url": "https://www.jst.go.jp/",
+      "ror": "https://ror.org/00097mb19"
+    }
+  ],
+  "e-RadProjectId": "123456",
+  "projectName": "Sample Research",
+  "researchField": "Informatics",
+  "repository": {
+    "name": "Gakunin RDM",
+    "url": "https://rdm.nii.ac.jp/mcsdj/"
+  },
+  "creator": [
+    {
+      "name": "Ichiro Suzuki",
+      "url": "https://en.wikipedia.org/wiki/Ichiro_Suzuki",
+      "affiliation": {
+        "name": "Seattle Mariners",
+        "url": "https://www.mlb.com/mariners"
+      },
+      "email": "ichiro@example.com"
     },
-    "creators":[
-        {
-            "name":"Ichiro Suzuki",
-            "url":"https://en.wikipedia.org/wiki/Ichiro_Suzuki",
-            "affiliation":"University of Tokyo",
-            "email":"ichiro@example.com"
-        },
-        {
-            "name":"Jiro Suzuki",
-            "orcid":"https://orcid.org/0000-0001-2345-6789",
-            "affiliation":"University of Tokyo",
-            "email":"jiro@example.com",
-            "e-Rad_researcher_number": "00123456"
-        }],
-    "affiliations":[
-        {
-            "name":"University of Tokyo",
-            "ror":"https://ror.org/057zh3y96",
-            "url":"https://www.u-tokyo.ac.jp/"
-        }
-    ],
-    "dataset":[
-        {
-            "data_number":1,
-            "title":"",
-            "description":"",
-            "free_or_consideration":"free",
-            "license":{
-                "name":"",
-                "url":""
-            },
-            "access_rights":"open access",
-            "size":"",
-            "hosting_institution":"University of Tokyo",
-            "data_manager":{
-                "name":"Jiro Suzuki"
-            }
-        }
-    ]
+    {
+      "name": "Jiro Suzuki",
+      "orcid": "https://orcid.org/0000-0001-2345-6789",
+      "affiliation": {
+        "name": "University of Tokyo",
+        "ror": "https://ror.org/057zh3y96",
+        "url": "https://www.u-tokyo.ac.jp/",
+        "address": "7-3-1 Hongo, Bunkyo-ku, 113-8654 Tokyo,  Japan"
+      },
+      "email": "jiro@example.com",
+      "telephone": "03-1234-5678",
+      "e-RadResearcherNumber": "00123456"
+    },
+    {
+      "name": "Saburo Suzuki",
+      "orcid": "https://orcid.org/0000-0002-3456-7890",
+      "affiliation": { "name": "University of Tokyo" },
+      "email": "ssuzuki@example.com",
+      "e-RadResearcherNumber": "00123457"
+    }
+  ],
+  "license": {
+    "name": "Apache License 2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+  },
+  "dmp": [
+    {
+      "dataNumber": 1,
+      "title": "parameters",
+      "description": "input parameter files",
+      "dataType": "Dataset",
+      "creator": [{ "name": "Ichiro Suzuki" }, { "name": "Saburo Suzuki" }],
+      "freeOrConsideration": "free",
+      "license": {
+        "name": "Apache License 2.0"
+      },
+      "accessRights": "open access",
+      "citationInfo": "following the license",
+      "maxFilesize": "1GB",
+      "hostingInstitution": {
+        "name": "University of Tokyo"
+      },
+      "dataManager": {
+        "name": "Jiro Suzuki"
+      }
+    },
+    {
+      "dataNumber": 2,
+      "title": "execution file",
+      "description": "python script",
+      "dataType": "Dataset",
+      "creator": [{ "name": "Jiro Suzuki" }],
+      "freeOrConsideration": "free",
+      "license": {
+        "name": "Apache License 2.0"
+      },
+      "accessRights": "open access",
+      "citationInfo": "following the license",
+      "maxFilesize": "1GB",
+      "hostingInstitution": {
+        "name": "University of Tokyo"
+      },
+      "dataManager": {
+        "name": "Jiro Suzuki"
+      }
+    }
+  ],
+  "dataset": [
+    {
+      "path": "configs/",
+      "url": "https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/configs/",
+      "size": "30B",
+      "name": "configs",
+      "dmp": 1
+    },
+    {
+      "path": "configs/input.json",
+      "url": "https://rdm.nii.ac.jp/mcsdj/files/osfstorage/636c521f4fa1910010825ee1",
+      "size": "30B",
+      "name": "input.json",
+      "dmp": 1,
+      "format": "application/json"
+    },
+    {
+      "path": "exe/",
+      "url": "https://rdm.nii.ac.jp/mcsdj/files/dir/osfstorage/exe/",
+      "size": "1150B",
+      "name": "exe",
+      "dmp": 2
+    },
+    {
+      "path": "exe/sample.py",
+      "url": "https://rdm.nii.ac.jp/mcsdj/files/osfstorage/636c52304fa1910010825ef9",
+      "size": "1150B",
+      "name": "sample.py",
+      "dmp": 2,
+      "format": "text/x-python"
+    }
+  ]
 }

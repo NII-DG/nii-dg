@@ -1,0 +1,175 @@
+{
+    "title": "metadata_json_schema",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "dmpFormat",
+      "projectName",
+      "fundingAgency"
+    ],
+    "properties": {
+        "dmpFormat": {"type": "string"},
+        "projectName": { "type": "string"},
+        "description":{"type":"string"},
+        "fundingAgency": {
+            "type": "array",
+            "items": { "$ref":"#/definitions/organization"}
+          },
+        "repository": { "$ref":"#/definitions/urlentity"},
+        "e-RadProjectId": {"type": "string"},
+        "publishedDate":{ "$ref":"#/definitions/date"},
+        "creator": {
+            "type": "array",
+            "items": { "$ref":"#/definitions/person"}
+        },
+        "hostingInstitution": { "$ref":"#/definitions/organization"},
+        "dataManager": { "$ref":"#/definitions/person"},
+        "license":{ "$ref":"#/definitions/license"},
+        "accessRights": { "$ref":"#/definitions/access_rights"},
+        "freeOrConsideration": {"$ref":"#/definitions/free_or_consideration"},
+        "availableFrom":{ "$ref":"#/definitions/date"},
+        "citationInfo": { "type": "string" },
+        "downloadUrl":{ "$ref":"#/definitions/distribution"},
+        "researchField": {"type": "string"},
+        "dmp": {
+            "type": "array",
+            "items": {
+            "type": "object",
+            "required": ["dataNumber", "title"],
+            "additionalProperties": false,
+            "properties": {
+                "dataNumber": { "type": "integer" },
+                "title": { "type": "string" },
+                "description": { "type": "string" },
+                "repository": { "$ref":"#/definitions/urlentity"},
+                "dataType": { "type": "string" },
+                "creator": {
+                    "type": "array",
+                    "items": { "$ref":"#/definitions/person"}
+                },
+                "hostingInstitution": { "$ref":"#/definitions/organization"},
+                "dataManager": { "$ref":"#/definitions/person"},
+                "maxFilesize":{ "type": "string" },
+                "license":{ "$ref":"#/definitions/license"},
+                "accessRights": { "$ref":"#/definitions/access_rights"},
+                "freeOrConsideration": {"$ref":"#/definitions/free_or_consideration"},
+                "availableFrom":{ "$ref":"#/definitions/date"},
+                "citationInfo": { "type": "string" },
+                "downloadUrl":{ "$ref":"#/definitions/distribution"}
+            }
+            }
+        },
+        "dataset":{
+            "type":"array",
+            "items":{
+                "type":"object",
+                "additionalProperties": false,
+                "required":["name","path"],
+                "properties":{
+                    "name": { "type": "string" },
+                    "path": { "type": "string" },
+                    "size": { "type": "string" },
+                    "format": { "type": "string" },
+                    "dmp":{"type":"integer"},
+                    "url":{ "$ref":"#/definitions/url"}
+                }
+            }
+        }
+    },
+    "definitions":{
+        "url":{
+            "type":"string",
+            "format":"url"
+        },
+        "date":{
+            "type":"string",
+            "format":"date"
+        },
+        "organization":{
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+                "name": { "type": "string" },
+                "alias": { "type": "string" },
+                "description": {"type":"string"},
+                "url": { "$ref":"#/definitions/url"},
+                "ror": { "$ref":"#/definitions/url"},
+                "address": { "type": "string" }
+            }
+        },
+        "person":{
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+            "name": { "type": "string" },
+            "alias": { "type": "string" },
+            "description": {"type":"string"},
+            "orcid": { "$ref":"#/definitions/url"},
+            "url": { "$ref":"#/definitions/url"},
+            "email": { 
+                "type":"string",
+                "format":"email"
+            },
+            "affiliation": { "$ref":"#/definitions/organization"},
+            "e-RadResearcherNumber": {
+                "type": "string",
+                "pattern": "[0-9]{8}"
+            },
+            "telephone": {"type": "string"},
+            "jobTitle": {"type": "string"}
+            }
+        },
+        "license":{
+            "type":"object",
+            "additionalProperties": false,
+            "required":["name"],
+            "properties":{
+            "name":{"type":"string"},
+            "url":{ "$ref":"#/definitions/url"},
+            "description": {"type":"string"}
+            }
+        },
+        "urlentity":{
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "url"],
+            "properties": {
+                "name": { "type": "string" },
+                "url": { "$ref":"#/definitions/url"},
+                "description": { "type": "string" }
+            }
+        },
+        "access_rights":{
+            "type": "string",
+            "enum": [
+                "open access",
+                "restricted access",
+                "embargoed access",
+                "metadata only access"
+            ]
+        },
+        "free_or_consideration": {
+            "type": "string",
+            "enum": ["free", "consideration"]
+        },
+        "distribution":{
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "url"],
+            "properties": {
+                "name": { "type": "string" },
+                "url": { "$ref":"#/definitions/url"},
+                "description": { "type": "string" },
+                "size": { "type": "string" },
+                "format": { "type": "string" },
+                "sha256": { 
+                    "type": "string",
+                    "pattern":"[0-9A-Fa-f]{64}"
+                 },
+                "uploadDate":{ "$ref":"#/definitions/date"}
+            }
+        }
+    }
+}

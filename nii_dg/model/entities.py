@@ -1,70 +1,106 @@
-from datetime import datetime,timezone, timedelta
+from datetime import datetime, timezone
+from typing import Any, Optional
+
+from nii_dg import const
+
+
+class ValidationError(Exception):
+    pass
 
 
 class Entity():
+    '''
+    エンティティ操作
+    '''
 
-    def __init__(self, id_=None, type_=None):
+    def __init__(self, id_: str, type_: str) -> None:
         self.id = id_
         self.type = type_
         self._jsonld = self._empty()
 
-    def _empty(self):
+    def _empty(self) -> dict[str, str]:
         val = {
             "@id": self.id,
             "@type": self.type
         }
         return val
 
-    def get_jsonld(self):
+    def get_jsonld(self) -> dict[str, str]:
+        '''
+        JSON-LDのインスタンス変数を返す
+        '''
         return self._jsonld
 
-    def set_name(self, name):
-        self._jsonld['name'] = name
+    def set_id(self, id_: str) -> None:
+        '''
+        keyが"@id"となるvalueをJSON-LDに追加もしくは上書きする
+        '''
+        self._jsonld["@id"] = id_
 
-    def add_properties(self, properties):
+    def set_name(self, name: str) -> None:
+        '''
+        keyが"name"となるvalueをJSON-LDに追加する
+        '''
+        self.get_jsonld()["name"] = name
+
+    def add_properties(self, properties: dict[str, str]) -> None:
+        '''
+        JSON-LDに別のJSON-LDを合成する
+        同じkeyに対して異なるvalueがある場合、エラー
+        '''
+        for k, v in properties.items():
+            if k not in self._jsonld:
+                continue
+            if v != self._jsonld[k]:
+                raise ValidationError(f"Different values were found for the same key {k}")
+
         self._jsonld.update(properties)
 
-    def get(self, property_name):
-        return self._jsonld.get(property_name)
+    def get(self, property_name: str) -> Optional[str]:
+        '''
+        JSON-LDの指定されたkeyに対応するvalueを返す
+        '''
+        return self.get_jsonld().get(property_name)
+
+    def get_id_dict(self) -> dict[str, str]:
+        '''
+        エンティティの@id key-valueを辞書で返す
+        '''
+        if self.get("@id") is None:
+            raise KeyError("This entity doesn't have @id property.")
+        return {"@id": self.get("@id")}
 
 
-class ContextEntity(Entity):
+class RootDataEntity(Entity):
+    '''
+    RootDataEntity用にEntityクラスを拡張
+    @id, @typeを規定値にし、作成日時を追加
+    '''
 
-    def __init__(self, id_=None, type_=None):
+    def __init__(self, id_: str = "./", type_: str = "Dataset") -> None:
         super().__init__(id_, type_)
 
-
-class DataEntity(Entity):
-
-    def __init__(self, id_=None, type_=None):
-        super().__init__(id_, type_)
-
-
-class RootDataEntity(DataEntity):
-
-    def __init__(self, id_='./', type_='Dataset'):
-        super().__init__(id_, type_)
-
-    def _empty(self):
+    def _empty(self) -> dict[str, str]:
         val = {
             "@id": self.id,
             "@type": self.type,
-            "datePublished": datetime.now(timezone(timedelta(hours=9))).isoformat(),
+            "datePublished": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
         }
         return val
 
 
 class Metadata(Entity):
-    BASENAME = "ro-crate-metadata.json"
-    PROFILE = "https://w3id.org/ro/crate/1.1"
+    '''
+    Self-describing Entity用にEntityクラスを拡張
+    @id, @typeを規定値にし、conformsTo, about keyを追加
+    '''
 
-    def __init__(self, id_=None, type_='CreativeWork'):
+    def __init__(self, id_: str = const.BASENAME, type_: str = "CreativeWork"):
         super().__init__(id_, type_)
-        self.id = self.BASENAME
 
-    def _empty(self):
-        val = {"@id": self.BASENAME,
+    def _empty(self) -> dict[str, Any]:
+        val = {"@id": self.id,
                "@type": self.type,
-               "conformsTo": {"@id": self.PROFILE},
+               "conformsTo": {"@id": const.PROFILE},
                "about": {"@id": "./"}}
         return val

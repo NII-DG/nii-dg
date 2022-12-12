@@ -1,0 +1,11 @@
+{
+    "dmpFormat":"common_metadata",
+    "projectName":"Sample Research",
+    "fundingAgency":[
+        {
+            "name":"Japan Science and Technology Agency",
+            "url":"https://www.jst.go.jp/",
+            "ror":"https://ror.org/00097mb19"
+            }
+        ]
+}

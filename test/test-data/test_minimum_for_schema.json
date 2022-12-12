@@ -1,0 +1,9 @@
+{
+    "dmpFormat":"common_metadata",
+    "projectName":"Sample Research",
+    "fundingAgency":[
+        {
+            "name":"Japan Science and Technology Agency"
+            }
+        ]
+}

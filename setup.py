@@ -19,7 +19,7 @@ setup(
     packages=["nii_dg"],
     package_data={
         "nii_dg": [
-            "common_metadata_schema.json",
+            "schema.json",
         ]
     },
     include_package_data=True,
@@ -32,6 +32,7 @@ setup(
         "isort",
         "mypy",
         "pytest",
+        "pytest-html",
     ],
     extras_require={
         "tests": [
@@ -39,6 +40,7 @@ setup(
             "isort",
             "mypy",
             "pytest",
+            "pytest-html",
         ],
     },
     entry_points={
