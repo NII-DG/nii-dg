@@ -3,27 +3,31 @@
 '''
 
 import pytest
-from nii_dg.model.rocrate import NIIROCrate
+
 from nii_dg import generate, main
+from nii_dg.model.rocrate import NIIROCrate
 
 
-def test_data_entity():
-# JSON-Schemaベースのvalidationは既にクリア
-# JSONから生成, OK
+def test_data_entity() -> None:
+    # JSON-Schemaベースのvalidationは既にクリア
+    # JSONから生成, OK
     pass
 
-def test_data_entity_error():
-# JSON-Schemaベースのvalidationは既にクリア
-# JSONから生成, エラー
-# ディレクトリなのに@idが/で終わっていない、など
+
+def test_data_entity_error() -> None:
+    # JSON-Schemaベースのvalidationは既にクリア
+    # JSONから生成, エラー
+    # ディレクトリなのに@idが/で終わっていない、など
     pass
 
-def test_load_data_dir():
-    #指定ディレクトリを読み込みエンティティ生成
+
+def test_load_data_dir() -> None:
+    # 指定ディレクトリを読み込みエンティティ生成
     pass
 
-def test_load_data_dir_error():
-    #指定ディレクトリを読み込みエンティティ生成,エラー
+
+def test_load_data_dir_error() -> None:
+    # 指定ディレクトリを読み込みエンティティ生成,エラー
     # 指定ディレクトリがない
     # 指定ディレクトリが空
     pass

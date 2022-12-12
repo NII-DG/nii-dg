@@ -3,29 +3,31 @@
 '''
 
 import pytest
-from nii_dg.model.rocrate import NIIROCrate
+
 from nii_dg import generate, main
+from nii_dg.model.rocrate import NIIROCrate
+
 
 @pytest.fixture()
-def crate(request):
-    return generate.generate_crate_instance( generate.read_dmp(request.param) )
+def crate(request) -> NIIROCrate:
+    return generate.generate_crate_instance(generate.read_dmp(request.param))
 
 
-@pytest.mark.parametrize('crate', ['/app/test/common_sample.json'], indirect=['crate'])
-def test_checkbyscript_normal(crate):
+@pytest.mark.parametrize("crate", ["/app/test/common_sample.json"], indirect=["crate"])
+def test_checkbyscript_normal(crate: NIIROCrate) -> None:
     '''
     入力JSONからコンテキストエンティティを正常に生成
     '''
     generate.add_entities_to_crate(crate)
-    assert len(crate.get_by_type('Person')) == 3 
-    assert len(crate.get_by_type('Organization')) == 3 
-    assert len(crate.get_by_type('RepositoryObject')) == 1
-    assert len(crate.get_by_type('PropertyValue')) == 3 
+    assert len(crate.get_by_type("Person")) == 3
+    assert len(crate.get_by_type("Organization")) == 3
+    assert len(crate.get_by_type("RepositoryObject")) == 1
+    assert len(crate.get_by_type("PropertyValue")) == 3
 
     # エンティティが正しく生成される
 
 
-def test_checkbyscript_error():
+def test_checkbyscript_error() -> None:
     '''
     入力JSONに対して生成時にエラー
     '''
@@ -34,7 +36,8 @@ def test_checkbyscript_error():
     # 同種のエンティティ：同一エンティティを指すがプロパティの値が異なっている
     # 別エンティティでnameやURLに重複がある
 
-def test_errorcode():
+
+def test_errorcode() -> None:
     '''
     生成エラー時に終了コードが1
     '''

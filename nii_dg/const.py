@@ -2,22 +2,22 @@
 from RO-Crate definition
 '''
 
-BASENAME = "ro-crate-metadata.json"
-PROFILE = "https://w3id.org/ro/crate/1.1"
+BASENAME: str = "ro-crate-metadata.json"
+PROFILE: str = "https://w3id.org/ro/crate/1.1"
 
 '''
 NII RO-Crate Original
 '''
-EXTRA_TERMS = {
+EXTRA_TERMS: dict[str, str] = {
     "accessRights": "http://purl.org/dc/terms/accessRights",
     "dmpFormat": "https://example.com/dmpFormat",  # to be updated
     "dmpDataNumber": "https://example.com/dataManagementPlan"  # to be updated
 }
-FREEACCESS = {"free":"true", "consideration":"false"}
+FREEACCESS: dict[str, str] = {"free": "true", "consideration": "false"}
 
-DMPSTYLES = [
-        "common_metadata",
-        "JST",
-        "AMED",
-        "METI"
-      ]
+DMPSTYLES: list[str] = [
+    "common_metadata",
+    "JST",
+    "AMED",
+    "METI"
+]

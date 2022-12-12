@@ -1,39 +1,47 @@
 # NII Data Governance Common Schema Profiles
-## 対象としたdmp定義
+
+## 対象とした dmp 定義
+
 - 内閣府「[公的資金による研究データの管理・利活用](https://www8.cao.go.jp/cstp/kenkyudx.html)に関する基本的な考え方」におけるメタデータの共通項目
-    - 以下 `common metadata`とする
-    - 参考: [PDF](https://www8.cao.go.jp/cstp/common_metadata_elements.pdf)
+  - 以下 `common metadata`とする
+  - 参考: [PDF](https://www8.cao.go.jp/cstp/common_metadata_elements.pdf)
 - 科学技術振興機構
-    - 以下`JST`とする
-    - 参考:[PDF](https://www.jst.go.jp/pr/intro/openscience/guideline_openscience_r4.pdf)
+  - 以下`JST`とする
+  - 参考:[PDF](https://www.jst.go.jp/pr/intro/openscience/guideline_openscience_r4.pdf)
 - 日本医療研究開発機構
-    - 以下 `AMED`とする
-    - 参考: [Web Page](https://www.amed.go.jp/koubo/datamanagement.html)
+  - 以下 `AMED`とする
+  - 参考: [Web Page](https://www.amed.go.jp/koubo/datamanagement.html)
 - 経済産業省
-    - 以下`METI`とする
-    - 参考:[Web Page](https://www.meti.go.jp/policy/innovation_policy/datamanagement.html)
+  - 以下`METI`とする
+  - 参考:[Web Page](https://www.meti.go.jp/policy/innovation_policy/datamanagement.html)
 
 ## vocabulary
+
 ### dmpFormat
+
 オリジナル語彙のため、語彙定義が必要
+
 - common metadata
-    -  2022/11現在, GRDMで選択可能なものはこれのみ
+  - 2022/11 現在, GRDM で選択可能なものはこれのみ
 - JST
 - AMED
 - METI
-    - 新エネルギー・産業技術総合開発機構(NEDO),生物系特定産業技術研究支援センター(BRAIN)はこれを選択
+  - 新エネルギー・産業技術総合開発機構(NEDO),生物系特定産業技術研究支援センター(BRAIN)はこれを選択
 
 ### dmpDataNumber
+
 オリジナル語彙のため、語彙定義が必要
 
 ### accessRights
+
 - open access
 - restricted access
 - embargoed access
 - metadata only access
-- 参考: [JPCOARスキーマガイドライン](https://schema.irdb.nii.ac.jp/ja/access_rights_vocabulary)
+- 参考: [JPCOAR スキーマガイドライン](https://schema.irdb.nii.ac.jp/ja/access_rights_vocabulary)
 
 ## profiles
+
 <table>
     <tr>
         <td>Property</td>
