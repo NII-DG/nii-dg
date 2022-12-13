@@ -40,15 +40,9 @@
 - metadata only access
 - 参考: [JPCOAR スキーマガイドライン](https://schema.irdb.nii.ac.jp/ja/access_rights_vocabulary)
 
-## Schema
+## Entity
 
-### File
-
-| Property | Required? | Format and Rules                                | Description | Why needed                                                                                                                        |
-| -------- | --------- | ----------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| @id      | MUST      | MUST end with `/` and SHOULD be the string `./` |             | [researchobject.org](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#direct-properties-of-the-root-data-entity) |
-
-## profiles
+### RootDataEntity
 
 <table>
     <tr>
