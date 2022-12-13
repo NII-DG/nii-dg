@@ -17,22 +17,11 @@ setup(
     python_requires=">=3.7",
     platforms="any",
     packages=["nii_dg"],
-    package_data={
-        "nii_dg": [
-            "schema.json",
-        ]
-    },
-    include_package_data=True,
-    install_requires=[
-        "jsonschema",
-        # "zoneinfo",
-    ],
     tests_require=[
         "flake8",
         "isort",
         "mypy",
         "pytest",
-        "pytest-html",
     ],
     extras_require={
         "tests": [
@@ -40,12 +29,11 @@ setup(
             "isort",
             "mypy",
             "pytest",
-            "pytest-html",
         ],
     },
     entry_points={
         "console_scripts": [
-            "dg=nii_dg.main:main",
+            "dg=nii_dg.cli:main",
         ]
     },
     classifiers=[
