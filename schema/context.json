@@ -1,0 +1,13 @@
+{
+  "@id": "https://example.com/context",
+  "name": ["Example context"],
+  "@context": {
+    "Common": {
+      "File": {
+        "File": "https://example.com/common_file",
+        "name": "https://example.com/common_file#name",
+        "desc": "https://example.com/common_file#desc"
+      }
+    }
+  }
+}
