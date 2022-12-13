@@ -13,7 +13,7 @@ def crate(request) -> NIIROCrate:
     return generate.generate_crate_instance(generate.read_dmp(request.param))
 
 
-@pytest.mark.parametrize("crate", ["/app/test/common_sample.json"], indirect=["crate"])
+@pytest.mark.parametrize("crate", ["/app/tests/common_sample.json"], indirect=["crate"])
 def test_checkbyscript_normal(crate: NIIROCrate) -> None:
     '''
     入力JSONからコンテキストエンティティを正常に生成

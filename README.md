@@ -124,8 +124,8 @@ $ nii-dg package path/to/input.json
 - データ管理者
 - DMP の記載内容
 
-実際の仕様については、[詳細ドキュメント](https://github.com/ascade/nii-dg/blob/9d56cba94da139bf5ec23d5432d48dbafc9d6097/test/README.md) を参照。
-また、サンプルとして、[サンプル](https://github.com/ascade/nii-dg/blob/f0f76213d5365ab5ed43902028060a335b8edb34/test/common_sample.json) を用意している。
+実際の仕様については、[詳細ドキュメント](https://github.com/ascade/nii-dg/blob/9d56cba94da139bf5ec23d5432d48dbafc9d6097/tests/README.md) を参照。
+また、サンプルとして、[サンプル](https://github.com/ascade/nii-dg/blob/f0f76213d5365ab5ed43902028060a335b8edb34/tests/common_sample.json) を用意している。
 
 ### Usage: 2. Rules
 

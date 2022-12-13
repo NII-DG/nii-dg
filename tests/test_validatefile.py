@@ -16,12 +16,12 @@ def metadata(request) -> dict[str, Any]:
 
 
 @pytest.mark.parametrize('filepath', [
-    '/app/test/test-data/test_common.json',
-    '/app/test/test-data/test_JST.json',
-    '/app/test/test-data/test_AMED.json',
-    '/app/test/test-data/test_METI.json',
-    '/app/test/test-data/test_minimum_for_schema.json',
-    '/app/test/test-data/test_maximum_for_schema.json',
+    '/app/tests/test-data/test_common.json',
+    '/app/tests/test-data/test_JST.json',
+    '/app/tests/test-data/test_AMED.json',
+    '/app/tests/test-data/test_METI.json',
+    '/app/tests/test-data/test_minimum_for_schema.json',
+    '/app/tests/test-data/test_maximum_for_schema.json',
 ])
 def test_generateing_normal(filepath: str) -> None:
     '''
@@ -33,8 +33,8 @@ def test_generateing_normal(filepath: str) -> None:
 
 # dmp形式がエラー
 filepaths_1 = [
-    '/app/test/test-data/test_error.json',
-    '/app/test/test-data/test_nokey.json',
+    '/app/tests/test-data/test_error.json',
+    '/app/tests/test-data/test_nokey.json',
 ]
 
 
@@ -51,8 +51,8 @@ def test_checking_dmp_error(metadata: dict[str, Any]) -> None:
 
 # dmp形式以外がJSON-Schemaエラー
 filepaths_2 = [
-    '/app/test/test-data/schema_errors/lack_required_level1.json',  # 第一階層の必須項目がない
-    '/app/test/test-data/schema_errors/lack_required_level2.json',  # 第二階層の必須項目がない
+    '/app/tests/test-data/schema_errors/lack_required_level1.json',  # 第一階層の必須項目がない
+    '/app/tests/test-data/schema_errors/lack_required_level2.json',  # 第二階層の必須項目がない
     # 必須項目があるが、型が不適当
     # オプション項目の型が不適当
     # 規定されていないkeyが存在する
