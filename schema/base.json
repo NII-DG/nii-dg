@@ -1,130 +1,150 @@
 {
   "RootDataEntity": {
     "@id": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "MUST be the string \"./\".",
       "description": ""
     },
     "name": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "string",
       "description": "Title of research project"
     },
     "description": {
-      "requiered": "MAY",
+      "required": "MAY",
       "rule": "string",
       "description": "Description of research project"
     },
     "funder": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "Array of Funding Agency or Person entities",
       "description": "Funding agencies of research project"
     },
     "dmpFormat": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "Choose one from the list: common metadata; JST; AMED; METI",
       "description": "Format of data management plan"
     },
     "identifier": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "Array of RepositoryObject and PropertyValue entities.",
       "description": "Repository where the data is managed; e-Rad project ID; any other identifier which indicates research project"
     },
     "dateCreated": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "MUST be a string in ISO 8601 date format and MAY be a timestamp down to the millisecond. Time zone is in UTC",
       "description": "Timestamp that RO-Crate is created"
     },
     "creator": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "Array of Person entities.",
       "description": "All data creators involved in research project"
     },
     "hasPart": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "Array of Dataset and File entities which indicate files and directories of research project.",
       "description": "All data creators involved in research project"
     }
   },
   "File": {
     "@id": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "MUST be either a URI Path relative to the RO Crate root (stated in identifier term of RootDataEntity) or an absolute URI.  When the file from outside of the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g. HTTP GET), permitting redirections and HTTP/HTTPS authentication.",
       "description": "Path of the file"
     },
     "name": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "string",
       "description": "Title of the file"
     },
     "dmpDataNumber": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "Object of @id term from DMP Entity, e.g. \"{\"@id\": \"#dmp:1\"}\".",
       "description": "Corresponding data number of DMP"
     },
     "contentSize": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "Integer plus \"B\" as units, e.g. \"1560B\". Be validated with the size listed in the DMP.",
       "description": "File size"
     },
     "encodingFormat": {
-      "requiered": "MAY",
+      "required": "MAY",
       "rule": "MUST be MIME type, e.g. \"application/pdf\".",
       "description": "File Format"
     },
     "url": {
-      "requiered": "MAY",
+      "required": "MAY",
       "rule": "URL",
       "description": "Direct URL to the file"
     },
     "sdDatePublished": {
-      "requiered": "MUST if the file from outside the RO-Crate Root",
+      "required": "MUST if the file from outside the RO-Crate Root",
       "rule": "MUST be a string in ISO 8601 date format",
       "description": "Date the file was obtained"
     }
   },
   "Dataset": {
     "@id": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "MUST be either a URI Path relative to the RO Crate root (stated in identifier term of RootDataEntity). SHOULD end with \"/\".",
       "description": "Path of the directory"
     },
     "name": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "string",
       "description": "Title of the directory"
     },
     "dmpDataNumber": {
-      "requiered": "MAY",
-      "rule": "Object of @id term from DMP Entity, e.g. \"{\"@id\": \"#dmp:1\"}\".",
+      "required": "MAY",
+      "rule": "Object of @id term from DMP entity, e.g. \"{\"@id\": \"#dmp:1\"}\".",
       "description": "Corresponding data number of DMP"
     },
     "contentSize": {
-      "requiered": "MAY",
+      "required": "MAY",
       "rule": "Integer plus \"B\" as units, e.g. \"1560B\". Be validated with the size listed in the DMP.",
       "description": "Total file size under the directory"
     },
     "url": {
-      "requiered": "MAY",
+      "required": "MAY",
       "rule": "URL",
       "description": "Direct URL to the directory"
     }
   },
   "DMP": {
     "@id": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "Data No. with prefix \"#dmp:\", e.g. \"#dmp:1\".",
       "description": "Data Number in DMP"
     },
     "name": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "string",
       "description": "Data title in DMP"
     },
     "description": {
-      "requiered": "MUST",
+      "required": "MUST",
       "rule": "string",
       "description": "Description of data in DMP"
+    },
+    "accessRights": {
+      "required": "MUST",
+      "rule": "Choose one from the list: open access; restricted access; embargoed access; metadata only access",
+      "description": "Access status of the data"
+    },
+    "availabilityStarts": {
+      "required": "MUST if accessRights has embargoed access",
+      "rule": "MUST be a string in ISO 8601 date format. Be velified that the value(ISO date) is the future than the time of verification.",
+      "description": "When the data will be available (open access)"
+    },
+    "usageInfo": {
+      "required": "MAY",
+      "rule": "string",
+      "description": "Explanation for citaion"
+    },
+    "distribution": {
+      "required": "MUST if accessRights has open access",
+      "rule": "Object of @id term from DataDownload entity, e.g. \"{\"@id\": \"https://example.com/downloadlink\"}\".",
+      "description": "Download link of dataset"
     }
   }
 }
