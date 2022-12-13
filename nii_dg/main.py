@@ -1,13 +1,15 @@
-from nii_dg.generate import (ValidationError, add_entities_to_crate,
-                             generate_crate_instance, read_dmp)
-from nii_dg import const
-from typing import Optional
+#!/usr/bin/env python3
 import json
 import sys
+from typing import Optional
+
+from nii_dg import const
+from nii_dg.generate import (ValidationError, add_entities_to_crate,
+                             generate_crate_instance, read_dmp)
 
 
 def generate_rocrate(dmp_path: str, dir_path: Optional[str] = None) -> None:
-   try:
+    try:
         crate = generate_crate_instance(read_dmp(dmp_path))
         add_entities_to_crate(crate)
 

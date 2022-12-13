@@ -1,6 +1,7 @@
+#!/usr/bin/env python3
 import json
 import os
-from typing import Any
+from typing import Any, Dict
 
 import jsonschema
 
@@ -12,19 +13,19 @@ class ValidationError(Exception):
     pass
 
 
-def read_dmp(path) -> dict[str, Any]:
-    '''
+def read_dmp(path) -> Dict[str, Any]:
+    """
     入力となるJSONをdictとして読む
-    '''
+    """
     with open(path, encoding="utf-8") as f:
         metadata = json.load(f)
     return metadata
 
 
-def validate_with_schema(dict_: dict[str, Any]) -> None:
-    '''
+def validate_with_schema(dict_: Dict[str, Any]) -> None:
+    """
     JSON-Schemaで入力を検証
-    '''
+    """
     with open(os.path.dirname(__file__) + "/schema.json", encoding="utf-8") as schemafile:
         schema = json.load(schemafile)
 
@@ -37,11 +38,11 @@ def validate_with_schema(dict_: dict[str, Any]) -> None:
         raise ValidationError("\n".join(error_messages))
 
 
-def check_dmp_format(dict_: dict[str, Any]) -> None:
-    '''
+def check_dmp_format(dict_: Dict[str, Any]) -> None:
+    """
     入力からDMPの形式を抽出
     対応するものか確認
-    '''
+    """
     dmp_f = dict_.get("dmpFormat")
     if dmp_f is None:
         raise ValidationError("property \"dmpFormat\" is missing.")
@@ -49,10 +50,10 @@ def check_dmp_format(dict_: dict[str, Any]) -> None:
         raise ValidationError(f"This library does not yet support {dmp_f} dmp.")
 
 
-def generate_crate_instance(dict_: dict[str, Any]) -> NIIROCrate:
-    '''
+def generate_crate_instance(dict_: Dict[str, Any]) -> NIIROCrate:
+    """
     DMPの形式
-    '''
+    """
     check_dmp_format(dict_)
     validate_with_schema(dict_)
 
@@ -60,9 +61,9 @@ def generate_crate_instance(dict_: dict[str, Any]) -> NIIROCrate:
 
 
 def add_entities_to_crate(crate: NIIROCrate) -> None:
-    '''
+    """
     入力JSONのkeyに対して対応するメソッドを実行しコンテキストエンティティを追加
-    '''
+    """
     crate.set_publisheddate()
 
     key_func = {

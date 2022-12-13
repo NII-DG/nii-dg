@@ -1,14 +1,15 @@
+#!/usr/bin/env python3
 import os
-from typing import Any, Optional
+from typing import Any, Dict, List, Optional
 
 from nii_dg import const
 from nii_dg.model.entities import Entity, Metadata, RootDataEntity
 
 
 def get_dir_size(path: str) -> int:
-    '''
+    """
     ディレクトリに含まれるファイルサイズの合計を算出する
-    '''
+    """
     total = 0
     with os.scandir(path) as it:
         for entry in it:
@@ -24,9 +25,9 @@ class ValidationError(Exception):
 
 
 class ROCrate():
-    '''
+    """
     基底クラス
-    '''
+    """
 
     def __init__(self) -> None:
         self.metadata = Metadata()
@@ -34,10 +35,10 @@ class ROCrate():
         self.entities = [self.metadata, self.rootdataentity]
         self.extra_terms = None
 
-    def get_by_type(self, e_type: str) -> list[Entity]:
-        '''
+    def get_by_type(self, e_type: str) -> List[Entity]:
+        """
         @typeが引数に一致するエンティティをリストで返す
-        '''
+        """
         ents = []
         for e in self.entities:
             if e.get("@type") == e_type:
@@ -45,30 +46,30 @@ class ROCrate():
         return ents
 
     def get_by_name(self, e_name: str) -> Optional[Entity]:
-        '''
+        """
         nameが引数に一致するエンティティを返す
         各エンティティでnameはユニークになる前提
-        '''
+        """
         for e in self.entities:
             if e.get("name") == e_name:
                 return e
         return None
 
     def get_by_id(self, e_id: str) -> Optional[Entity]:
-        '''
+        """
         @idが引数に一致するエンティティを返す
         各エンティティでpidはユニークになる前提
-        '''
+        """
         for e in self.entities:
             if e.get("@id") == e_id:
                 return e
         return None
 
-    def convert_name_to_id(self, namedict: dict[str, str]) -> Optional[dict[str, str]]:
-        '''
+    def convert_name_to_id(self, namedict: Dict[str, str]) -> Optional[Dict[str, str]]:
+        """
         {name: xxx} の辞書を引数として、nameが一致するエンティティが存在する時
         そのエンティティの@idを辞書で返す
-        '''
+        """
         name = namedict.get("name")
         if name is None:
             raise TypeError("key \"name\" is not found in the dictionary")
@@ -78,12 +79,12 @@ class ROCrate():
             return None
         return e.get_id_dict()
 
-    def add_entity(self, id_: str, e_type: str, properties: dict[str, Any]) -> dict[str, str]:
-        '''
+    def add_entity(self, id_: str, e_type: str, properties: Dict[str, Any]) -> Dict[str, str]:
+        """
         @idが一致するエンティティが存在しない場合、エンティティを新規作成
         存在する場合はプロパティを更新
         いずれも該当するエンティティの@id key-valueを辞書で返す
-        '''
+        """
         if self.get_by_id(id_) is None:
             e = Entity(id_, e_type)
             self.entities.append(e)
@@ -93,12 +94,12 @@ class ROCrate():
         e.add_properties(properties)
         return e.get_id_dict()
 
-    def add_entity_by_name(self, e_type: str, properties: dict[str, Any]) -> dict[str, str]:
-        '''
+    def add_entity_by_name(self, e_type: str, properties: Dict[str, Any]) -> Dict[str, str]:
+        """
         nameが一致するエンティティが存在しない場合、エンティティを新規作成
         存在する場合はプロパティを更新
         いずれも該当するエンティティの@id key-valueを辞書で返す
-        '''
+        """
         name = properties.get("name")
         if name is None:
             raise ValidationError("key \"name\" is required.")
@@ -111,10 +112,10 @@ class ROCrate():
         e.add_properties(properties)
         return e.get_id_dict()
 
-    def generate(self) -> dict[str, Any]:
-        '''
+    def generate(self) -> Dict[str, Any]:
+        """
         各エンティティからRO-Crate形式のJSON-LDを作成
-        '''
+        """
         graph = []
         for entity in self.entities:
             graph.append(entity.get_jsonld())
@@ -125,21 +126,21 @@ class ROCrate():
 
 
 class NIIROCrate(ROCrate):
-    '''
+    """
     RO-Crateクラスを拡張しNII標準独自のメソッド・インスタンス変数を追加
-    '''
+    """
 
-    def __init__(self, dmp: dict[str, Any]):
+    def __init__(self, dmp: Dict[str, Any]):
         super().__init__()
         self.extra_terms = const.EXTRA_TERMS
         self.dmp = dmp
         self.dmp_format = dmp.get("dmpFormat")
         self.rootdataentity.add_properties({"dmpFormat": self.dmp_format})
 
-    def add_entity_by_url(self, dict_: dict[str, Any], type_: str) -> dict[str, Any]:
-        '''
+    def add_entity_by_url(self, dict_: Dict[str, Any], type_: str) -> Dict[str, Any]:
+        """
         url キーを含む辞書から、urlのvalueを@idとしてエンティティ作成
-        '''
+        """
 
         id_ = dict_.get("url")
         if id_ is None:
@@ -148,11 +149,11 @@ class NIIROCrate(ROCrate):
 
         return self.add_entity(id_, type_, properties)
 
-    def add_erad(self, erad: str, erad_type: str) -> dict[str, Any]:
-        '''
+    def add_erad(self, erad: str, erad_type: str) -> Dict[str, Any]:
+        """
         e-Rad番号のエンティティを追加
         プロジェクトIDか研究者番号かを引数で指定
-        '''
+        """
         properties = {"value": erad}
 
         if erad_type == "project":
@@ -164,21 +165,21 @@ class NIIROCrate(ROCrate):
 
         return self.add_entity(f"#e-Rad:{erad}", "PropertyValue", properties)
 
-    def add_contactpoint(self, cp: dict[str, Any]) -> dict[str, Any]:
-        '''
+    def add_contactpoint(self, cp: Dict[str, Any]) -> Dict[str, Any]:
+        """
         ContactPointエンティティを作成する
         IDはemail valueから生成
-        '''
+        """
 
         properties = {k: v for k, v in cp.items() if k in ["email", "telephone", "contactType"]}
         em = properties["email"]
         return self.add_entity(f"#mailto:{em}", "ContactPoint", properties)
 
-    def add_organization(self, org: dict[str, Any]) -> dict[str, Any]:
-        '''
+    def add_organization(self, org: Dict[str, Any]) -> Dict[str, Any]:
+        """
         Organizationエンティティを作成する
         @idはrorもしくはurlのvalueとし、両方ある場合はrorを優先
-        '''
+        """
 
         # when "ror" is missing, "url" is adopted as @id property
         ids = [item for item in [org.get("ror"), org.get("url")] if item is not None]
@@ -192,11 +193,11 @@ class NIIROCrate(ROCrate):
 
         return self.add_entity(ids[0], "Organization", properties)
 
-    def add_person(self, person: dict[str, Any]) -> dict[str, Any]:
-        '''
+    def add_person(self, person: Dict[str, Any]) -> Dict[str, Any]:
+        """
         Personエンティティを作成する
         @idはorcidもしくはurlのvalueとし、rorを優先
-        '''
+        """
 
         properties = {k: v for k, v in person.items() if k in ["name", "description", "email", "jobTitle"]}
 
@@ -226,9 +227,9 @@ class NIIROCrate(ROCrate):
         return self.add_entity(ids[0], "Person", properties)
 
     def load_data_dir(self, data_dir: Optional[str]) -> None:
-        '''
+        """
         ローカルのディレクトリを読み、データエンティティを作成
-        '''
+        """
 
         file_list = []
 
@@ -256,9 +257,9 @@ class NIIROCrate(ROCrate):
         self.rootdataentity.add_properties({"hasPart": file_list})
 
     def set_publisheddate(self) -> None:
-        '''
+        """
         publishedDate プロパティをルートエンティティに追加
-        '''
+        """
         pd = self.dmp.get("publishedDate")
         cd = self.rootdataentity.get("datePublished")
         self.rootdataentity.add_properties({"dateCreated": cd})
@@ -267,15 +268,15 @@ class NIIROCrate(ROCrate):
             self.rootdataentity.add_properties({"datePublished": cd})
 
     def set_project_name(self, name: str) -> None:
-        '''
+        """
         name プロパティをルートエンティティに追加
-        '''
+        """
         self.rootdataentity.set_name(name)
 
-    def set_funder(self, funders: list[dict[str, Any]]) -> None:
-        '''
+    def set_funder(self, funders: List[Dict[str, Any]]) -> None:
+        """
         funder プロパティをルートエンティティに追加
-        '''
+        """
         funder_list = []
 
         for fa in funders:
@@ -287,10 +288,10 @@ class NIIROCrate(ROCrate):
         else:
             pass
 
-    def set_repo(self, repository: dict[str, Any]) -> None:
-        '''
+    def set_repo(self, repository: Dict[str, Any]) -> None:
+        """
         リポジトリURLをルートエンティティにidentifierとして追加
-        '''
+        """
         id_ = self.add_entity_by_url(repository, "RepositoryObject")
 
         ids = self.rootdataentity.get("identifier")
@@ -300,9 +301,9 @@ class NIIROCrate(ROCrate):
         self.rootdataentity.add_properties({"identifier": ids})
 
     def set_erad(self, erad: str) -> None:
-        '''
+        """
         e-Rad project プロジェクトIDをルートエンティティにidentifierとして追加
-        '''
+        """
         erad_id = self.add_erad(erad, "project")
 
         ids = self.rootdataentity.get("identifier")
@@ -312,15 +313,15 @@ class NIIROCrate(ROCrate):
         self.rootdataentity.add_properties({"identifier": ids})
 
     def set_field(self, field: str) -> None:
-        '''
+        """
         研究分野をルートエンティティにkeywordsとして追加
-        '''
+        """
         self.rootdataentity.add_properties({"keywords": field})
 
-    def set_creators(self, creators: list[dict[str, Any]]) -> None:
-        '''
+    def set_creators(self, creators: List[Dict[str, Any]]) -> None:
+        """
         creatorをルートエンティティに追加
-        '''
+        """
         creator_list = []
 
         for creator in creators:
@@ -330,10 +331,10 @@ class NIIROCrate(ROCrate):
 
         self.rootdataentity.add_properties({"creator": creator_list})
 
-    def set_affiliations(self, affiliations: list[dict[str, Any]]) -> None:
-        '''
+    def set_affiliations(self, affiliations: List[Dict[str, Any]]) -> None:
+        """
         Add "affiliation" entity
-        '''
+        """
 
         for affiliation in affiliations:
             aff_e = self.get_by_name(affiliation["name"])
@@ -343,20 +344,20 @@ class NIIROCrate(ROCrate):
                 properties = {k: v for k, v in affiliation.items() if k not in ["ror", "url"]}
                 aff_e.add_properties(properties)
 
-    def set_license(self, license_: dict[str, str], entity: Optional[Entity] = None) -> None:
-        '''
+    def set_license(self, license_: Dict[str, str], entity: Optional[Entity] = None) -> None:
+        """
         ライセンスのエンティティを追加
-        '''
+        """
         if entity is None:
             entity = self.rootdataentity
 
         license_id = self.add_entity_by_url(license_, "CreativeWork")
-        entity.add_properties({'license': license_id})
+        entity.add_properties({"license": license_id})
 
     def set_dmp_common(self) -> None:
-        '''
+        """
         DMPの内容を番号ごとにエンティティとして追加: common metadata形式
-        '''
+        """
         dmpset = self.dmp.get("dmp")
         i = 1
 
@@ -370,9 +371,9 @@ class NIIROCrate(ROCrate):
                 "contentSize": dmp.get("maxFilesize")
             }
 
-            if dmp.get('creator') is not None:
+            if dmp.get("creator") is not None:
                 c_list = []
-                for creator in dmp.get('creator'):
+                for creator in dmp.get("creator"):
                     if self.get_by_name(creator["name"]):
                         c_id = self.get_by_name(creator["name"]).get_id_dict()
                     else:
@@ -418,10 +419,10 @@ class NIIROCrate(ROCrate):
 
             self.add_entity(id_, "CreativeWork", properties)
 
-    def set_data(self, datalist: list[dict[str, Any]]) -> None:
-        '''
+    def set_data(self, datalist: List[Dict[str, Any]]) -> None:
+        """
         JSON内のディレクトリ・ファイル情報をデータエンティティとして追加
-        '''
+        """
 
         if self.rootdataentity.get("hasPart") is None:
             self.rootdataentity.add_properties({"hasPart": []})
