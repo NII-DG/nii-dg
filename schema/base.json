@@ -1,9 +1,9 @@
 {
   "RootDataEntity": {
     "@id": {
-      "required": "MUST",
-      "rule": "MUST be the string \"./\".",
-      "description": ""
+      "description": "MUST. MUST be \"./\".",
+      "example": "./",
+      "expected_type": "str"
     },
     "name": {
       "required": "MUST",
@@ -17,8 +17,9 @@
     },
     "funder": {
       "required": "MUST",
-      "rule": "Array of Funding Agency or Person entities",
-      "description": "Funding agencies of research project"
+      "rule": "Array of Funder entities",
+      "description": "Funding agencies of research project",
+      "expected_type": "List[Funder]"
     },
     "dmpFormat": {
       "required": "MUST",
@@ -39,6 +40,11 @@
       "required": "MUST",
       "rule": "Array of Person entities.",
       "description": "All data creators involved in research project"
+    },
+    "distribution": {
+      "required": "MUST if accessRights has open access and all open-access data set is available from single URL.",
+      "rule": "Object of @id term from DataDownload entity, e.g. \"{\"@id\": \"https://example.com/downloadlink\"}\".",
+      "description": "Download link of dataset"
     },
     "hasPart": {
       "required": "MUST",
@@ -142,9 +148,14 @@
       "description": "Explanation for citaion"
     },
     "distribution": {
-      "required": "MUST if accessRights has open access",
+      "required": "MUST if accessRights has open access and different for each data set.",
       "rule": "Object of @id term from DataDownload entity, e.g. \"{\"@id\": \"https://example.com/downloadlink\"}\".",
       "description": "Download link of dataset"
+    },
+    "contentSize": {
+      "required": "MAY",
+      "rule": "Integer plus \"B\" as units, e.g. \"1560B\". Be validated with the size listed in the DMP.",
+      "description": "Total file size under the directory"
     }
   }
 }
