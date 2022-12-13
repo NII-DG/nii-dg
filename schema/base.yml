@@ -1,12 +1,12 @@
 RootDataEntity:
   "@id":
-    description: MUST. MUST be "./".
+    description: MUST. String must be "./".
     example: ./
     expected_type: str
   name:
-    required: MUST
-    rule: string
-    description: Title of research project
+    description: MUST. Title of the research project
+    example: Sample Research
+    expected_type: str
   description:
     required: MAY
     rule: string
