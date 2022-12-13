@@ -2,37 +2,30 @@
 
 ## Memo
 
-1. オレオレ json で common.json と amed.json を書く
+1. オレオレ yaml で base.yml と amed.yml を書く
 
-https://github.com/ascade/nii-dg/schame/common.json
+https://github.com/ascade/nii-dg/schame/common.yml
 
-```json
-{
-  "File": {
-    "name": {
+```yaml
+  "File":
+    "name":
       "desc": "foobar",
       "rule": "",
       "required": ""
-    },
-    "desc": {
+    "desc":
       "desc": "foobar",
       "rule": "",
       "required": ""
-    }
-  },
-  "Dataset": {
-    "name": {
+  "Dataset":
+    "name":
       "desc": "foobar",
       "rule": "",
       "required": ""
-    },
-    "desc": {
+    "desc":
       "desc": "foobar",
       "rule": "",
       "required": ""
-    }
-  }
-}
+
 ```
 
 amed.json
@@ -54,9 +47,9 @@ amed.json
 }
 ```
 
-2. オレオレ json から、md を生成 (自動生成)
+2. オレオレ yaml から、md を生成 (自動生成)
 
-3. context 用の json-ld を生成し、url として、オレオレ json を参照する (自動生成)
+3. context 用の json-ld を生成し、url として、 md を参照する (自動生成)
 
 entity ごとに context.json file を自動生成する
 
@@ -103,8 +96,8 @@ https://github.com/ascade/nii-dg/schema/context/common/file.json
   - generate_md.py
   - generate_rocrate_context.py
   - jsonschema
-- amed.json
-- base.json
+- amed.yaml
+- base.yaml
 - docs
   - amed.md
   - base.md
@@ -116,7 +109,6 @@ https://github.com/ascade/nii-dg/schema/context/common/file.json
     - ...
   - amed
     - file.json
-
 
 ## Memo
 
