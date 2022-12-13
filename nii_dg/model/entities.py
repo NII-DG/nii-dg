@@ -1,8 +1,5 @@
 from datetime import datetime, timezone
-<<<<<<< HEAD
 from typing import Any, Optional
-=======
->>>>>>> 23b1b8b... Add github action and update README
 
 from nii_dg import const
 
@@ -34,26 +31,19 @@ class Entity():
         '''
         return self._jsonld
 
-<<<<<<< HEAD
     def set_id(self, id_: str) -> None:
         '''
         keyが"@id"となるvalueをJSON-LDに追加もしくは上書きする
         '''
         self._jsonld["@id"] = id_
 
-=======
->>>>>>> 23b1b8b... Add github action and update README
     def set_name(self, name: str) -> None:
         '''
         keyが"name"となるvalueをJSON-LDに追加する
         '''
         self.get_jsonld()["name"] = name
 
-<<<<<<< HEAD
     def add_properties(self, properties: dict[str, str]) -> None:
-=======
-    def add_properties(self, properties: dict) -> None:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         JSON-LDに別のJSON-LDを合成する
         同じkeyに対して異なるvalueがある場合、エラー
@@ -66,11 +56,7 @@ class Entity():
 
         self._jsonld.update(properties)
 
-<<<<<<< HEAD
     def get(self, property_name: str) -> Optional[str]:
-=======
-    def get(self, property_name: str) -> str:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         JSON-LDの指定されたkeyに対応するvalueを返す
         '''
@@ -80,11 +66,8 @@ class Entity():
         '''
         エンティティの@id key-valueを辞書で返す
         '''
-<<<<<<< HEAD
         if self.get("@id") is None:
             raise KeyError("This entity doesn't have @id property.")
-=======
->>>>>>> 23b1b8b... Add github action and update README
         return {"@id": self.get("@id")}
 
 

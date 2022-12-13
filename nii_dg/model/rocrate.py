@@ -1,9 +1,5 @@
 import os
-<<<<<<< HEAD
 from typing import Any, Optional
-=======
-from typing import Optional
->>>>>>> 23b1b8b... Add github action and update README
 
 from nii_dg import const
 from nii_dg.model.entities import Entity, Metadata, RootDataEntity
@@ -38,11 +34,7 @@ class ROCrate():
         self.entities = [self.metadata, self.rootdataentity]
         self.extra_terms = None
 
-<<<<<<< HEAD
     def get_by_type(self, e_type: str) -> list[Entity]:
-=======
-    def get_by_type(self, e_type: str) -> list:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         @typeが引数に一致するエンティティをリストで返す
         '''
@@ -72,11 +64,7 @@ class ROCrate():
                 return e
         return None
 
-<<<<<<< HEAD
     def convert_name_to_id(self, namedict: dict[str, str]) -> Optional[dict[str, str]]:
-=======
-    def convert_name_to_id(self, namedict: dict) -> Optional[dict]:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         {name: xxx} の辞書を引数として、nameが一致するエンティティが存在する時
         そのエンティティの@idを辞書で返す
@@ -90,11 +78,7 @@ class ROCrate():
             return None
         return e.get_id_dict()
 
-<<<<<<< HEAD
     def add_entity(self, id_: str, e_type: str, properties: dict[str, Any]) -> dict[str, str]:
-=======
-    def add_entity(self, id_: str, e_type: str, properties: dict) -> dict:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         @idが一致するエンティティが存在しない場合、エンティティを新規作成
         存在する場合はプロパティを更新
@@ -109,11 +93,7 @@ class ROCrate():
         e.add_properties(properties)
         return e.get_id_dict()
 
-<<<<<<< HEAD
     def add_entity_by_name(self, e_type: str, properties: dict[str, Any]) -> dict[str, str]:
-=======
-    def add_entity_by_name(self, e_type: str, properties: dict) -> dict:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         nameが一致するエンティティが存在しない場合、エンティティを新規作成
         存在する場合はプロパティを更新
@@ -149,7 +129,6 @@ class NIIROCrate(ROCrate):
     RO-Crateクラスを拡張しNII標準独自のメソッド・インスタンス変数を追加
     '''
 
-<<<<<<< HEAD
     def __init__(self, dmp: dict[str, Any]):
         super().__init__()
         self.extra_terms = const.EXTRA_TERMS
@@ -158,16 +137,6 @@ class NIIROCrate(ROCrate):
         self.rootdataentity.add_properties({"dmpFormat": self.dmp_format})
 
     def add_entity_by_url(self, dict_: dict[str, Any], type_: str) -> dict[str, Any]:
-=======
-    def __init__(self, dmp: str):
-        super().__init__()
-        self.extra_terms = const.EXTRA_TERMS
-        self.dmp = dmp
-        self.dmp_format = dmp.get("dmp_format")
-        self.rootdataentity.add_properties({"dmpFormat": self.dmp_format})
-
-    def add_entity_by_url(self, dict_: dict, type_: str) -> dict:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         url キーを含む辞書から、urlのvalueを@idとしてエンティティ作成
         '''
@@ -179,11 +148,7 @@ class NIIROCrate(ROCrate):
 
         return self.add_entity(id_, type_, properties)
 
-<<<<<<< HEAD
     def add_erad(self, erad: str, erad_type: str) -> dict[str, Any]:
-=======
-    def add_erad(self, erad: str, erad_type: str) -> dict:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         e-Rad番号のエンティティを追加
         プロジェクトIDか研究者番号かを引数で指定
@@ -197,13 +162,9 @@ class NIIROCrate(ROCrate):
         else:
             raise ValidationError("e-rad type should be \"project\" or \"researcher\".")
 
-<<<<<<< HEAD
         return self.add_entity(f"#e-Rad:{erad}", "PropertyValue", properties)
 
     def add_contactpoint(self, cp: dict[str, Any]) -> dict[str, Any]:
-=======
-    def add_contactpoint(self, cp: dict) -> dict:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         ContactPointエンティティを作成する
         IDはemail valueから生成
@@ -213,11 +174,7 @@ class NIIROCrate(ROCrate):
         em = properties["email"]
         return self.add_entity(f"#mailto:{em}", "ContactPoint", properties)
 
-<<<<<<< HEAD
     def add_organization(self, org: dict[str, Any]) -> dict[str, Any]:
-=======
-    def add_organization(self, org: dict) -> dict:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         Organizationエンティティを作成する
         @idはrorもしくはurlのvalueとし、両方ある場合はrorを優先
@@ -235,11 +192,7 @@ class NIIROCrate(ROCrate):
 
         return self.add_entity(ids[0], "Organization", properties)
 
-<<<<<<< HEAD
     def add_person(self, person: dict[str, Any]) -> dict[str, Any]:
-=======
-    def add_person(self, person: dict) -> dict:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         Personエンティティを作成する
         @idはorcidもしくはurlのvalueとし、rorを優先
@@ -270,13 +223,9 @@ class NIIROCrate(ROCrate):
         if erad is not None:
             properties["identifier"] = self.add_erad(erad, "researcher")
 
-<<<<<<< HEAD
         return self.add_entity(ids[0], "Person", properties)
 
     def load_data_dir(self, data_dir: Optional[str]) -> None:
-=======
-    def load_data_dir(self, data_dir: str):
->>>>>>> 23b1b8b... Add github action and update README
         '''
         ローカルのディレクトリを読み、データエンティティを作成
         '''
@@ -292,34 +241,19 @@ class NIIROCrate(ROCrate):
                 if file == "ro-crate-metadata.json":
                     continue
                 f_path = os.path.join(root, file)
-<<<<<<< HEAD
                 abs_path = f_path.replace(data_dir + "/", "")
                 self.add_entity(abs_path, "File",
                                 {"name": file, "fileSize": str(os.path.getsize(f_path)) + "B"})
-=======
-                abs_path = f_path.replace(data_dir + '/', '')
-                self.add_entity(abs_path, 'File',
-                                {"name": file, "fileSize": str(os.path.getsize(f_path))+'B'})
->>>>>>> 23b1b8b... Add github action and update README
                 file_list.append({"@id": abs_path})
 
             for dir_ in dirs:
                 d_path = os.path.join(root, dir_)
-<<<<<<< HEAD
                 abs_path = d_path.replace(data_dir, "") + "/"
                 self.add_entity(abs_path, "Dataset",
                                 {"name": dir_, "fileSize": str(get_dir_size(d_path)) + "B"})
                 file_list.append({"@id": abs_path})
 
         self.rootdataentity.add_properties({"hasPart": file_list})
-=======
-                abs_path = d_path.replace(data_dir, '') + '/'
-                self.add_entity(abs_path, 'Dataset',
-                                {"name": dir_, "fileSize": str(get_dir_size(d_path)) + 'B'})
-                file_list.append({"@id": abs_path})
-
-        self.rootdataentity.add_properties({'hasPart': file_list})
->>>>>>> 23b1b8b... Add github action and update README
 
     def set_publisheddate(self) -> None:
         '''
@@ -338,11 +272,7 @@ class NIIROCrate(ROCrate):
         '''
         self.rootdataentity.set_name(name)
 
-<<<<<<< HEAD
     def set_funder(self, funders: list[dict[str, Any]]) -> None:
-=======
-    def set_funder(self, funders: list) -> None:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         funder プロパティをルートエンティティに追加
         '''
@@ -357,11 +287,7 @@ class NIIROCrate(ROCrate):
         else:
             pass
 
-<<<<<<< HEAD
     def set_repo(self, repository: dict[str, Any]) -> None:
-=======
-    def set_repo(self, repository: dict) -> None:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         リポジトリURLをルートエンティティにidentifierとして追加
         '''
@@ -373,11 +299,7 @@ class NIIROCrate(ROCrate):
         ids.append(id_)
         self.rootdataentity.add_properties({"identifier": ids})
 
-<<<<<<< HEAD
     def set_erad(self, erad: str) -> None:
-=======
-    def set_erad(self, erad) -> None:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         e-Rad project プロジェクトIDをルートエンティティにidentifierとして追加
         '''
@@ -393,15 +315,9 @@ class NIIROCrate(ROCrate):
         '''
         研究分野をルートエンティティにkeywordsとして追加
         '''
-<<<<<<< HEAD
         self.rootdataentity.add_properties({"keywords": field})
 
     def set_creators(self, creators: list[dict[str, Any]]) -> None:
-=======
-        self.rootdataentity.add_properties({'keywords': field})
-
-    def set_creators(self, creators: list) -> None:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         creatorをルートエンティティに追加
         '''
@@ -414,11 +330,7 @@ class NIIROCrate(ROCrate):
 
         self.rootdataentity.add_properties({"creator": creator_list})
 
-<<<<<<< HEAD
     def set_affiliations(self, affiliations: list[dict[str, Any]]) -> None:
-=======
-    def set_affiliations(self, affiliations: list) -> None:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         Add "affiliation" entity
         '''
@@ -431,11 +343,7 @@ class NIIROCrate(ROCrate):
                 properties = {k: v for k, v in affiliation.items() if k not in ["ror", "url"]}
                 aff_e.add_properties(properties)
 
-<<<<<<< HEAD
     def set_license(self, license_: dict[str, str], entity: Optional[Entity] = None) -> None:
-=======
-    def set_license(self, license_: dict, entity: Entity = None) -> None:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         ライセンスのエンティティを追加
         '''
@@ -459,11 +367,7 @@ class NIIROCrate(ROCrate):
             properties = {
                 "name": dmp.get("title"),
                 "description": dmp.get("description"),
-<<<<<<< HEAD
                 "contentSize": dmp.get("maxFilesize")
-=======
-                "contentSize": dmp.get("max_filesize")
->>>>>>> 23b1b8b... Add github action and update README
             }
 
             if dmp.get('creator') is not None:
@@ -514,23 +418,12 @@ class NIIROCrate(ROCrate):
 
             self.add_entity(id_, "CreativeWork", properties)
 
-<<<<<<< HEAD
     def set_data(self, datalist: list[dict[str, Any]]) -> None:
-=======
-    def set_data(self, datalist: list = None) -> None:
->>>>>>> 23b1b8b... Add github action and update README
         '''
         JSON内のディレクトリ・ファイル情報をデータエンティティとして追加
         '''
 
-<<<<<<< HEAD
         if self.rootdataentity.get("hasPart") is None:
-=======
-        if datalist is None:
-            datalist = self.dmp.get("dataset")
-
-        if self.rootdataentity.get('hasPart') is None:
->>>>>>> 23b1b8b... Add github action and update README
             self.rootdataentity.add_properties({"hasPart": []})
 
         for data in datalist:
@@ -551,8 +444,4 @@ class NIIROCrate(ROCrate):
                     properties["encodingFormat"] = data.get("format")
                 data_id = self.add_entity(id_, "File", properties)
 
-<<<<<<< HEAD
             self.rootdataentity.get("hasPart").append(data_id)
-=======
-            self.rootdataentity.get('hasPart').append(data_id)
->>>>>>> 23b1b8b... Add github action and update README
