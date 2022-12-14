@@ -3,7 +3,7 @@
 
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, TypedDict, cast
+from typing import Any, Dict, List, TypedDict
 
 import yaml
 
