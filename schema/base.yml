@@ -183,6 +183,7 @@ DataDownload:
     description: Required. Must be reachable URL.
     example: https://rdm.nii.ac.jp/example/
     expected_type: str
-  downloadUrl: Required. URL for donwloding data set. Must be the same URL as @id term.
+  downloadUrl:
+    description: Required. URL for donwloding data set. Must be the same URL as @id term.
     example: https://zenodo.org/record/example
     expected_type: str
