@@ -13,11 +13,10 @@ RootDataEntity:
     expected_type: str
   funder:
     description: Required. Funding agencies of research project. Must be array of Funder entities.
-    example:
-      [
-        { "@id": "https://ror.org/04ksd4g47" },
-        { "@id": "https://ror.org/007f5s288" }
-      ]
+    example: '[
+      { "@id": "https://ror.org/04ksd4g47" },
+      { "@id": "https://ror.org/007f5s288" }
+      ]'
     expected_type: List[Funder]
   dateCreated:
     description: Required. MUST be a string in ISO 8601 date format and a timestamp down to the millisecond. Time zone is in UTC. Indicates timestamp the RO-Crate itself is created.
@@ -25,19 +24,19 @@ RootDataEntity:
     expected_type: str
   creator:
     description: Required. Must be array of Person entities. Indicates all data creators involved in this research project.
-    example: [{ "@id": "https://orcid.org/0000-0001-2345-6789" }]
+    example: '[{ "@id": "https://orcid.org/0000-0001-2345-6789" }]'
     expected_type: List[Creator]
   repository:
     description: Optional. Can be added when all data set is managed in a single repository. Indicates where the data is managed.
-    example: { "@id": "https://github.com/username/repository" }
+    example: '{ "@id": "https://github.com/username/repository" }'
     expected_type: RepositoryObject
   distribution:
     description: Optional. Can be added when access rights has "open access" and all open-access data set is available from a single URL. Indicates where download url of data set.
-    example: { "@id": "https://zenodo.org/record/example" }
+    example: '{ "@id": "https://zenodo.org/record/example" }'
     expected_type: DataDownload
   hasPart:
     description: Required. Must be array of Dataset and File entities which indicate files and directories.
-    example: [{ "@id": "config/" }, { "@id": "config/config.txt" }]
+    example: '[{ "@id": "config/" }, { "@id": "config/config.txt" }]'
     expected_type: List[Dataset | File]
 File:
   "@id":
@@ -50,7 +49,7 @@ File:
     expected_type: str
   dmpDataNumber:
     description: Required. Must be @id term from DMP entity. Indicates data number in DMP this file is included in.
-    example: { "@id": "#dmp:1" }
+    example: '{ "@id": "#dmp:1" }'
     expected_type: DMP
   contentSize:
     description: Required. Must be integer of file size with a suffix "B" as a unit, bite. Be validated with the size listed in DMP.
@@ -112,7 +111,7 @@ DMP:
     expected_type: str
   distribution:
     description: Required when accessRights has open access. When all open-access data set is available from a single URL, it can be ommited instead of adding to RootDataEntity. Indicates where download url of data set.
-    example: { "@id": "https://zenodo.org/record/example" }
+    example: '{ "@id": "https://zenodo.org/record/example" }'
     expected_type: DataDownload
   contentSize:
     description: Optional. Must choose one from the list, 1GB; 10GB; 100GB; 1TB; 1PB.
@@ -146,7 +145,7 @@ Creator:
     expected_type: str
   affiliation:
     description: Required. Affiliation a creator belongs to. Must be @id term from DMP entity.
-    example: { "@id": "https://ror.org/04ksd4g47" }
+    example: '{ "@id": "https://ror.org/04ksd4g47" }'
     expected_type: Affiliation
   email:
     description: Required. Email address of a creator.
