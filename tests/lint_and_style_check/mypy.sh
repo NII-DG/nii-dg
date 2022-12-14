@@ -21,14 +21,14 @@ mypy --strict \
     --implicit-reexport \
     ${BASE_DIR}/nii_dg
 
-echo "--- ${BASE_DIR}/test ---"
+echo "--- ${BASE_DIR}/tests ---"
 mypy --strict \
     --allow-untyped-calls \
     --allow-untyped-decorators \
     --ignore-missing-imports \
     --no-warn-unused-ignores \
     --implicit-reexport \
-    ${BASE_DIR}/test
+    ${BASE_DIR}/tests
 
 echo "--- ${BASE_DIR}/setup.py ---"
 mypy --strict \
