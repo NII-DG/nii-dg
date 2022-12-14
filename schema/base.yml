@@ -1,185 +1,185 @@
 RootDataEntity:
   "@id":
-    description: Required. MUST be "./".
+    expected_type: str
     example: ./
-    expected_type: str
+    description: Required. MUST be "./".
   name:
-    description: Required. Title of a research project.
+    expected_type: str
     example: Example Research Project
-    expected_type: str
+    description: Required. Title of a research project.
   description:
-    description: Optional. Description of a research project.
+    expected_type: str
     example: This research project aims to reveal the effect of xxx.
-    expected_type: str
+    description: Optional. Description of a research project.
   funder:
-    description: Required. Funding agencies of a research project. MUST be an array of Funder entities.
-    example: [{ "@id": "https://ror.org/01b9y6c26" }]
     expected_type: List[Funder]
+    example: '[{"@id": "https://ror.org/01b9y6c26"}]'
+    description: Required. Funding agencies of a research project. MUST be an array of Funder entities.
   dateCreated:
-    description: Required. MUST be a string in ISO 8601 date format and a timestamp down to milliseconds. The time zone is UTC. Indicates timestamp the RO-Crate itself was created.
-    example: "2022-12-09T10:48:07.976+00:00"
     expected_type: str
+    example: "2022-12-09T10:48:07.976+00:00"
+    description: Required. MUST be a string in ISO 8601 date format and a timestamp down to milliseconds. The time zone is UTC. Indicates timestamp the RO-Crate itself was created.
   creator:
-    description: Required. MUST be an array of Person entities. Indicates all data creators involved in this research project.
-    example: [{ "@id": "https://orcid.org/0000-0001-2345-6789" }]
     expected_type: List[Creator]
+    example: '[{"@id": "https://orcid.org/0000-0001-2345-6789"}]'
+    description: Required. MUST be an array of Person entities. Indicates all data creators involved in this research project.
   repository:
-    description: Optional. It can be added when all data set is managed in a single repository. Indicates where the data is managed.
-    example: { "@id": "https://github.com/username/repository" }
     expected_type: RepositoryObject
+    example: '{"@id": "https://github.com/username/repository"}'
+    description: Optional. It can be added when all data set is managed in a single repository. Indicates where the data is managed.
   distribution:
-    description: Optional. It can be added when access rights have "open access" and all open-access data set is available from a single URL. Indicates where the download URL of the data set.
-    example: { "@id": "https://zenodo.org/record/example" }
     expected_type: DataDownload
+    example: '{"@id": "https://zenodo.org/record/example"}'
+    description: Optional. It can be added when access rights have "open access" and all open-access data set is available from a single URL. Indicates where the download URL of the data set.
   hasPart:
-    description: Required. MUST be an array of Dataset and File entities that indicate files and directories.
-    example: [{ "@id": "config/" }, { "@id": "config/config.txt" }]
     expected_type: List[Union[Dataset, File]]
+    example: '[{"@id": "config/"}, {"@id": "config/config.txt"}]'
+    description: Required. MUST be an array of Dataset and File entities that indicate files and directories.
 File:
   "@id":
-    description: Required. MUST be either a URI Path relative to the RO Crate root (stated in the identifier term of RootDataEntity) or an absolute URI. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+    expected_type: str
     example: config/setting.txt
-    expected_type: str
+    description: Required. MUST be either a URI Path relative to the RO Crate root (stated in the identifier term of RootDataEntity) or an absolute URI. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
   name:
-    description: Required. Indicates file name.
+    expected_type: str
     example: setting.txt
-    expected_type: str
+    description: Required. Indicates file name.
   dmpDataNumber:
-    description: Required. MUST be a @id term from the DMP entity. Indicates data number in DMP this file is included in.
-    example: { "@id": "#dmp:1" }
     expected_type: DMP
+    example: '{"@id": "#dmp:1"}'
+    description: Required. MUST be a @id term from the DMP entity. Indicates data number in DMP this file is included in.
   contentSize:
-    description: Required. MUST be an integer of file size with the suffix "B" as a unit, bytes. Be validated with the size listed in DMP.
+    expected_type: str
     example: 1560B
-    expected_type: str
+    description: Required. MUST be an integer of file size with the suffix "B" as a unit, bytes. Be validated with the size listed in DMP.
   encodingFormat:
-    description: Optional. MUST be MIME type. Indicates file format.
+    expected_type: str
     example: text/plain
-    expected_type: str
+    description: Optional. MUST be MIME type. Indicates file format.
   url:
-    description: Optional. MUST be a direct URL to the file.
+    expected_type: str
     example: https://github.com/username/repository/file
-    expected_type: str
+    description: Optional. MUST be a direct URL to the file.
   sdDatePublished:
-    description: Required when the file is from outside the RO-Crate Root. Indicates the date the file was obtained. MUST be a string in ISO 8601 date format.
-    example: "2022-12-01"
     expected_type: str
+    example: "2022-12-01"
+    description: Required when the file is from outside the RO-Crate Root. Indicates the date the file was obtained. MUST be a string in ISO 8601 date format.
 Dataset:
   "@id":
-    description: Required. MUST be either a URI Path relative to the RO-Crate root (stated in the identifier term of RootDataEntity). MUST end with "/". Indicates the path to the directory.
+    expected_type: str
     example: config/
-    expected_type: str
+    description: Required. MUST be either a URI Path relative to the RO-Crate root (stated in the identifier term of RootDataEntity). MUST end with "/". Indicates the path to the directory.
   name:
-    description: Required. Indicates directory name.
+    expected_type: str
     example: config
-    expected_type: str
+    description: Required. Indicates directory name.
   url:
-    description: Optional. MUST be a direct URL to the directory.
-    example: https://github.com/username/repository/directory
     expected_type: str
+    example: https://github.com/username/repository/directory
+    description: Optional. MUST be a direct URL to the directory.
 DMP:
   "@id":
-    description: Required. MUST be data No. with the prefix "#dmp:". Indicates data No. in the DMP list.
+    expected_type: str
     example: "#dmp:1"
-    expected_type: str
+    description: Required. MUST be data No. with the prefix "#dmp:". Indicates data No. in the DMP list.
   name:
-    description: Required. Indicates data title in DMP.
+    expected_type: str
     example: calculated data
-    expected_type: str
+    description: Required. Indicates data title in DMP.
   description:
-    description: Required. Indicates data description in DMP.
+    expected_type: str
     example: Result data calculated by Newton's method
-    expected_type: str
+    description: Required. Indicates data description in DMP.
   accessRights:
-    description: Required when all data sets have a common access right, they can be omitted instead of added to RootDataEntity. MUST choose one from the list, open access; restricted access; embargoed access; or metadata-only access. Indicate the availability of the data set.
-    example: open access
     expected_type: Literal["open access", "restricted access", "embargoed access", "metadata only access"]
+    example: open access
+    description: Required when all data sets have a common access right, they can be omitted instead of added to RootDataEntity. MUST choose one from the list, open access; restricted access; embargoed access; or metadata-only access. Indicate the availability of the data set.
   availabilityStarts:
-    description: Required when accessRights has embargoed access. MUST be a string in ISO 8601 date format. Be verified that the value is the future than the time of verification.
+    expected_type: str
     example: "2023-04-01"
-    expected_type: str
+    description: Required when accessRights has embargoed access. MUST be a string in ISO 8601 date format. Be verified that the value is the future than the time of verification.
   isAccessibleForFree:
-    description: Required when accessRights has open access or restricted access. MUST be a boolean. True means the data set is free to access, while False means consideration. When access rights have open access, MUST be True.
-    example: "True"
     expected_type: bool
+    example: "True"
+    description: Required when accessRights has open access or restricted access. MUST be a boolean. True means the data set is free to access, while False means consideration. When access rights have open access, MUST be True.
   usageInfo:
-    description: Optional. An explanation for citation.
-    example: Contact data manager before usage of this data set.
     expected_type: str
+    example: Contact data manager before usage of this data set.
+    description: Optional. An explanation for citation.
   distribution:
-    description: Required when accessRights has open access. When all open-access data set is available from a single URL, they can be omitted instead of added to RootDataEntity. Indicates where the download URL of the data set.
-    example: { "@id": "https://zenodo.org/record/example" }
     expected_type: DataDownload
+    example: '{"@id": "https://zenodo.org/record/example"}'
+    description: Required when accessRights has open access. When all open-access data set is available from a single URL, they can be omitted instead of added to RootDataEntity. Indicates where the download URL of the data set.
   contentSize:
-    description: Optional. MUST choose one from 1GB, 10GB, 100GB, 1TB and 1PB.
-    example: 100GB
     expected_type: Literal["1GB", "10GB", "100GB", "1TB", "1PB"]
+    example: 100GB
+    description: Optional. MUST choose one from 1GB, 10GB, 100GB, 1TB and 1PB.
 Funder:
   "@id":
-    description: Required. MUST be the URL of the organization and recommended ROR ID.
+    expected_type: str
     example: https://ror.org/04ksd4g47
-    expected_type: str
+    description: Required. MUST be the URL of the organization and recommended ROR ID.
   name:
-    description: Required. Name of the funder.
+    expected_type: str
     example: National Institute of Informatics
-    expected_type: str
+    description: Required. Name of the funder.
   description:
-    description: Optional. Description of a funder.
-    example: Japan's only general academic research institution seeking to create future value in the new discipline of informatics.
     expected_type: str
+    example: Japan's only general academic research institution seeking to create future value in the new discipline of informatics.
+    description: Optional. Description of a funder.
 Creator:
   "@id":
-    description: Required. MUST be the URL of a creator and recommended ORCID ID.
+    expected_type: str
     example: https://orcid.org/0000-0001-2345-6789
-    expected_type: str
+    description: Required. MUST be the URL of a creator and recommended ORCID ID.
   name:
-    description: Required. Name of a creator. MUST be in the order of first name, and family name.
+    expected_type: str
     example: Ichiro Suzuki
-    expected_type: str
+    description: Required. Name of a creator. MUST be in the order of first name, and family name.
   alias:
-    description: Optional. Another writing of the name of a creator.
+    expected_type: str
     example: S. Ichiro
-    expected_type: str
+    description: Optional. Another writing of the name of a creator.
   affiliation:
-    description: Required. Affiliation, a creator, belongs to. MUST be a @id term from the DMP entity.
-    example: { "@id": "https://ror.org/04ksd4g47" }
     expected_type: Affiliation
+    example: '{"@id": "https://ror.org/04ksd4g47"}'
+    description: Required. Affiliation, a creator, belongs to. MUST be a @id term from the DMP entity.
   email:
-    description: Required. Email address of a creator.
-    example: ichiro@example.com
     expected_type: str
+    example: ichiro@example.com
+    description: Required. Email address of a creator.
 Affiliation:
   "@id":
-    description: Required. MUST be the URL of the organization and recommended ROR ID.
+    expected_type: str
     example: https://ror.org/04ksd4g47
-    expected_type: str
+    description: Required. MUST be the URL of the organization and recommended ROR ID.
   name:
-    description: Required. Name of an organization.
+    expected_type: str
     example: National Institute of Informatics
-    expected_type: str
+    description: Required. Name of an organization.
   description:
-    description: Optional. Description of an organization.
-    example: Japan's only general academic research institution seeking to create future value in the new discipline of informatics.
     expected_type: str
+    example: Japan's only general academic research institution seeking to create future value in the new discipline of informatics.
+    description: Optional. Description of an organization.
 RepositoryObject:
   "@id":
-    description: Required. MUST be the URL of a repository.
+    expected_type: str
     example: https://rdm.nii.ac.jp/example/
-    expected_type: str
+    description: Required. MUST be the URL of a repository.
   name:
-    description: Required. Name of a repository.
+    expected_type: str
     example: Gakunin RDM
-    expected_type: str
+    description: Required. Name of a repository.
   description:
-    description: Optional. Description of a repository.
-    example: Repository managed by NII.
     expected_type: str
+    example: Repository managed by NII.
+    description: Optional. Description of a repository.
 DataDownload:
   "@id":
-    description: Required. MUST be a reachable URL.
+    expected_type: str
     example: https://rdm.nii.ac.jp/example/
-    expected_type: str
+    description: Required. MUST be a reachable URL.
   downloadUrl:
-    description: Required. URL for downloading data sets. MUST be the same URL as the @id term.
-    example: https://zenodo.org/record/example
     expected_type: str
+    example: https://zenodo.org/record/example
+    description: Required. URL for downloading data sets. MUST be the same URL as the @id term.
