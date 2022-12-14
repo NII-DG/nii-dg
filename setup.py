@@ -17,6 +17,9 @@ setup(
     python_requires=">=3.7",
     platforms="any",
     packages=["nii_dg"],
+    install_requires=[
+        "pyyaml",
+    ],
     tests_require=[
         "flake8",
         "isort",
