@@ -18,7 +18,7 @@ setup(
     platforms="any",
     packages=["nii_dg"],
     install_requires=[
-        "yaml",
+        "pyyaml",
     ],
     tests_require=[
         "flake8",
