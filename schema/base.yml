@@ -59,39 +59,33 @@ RootDataEntity:
     expected_type: List[Dataset | File]
 File:
   "@id":
-    required: MUST
-    rule:
-      MUST be either a URI Path relative to the RO Crate root (stated in identifier
-      term of RootDataEntity) or an absolute URI.  When the file from outside of the
-      repository, @id SHOULD be directly downloadable by a simple retrieval (e.g.
-      HTTP GET), permitting redirections and HTTP/HTTPS authentication.
-    description: Path of the file
+    description: Required. MUST be either a URI Path relative to the RO Crate root (stated in identifier term of RootDataEntity) or an absolute URI. When the file from outside of the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g. HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+    example: config/setting.txt
+    expected_type: str
   name:
-    required: MUST
-    rule: string
-    description: Title of the file
+    description: Required. Indicates file name.
+    example: setting.txt
+    expected_type: str
   dmpDataNumber:
-    required: MUST
-    rule: 'Object of @id term from DMP Entity, e.g. "{"@id": "#dmp:1"}".'
-    description: Corresponding data number of DMP
+    description: Required. Must be @id term from DMP entity. Indicates data number in DMP this file is included in.
+    example: { "@id": "#dmp:1" }
+    expected_type: DMP
   contentSize:
-    required: MUST
-    rule:
-      Integer plus "B" as units, e.g. "1560B". Be validated with the size listed
-      in the DMP.
-    description: File size
+    description: Required. Must be integer of file size with a suffix "B" as a unit, bite. Be validated with the size listed in DMP.
+    example: 1560B
+    expected_type: str
   encodingFormat:
-    required: MAY
-    rule: MUST be MIME type, e.g. "application/pdf".
-    description: File Format
+    description: Optional. Must be MIME type. Indicates file format.
+    example: text/plain
+    expected_type: str
   url:
-    required: MAY
-    rule: URL
-    description: Direct URL to the file
+    description: Optional. Must be direct URL to the file.
+    example: https://github.com/username/repository/xxx
+    expected_type: str
   sdDatePublished:
-    required: MUST if the file from outside the RO-Crate Root
-    rule: MUST be a string in ISO 8601 date format
-    description: Date the file was obtained
+    description: Required when the file from outside the RO-Crate Root. Indicates date the file was obtained. MUST be a string in ISO 8601 date format.
+    example: "2022-12-01"
+    expected_type: datetime
 Dataset:
   "@id":
     required: MUST
