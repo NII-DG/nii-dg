@@ -86,4 +86,7 @@ See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg
 
 ## DataDownload
 
-Generate automatically
+| Property      | Type  | Description                                                                    | Example                             |
+| ------------- | ----- | ------------------------------------------------------------------------------ | ----------------------------------- |
+| `@id`         | `str` | Required. MUST be a reachable URL.                                             | `https://rdm.nii.ac.jp/example/`    |
+| `downloadUrl` | `str` | Required. URL for downloading data sets. MUST be the same URL as the @id term. | `https://zenodo.org/record/example` |
