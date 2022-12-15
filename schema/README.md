@@ -49,16 +49,18 @@ amed.json
 
 2. オレオレ yaml から、md を生成 (自動生成)
 
-3. context 用の json-ld を生成し、url として、 md を参照する (自動生成)
-
-entity ごとに context.json file を自動生成する
+3. context 用の json-ld を extityごとに自動生成する。この時、語彙定義のurl として、 2.で自動生成したmd を参照する.
 
 ### やりたいこと
 
 生成した json ld の entity のなかの context に
-
-https://github.com/ascade/nii-dg/schame/context.json/Common/File
-
+```json
+{
+    "@context": "https://github.com/ascade/nii-dg/schame/context.json/Common/File",
+    "@id": "sample/file.txt",
+    "@type": "File"
+}
+```
 とかいたら、
 
 ```
@@ -67,7 +69,7 @@ https://github.com/ascade/nii-dg/schame/context.json/Common/File
 "desc": "https://example.com/amed_file:desc"
 ```
 
-が帰ってくる
+が返ってくる
 
 https://github.com/ascade/nii-dg/schema/context/common/file.json
 
@@ -93,14 +95,18 @@ https://github.com/ascade/nii-dg/schema/context/common/file.json
 
 - README.md
 - scripts
-  - generate_md.py
+  - generate_docs.py
   - generate_rocrate_context.py
-  - jsonschema
-- amed.yaml
-- base.yaml
+  - validate_and format_yml.py
+- amed.yml
+- base.yml
+- meti.yml
+- cabinet_office.yml
 - docs
   - amed.md
   - base.md
+  - meti.md
+  - cabinet_office.md
 - context <- json-ld から呼ばれるためだけ (人間は触らない)
   - base
     - file.json
@@ -116,8 +122,9 @@ https://github.com/ascade/nii-dg/schema/context/common/file.json
 
 - オレオレ json (schema 定義の json)
   - 2 パターン
-    - common.json を継承するか？
-    - common.json を cp するか？
+    - ~~common.json を継承する~~
+    - entity単位でcommon.json を cp する
+      - entity が丸々baseと同じなら省略可能
 - python file (schema 定義を反映した rule set / used by generator and validator)
   - 多分こっちの実装も上のパターンと同じにしたほうがなるべく良い
 
@@ -133,7 +140,7 @@ json ld context (referred by json ld (ro-crate))
 
 ---
 
-common からの拡張の usecase
+base からの拡張の usecase
 
 - field の追加
 - field の削除
@@ -152,7 +159,7 @@ common からの拡張の usecase
 
 ## 共通スキーマ
 
-[`common.md`](./common.md)
+[`base.md`](./docs/base.md)
 
 ## 分野別スキーマ
 
