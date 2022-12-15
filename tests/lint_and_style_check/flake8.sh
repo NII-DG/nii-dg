@@ -14,4 +14,5 @@ cd ${BASE_DIR}
 
 flake8 ${BASE_DIR} \
     --extend-ignore=E501 \
-    --count --show-source --statistics
+    --count --show-source --statistics \
+    --per-file-ignores='*/__init__.py:F401 tests_prev/*:F401'
