@@ -156,10 +156,11 @@ Affiliation:
   name:
     expected_type: str
     example: National Institute of Informatics
-    description: Required. Name of an organization.
+    description: Required. Name of the organization.
   description:
+    expected_type: str
     example: Japan's only general academic research institution seeking to create future value in the new discipline of informatics.
-    description: Optional. Description of an organization.
+    description: Optional. Description of the organization.
 RepositoryObject:
   "@id":
     expected_type: str

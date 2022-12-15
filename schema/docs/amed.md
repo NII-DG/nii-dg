@@ -1,4 +1,4 @@
-# NII-DG: Schema: formated_amed
+# NII-DG: Schema: amed
 
 See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg/blob/main/schema/README.md) for more information.
 
