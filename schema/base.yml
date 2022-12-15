@@ -6,15 +6,15 @@ RootDataEntity:
   name:
     expected_type: str
     example: Example Research Project
-    description: Required. Title of a research project.
+    description: Required. Title of the research project.
   description:
     expected_type: str
     example: This research project aims to reveal the effect of xxx.
-    description: Optional. Description of a research project.
+    description: Optional. Description of the research project.
   funder:
     expected_type: List[Funder]
     example: '[{"@id": "https://ror.org/01b9y6c26"}]'
-    description: Required. Funding agencies of a research project. MUST be an array of Funder entities.
+    description: Required. Funding agencies of the research project. MUST be an array of Funder entities.
   dateCreated:
     expected_type: str
     example: "2022-12-09T10:48:07.976+00:00"
@@ -26,13 +26,13 @@ RootDataEntity:
     example: [{ "@id": "https://orcid.org/0000-0001-2345-6789" }]
     expected_type: List[Creator]
   repository:
-    description: Optional. It can be added when all data set is managed in a single repository. Indicates where the data is managed.
-    example: { "@id": "https://github.com/username/repository" }
     expected_type: RepositoryObject
+    example: '{ "@id": "https://doi.org/xxxxxxxx" }'
+    description: Can be added when all data set is managed in a single repository. Indicates repository where the data is managed.
   distribution:
-    description: Optional. It can be added when access rights have "open access" and all open-access data set is available from a single URL. Indicates where the download URL of the data set.
-    example: { "@id": "https://zenodo.org/record/example" }
     expected_type: DataDownload
+    example: '{"@id": "https://zenodo.org/record/example"}'
+    description: Optional. It can be added when access rights have "open access" and all open-access data set is available from a single URL. Indicates where the download URL of the data set.
   hasPart:
     expected_type: List[Union[Dataset, File]]
     example: '[{"@id": "config/"}, {"@id": "config/config.txt"}]'
@@ -171,6 +171,8 @@ Affiliation:
     description: Optional. Description of an organization.
 RepositoryObject:
   "@id":
+    expected_type: str
+    example: https://rdm.nii.ac.jp/example/
     description: Required. MUST be the URL of a repository.
     example: https://rdm.nii.ac.jp/example/
     expected_type: str

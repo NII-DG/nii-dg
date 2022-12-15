@@ -1,27 +1,24 @@
 RootDataEntity:
   "@id":
-    description: Required. Must be "./" .
+    expected_type: str
     example: ./
-    expected_type: str
+    description: Required. MUST be "./".
   name:
-    description: Required. Title of the research project
-    example: Sample Research
     expected_type: str
+    example: Example Research Project
+    description: Required. Title of the research project.
   description:
-    description: Optional. Description of the research project
-    example: This research project aims to reveal the affect of xxx.
     expected_type: str
+    example: This research project aims to reveal the effect of xxx.
+    description: Optional. Description of the research project.
   funder:
-    description: Required. Funding agencies of research project. Must be array of Funder entities.
-    example: '[
-      { "@id": "https://ror.org/04ksd4g47" },
-      { "@id": "https://ror.org/007f5s288" }
-      ]'
     expected_type: List[Funder]
+    example: '[{"@id": "https://ror.org/01b9y6c26"}]'
+    description: Required. Funding agencies of the research project. MUST be an array of Funder entities.
   dateCreated:
-    description: Required. MUST be a string in ISO 8601 date format and a timestamp down to the millisecond. Time zone is in UTC. Indicates timestamp the RO-Crate itself is created.
-    example: "2022-12-09T10:48:07.976+00:00"
     expected_type: str
+    example: "2022-12-09T10:48:07.976+00:00"
+    description: Required. MUST be a string in ISO 8601 date format and a timestamp down to the millisecond. Time zone is in UTC. Indicates timestamp the RO-Crate itself is created.
   creator:
     description: Required. Must be array of Person entities. Indicates all data creators involved in this research project.
     example: '[{ "@id": "https://orcid.org/0000-0001-2345-6789" }]'
