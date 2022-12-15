@@ -19,6 +19,7 @@ setup(
     packages=["nii_dg"],
     install_requires=[
         "pyyaml",
+        "flask",
     ],
     tests_require=[
         "flake8",
@@ -33,11 +34,6 @@ setup(
             "mypy",
             "pytest",
         ],
-    },
-    entry_points={
-        "console_scripts": [
-            "dg=nii_dg.cli:main",
-        ]
     },
     classifiers=[
         "Development Status :: 5 - Production/Stable",
