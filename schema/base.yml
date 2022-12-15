@@ -147,7 +147,7 @@ Creator:
   email:
     expected_type: str
     example: ichiro@example.com
-    description: Required. Email address of a creator.
+    description: Required. Email address of the creator.
   telephone:
     expected_type: str
     example: "03-0000-0000"
