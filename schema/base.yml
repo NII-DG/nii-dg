@@ -6,15 +6,15 @@ RootDataEntity:
   name:
     expected_type: str
     example: Example Research Project
-    description: Required. Title of a research project.
+    description: Required. Title of the research project.
   description:
     expected_type: str
     example: This research project aims to reveal the effect of xxx.
-    description: Optional. Description of a research project.
+    description: Optional. Description of the research project.
   funder:
     expected_type: List[Funder]
     example: '[{"@id": "https://ror.org/01b9y6c26"}]'
-    description: Required. Funding agencies of a research project. MUST be an array of Funder entities.
+    description: Required. Funding agencies of the research project. MUST be an array of Funder entities.
   dateCreated:
     expected_type: str
     example: "2022-12-09T10:48:07.976+00:00"
@@ -25,8 +25,8 @@ RootDataEntity:
     description: Required. MUST be an array of Person entities. Indicates all data creators involved in this research project.
   repository:
     expected_type: RepositoryObject
-    example: '{"@id": "https://github.com/username/repository"}'
-    description: Optional. It can be added when all data set is managed in a single repository. Indicates where the data is managed.
+    example: '{ "@id": "https://doi.org/xxxxxxxx" }'
+    description: Can be added when all data set is managed in a single repository. Indicates repository where the data is managed.
   distribution:
     expected_type: DataDownload
     example: '{"@id": "https://zenodo.org/record/example"}'
@@ -158,7 +158,6 @@ Affiliation:
     example: National Institute of Informatics
     description: Required. Name of an organization.
   description:
-    expected_type: str
     example: Japan's only general academic research institution seeking to create future value in the new discipline of informatics.
     description: Optional. Description of an organization.
 RepositoryObject:
