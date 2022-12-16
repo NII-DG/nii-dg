@@ -15,6 +15,10 @@ RootDataEntity:
     expected_type: List[Funder]
     example: '[{"@id": "https://ror.org/01b9y6c26"}]'
     description: Required. Funding agencies of the research project. MUST be an array of Funder entities.
+  funding:
+    expected_type: str
+    example: Acceleration Transformative Research for Medical Innovation
+    description: Required. Indicates the name of funding program.
   dateCreated:
     expected_type: str
     example: "2022-12-09T10:48:07.976+00:00"
@@ -129,16 +133,3 @@ Creator:
     expected_type: str
     example: Chief reseacher, Data manager
     description: Required for chief researcher and data manager. The job title of the person.
-PropertyValue:
-  "@id":
-    expected_type: str
-    example: "#jRCT:1234567"
-    description: Required. URL of registrated data. When there is no URL, combine registry name and ID with prefix "#".
-  name:
-    expected_type: str
-    example: Japan Registry of Clinical Trials
-    description: Required. Name of the data registry service.
-  value:
-    expected_type: str
-    example: "1234567"
-    description: Required. ID you got from the registry service.

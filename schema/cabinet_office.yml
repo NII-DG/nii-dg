@@ -129,16 +129,3 @@ Creator:
     expected_type: Erad
     example: '{ "@id": "#e-Rad:001234567" }'
     description: Required when the creator has e-Rad researcher number. MUST be @id term of PropertyValue entities. Indicates e-Rad researcher number.
-Erad:
-  "@id":
-    expected_type: str
-    example: "#e-Rad:1234567"
-    description: Required. It must be ID with prefix "#e-Rad:".
-  name:
-    expected_type: Literal["e-Rad project ID", "e-Rad researcher number"]
-    example: e-Rad project ID
-    description: Required. Indicates a category of ID, project ID or researcher number.
-  value:
-    expected_type: str
-    example: "1234567"
-    description: Required. ID or e-Rad.

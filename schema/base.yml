@@ -12,9 +12,9 @@ RootDataEntity:
     example: This research project aims to reveal the effect of xxx.
     description: Optional. Description of the research project.
   funder:
-    expected_type: List[Funder]
+    expected_type: List[Organization]
     example: '[{"@id": "https://ror.org/01b9y6c26"}]'
-    description: Required. Funding agencies of the research project. MUST be an array of Funder entities.
+    description: Required. Funding agencies of the research project. MUST be an array of Organization entities.
   dateCreated:
     expected_type: str
     example: "2022-12-09T10:48:07.976+00:00"
@@ -114,7 +114,7 @@ DMP:
     expected_type: Literal["1GB", "10GB", "100GB", "1TB", "1PB"]
     example: 100GB
     description: Optional. MUST choose one from 1GB, 10GB, 100GB, 1TB and 1PB. Indicates maximum of sum total file size included in this DMP condition.
-Funder:
+Organization:
   "@id":
     expected_type: str
     example: https://ror.org/04ksd4g47
@@ -122,11 +122,11 @@ Funder:
   name:
     expected_type: str
     example: National Institute of Informatics
-    description: Required. Name of the funder.
+    description: Required. Name of the organization.
   description:
     expected_type: str
     example: Japan's only general academic research institution seeking to create future value in the new discipline of informatics.
-    description: Optional. Description of a funder.
+    description: Optional. Description of the organization.
 Creator:
   "@id":
     expected_type: str
@@ -141,7 +141,7 @@ Creator:
     example: S. Ichiro
     description: Optional. Another writing of a name of the creator.
   affiliation:
-    expected_type: Affiliation
+    expected_type: Organization
     example: '{"@id": "https://ror.org/04ksd4g47"}'
     description: Required. Affiliation which the creator belongs to. MUST be a @id term from the DMP entity.
   email:
@@ -152,24 +152,24 @@ Creator:
     expected_type: str
     example: "03-0000-0000"
     description: Optional. Phone number of the creator.
-Affiliation:
+License:
   "@id":
     expected_type: str
-    example: https://ror.org/04ksd4g47
-    description: Required. MUST be the URL of the organization and recommended ROR ID.
+    example: "https://www.apache.org/licenses/LICENSE-2.0"
+    description: Required. MUST be URL of the license.
   name:
     expected_type: str
-    example: National Institute of Informatics
-    description: Required. Name of the organization.
+    example: Apache License 2.0
+    description: Required. Name of the license.
   description:
     expected_type: str
-    example: Japan's only general academic research institution seeking to create future value in the new discipline of informatics.
-    description: Optional. Description of the organization.
+    example: the licensed defined by Apache Software Foundation
+    description: Optional. Description of the license.
 RepositoryObject:
   "@id":
     expected_type: str
     example: "https://doi.org/xxxxxxxx"
-    description: Required. MUST be the URL of the repository. DOI link is recommended.
+    description: Required. MUST be URL of the repository. DOI link is recommended.
   name:
     expected_type: str
     example: Gakunin RDM
@@ -188,6 +188,7 @@ DataDownload:
     example: https://zenodo.org/record/example
     description: Required. URL for downloading data sets. MUST be the same URL as the @id term.
 HostingInstitution:
+  # based on Organization entity
   "@id":
     expected_type: str
     example: https://ror.org/04ksd4g47
@@ -204,3 +205,30 @@ HostingInstitution:
     expected_type: str
     example: "2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430"
     description: Required. Physical address of the organization.
+PropertyValue:
+  "@id":
+    expected_type: str
+    example: "#jRCT:1234567"
+    description: Required. URL of registrated data. When there is no URL, combine registry name and ID with prefix "#".
+  name:
+    expected_type: str
+    example: Japan Registry of Clinical Trials
+    description: Required. Name of the data registry service.
+  value:
+    expected_type: str
+    example: "1234567"
+    description: Required. ID you got from the registry service.
+Erad:
+  # based on ProperyValue entity
+  "@id":
+    expected_type: str
+    example: "#e-Rad:1234567"
+    description: Required. It must be ID with prefix "#e-Rad:".
+  name:
+    expected_type: Literal["e-Rad project ID", "e-Rad researcher number"]
+    example: e-Rad project ID
+    description: Required. Indicates a category of ID, project ID or researcher number.
+  value:
+    expected_type: str
+    example: "1234567"
+    description: Required. ID or e-Rad.
