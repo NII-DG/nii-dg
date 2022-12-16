@@ -1,7 +1,7 @@
 DMP:
-  "@id":
+  '@id':
     expected_type: str
-    example: "#dmp:1"
+    example: '#dmp:1'
     description: Required. MUST be data No. with the prefix `#dmp:`. Indicates data No. in the DMP list.
   name:
     expected_type: str
@@ -29,7 +29,7 @@ DMP:
     description: Required when accessRights has `restricted access`, `embargoed access` or `metadata only access`. Indicates why access to the data set is ristricted and embargoed.
   availabilityStarts:
     expected_type: str
-    example: "2023-04-01"
+    example: '2023-04-01'
     description: Required when accessRights has `embargoed access`. MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
   creator:
     expected_type: List[Affiliation]
@@ -41,7 +41,7 @@ DMP:
     description: Optional. An explanation of the technique for collecting data.
   isAccessibleForFree:
     expected_type: bool
-    example: "True"
+    example: 'True'
     description: Required when accessRights has `open access` or `restricted access`. MUST be a boolean. True means the data set is free to access, while False means consideration. When access rights have open access, MUST be True.
   license:
     expected_type: License
@@ -56,9 +56,9 @@ DMP:
     example: '{ "@id": "https://doi.org/xxxxxxxx" }'
     description: Required. MUST be @id term of the RepositoryObject entity. When all data set is managed in a single repository, it can be omitted instead of adding to RootDataEntity. Indicates repository where the data is managed.
   contentSize:
-    expected_type: Literal["1GB", "10GB", "100GB", "1TB", "1PB"]
+    expected_type: Literal["1GB", "10GB", "100GB", "over100GB"]
     example: 100GB
-    description: Optional. MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in this DMP condition.
+    description: Optional. MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition.
   distribution:
     expected_type: DataDownload
     example: '{"@id": "https://zenodo.org/record/example"}'
