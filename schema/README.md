@@ -29,7 +29,7 @@ DMPとしてAMEDを利用する場合
 3. 対応する.pyをnii_dg/schema配下に作成しクラスを追加する。この時基底クラスは不要。
 ```
 
-### .yml format
+### schema of .yml
 - Each entity name MUST be in upper camel case (Pascal case).
 - Each entity MUST have `@id` term. URI is recommended.
 - Each term name MUST be in lower camel case, excluding `@id` term.
