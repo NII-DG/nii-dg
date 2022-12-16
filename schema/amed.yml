@@ -2,7 +2,7 @@ RootDataEntity:
   "@id":
     expected_type: str
     example: ./
-    description: Required. MUST be "./".
+    description: Required. MUST be `./`.
   name:
     expected_type: str
     example: Example Research Project
@@ -12,42 +12,50 @@ RootDataEntity:
     example: This research project aims to reveal the effect of xxx.
     description: Optional. Description of the research project.
   funder:
-    expected_type: List[Funder]
+    expected_type: List[Organization]
     example: '[{"@id": "https://ror.org/01b9y6c26"}]'
-    description: Required. Funding agencies of the research project. MUST be an array of Funder entities.
+    description: Required. Funding agencies of the research project. MUST be an array of @id term of Organization entity.
+  funding:
+    expected_type: str
+    example: Acceleration Transformative Research for Medical Innovation
+    description: Required. Indicates the name of funding program.
   dateCreated:
     expected_type: str
     example: "2022-12-09T10:48:07.976+00:00"
     description: Required. MUST be a string in ISO 8601 date format and a timestamp down to the millisecond. Time zone is in UTC. Indicates timestamp the RO-Crate itself is created.
+  chiefResearcher:
+    expected_type: Person
+    example: '{"@id": "https://orcid.org/0000-0001-2345-6789"}'
+    description: Required. MUST be @id term of Person entity. Indicates chief researcher or representative of the research project.
   creator:
-    expected_type: List[Creator]
-    example: '[{ "@id": "https://orcid.org/0000-0001-2345-6789" }]'
-    description: Required. Must be array of Person entities. Indicates all data creators involved in this research project.
+    expected_type: List[Person]
+    example: '[{"@id": "https://orcid.org/0000-0001-2345-6789"}]'
+    description: Required. MUST be an array of @id term of Person entity. Indicates all data creators involved in this research project.
   hostingInstitution:
     expected_type: HostingInstituion
-    example: '[{ "@id": "https://ror.org/04ksd4g47" }]'
-    description: Must. Indicates hosting institution of the data set.
+    example: '{ "@id": "https://ror.org/04ksd4g47" }'
+    description: Required. Indicates hosting institution of the data set.
   dataManager:
-    expected_type: Creator
-    example: '[{ "@id": "https://orcid.org/0000-0001-2345-6789" }]'
-    description: Must. Indicates data manager of data set.
+    expected_type: Person
+    example: '{ "@id": "https://orcid.org/0000-0001-2345-6789" }'
+    description: Required. Indicates data manager of data set.
   repository:
     expected_type: RepositoryObject
     example: '{ "@id": "https://doi.org/xxxxxxxx" }'
-    description: Can be added when all data set is managed in a single repository. Indicates repository where the data is managed.
+    description: Can be added when all data set is managed in a single repository. MUST be @id term of RepositoryObject entity. Indicates repository where the data is managed.
   distribution:
     expected_type: DataDownload
-    example: '{ "@id": "https://zenodo.org/record/example" }'
-    description: Can be added when access rights has "open access" and all open-access data set is available from a single URL. Indicates where download url of data set.
+    example: '{"@id": "https://zenodo.org/record/example"}'
+    description: Can be added when access rights have `open access` and all open-access data set is available from a single URL. MUST be @id term of DataDownload entity. Indicates where the download URL of the data set.
   hasPart:
-    expected_type: List[Dataset | File]
+    expected_type: List[Union[Dataset, File]]
     example: '[{ "@id": "config/" }, { "@id": "config/config.txt" }]'
-    description: Required. Must be array of Dataset and File entities which indicate files and directories.
+    description: Required. MUST be an array of Dataset and File entities that indicate files and directories as subjects of data governance.
 DMP:
   "@id":
     expected_type: str
     example: "#dmp:1"
-    description: Required. Must be data No. with prefix "#dmp:". Indicates data No. in DMP list.
+    description: Required. MUST be data No. with the prefix `#dmp:`. Indicates data No. in the DMP list.
   name:
     expected_type: str
     example: calculated data
@@ -63,15 +71,15 @@ DMP:
   accessRights:
     expected_type: Literal["open access", "restricted access", "embargoed access", "metadata only access"]
     example: open access
-    description: Required when all data sets have a common access right, they can be omitted instead of added to RootDataEntity. MUST choose one from the list, open access; restricted access; embargoed access; or metadata-only access. Indicate the availability of the data set.
+    description: Required. MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicate the availability of the data set.
   availabilityStarts:
     expected_type: str
     example: "2023-04-01"
-    description: Required when accessRights has embargoed access. MUST be a string in ISO 8601 date format. Be verified that the value is the future than the time of verification.
+    description: Required when accessRights has `embargoed access`. MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
   isAccessibleForFree:
     expected_type: bool
     example: "True"
-    description: Required when accessRights has open access or restricted access. MUST be a boolean. True means the data set is free to access, while False means consideration. When access rights have open access, MUST be True.
+    description: Required when accessRights has `open access` or `restricted access`. MUST be a boolean. True means the data set is free to access, while False means consideration. When access rights have open access, MUST be True.
   usageInfo:
     expected_type: str
     example: Contact data manager before usage of this data set.
@@ -83,62 +91,20 @@ DMP:
   distribution:
     expected_type: DataDownload
     example: '{ "@id": "https://zenodo.org/record/example" }'
-    description: Required when accessRights has open access. When all open-access data set is available from a single URL, it can be omitted instead of adding to RootDataEntity. Indicates where download url of data set.
+    description: Required when accessRights has `open access`. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, they can be omitted instead of added to RootDataEntity. Indicates where the download URL of the data set.
   contentSize:
     expected_type: Literal["1GB", "10GB", "100GB", "1TB", "1PB"]
     example: 100GB
-    description: Optional. Must choose one from the list, 1GB; 10GB; 100GB; 1TB; 1PB.
+    description: Required. MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in this DMP condition.
   gotInformedConsent:
     expected_type: Literal["yes", "no", "unknown"]
     example: "yes"
-    description: Required. Must choose one from the list, yes; no; unknown. Indicates whether you got informed consent from subjects.
+    description: Required. MUST choose one from `yes`, `no` or `unknown`. Indicates whether you got informed consent from subjects.
   informedConsentFormat:
     expected_type: Literal["AMED", "other"]
     example: AMED
-    description: Required when you got informed consent. Must be either "AMED" or "others". Indicates format of informed consent you used in this research to collect data. Whichever format you used, it must include the agreement for possibility that the data, including personal information, will be provided to third parties for purposes other than academic research.
+    description: Required when you got informed consent. MUST be either `AMED` or `others`. Indicates format of informed consent you used in this research to collect data. Whichever format you used, it must include the agreement for possibility that the data, including personal information, will be provided to third parties for purposes other than academic research.
   identifier:
     expected_type: PropertyValue
     example: '{"@id": "https://jrct.niph.go.jp/latest-detail/jRCT202211111111"}'
-    description: Optional. When you registered to database e.g. jRCT, UMIN-CTR, can be added @id term of PropertyValue entity of them. Indicates identifier of data set.
-Creator:
-  "@id":
-    expected_type: str
-    example: https://orcid.org/0000-0001-2345-6789
-    description: Required. MUST be the URL of a creator and recommended ORCID ID.
-  name:
-    expected_type: str
-    example: Ichiro Suzuki
-    description: Required. Name of a creator. MUST be in the order of first name, and family name.
-  alias:
-    expected_type: str
-    example: S. Ichiro
-    description: Optional. Another writing of the name of a creator.
-  affiliation:
-    expected_type: Affiliation
-    example: '{"@id": "https://ror.org/04ksd4g47"}'
-    description: Required. Affiliation, a creator, belongs to. MUST be a @id term from the DMP entity.
-  email:
-    expected_type: str
-    example: ichiro@example.com
-    description: Required. Email address of a creator.
-  telephone:
-    expected_type: str
-    example: "03-0000-0000"
-    description: Optional. Phone number of the creator.
-  jobTitle:
-    expected_type: str
-    example: Chief reseacher, Data manager
-    description: Required for chief researcher and data manager. The job title of the person.
-PropertyValue:
-  "@id":
-    expected_type: str
-    example: "#jRCT:1234567"
-    description: Required. URL of registrated data. When there is no URL, combine registry name and ID with prefix "#".
-  name:
-    expected_type: str
-    example: Japan Registry of Clinical Trials
-    description: Required. Name of the data registry service.
-  value:
-    expected_type: str
-    example: "1234567"
-    description: Required. ID you got from the registry service.
+    description: Optional. MUST be @id term of PropertyValue entity. When you use registry service (e.g. jRCT, UMIN-CTR), it can be added @id term of PropertyValue entity of them. Indicates identifier of data set.
