@@ -34,7 +34,7 @@ RootDataEntity:
   hasPart:
     expected_type: List[Union[Dataset, File]]
     example: '[{"@id": "config/"}, {"@id": "config/config.txt"}]'
-    description: Required. MUST be an array of Dataset and File entities that indicate files and directories.
+    description: Required. MUST be an array of Dataset and File entities that indicate files and directories as subjects of data governance.
 DMP:
   "@id":
     expected_type: str
@@ -50,7 +50,7 @@ DMP:
     description: Required. Indicates data description in DMP.
   hostingInstitution:
     expected_type: HostingInstituion
-    example: '[{ "@id": "https://ror.org/04ksd4g47" }]'
+    example: '{ "@id": "https://ror.org/04ksd4g47" }'
     description: Required. Indicates hosting institution of the data set.
   wayOfManage:
     expected_type: Literal["commissioned", "self-managed"]
@@ -59,7 +59,7 @@ DMP:
   accessRights:
     expected_type: Literal["open access", "restricted access", "embargoed access", "metadata only access"]
     example: open access
-    description: Required when all data sets have a common access right, they can be omitted instead of added to RootDataEntity. MUST choose one from the list, open access; restricted access; embargoed access; or metadata-only access. Indicate the availability of the data set.
+    description: Required. MUST choose one from the list, open access; restricted access; embargoed access; or metadata-only access. Indicate the availability of the data set.
   reasonForConcealment:
     expected_type: str
     example: To ensure market competitiveness for commercialization
@@ -67,7 +67,7 @@ DMP:
   availabilityStarts:
     expected_type: str
     example: "2023-04-01"
-    description: Required when accessRights has embargoed access. MUST be a string in ISO 8601 date format. Be verified that the value is the future than the time of verification.
+    description: Required when accessRights has embargoed access. MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
   creator:
     expected_type: List[Affiliation]
     example: '[{"@id": "https://ror.org/04ksd4g47"}]'
@@ -95,7 +95,7 @@ DMP:
   contentSize:
     expected_type: Literal["1GB", "10GB", "100GB", "1TB", "1PB"]
     example: 100GB
-    description: Optional. MUST choose one from 1GB, 10GB, 100GB, 1TB and 1PB.
+    description: Required when accessRights has open access, restricted access or embargoed access. MUST choose one from 1GB, 10GB, 100GB, 1TB and 1PB. Indicates maximum of sum total file size included in this DMP condition.
   distribution:
     expected_type: DataDownload
     example: '{"@id": "https://zenodo.org/record/example"}'
