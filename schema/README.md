@@ -33,10 +33,10 @@ DMPとしてAMEDを利用する場合
 - Each entity name MUST be in upper camel case (Pascal case).
 - Each entity MUST have `@id` term. URI is recommended.
 - Each term name MUST be in lower camel case, excluding `@id` term.
-- Each term MUST have three fileds: expected_type, example and description.
-- Field `expect_type` MUST be type of python. In validation, usage of mypy is considered based on this expected_type.
-- In filed `example`, you MUST show an example of the term value for the sake of clarity.
-- In filed `description`, you MUST show that this term is required or not at the beggining. Definition (what the term indicates) and input format is also needed to add.
+- Each term MUST have three fileds: `expected_type`, `example` and `description`.
+- Field `expect_type` MUST be type of python. Usage of mypy is considered for validation based on this `expected_type`.
+- In the filed `example`, you MUST show an example of the term value for the sake of clarity.
+- In the filed `description`, you MUST show that this term is required or not at the beggining. Definition (what the term indicates) and input format is also needed.
 
 ## Memo
 
