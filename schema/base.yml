@@ -30,7 +30,7 @@ RootDataEntity:
   distribution:
     expected_type: DataDownload
     example: '{"@id": "https://zenodo.org/record/example"}'
-    description: Can be added when access rights have "open access" and all open-access data set is available from a single URL. MUST be @id term of DataDownload entity. Indicates where the download URL of the data set.
+    description: Can be added when access rights have `open access` and all open-access data set is available from a single URL. MUST be @id term of DataDownload entity. Indicates where the download URL of the data set.
   hasPart:
     expected_type: List[Union[Dataset, File]]
     example: '[{"@id": "config/"}, {"@id": "config/config.txt"}]'
@@ -39,7 +39,7 @@ File:
   "@id":
     expected_type: str
     example: config/setting.txt
-    description: Required. MUST be either a URI Path relative to the RO Crate root (stated in the identifier term of RootDataEntity) or an absolute URI. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+    description: Required. MUST be either a URI Path relative to the top directory of your repository (stated in the identifier term of RootDataEntity) or an absolute URI. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
   name:
     expected_type: str
     example: setting.txt
@@ -51,7 +51,7 @@ File:
   contentSize:
     expected_type: str
     example: 1560B
-    description: Required. MUST be an integer of the file size with the suffix "B" as a unit, bytes. It will be used in the validation of the size listed in DMP.
+    description: Required. MUST be an integer of the file size with the suffix `B` as a unit, bytes. It will be used in the validation of the size listed in DMP.
   encodingFormat:
     expected_type: str
     example: text/plain
@@ -97,15 +97,15 @@ DMP:
   accessRights:
     expected_type: Literal["open access", "restricted access", "embargoed access", "metadata only access"]
     example: open access
-    description: Required. MUST choose one from the list, open access; restricted access; embargoed access; or metadata-only access. Indicate the availability of the data set.
+    description: Required. MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicate the availability of the data set.
   availabilityStarts:
     expected_type: str
     example: "2023-04-01"
-    description: Required when accessRights has embargoed access. MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
+    description: Required when accessRights has `embargoed access`. MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
   isAccessibleForFree:
     expected_type: bool
     example: "True"
-    description: Required when accessRights has open access or restricted access. MUST be a boolean. True means the data set is free to access, while False means consideration. When access rights have open access, MUST be True.
+    description: Required when accessRights has `open access` or `restricted access`. MUST be a boolean. True means the data set is free to access, while False means consideration. When access rights have open access, MUST be True.
   usageInfo:
     expected_type: str
     example: Contact data manager before usage of this data set.
@@ -117,11 +117,11 @@ DMP:
   distribution:
     expected_type: DataDownload
     example: '{"@id": "https://zenodo.org/record/example"}'
-    description: Required when accessRights has open access. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, they can be omitted instead of added to RootDataEntity. Indicates where the download URL of the data set.
+    description: Required when accessRights has `open access`. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, they can be omitted instead of added to RootDataEntity. Indicates where the download URL of the data set.
   contentSize:
     expected_type: Literal["1GB", "10GB", "100GB", "1TB", "1PB"]
     example: 100GB
-    description: Optional. MUST choose one from 1GB, 10GB, 100GB, 1TB and 1PB. Indicates maximum of sum total file size included in this DMP condition.
+    description: Optional. MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in this DMP condition.
 Organization:
   "@id":
     expected_type: str
@@ -208,7 +208,7 @@ HostingInstitution:
   "@id":
     expected_type: str
     example: https://ror.org/04ksd4g47
-    description: Required. MUST be the URL of the organization and recommended ROR ID.
+    description: Required. MUST be the URL of the organization. ROR ID is recommended.
   name:
     expected_type: str
     example: National Institute of Informatics
@@ -225,7 +225,7 @@ PropertyValue:
   "@id":
     expected_type: str
     example: "#jRCT:1234567"
-    description: Required. URL of registrated data. When there is no URL, combine registry name and ID with prefix "#".
+    description: Required. URL of registrated data. When there is no URL, combine registry name and ID with prefix `#`.
   name:
     expected_type: str
     example: Japan Registry of Clinical Trials
@@ -233,17 +233,17 @@ PropertyValue:
   value:
     expected_type: str
     example: "1234567"
-    description: Required. ID you got from the registry service.
+    description: Required. Indicates ID you got from the registry service.
 Erad:
   # based on ProperyValue entity
   "@id":
     expected_type: str
     example: "#e-Rad:1234567"
-    description: Required. It must be ID with prefix "#e-Rad:".
+    description: Required. It must be ID with prefix `#e-Rad:`.
   name:
     expected_type: Literal["e-Rad project ID", "e-Rad researcher number"]
     example: e-Rad project ID
-    description: Required. Indicates a category of ID, project ID or researcher number.
+    description: Required. MUST choose either `e-Rad project ID` or `e-Rad researcher number`. Indicates a category of ID, here project ID or researcher number.
   value:
     expected_type: str
     example: "1234567"
@@ -252,7 +252,7 @@ ContactPoint:
   "@id":
     expected_type: str
     example: "#mailto:contact@example.com"
-    description: Required. MUST be email with the prefix "#mailto:" or be phone number with the prefix "#callto:".
+    description: Required. MUST be email with the prefix `#mailto:` or be phone number with the prefix `#callto:`.
   name:
     expected_type: str
     example: Sample Inc., Open-Science department, data management unit
@@ -264,4 +264,4 @@ ContactPoint:
   telephone:
     expected_type: str
     example: "03-0000-0000"
-    description: Required either email (described in the previous section)or telephone. Phone number as contact information.
+    description: Required either email (described in the previous section) or telephone. Phone number as contact information.

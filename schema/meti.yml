@@ -22,15 +22,15 @@ DMP:
   accessRights:
     expected_type: Literal["open access", "restricted access", "embargoed access", "metadata only access"]
     example: open access
-    description: Required. MUST choose one from the list, open access; restricted access; embargoed access; or metadata-only access. Indicate the availability of the data set.
+    description: Required. MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicate the availability of the data set.
   reasonForConcealment:
     expected_type: str
     example: To ensure market competitiveness for commercialization
-    description: Required when accessRights has restricted access, embargoed access and metadata only access. Indicates why access to the data set is ristricted and embargoed.
+    description: Required when accessRights has `restricted access`, `embargoed access` or `metadata only access`. Indicates why access to the data set is ristricted and embargoed.
   availabilityStarts:
     expected_type: str
     example: "2023-04-01"
-    description: Required when accessRights has embargoed access. MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
+    description: Required when accessRights has `embargoed access`. MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
   creator:
     expected_type: List[Affiliation]
     example: '[{"@id": "https://ror.org/04ksd4g47"}]'
@@ -38,15 +38,15 @@ DMP:
   measurementTechnique:
     expected_type: str
     example: Obtained using simulation software.
-    description: Optional. An explanation of the technique for getting data.
+    description: Optional. An explanation of the technique for collecting data.
   isAccessibleForFree:
     expected_type: bool
     example: "True"
-    description: Required when accessRights has open access or restricted access. MUST be a boolean. True means the data set is free to access, while False means consideration. When accessRights have open access, MUST be True.
+    description: Required when accessRights has `open access` or `restricted access`. MUST be a boolean. True means the data set is free to access, while False means consideration. When access rights have open access, MUST be True.
   license:
     expected_type: License
     example: '{"@id": "https://www.apache.org/licenses/LICENSE-2.0"}'
-    description: Required when accessRights has open access. MUST be a @id term of License entity. Indicates the license applied for the data.
+    description: Required when accessRights has `open access`. MUST be a @id term of License entity. Indicates the license applied for the data.
   usageInfo:
     expected_type: str
     example: Contact data manager before usage of this data set.
@@ -58,12 +58,12 @@ DMP:
   contentSize:
     expected_type: Literal["1GB", "10GB", "100GB", "1TB", "1PB"]
     example: 100GB
-    description: Required when accessRights has open access, restricted access or embargoed access. MUST choose one from 1GB, 10GB, 100GB, 1TB and 1PB. Indicates maximum of sum total file size included in this DMP condition.
+    description: Optional. MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in this DMP condition.
   distribution:
     expected_type: DataDownload
     example: '{"@id": "https://zenodo.org/record/example"}'
-    description: Required when accessRights has open access. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, they can be omitted instead of added to RootDataEntity. Indicates where the download URL of the data set.
+    description: Required when accessRights has `open access`. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, they can be omitted instead of added to RootDataEntity. Indicates where the download URL of the data set.
   contactPoint:
     expected_type: ContactPoint
     example: '{ "@id": "#mailto:contact@example.com" }'
-    description: Required when accessRights has open access or restricted access. MUST be @id term of ContactPoint entity. Indicates contact information.
+    description: Required when accessRights has `open access` or `restricted access`. MUST be @id term of ContactPoint entity. Indicates contact information.
