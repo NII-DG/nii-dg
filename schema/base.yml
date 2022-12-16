@@ -1,5 +1,5 @@
 RootDataEntity:
-  "@id":
+  '@id':
     expected_type: str
     example: ./
     description: Required. MUST be `./`.
@@ -17,7 +17,7 @@ RootDataEntity:
     description: Required. Funding agencies of the research project. MUST be an array of @id term of Organization entity.
   dateCreated:
     expected_type: str
-    example: "2022-12-09T10:48:07.976+00:00"
+    example: '2022-12-09T10:48:07.976+00:00'
     description: Required. MUST be a string in ISO 8601 date format and a timestamp down to milliseconds. The time zone is UTC. Indicates timestamp the RO-Crate itself was created.
   creator:
     expected_type: List[Person]
@@ -36,7 +36,7 @@ RootDataEntity:
     example: '[{"@id": "config/"}, {"@id": "config/config.txt"}]'
     description: Required. MUST be an array of Dataset and File entities that indicate files and directories as subjects of data governance.
 File:
-  "@id":
+  '@id':
     expected_type: str
     example: config/setting.txt
     description: Required. MUST be either a URI Path relative to the top directory of your repository (stated in the identifier term of RootDataEntity) or an absolute URI. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
@@ -66,10 +66,10 @@ File:
     description: Optional. MUST be a direct URL to the file.
   sdDatePublished:
     expected_type: str
-    example: "2022-12-01"
+    example: '2022-12-01'
     description: Required when the file is from outside the RO-Crate Root. Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
 Dataset:
-  "@id":
+  '@id':
     expected_type: str
     example: config/
     description: Required. MUST be either a URI Path relative to the RO-Crate root (stated in the identifier term of RootDataEntity) or an absolute URI. MUST end with `/`. Indicates the path to the directory.
@@ -82,9 +82,9 @@ Dataset:
     example: https://github.com/username/repository/directory
     description: Optional. MUST be a direct URL to the directory.
 DMP:
-  "@id":
+  '@id':
     expected_type: str
-    example: "#dmp:1"
+    example: '#dmp:1'
     description: Required. MUST be data No. with the prefix `#dmp:`. Indicates data No. in the DMP list.
   name:
     expected_type: str
@@ -100,11 +100,11 @@ DMP:
     description: Required. MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicate the availability of the data set.
   availabilityStarts:
     expected_type: str
-    example: "2023-04-01"
+    example: '2023-04-01'
     description: Required when accessRights has `embargoed access`. MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
   isAccessibleForFree:
     expected_type: bool
-    example: "True"
+    example: 'True'
     description: Required when accessRights has `open access` or `restricted access`. MUST be a boolean. True means the data set is free to access, while False means consideration. When access rights have open access, MUST be True.
   usageInfo:
     expected_type: str
@@ -119,11 +119,11 @@ DMP:
     example: '{"@id": "https://zenodo.org/record/example"}'
     description: Required when accessRights has `open access`. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, they can be omitted instead of added to RootDataEntity. Indicates where the download URL of the data set.
   contentSize:
-    expected_type: Literal["1GB", "10GB", "100GB", "1TB", "1PB"]
+    expected_type: Literal["1GB", "10GB", "100GB", "over100GB"]
     example: 100GB
-    description: Optional. MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in this DMP condition.
+    description: Optional. MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition.
 Organization:
-  "@id":
+  '@id':
     expected_type: str
     example: https://ror.org/04ksd4g47
     description: Required. MUST be the URL of the organization. ROR ID is recommended.
@@ -136,7 +136,7 @@ Organization:
     example: Japan's only general academic research institution seeking to create future value in the new discipline of informatics.
     description: Optional. Description of the organization.
 Person:
-  "@id":
+  '@id':
     expected_type: str
     example: https://orcid.org/0000-0001-2345-6789
     description: Required. MUST be URL of the person. ORCID ID is recommended.
@@ -158,12 +158,12 @@ Person:
     description: Required. Email address of the person.
   telephone:
     expected_type: str
-    example: "03-0000-0000"
+    example: '03-0000-0000'
     description: Optional. Phone number of the person.
 License:
-  "@id":
+  '@id':
     expected_type: str
-    example: "https://www.apache.org/licenses/LICENSE-2.0"
+    example: 'https://www.apache.org/licenses/LICENSE-2.0'
     description: Required. MUST be URL of the license.
   name:
     expected_type: str
@@ -174,9 +174,9 @@ License:
     example: the licensed defined by Apache Software Foundation
     description: Optional. Description of the license.
 RepositoryObject:
-  "@id":
+  '@id':
     expected_type: str
-    example: "https://doi.org/xxxxxxxx"
+    example: 'https://doi.org/xxxxxxxx'
     description: Required. MUST be URL of the repository. DOI link is recommended.
   name:
     expected_type: str
@@ -187,7 +187,7 @@ RepositoryObject:
     example: Repository managed by NII.
     description: Optional. Indicates a description of the repository.
 DataDownload:
-  "@id":
+  '@id':
     expected_type: str
     example: https://zenodo.org/record/example
     description: Required. MUST be a reachable URL.
@@ -201,11 +201,11 @@ DataDownload:
     description: Optional. MUST be the SHA-2 SHA256 hash of the download file.
   uploadDate:
     expected_type: str
-    example: "2022-12-01"
+    example: '2022-12-01'
     description: Optional. MUST be a string in ISO 8601 date format. Indicates the date when this data set was uploaded to this site.
 HostingInstitution:
   # based on Organization entity
-  "@id":
+  '@id':
     expected_type: str
     example: https://ror.org/04ksd4g47
     description: Required. MUST be the URL of the organization. ROR ID is recommended.
@@ -219,12 +219,12 @@ HostingInstitution:
     description: Optional. Description of the organization.
   address:
     expected_type: str
-    example: "2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430"
+    example: '2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430'
     description: Required. Physical address of the organization.
 PropertyValue:
-  "@id":
+  '@id':
     expected_type: str
-    example: "#jRCT:1234567"
+    example: '#jRCT:1234567'
     description: Required. URL of registrated data. When there is no URL, combine registry name and ID with prefix `#`.
   name:
     expected_type: str
@@ -232,13 +232,13 @@ PropertyValue:
     description: Required. Name of the data registry service.
   value:
     expected_type: str
-    example: "1234567"
+    example: '1234567'
     description: Required. Indicates ID you got from the registry service.
 Erad:
   # based on ProperyValue entity
-  "@id":
+  '@id':
     expected_type: str
-    example: "#e-Rad:1234567"
+    example: '#e-Rad:1234567'
     description: Required. It must be ID with prefix `#e-Rad:`.
   name:
     expected_type: Literal["e-Rad project ID", "e-Rad researcher number"]
@@ -246,12 +246,12 @@ Erad:
     description: Required. MUST choose either `e-Rad project ID` or `e-Rad researcher number`. Indicates a category of ID, here project ID or researcher number.
   value:
     expected_type: str
-    example: "1234567"
+    example: '1234567'
     description: Required. ID or e-Rad.
 ContactPoint:
-  "@id":
+  '@id':
     expected_type: str
-    example: "#mailto:contact@example.com"
+    example: '#mailto:contact@example.com'
     description: Required. MUST be email with the prefix `#mailto:` or be phone number with the prefix `#callto:`.
   name:
     expected_type: str
@@ -263,5 +263,5 @@ ContactPoint:
     description: Required either email or telephone (described in the next section). Email address as contact information.
   telephone:
     expected_type: str
-    example: "03-0000-0000"
+    example: '03-0000-0000'
     description: Required either email (described in the previous section) or telephone. Phone number as contact information.

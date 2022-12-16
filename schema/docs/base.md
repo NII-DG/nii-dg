@@ -50,7 +50,7 @@ See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg
 | `usageInfo` | `str` | Optional. An explanation for citation. | `Contact data manager before usage of this data set.` |
 | `repository` | `RepositoryObject` | Required. MUST be @id term of the RepositoryObject entity. When all data set is managed in a single repository, it can be omitted instead of adding to RootDataEntity. Indicates repository where the data is managed. | `{ "@id": "https://doi.org/xxxxxxxx" }` |
 | `distribution` | `DataDownload` | Required when accessRights has `open access`. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, they can be omitted instead of added to RootDataEntity. Indicates where the download URL of the data set. | `{"@id": "https://zenodo.org/record/example"}` |
-| `contentSize` | `Literal["1GB", "10GB", "100GB", "1TB", "1PB"]` | Optional. MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in this DMP condition. | `100GB` |
+| `contentSize` | `Literal["1GB", "10GB", "100GB", "over100GB"]` | Optional. MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition. | `100GB` |
 
 ## Organization
 
