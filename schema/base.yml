@@ -119,9 +119,9 @@ DMP:
     example: '{"@id": "https://zenodo.org/record/example"}'
     description: Required when accessRights has `open access`. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, they can be omitted instead of added to RootDataEntity. Indicates where the download URL of the data set.
   contentSize:
-    expected_type: Literal["1GB", "10GB", "100GB", "1TB", "1PB"]
+    expected_type: Literal["1GB", "10GB", "100GB", "over100GB"]
     example: 100GB
-    description: Optional. MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in this DMP condition.
+    description: Optional. MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition.
 Organization:
   "@id":
     expected_type: str
