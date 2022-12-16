@@ -1,4 +1,4 @@
-# NII-DG: Schema: cabinet_office
+# NII-DG: Schema: cao
 
 See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg/blob/main/schema/README.md) for more information.
 

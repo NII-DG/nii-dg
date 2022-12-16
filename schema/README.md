@@ -1,10 +1,27 @@
 # NII-DG: Schema
 
+## for referring documents
+- mdの見方
+```
+1. 自分が利用したいルールの.mdを探す
+2. 該当.md内にあるエンティティはその.md内定義を参照する
+3. RootDataEntityを含む追加したいエンティティが該当.mdにない場合、base.mdを参照する
+4. base.mdに追加したいエンティティがない場合、新たにエンティティ定義を追加しそれを参照する
+```
+
+## for adding schema
+- 新しいエンティティ定義を追加したい人向け
+```
+1. yamlを書く
+2. validateして.mdを生成。 schema/script/generate_docs.py を利用
+3. 対応する.pyをnii_dg/schema配下に作成。この時base.pyを継承するかしないかは特に指定しない。
+```
+
 ## Memo
 
 1. オレオレ yaml で base.yml と amed.yml を書く
 
-https://github.com/ascade/nii-dg/schame/common.yml
+https://github.com/ascade/nii-dg/schema/base.yml
 
 ```yaml
   "File":
@@ -97,24 +114,24 @@ https://github.com/ascade/nii-dg/schema/context/common/file.json
 - scripts
   - generate_docs.py
   - generate_rocrate_context.py
-  - validate_and format_yml.py
-- amed.yml
+  - validate_and_format_yml.py
 - base.yml
+- amed.yml
+- cao.yml
 - meti.yml
-- cabinet_office.yml
 - docs
-  - amed.md
   - base.md
+  - amed.md
+  - cao.md
   - meti.md
-  - cabinet_office.md
 - context <- json-ld から呼ばれるためだけ (人間は触らない)
   - base
     - file.json
     - dataset.json
-    - rootdatasetentity.json
+    - rootdataentity.json
     - ...
   - amed
-    - file.json
+    - rootdataentity.json
 
 ## Memo
 
@@ -188,6 +205,11 @@ base からの拡張の usecase
 - 経済産業省
   - 以下`METI`とする
   - 参考:[Web Page](https://www.meti.go.jp/policy/innovation_policy/datamanagement.html)
+
+## memo 12/16
+- ディレクトリトラバースするのか?
+    - しない
+
 
 ## vocabulary
 
