@@ -19,3 +19,40 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+"""
+{
+  '@context': 'https://w3id.org/ro/crate/1.1/context',
+    '@graph': [{
+      '@context': 'https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/RootDataEntity.json',
+      '@id': './',
+      '@type': 'Dataset',
+      'hasPart': [{ '@id': './data/file_1.txt' },
+      { '@id': './data/file_2.txt' },
+      { '@id': './data' }]
+    },
+    {
+      '@id': 'ro-crate-metadata.json',
+      '@type': 'CreativeWork',
+      'about': { '@id': './' },
+      'conformsTo': { '@id': 'https://w3id.org/ro/crate/1.1' }
+    },
+    {
+      '@context': 'https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/File.json',
+      '@id': './data/file_1.txt',
+      '@type': 'File'
+    },
+    {
+      '@context': 'https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/File.json',
+      '@id': './data/file_2.txt',
+      '@type': 'File'
+    },
+    {
+      '@context': 'https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/Dataset.json',
+      '@id': './data',
+      '@type': 'Dataset',
+      'hasPart': [{ '@id': './data/file_1.txt' },
+      { '@id': './data/file_2.txt' }]
+    }]
+}
+"""

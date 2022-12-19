@@ -7,7 +7,7 @@ Definition of RO-Crate class.
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
                            ROCrateMetadata)
@@ -38,7 +38,7 @@ class ROCrate():
 
     BASE_CONTEXT: str = "https://w3id.org/ro/crate/1.1/context"
 
-    def __init__(self) -> None:
+    def __init__(self, from_jsonld: Optional[Dict[str, Any]] = None) -> None:
         self.root = RootDataEntity()
         self.root["hasPart"] = self.data_entities
         self.add(self.root, ROCrateMetadata(root=self.root))

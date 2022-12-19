@@ -107,6 +107,7 @@ class Entity(TypedMutableMapping):
         """\
         Called at RO-Crate dump time.
         Check if all required props are set and if prop types are correct.
+        Implementation of this method is required in each subclass.
         """
         # Abstract method
         raise NotImplementedError
@@ -115,6 +116,7 @@ class Entity(TypedMutableMapping):
         """\
         Called at Data Governance validation time.
         Comprehensive validation including the value of props.
+        Implementation of this method is required in each subclass.
         """
         # Abstract method
         raise NotImplementedError
