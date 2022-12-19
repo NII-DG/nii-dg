@@ -55,7 +55,7 @@ DMP:
   '@id':
     expected_type: str
     example: '#dmp:1'
-    description: Required. MUST be data No. with the prefix `#dmp:`. Indicates data No. in the DMP list.
+    description: Required. MUST be data No. with the prefix `#dmp:`. Indicates data number in the DMP list.
   name:
     expected_type: str
     example: calculated data
@@ -71,7 +71,7 @@ DMP:
   accessRights:
     expected_type: Literal["open access", "restricted access", "embargoed access", "metadata only access"]
     example: open access
-    description: Required. MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicate the availability of the data set.
+    description: Required. MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicates the availability of the data set.
   availabilityStarts:
     expected_type: str
     example: '2023-04-01'
@@ -79,7 +79,7 @@ DMP:
   isAccessibleForFree:
     expected_type: bool
     example: 'True'
-    description: Required when accessRights has `open access` or `restricted access`. MUST be a boolean. True means the data set is free to access, while False means consideration. When access rights have open access, MUST be True.
+    description: Required when accessRights has `open access` or `restricted access`. MUST be a boolean. `True` means the data set is free to access, while `False` means consideration. When accessRights has `open access`, MUST be `True`.
   usageInfo:
     expected_type: str
     example: Contact data manager before usage of this data set.
@@ -91,7 +91,7 @@ DMP:
   distribution:
     expected_type: DataDownload
     example: '{ "@id": "https://zenodo.org/record/example" }'
-    description: Required when accessRights has `open access`. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, they can be omitted instead of added to RootDataEntity. Indicates where the download URL of the data set.
+    description: Required when accessRights has `open access`. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, it can be omitted instead of adding to RootDataEntity. Indicates where the download URL of the data set.
   contentSize:
     expected_type: Literal["1GB", "10GB", "100GB", "over100GB"]
     example: 100GB
