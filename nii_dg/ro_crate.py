@@ -5,9 +5,11 @@
 Definition of RO-Crate class.
 """
 
-from typing import List
+from typing import Any, Dict, List
 
-from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, Entity
+from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
+                           ROCrateMetadata)
+from nii_dg.schema import RootDataEntity
 
 
 class ROCrate():
@@ -30,10 +32,14 @@ class ROCrate():
     data_entities: List[DataEntity] = []
     contextual_entities: List[ContextualEntity] = []
 
+    root: RootDataEntity
+
     BASE_CONTEXT: str = "https://w3id.org/ro/crate/1.1/context"
 
     def __init__(self) -> None:
-        self.add(ROCrateMetadata())
+        self.root = RootDataEntity()
+        self.root["hasPart"] = self.data_entities
+        self.add(self.root, ROCrateMetadata(root=self.root))
 
     def add(self, *entities: Entity) -> None:
         for entity in entities:
@@ -46,20 +52,11 @@ class ROCrate():
             else:
                 raise TypeError("Invalid entity type")  # TODO: define exception
 
+    def as_jsonld(self) -> Dict[str, Any]:
+        return {
+            "@context": self.BASE_CONTEXT,
+            "@graph": [e.as_jsonld() for e in self.default_entities + self.data_entities + self.contextual_entities]  # type: ignore
+        }
 
-class ROCrateMetadata(DefaultEntity):
-    """\
-    RO-Crate must contain a RO-Crate metadata file descriptor with the `@id` of `ro-crate-metadata.json`.
-
-    See https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#ro-crate-metadata-file-descriptor.
-    """
-
-    ID = "ro-crate-metadata.json"
-    TYPE = "CreativeWork"
-    CONFORMS_TO = "https://w3id.org/ro/crate/1.1"
-
-    def __init__(self) -> None:
-        super().__init__(id=self.ID)
-        self["@type"] = self.TYPE
-        self["conformsTo"] = {"@id": self.CONFORMS_TO}
-        self["about"] = {"@id": "./"}
+    def dump(self, path: str) -> None:
+        pass
