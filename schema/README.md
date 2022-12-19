@@ -30,13 +30,25 @@ DMPとしてAMEDを利用する場合
 ```
 
 ### schema of .yml
-- Each entity name MUST be in upper camel case (Pascal case).
-- Each entity MUST have `@id` term. URI is recommended.
-- Each term name MUST be in lower camel case, excluding `@id` term.
-- Each term MUST have three fileds: `expected_type`, `example` and `description`.
-- Field `expect_type` MUST be type of python. Usage of mypy is considered for validation based on this `expected_type`.
+```yaml
+- EntityName1
+    - "@id"
+        - expected_type
+        - example
+        - description
+    - termName
+        - expected_type
+        - example
+        - description
+```
+
+- Each entity MUST be named using upper camel case (Pascal case). The name is also used for `@type` value.
+- Each entity MUST have `@id` term. URI is recommended for `@id` value.
+- Each term MUST be named using lower camel case, excluding `@id` term.
+- Each term MUST have three fileds to describe: `expected_type`, `example` and `description`.
+- Field `expect_type` MUST be chosen from types in python. Usage of mypy is considered for validation based on this `expected_type`.
 - In the filed `example`, you MUST show an example of the term value for the sake of clarity.
-- In the filed `description`, you MUST show that this term is required or not at the beggining. Definition (what the term indicates) and input format is also needed.
+- In the filed `description`, you MUST show that this term is required or not. Definition (what the term indicates) and input format is also needed.
 
 ## Memo
 
