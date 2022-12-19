@@ -105,14 +105,6 @@ See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg
 | `description` | `str` | Optional. Description of the organization. | `Japan's only general academic research institution seeking to create future value in the new discipline of informatics.` |
 | `address` | `str` | Required. Physical address of the organization. | `2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430` |
 
-## PropertyValue
-
-| Property | Type | Description | Example |
-| --- | --- | --- | --- |
-| `@id` | `str` | Required. URL of registrated data. When there is no URL, combine registry name and ID with prefix `#`. | `#jRCT:1234567` |
-| `name` | `str` | Required. Name of the data registry service. | `Japan Registry of Clinical Trials` |
-| `value` | `str` | Required. Indicates ID you got from the registry service. | `1234567` |
-
 ## ContactPoint
 
 | Property | Type | Description | Example |

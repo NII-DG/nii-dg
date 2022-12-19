@@ -221,19 +221,6 @@ HostingInstitution:
     expected_type: str
     example: '2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430'
     description: Required. Physical address of the organization.
-PropertyValue:
-  '@id':
-    expected_type: str
-    example: '#jRCT:1234567'
-    description: Required. URL of registrated data. When there is no URL, combine registry name and ID with prefix `#`.
-  name:
-    expected_type: str
-    example: Japan Registry of Clinical Trials
-    description: Required. Name of the data registry service.
-  value:
-    expected_type: str
-    example: '1234567'
-    description: Required. Indicates ID you got from the registry service.
 ContactPoint:
   '@id':
     expected_type: str
