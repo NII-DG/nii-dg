@@ -30,16 +30,18 @@ DMPとしてAMEDを利用する場合
 ```
 
 ### schema of .yml
+- Place the created YAML file under directory `schema/`.
+
 ```yaml
-- EntityName1
-    - "@id"
-        - expected_type
-        - example
-        - description
-    - termName
-        - expected_type
-        - example
-        - description
+EntityName1:
+    '@id':
+        expected_type: type_in_python
+        example: exampleValue
+        description: description of this term
+    termName:
+        expected_type: type_in_python
+        example: exampleValue
+        description: description of this term
 ```
 
 - Each entity MUST be named using upper camel case (Pascal case). The name is also used for `@type` value.
