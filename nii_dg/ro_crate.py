@@ -5,6 +5,8 @@
 Definition of RO-Crate class.
 """
 
+import json
+from pathlib import Path
 from typing import Any, Dict, List
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
@@ -59,4 +61,8 @@ class ROCrate():
         }
 
     def dump(self, path: str) -> None:
-        pass
+        """\
+        Dump the RO-Crate to the specified path.
+        """
+        with Path(path).resolve().open("w") as f:
+            json.dump(self.as_jsonld(), f, width=1000, indent=2,)

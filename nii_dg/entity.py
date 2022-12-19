@@ -125,22 +125,18 @@ class DefaultEntity(Entity):
     A entity that is always included in the RO-Crate. For example, ROCrateMetadata, RootDataEntity, etc.
     """
 
-    pass
-
 
 class DataEntity(Entity):
     """\
     A entity that represents a file or directory. For example, File, Dataset, etc.
     This entity is always included in RootDataset entity.
     """
-    pass
 
 
 class ContextualEntity(Entity):
     """\
     A entity that represents a metadata. For example, Person, License, etc.
     """
-    pass
 
 
 class ROCrateMetadata(DefaultEntity):
