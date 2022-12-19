@@ -35,10 +35,10 @@ RootDataEntity:
     expected_type: str
     example: Informatics
     description: Required. Indicates research filed of the project.
-  identifier:
-    expected_type: Erad
-    example: '{ "@id": "#e-Rad:123456" }'
-    description: Required when your project has e-Rad project ID. MUST be @id term of PropertyValue entities. Indicates e-Rad project ID.
+  eradProjectId:
+    expected_type: str
+    example: '123456'
+    description: Required when your project has e-Rad project ID. Indicates e-Rad project ID.
   hasPart:
     expected_type: List[Union[Dataset, File]]
     example: '[{"@id": "config/"}, {"@id": "config/config.txt"}]'
@@ -125,7 +125,7 @@ Person:
     expected_type: str
     example: '03-0000-0000'
     description: Optional. Phone number of the person.
-  identifier:
-    expected_type: Erad
-    example: '{ "@id": "#e-Rad:001234567" }'
-    description: Required when the person has e-Rad researcher number. MUST be @id term of Erad entities. Indicates e-Rad researcher number.
+  eradResearcherNumber:
+    expected_type: str
+    example: '001234567'
+    description: Required when the person has e-Rad researcher number. Indicates e-Rad researcher number.

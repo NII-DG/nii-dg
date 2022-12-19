@@ -113,14 +113,6 @@ See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg
 | `name` | `str` | Required. Name of the data registry service. | `Japan Registry of Clinical Trials` |
 | `value` | `str` | Required. Indicates ID you got from the registry service. | `1234567` |
 
-## Erad
-
-| Property | Type | Description | Example |
-| --- | --- | --- | --- |
-| `@id` | `str` | Required. It must be ID with prefix `#e-Rad:`. | `#e-Rad:1234567` |
-| `name` | `Literal["e-Rad project ID", "e-Rad researcher number"]` | Required. MUST choose either `e-Rad project ID` or `e-Rad researcher number`. Indicates a category of ID, here project ID or researcher number. | `e-Rad project ID` |
-| `value` | `str` | Required. ID or e-Rad. | `1234567` |
-
 ## ContactPoint
 
 | Property | Type | Description | Example |

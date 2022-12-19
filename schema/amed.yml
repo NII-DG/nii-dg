@@ -105,6 +105,6 @@ DMP:
     example: AMED
     description: Required when you got informed consent. MUST be either `AMED` or `others`. Indicates format of informed consent you used in this research to collect data. Whichever format you used, it must include the agreement for possibility that the data, including personal information, will be provided to third parties for purposes other than academic research.
   identifier:
-    expected_type: PropertyValue
-    example: '{"@id": "https://jrct.niph.go.jp/latest-detail/jRCT202211111111"}'
-    description: Optional. MUST be @id term of PropertyValue entity. When you use registry service (e.g. jRCT, UMIN-CTR), it can be added @id term of PropertyValue entity of them. Indicates identifier of data set.
+    expected_type: List[PropertyValue]
+    example: '[{"@id": "https://jrct.niph.go.jp/latest-detail/jRCT202211111111"}]'
+    description: Optional. MUST be array of @id term of PropertyValue entity. When you use registry service (e.g. jRCT, UMIN-CTR), it can be added @id term of PropertyValue entity of them. Indicates identifier of data set.

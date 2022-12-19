@@ -234,20 +234,6 @@ PropertyValue:
     expected_type: str
     example: '1234567'
     description: Required. Indicates ID you got from the registry service.
-Erad:
-  # based on ProperyValue entity
-  '@id':
-    expected_type: str
-    example: '#e-Rad:1234567'
-    description: Required. It must be ID with prefix `#e-Rad:`.
-  name:
-    expected_type: Literal["e-Rad project ID", "e-Rad researcher number"]
-    example: e-Rad project ID
-    description: Required. MUST choose either `e-Rad project ID` or `e-Rad researcher number`. Indicates a category of ID, here project ID or researcher number.
-  value:
-    expected_type: str
-    example: '1234567'
-    description: Required. ID or e-Rad.
 ContactPoint:
   '@id':
     expected_type: str
