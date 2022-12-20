@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import datetime
+import re
+import urllib.parse
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -32,6 +35,24 @@ def check_required_key(ent: Entity, key: str) -> None:
             key=key,
             entity=ent.__class__.__name__
         )) from None
+
+
+def is_url_or_path(value: str) -> Optional[str]:
+    encoded_value = urllib.parse.quote(value, safe="!#$&'()*+,/:;=?@[]\\")
+
+    urlpattern = r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
+    urlmatch = re.compile(urlpattern)
+
+    if urlmatch.match(encoded_value):
+        return "url"
+
+    pathpattern = r"[\w/:%\.\\]+"
+    pathmatch = re.compile(pathpattern)
+
+    if pathmatch.match(encoded_value):
+        return "path"
+
+    raise ValueError
 
 
 class RootDataEntity(DefaultEntity):
@@ -117,16 +138,44 @@ class File(DataEntity):
     def check_props(self) -> None:
         '''
         Check properties based on the schema of File.
-        - @id: Required. MUST be path to the file.
+        - @id: Required. MUST be path to the file or URL.
         - name: Required. MUST be string.
         - contentSize: Required. MUST be an integer of the file size with the suffix `B` as a unit, bytes.
         - encodingFormat: Optional. MUST be MIME type.
         - sha256: Optional. MUST be the SHA-2 SHA256 hash of the file.
         - url: Optional. Must be URL.
-        - sdDatePublished: Optional. MUST be a string in ISO 8601 date format.
+        - sdDatePublished: Required when the file is from outside the RO-Crate Root. MUST be a string in ISO 8601 date format.
         '''
-        # TODO: impl.
-        pass
+        required_keys: Dict[str, Union[type, List[type]]] = {
+            "@id": str,
+            "name": str,
+            "contentSize": str,
+        }
+        optional_keys: Dict[str, Union[type, List[type]]] = {
+            "encodingFormat": str,
+            "sha256": str,
+            "url": str
+        }
+
+        try:
+            idtype = is_url_or_path(self["@id"])
+        except ValueError:
+            raise TypeError("Value of '@id' MUST be URL of file path.") from None
+        if idtype == "url":
+            required_keys["sdDatePublished"] = str
+        elif idtype == "path":
+            if self["@id"].endswith('/'):
+                raise ValueError("Value of '@id' in File entity MUST not end with '/'.")
+            optional_keys["sdDatePublished"] = str
+
+        for k in required_keys:
+            check_required_key(self, k)
+
+        for k, v in {**required_keys, **optional_keys}.items():
+            try:
+                check_type(self, k, v)
+            except KeyError:
+                pass
 
     def validate(self) -> None:
         # TODO: impl.
