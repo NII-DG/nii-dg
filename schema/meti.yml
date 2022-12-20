@@ -1,69 +1,106 @@
 DMP:
-  '@id':
-    expected_type: str
-    example: '#dmp:1'
-    description: Required. MUST be data No. with the prefix `#dmp:`. Indicates data No. in the DMP list.
-  name:
-    expected_type: str
-    example: calculated data
-    description: Required. Indicates data title in DMP.
-  description:
-    expected_type: str
-    example: Result data calculated by Newton's method
-    description: Required. Indicates data description in DMP.
-  hostingInstitution:
-    expected_type: HostingInstituion
-    example: '{ "@id": "https://ror.org/04ksd4g47" }'
-    description: Required. Indicates hosting institution of the data set.
-  wayOfManage:
-    expected_type: Literal["commissioned", "self-managed"]
-    example: commissioned
-    description: Required. Indicated how the data set is managed.
-  accessRights:
-    expected_type: Literal["open access", "restricted access", "embargoed access", "metadata only access"]
-    example: open access
-    description: Required. MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicate the availability of the data set.
-  reasonForConcealment:
-    expected_type: str
-    example: To ensure market competitiveness for commercialization
-    description: Required when accessRights has `restricted access`, `embargoed access` or `metadata only access`. Indicates why access to the data set is ristricted and embargoed.
-  availabilityStarts:
-    expected_type: str
-    example: '2023-04-01'
-    description: Required when accessRights has `embargoed access`. MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
-  creator:
-    expected_type: List[Affiliation]
-    example: '[{"@id": "https://ror.org/04ksd4g47"}]'
-    description: Required. MUST be an array of Affiliation entities. Indicates the organization which created the data set.
-  measurementTechnique:
-    expected_type: str
-    example: Obtained using simulation software.
-    description: Optional. An explanation of the technique for collecting data.
-  isAccessibleForFree:
-    expected_type: bool
-    example: 'True'
-    description: Required when accessRights has `open access` or `restricted access`. MUST be a boolean. True means the data set is free to access, while False means consideration. When access rights have open access, MUST be True.
-  license:
-    expected_type: License
-    example: '{"@id": "https://www.apache.org/licenses/LICENSE-2.0"}'
-    description: Required when accessRights has `open access`. MUST be a @id term of License entity. Indicates the license applied for the data.
-  usageInfo:
-    expected_type: str
-    example: Contact data manager before usage of this data set.
-    description: Optional. An explanation for citation.
-  repository:
-    expected_type: RepositoryObject
-    example: '{ "@id": "https://doi.org/xxxxxxxx" }'
-    description: Required. MUST be @id term of the RepositoryObject entity. When all data set is managed in a single repository, it can be omitted instead of adding to RootDataEntity. Indicates repository where the data is managed.
-  contentSize:
-    expected_type: Literal["1GB", "10GB", "100GB", "over100GB"]
-    example: 100GB
-    description: Optional. MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition.
-  distribution:
-    expected_type: DataDownload
-    example: '{"@id": "https://zenodo.org/record/example"}'
-    description: Required when accessRights has `open access`. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, they can be omitted instead of added to RootDataEntity. Indicates where the download URL of the data set.
-  contactPoint:
-    expected_type: ContactPoint
-    example: '{ "@id": "#mailto:contact@example.com" }'
-    description: Required when accessRights has `open access` or `restricted access`. MUST be @id term of ContactPoint entity. Indicates contact information.
+  description: Contents from data management plan that is (will be) submitted to the funding agency.
+  props:
+    '@id':
+      expected_type: str
+      example: '#dmp:1'
+      description: Required. MUST be data No. with the prefix `#dmp:`. Indicates data number in the DMP list.
+    name:
+      expected_type: str
+      example: calculated data
+      description: Required. Indicates data title in DMP.
+    description:
+      expected_type: str
+      example: Result data calculated by Newton's method
+      description: Required. Indicates data description in DMP.
+    hostingInstitution:
+      expected_type: HostingInstituion
+      example: '{ "@id": "https://ror.org/04ksd4g47" }'
+      description: Required. Indicates hosting institution of the data set.
+    wayOfManage:
+      expected_type: Literal["commissioned", "self-managed"]
+      example: commissioned
+      description: Required. Indicated how the data set is managed.
+    accessRights:
+      expected_type: Literal["open access", "restricted access", "embargoed access", "metadata only access"]
+      example: open access
+      description: Required. MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicates the availability of the data set.
+    reasonForConcealment:
+      expected_type: str
+      example: To ensure market competitiveness for commercialization
+      description: Required when accessRights has `restricted access`, `embargoed access` or `metadata only access`. Indicates why access to the data set is ristricted and embargoed.
+    availabilityStarts:
+      expected_type: str
+      example: '2023-04-01'
+      description: Required when accessRights has `embargoed access`. MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
+    creator:
+      expected_type: List[Affiliation]
+      example: '[{"@id": "https://ror.org/04ksd4g47"}]'
+      description: Required. MUST be an array of Affiliation entities. Indicates the organization which created the data set.
+    measurementTechnique:
+      expected_type: str
+      example: Obtained using simulation software.
+      description: Optional. An explanation of the technique for collecting data.
+    isAccessibleForFree:
+      expected_type: bool
+      example: 'True'
+      description: Required when accessRights has `open access` or `restricted access`. MUST be a boolean. `True` means the data set is free to access, while `False` means consideration. When accessRights has `open access`, MUST be `True`.
+    license:
+      expected_type: License
+      example: '{"@id": "https://www.apache.org/licenses/LICENSE-2.0"}'
+      description: Required when accessRights has `open access`. MUST be a @id term of License entity. Indicates the license applied for the data.
+    usageInfo:
+      expected_type: str
+      example: Contact data manager before usage of this data set.
+      description: Optional. An explanation for citation.
+    repository:
+      expected_type: RepositoryObject
+      example: '{ "@id": "https://doi.org/xxxxxxxx" }'
+      description: Required. MUST be @id term of the RepositoryObject entity. When all data set is managed in a single repository, it can be omitted instead of adding to RootDataEntity. Indicates repository where the data is managed.
+    contentSize:
+      expected_type: Literal["1GB", "10GB", "100GB", "over100GB"]
+      example: 100GB
+      description: Optional. MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition.
+    distribution:
+      expected_type: DataDownload
+      example: '{"@id": "https://zenodo.org/record/example"}'
+      description: Required when accessRights has `open access`. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, it can be omitted instead of adding to RootDataEntity. Indicates where the download URL of the data set.
+    contactPoint:
+      expected_type: ContactPoint
+      example: '{ "@id": "#mailto:contact@example.com" }'
+      description: Required when accessRights has `open access` or `restricted access`. MUST be @id term of ContactPoint entity. Indicates contact information.
+File:
+  description: A file included in the research project, e.g. text file, script file and images.
+  props:
+    '@id':
+      expected_type: str
+      example: config/setting.txt
+      description: Required. MUST be either a URI Path relative to the top directory of your repository (stated in the identifier term of RootDataEntity) or an absolute URI. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+    name:
+      expected_type: str
+      example: setting.txt
+      description: Required. Indicates the file name.
+    dmpDataNumber:
+      expected_type: DMP
+      example: '{"@id": "#dmp:1"}'
+      description: Required. MUST be @id term of the DMP entity. Indicates data number in DMP that includes this file.
+    contentSize:
+      expected_type: str
+      example: 1560B
+      description: Required. MUST be an integer of the file size with the suffix `B` as a unit, bytes. It will be used in the validation of the size listed in DMP.
+    encodingFormat:
+      expected_type: str
+      example: text/plain
+      description: Optional. MUST be MIME type. Indicates file format.
+    sha256:
+      expected_type: str
+      example: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      description: Optional. MUST be the SHA-2 SHA256 hash of the file.
+    url:
+      expected_type: str
+      example: https://github.com/username/repository/file
+      description: Optional. MUST be a direct URL to the file.
+    sdDatePublished:
+      expected_type: str
+      example: '2022-12-01'
+      description: Required when the file is from outside the RO-Crate Root. Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.

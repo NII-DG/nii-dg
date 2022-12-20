@@ -1,5 +1,5 @@
 RootDataEntity:
-  desscription: a Dataset that represent the RO-Crate. For more information, see https://www.researchobject.org/ro-crate/1.1/root-data-entity.html .
+  description: a Dataset that represent the RO-Crate. For more information, see https://www.researchobject.org/ro-crate/1.1/root-data-entity.html .
   props:
     '@id':
       expected_type: str
@@ -38,7 +38,7 @@ RootDataEntity:
       example: '[{"@id": "config/"}, {"@id": "config/config.txt"}]'
       description: Required. MUST be an array of Dataset and File entities that indicate files and directories as subjects of data governance.
 File:
-  desscription: A file included in the research project, e.g. text file, script file and images.
+  description: A file included in the research project, e.g. text file, script file and images.
   props:
     '@id':
       expected_type: str
@@ -48,10 +48,6 @@ File:
       expected_type: str
       example: setting.txt
       description: Required. Indicates the file name.
-    dmpDataNumber:
-      expected_type: DMP
-      example: '{"@id": "#dmp:1"}'
-      description: Required. MUST be @id term of the DMP entity. Indicates data number in DMP that includes this file.
     contentSize:
       expected_type: str
       example: 1560B
@@ -73,7 +69,7 @@ File:
       example: '2022-12-01'
       description: Required when the file is from outside the RO-Crate Root. Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
 Dataset:
-  desscription: A folder of the files included in the research project.
+  description: A folder of the files included in the research project.
   props:
     '@id':
       expected_type: str
@@ -88,7 +84,7 @@ Dataset:
       example: https://github.com/username/repository/directory
       description: Optional. MUST be a direct URL to the directory.
 Organization:
-  desscription: An organization related to the research project, e.g. university, research institution and funding agency.
+  description: An organization related to the research project, e.g. university, research institution and funding agency.
   props:
     '@id':
       expected_type: str
@@ -107,7 +103,7 @@ Organization:
       example: Japan's only general academic research institution seeking to create future value in the new discipline of informatics.
       description: Optional. Description of the organization.
 Person:
-  desscription: A person who contributes to the research project, e.g. researcher.
+  description: A person who contributes to the research project, e.g. researcher.
   props:
     '@id':
       expected_type: str
@@ -134,7 +130,7 @@ Person:
       example: '03-0000-0000'
       description: Optional. Phone number of the person.
 License:
-  desscription: A license granted to the data.
+  description: A license granted to the data.
   props:
     '@id':
       expected_type: str
@@ -149,7 +145,7 @@ License:
       example: the licensed defined by Apache Software Foundation
       description: Optional. Description of the license.
 RepositoryObject:
-  desscription: fuga
+  description: A repository where the research data is managed in
   props:
     '@id':
       expected_type: str
@@ -164,7 +160,7 @@ RepositoryObject:
       example: Repository managed by NII.
       description: Optional. Indicates a description of the repository.
 DataDownload:
-  desscription: fuga
+  description: Downloadable dataset from the research project.
   props:
     '@id':
       expected_type: str
@@ -184,7 +180,7 @@ DataDownload:
       description: Optional. MUST be a string in ISO 8601 date format. Indicates the date when this data set was uploaded to this site.
 HostingInstitution:
   # based on Organization entity
-  desscription: fuga
+  description: An organization that has responsibility of managing research data.
   props:
     '@id':
       expected_type: str
@@ -203,7 +199,7 @@ HostingInstitution:
       example: '2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430'
       description: Required. Physical address of the organization.
 ContactPoint:
-  desscription: fuga
+  description: A contact information.
   props:
     '@id':
       expected_type: str
