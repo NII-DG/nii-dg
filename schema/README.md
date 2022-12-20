@@ -1,21 +1,56 @@
 # NII-DG: Schema
 
-## for referring documents
+## How to refer documents
 - mdの見方
 ```
 1. 自分が利用したいルールの.mdを探す
 2. 該当.md内にあるエンティティはその.md内定義を参照する
-3. RootDataEntityを含む追加したいエンティティが該当.mdにない場合、base.mdを参照する
-4. base.mdに追加したいエンティティがない場合、新たにエンティティ定義を追加しそれを参照する
+3. 利用したいエンティティが該当.mdにない場合、base.mdを参照する
+4. base.mdに利用したいエンティティがない場合もしくは定義が一致しない場合、新たにエンティティ定義を追加しそれを参照する
 ```
+### example
+DMPとしてAMEDを利用する場合
+- 1. schema/docs/から`amed.md`を探す
+- 2. エンティティ定義`RootDataEntity`と`DMP`が見つかる
+- 3. `creator`termを追加したいが、`Person`エンティティ定義がないため`base.md`を探す
+- 4. `base.md`内に`Person`エンティティ定義があるため、これを採用する
 
-## for adding schema
-- 新しいエンティティ定義を追加したい人向け
+## How to add new schema
+- 類似エンティティを拡張する場合
+```
+1. yamlを書く。この時、base.ymlから既存エンティティの部分をcopyした上で修正を加える。
+2. validateして.mdを生成。 schema/script/generate_docs.py を利用
+3. 対応する.pyをnii_dg/schema配下に作成しクラスを追加する。この時基底クラスは不要。
+```
+- 類似のエンティティが存在しない場合
 ```
 1. yamlを書く
 2. validateして.mdを生成。 schema/script/generate_docs.py を利用
-3. 対応する.pyをnii_dg/schema配下に作成。この時base.pyを継承するかしないかは特に指定しない。
+3. 対応する.pyをnii_dg/schema配下に作成しクラスを追加する。この時基底クラスは不要。
 ```
+
+### schema of .yml
+- Place the created YAML file under directory `schema/`.
+
+```yaml
+EntityName1:
+    '@id':
+        expected_type: type_in_python
+        example: exampleValue
+        description: description of this term
+    termName:
+        expected_type: type_in_python
+        example: exampleValue
+        description: description of this term
+```
+
+- Each entity MUST be named using upper camel case (Pascal case). The name is also used for `@type` value.
+- Each entity MUST have `@id` term. URI is recommended for `@id` value.
+- Each term MUST be named using lower camel case, excluding `@id` term.
+- Each term MUST have three fileds to describe: `expected_type`, `example` and `description`.
+- Field `expect_type` MUST be chosen from types in python. Usage of mypy is considered for validation based on this `expected_type`.
+- In the filed `example`, you MUST show an example of the term value for the sake of clarity.
+- In the filed `description`, you MUST show that this term is required or not. Definition (what the term indicates) and input format is also needed.
 
 ## Memo
 

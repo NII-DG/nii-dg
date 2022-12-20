@@ -15,7 +15,7 @@ See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg
 | `repository` | `RepositoryObject` | Can be added when all data set is managed in a single repository. MUST be @id term of RepositoryObject entity. Indicates repository where the data is managed. | `{ "@id": "https://doi.org/xxxxxxxx" }` |
 | `distribution` | `DataDownload` | Can be added when access rights have `open access` and all open-access data set is available from a single URL. MUST be @id term of DataDownload entity. Indicates where the download URL of the data set. | `{"@id": "https://zenodo.org/record/example"}` |
 | `keyword` | `str` | Required. Indicates research filed of the project. | `Informatics` |
-| `identifier` | `Erad` | Required when your project has e-Rad project ID. MUST be @id term of PropertyValue entities. Indicates e-Rad project ID. | `{ "@id": "#e-Rad:123456" }` |
+| `eradProjectId` | `str` | Required when your project has e-Rad project ID. Indicates e-Rad project ID. | `123456` |
 | `hasPart` | `List[Union[Dataset, File]]` | Required. MUST be an array of Dataset and File entities that indicate files and directories as subjects of data governance. | `[{"@id": "config/"}, {"@id": "config/config.txt"}]` |
 
 ## DMP
@@ -47,5 +47,5 @@ See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg
 | `affiliation` | `Organization` | Required. Affiliation which the person belongs to. MUST be a @id term of the DMP entity. | `{"@id": "https://ror.org/04ksd4g47"}` |
 | `email` | `str` | Required. Email address of the person. | `ichiro@example.com` |
 | `telephone` | `str` | Optional. Phone number of the person. | `03-0000-0000` |
-| `identifier` | `Erad` | Required when the person has e-Rad researcher number. MUST be @id term of Erad entities. Indicates e-Rad researcher number. | `{ "@id": "#e-Rad:001234567" }` |
+| `eradResearcherNumber` | `str` | Required when the person has e-Rad researcher number. Indicates e-Rad researcher number. | `001234567` |
 
