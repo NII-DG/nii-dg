@@ -2,10 +2,36 @@
 # coding: utf-8
 
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Union
 
-from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity
+from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, Entity
 from nii_dg.utils import github_branch, github_repo
+
+
+def check_type(ent: Entity, key: str, type: Union[type, List[type]]) -> None:
+    if isinstance(type, list):
+        for e in ent[key]:
+            if not isinstance(e, type[0]):
+                raise TypeError("Elements of '{key}' list MUST be {typename}.".format(
+                    key=key,
+                    typename=type[0].__name__
+                ))
+    else:
+        if not isinstance(ent[key], type):
+            raise TypeError("The value of '{key}' MUST be {typename}.".format(
+                key=key,
+                typename=type.__name__
+            ))
+
+
+def check_required_key(ent: Entity, key: str) -> None:
+    try:
+        ent[key]
+    except KeyError:  # define validation error
+        raise TypeError("The required term '{key}' is not found in the {entity}.".format(
+            key=key,
+            entity=ent.__class__.__name__
+        )) from None
 
 
 class RootDataEntity(DefaultEntity):
@@ -39,8 +65,37 @@ class RootDataEntity(DefaultEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        # TODO: impl.
-        pass
+        '''
+        Check properties based on the schema of RootDataEntity.
+        - @id: Set './' at the constructor. No checl is done here.
+        - name: Required. MUST be string.
+        - description: Optional. MUST be string.
+        - funder: Required. MUST be an array of Organization entity.
+        - dateCreated: 自動生成?
+        - creator: Required. Must be an array of Person entity.
+        - repository: Optional. Must be RepositoryObject entity.
+        - distribution: Optional. Must be DataDownload entity.
+        - hasPart: Will be set at RO-Crate Class. No check is done here.
+        '''
+        required_keys: Dict[str, Union[type, List[type]]] = {
+            "name": str,
+            "funder": [Organization],
+            "creator": [Person]
+        }
+        optional_keys: Dict[str, Union[type, List[type]]] = {
+            "description": str,
+            "repository": RepositoryObject,
+            "distribution": DataDownload
+        }
+
+        for k in required_keys:
+            check_required_key(self, k)
+
+        for k, v in {**required_keys, **optional_keys}.items():
+            try:
+                check_type(self, k, v)
+            except KeyError:
+                pass
 
     def validate(self) -> None:
         # TODO: impl.
@@ -60,6 +115,16 @@ class File(DataEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        '''
+        Check properties based on the schema of File.
+        - @id: Required. MUST be path to the file.
+        - name: Required. MUST be string.
+        - contentSize: Required. MUST be an integer of the file size with the suffix `B` as a unit, bytes.
+        - encodingFormat: Optional. MUST be MIME type.
+        - sha256: Optional. MUST be the SHA-2 SHA256 hash of the file.
+        - url: Optional. Must be URL.
+        - sdDatePublished: Optional. MUST be a string in ISO 8601 date format.
+        '''
         # TODO: impl.
         pass
 
@@ -89,11 +154,6 @@ class Dataset(DataEntity):
         pass
 
 
-class DMP(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-
 class Organization(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
@@ -109,17 +169,17 @@ class License(ContextualEntity):
         super().__init__(id=id, props=props)
 
 
-class HostingInstitution(ContextualEntity):
+class RepositoryObject(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
 
-class PropertyValue(ContextualEntity):
+class DataDownload(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
 
-class Erad(ContextualEntity):
+class HostingInstitution(Organization):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
