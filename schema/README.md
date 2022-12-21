@@ -20,7 +20,7 @@ DMPとしてAMEDを利用する場合
 ```
 1. yamlを書く。この時、base.ymlから既存エンティティの部分をcopyした上で修正を加える。
 2. validateして.mdを生成。 schema/script/generate_docs.py を利用
-3. 対応する.pyをnii_dg/schema配下に作成しクラスを追加する。この時基底クラスは不要。
+3. 対応する.pyをnii_dg/schema配下に作成しクラスを追加する。この時基底クラスとしてbase.ymlからcopyした既存エンティティのclassを継承する。base.yml以外からの継承は不可。
 ```
 - 類似のエンティティが存在しない場合
 ```
@@ -29,28 +29,32 @@ DMPとしてAMEDを利用する場合
 3. 対応する.pyをnii_dg/schema配下に作成しクラスを追加する。この時基底クラスは不要。
 ```
 
-### schema of .yml
-- Place the created YAML file under directory `schema/`.
+### How to create .yml
+- Place the created YAML file under the directory `schema/`.
 
 ```yaml
 EntityName1:
+  description: description of the entity, EntityName1
+  props:
     '@id':
-        expected_type: type_in_python
-        example: exampleValue
-        description: description of this term
+      expected_type: type_in_python
+      example: exampleValue
+      description: Required or not. Format that must be followed.
     termName:
-        expected_type: type_in_python
-        example: exampleValue
-        description: description of this term
+      expected_type: type_in_python
+      example: exampleValue
+      description: Required or not. Format that must be followed. Description of this term, termName
 ```
 
 - Each entity MUST be named using upper camel case (Pascal case). The name is also used for `@type` value.
-- Each entity MUST have `@id` term. URI is recommended for `@id` value.
+- Each entity MUST have 2 properties: `description` and `props`.
+  - Property `description` needs the description of the entity itself.
+  - Property `props` has an object of terms. Each entity MUST have `@id` term. URI is recommended for `@id` value.
 - Each term MUST be named using lower camel case, excluding `@id` term.
-- Each term MUST have three fileds to describe: `expected_type`, `example` and `description`.
-- Field `expect_type` MUST be chosen from types in python. Usage of mypy is considered for validation based on this `expected_type`.
-- In the filed `example`, you MUST show an example of the term value for the sake of clarity.
-- In the filed `description`, you MUST show that this term is required or not. Definition (what the term indicates) and input format is also needed.
+- Each term MUST have 3 fileds to describe: `expected_type`, `example` and `description`.
+  - Field `expect_type` MUST be chosen from types in python. Usage of mypy is considered for validation based on this `expected_type`.
+  - In the filed `example`, you MUST show an example of the term value for the sake of clarity.
+  - In the filed `description`, you MUST show that this term is required or not. Definition (what the term indicates) and input format is also needed.
 
 ## Memo
 

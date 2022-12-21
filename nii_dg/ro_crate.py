@@ -55,6 +55,7 @@ class ROCrate():
                 raise TypeError("Invalid entity type")  # TODO: define exception
 
     def as_jsonld(self) -> Dict[str, Any]:
+        # add dateCreated to RootDataEntity
         return {
             "@context": self.BASE_CONTEXT,
             "@graph": [e.as_jsonld() for e in self.default_entities + self.data_entities + self.contextual_entities]  # type: ignore

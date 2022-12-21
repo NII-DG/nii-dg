@@ -1,59 +1,62 @@
 GinMonitoring:
-  '@id':
-    description: Required. MUST be index number of monitoring rules with the prefix `#ginmonitoring:`.
-    example: '#ginmonitoring:1'
-    expected_type: str
-  about:
-    description: 'Required. MUST be `{"@id": "./"}`. Indicates this rule applies to the research project stated in RootDataEntity.'
-    example: '{"@id": "./"}'
-    expected_type: RootDataEntity
-  contentSize:
-    description: Required. MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in the experiment package.
-    example: 100GB
-    expected_type: Literal["1GB", "10GB", "100GB", "1TB", "1PB"]
-  workflowIdentifier:
-    description: Required. MUST choose one from `basic`, `bio` and `neuro`. Indicates a kind of workflow used in the research workflow.
-    example: bio
-    expected_type: Literal["basic", "bio", "nuero"]
-  datasetStructure:
-    description: Required. MUST choose either `with_code` or `for_parameter`. Indicates a kind of dataset structure used in the research workflow.
-    example: bio
-    expected_type: Literal["with_code", "for_parameter"]
+  description: Monitoring function for the GIN-fork platform.
+  props:
+    '@id':
+      description: Required. MUST be index number of monitoring rules with the prefix `#ginmonitoring:`.
+      example: '#ginmonitoring:1'
+      expected_type: str
+    about:
+      description: 'Required. MUST be `{"@id": "./"}`. Indicates this rule applies to the research project stated in RootDataEntity.'
+      example: '{"@id": "./"}'
+      expected_type: RootDataEntity
+    contentSize:
+      description: Required. MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in the experiment package.
+      example: 100GB
+      expected_type: Literal["1GB", "10GB", "100GB", "1TB", "1PB"]
+    workflowIdentifier:
+      description: Required. MUST choose one from `basic`, `bio` and `neuro`. Indicates a kind of workflow used in the research workflow.
+      example: bio
+      expected_type: Literal["basic", "bio", "nuero"]
+    datasetStructure:
+      description: Required. MUST choose either `with_code` or `for_parameter`. Indicates a kind of dataset structure used in the research workflow.
+      example: bio
+      expected_type: Literal["with_code", "for_parameter"]
 File:
-  '@id':
-    description: Required. MUST be either a URI Path relative to the top directory of your repository (stated in the identifier term of RootDataEntity) or an absolute URI. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
-    example: config/setting.txt
-    expected_type: str
-  name:
-    description: Required. Indicates the file name.
-    example: setting.txt
-    expected_type: str
-  dmpDataNumber:
-    description: Required. MUST be @id term of the DMP entity. Indicates data number in DMP that includes this file.
-    example: '{"@id": "#dmp:1"}'
-    expected_type: DMP
-  contentSize:
-    description: Required. MUST be an integer of the file size with the suffix `B` as a unit, bytes. It will be used in the validation of the size listed in DMP.
-    example: 1560B
-    expected_type: str
-  encodingFormat:
-    description: Optional. MUST be MIME type. Indicates file format.
-    example: text/plain
-    expected_type: str
-  sha256:
-    description: Optional. MUST be the SHA-2 SHA256 hash of the file.
-    example: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-    expected_type: str
-  url:
-    description: Optional. MUST be a direct URL to the file.
-    example: https://github.com/username/repository/file
-    expected_type: str
-  sdDatePublished:
-    description: Required when the file is from outside the RO-Crate Root. Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
-    example: '2022-12-01'
-    expected_type: str
-  experimentPackageFlag:
-    description: Required. Indicates whether the file is included in an experiment package.  MUST be a boolean.
-    example: 'True'
-    expected_type: bool
-
+  description: A file monitored in the GIN-fork platform.
+  props:
+    '@id':
+      description: Required. MUST be either a URI Path relative to the top directory of your repository (stated in the identifier term of RootDataEntity) or an absolute URI. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+      example: config/setting.txt
+      expected_type: str
+    name:
+      description: Required. Indicates the file name.
+      example: setting.txt
+      expected_type: str
+    dmpDataNumber:
+      description: Required. MUST be @id term of the DMP entity. Indicates data number in DMP that includes this file.
+      example: '{"@id": "#dmp:1"}'
+      expected_type: DMP
+    contentSize:
+      description: Required. MUST be an integer of the file size with the suffix `B` as a unit, bytes. It will be used in the validation of the size listed in DMP.
+      example: 1560B
+      expected_type: str
+    encodingFormat:
+      description: Optional. MUST be MIME type. Indicates file format.
+      example: text/plain
+      expected_type: str
+    sha256:
+      description: Optional. MUST be the SHA-2 SHA256 hash of the file.
+      example: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      expected_type: str
+    url:
+      description: Optional. MUST be a direct URL to the file.
+      example: https://github.com/username/repository/file
+      expected_type: str
+    sdDatePublished:
+      description: Required when the file is from outside the RO-Crate Root. Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
+      example: '2022-12-01'
+      expected_type: str
+    experimentPackageFlag:
+      description: Required. Indicates whether the file is included in an experiment package.  MUST be a boolean.
+      example: 'True'
+      expected_type: bool

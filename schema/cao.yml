@@ -1,26 +1,18 @@
-RootDataEntity:
-  description: a Dataset that represent the RO-Crate. For more information, see https://www.researchobject.org/ro-crate/1.1/root-data-entity.html .
+DMPMetadata:
+  description: Metadata of research project that is the subject of this data management plan.
   props:
     '@id':
       expected_type: str
-      example: ./
-      description: Required. MUST be `./`.
+      example: '#CAO-DMP'
+      description: Required. MUST be the name with prefix `#`.
+    about:
+      expected_type: RootDataEntity
+      example: '{"@id": "./"}'
+      description: 'Required. MUST be `{"@id": "./"}`. Indicates this DMP is about research project that the data stated in RootDataEntity are generated.'
     name:
       expected_type: str
-      example: Example Research Project
-      description: Required. Title of the research project.
-    description:
-      expected_type: str
-      example: This research project aims to reveal the effect of xxx.
-      description: Optional. Description of the research project.
-    funder:
-      expected_type: List[Funder]
-      example: '[{"@id": "https://ror.org/01b9y6c26"}]'
-      description: Required. Funding agencies of the research project. MUST be an array of @id term of Organization entity.
-    dateCreated:
-      expected_type: str
-      example: '2022-12-09T10:48:07.976+00:00'
-      description: Required. MUST be a string in ISO 8601 date format and a timestamp down to milliseconds. The time zone is UTC. Indicates timestamp the RO-Crate itself was created.
+      example: CAO-DMP
+      description: Required. MUST be `CAO-DMP`. Indicates the DMP format used by your project.
     creator:
       expected_type: List[Person]
       example: '[{"@id": "https://orcid.org/0000-0001-2345-6789"}]'
@@ -32,7 +24,7 @@ RootDataEntity:
     distribution:
       expected_type: DataDownload
       example: '{"@id": "https://zenodo.org/record/example"}'
-      description: Can be added when access rights have `open access` and all open-access data set is available from a single URL. MUST be @id term of DataDownload entity. Indicates where the download URL of the data set.
+      description: Can be added when accesRights have `open access` and all open-access data set is available from a single URL. MUST be @id term of DataDownload entity. Indicates where the download URL of the data set.
     keyword:
       expected_type: str
       example: Informatics
@@ -42,9 +34,9 @@ RootDataEntity:
       example: '123456'
       description: Required when your project has e-Rad project ID. Indicates e-Rad project ID.
     hasPart:
-      expected_type: List[Union[Dataset, File]]
-      example: '[{"@id": "config/"}, {"@id": "config/config.txt"}]'
-      description: Required. MUST be an array of Dataset and File entities that indicate files and directories as subjects of data governance.
+      expected_type: List[DMP]
+      example: '[{ "@id": "#dmp:1" }, { "@id": "#dmp:2" }]'
+      description: Required. MUST be an array of DMP entity, which is included in this DMP.
 DMP:
   description: Contents from data management plan that is (will be) submitted to the funding agency.
   props:
@@ -97,7 +89,7 @@ DMP:
       example: 100GB
       description: Optional. MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition.
     hostingInstitution:
-      expected_type: HostingInstituion
+      expected_type: HostingInstitution
       example: '{ "@id": "https://ror.org/04ksd4g47" }'
       description: Required. Indicates hosting institution of the data set.
     dataManager:
@@ -122,7 +114,7 @@ Person:
     affiliation:
       expected_type: Organization
       example: '{"@id": "https://ror.org/04ksd4g47"}'
-      description: Required. Affiliation which the person belongs to. MUST be a @id term of the DMP entity.
+      description: Required. Affiliation which the person belongs to. MUST be a @id term of the Organization entity.
     email:
       expected_type: str
       example: ichiro@example.com
@@ -134,7 +126,7 @@ Person:
     eradResearcherNumber:
       expected_type: str
       example: '001234567'
-      description: Required when the person has e-Rad researcher number. Indicates e-Rad researcher number.
+      description: Required when the person is data manager or has e-Rad researcher number. Indicates e-Rad researcher number.
 File:
   description: A file included in the research project, e.g. text file, script file and images.
   props:
