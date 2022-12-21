@@ -12,6 +12,10 @@ from nii_dg.utils import github_branch, github_repo
 
 
 def check_type(ent: Entity, key: str, type: Union[type, List[type]]) -> None:
+    '''
+    Check the type of the value is correct.
+    If not correct, raise TypeError.
+    '''
     if isinstance(type, list):
         for e in ent[key]:
             if not isinstance(e, type[0]):
@@ -28,6 +32,10 @@ def check_type(ent: Entity, key: str, type: Union[type, List[type]]) -> None:
 
 
 def check_required_key(ent: Entity, key: str) -> None:
+    '''
+    Check required key is existing or not.
+    If not, raise TypeError.
+    '''
     try:
         ent[key]
     except KeyError:  # define validation error
@@ -38,6 +46,10 @@ def check_required_key(ent: Entity, key: str) -> None:
 
 
 def is_url_or_path(value: str) -> Optional[str]:
+    '''
+    Check value is in format of URL or path.
+    If not either, raise ValueError.
+    '''
     encoded_value = urllib.parse.quote(value, safe="!#$&'()*+,/:;=?@[]\\")
 
     urlpattern = r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
@@ -53,6 +65,34 @@ def is_url_or_path(value: str) -> Optional[str]:
         return "path"
 
     raise ValueError
+
+
+def check_content_size(value: str) -> None:
+    '''
+    Check file size value is in regulation format.
+    If not, raise ValueError.
+    '''
+    pattern = "[0-9]+B"
+    sizematch = re.compile(pattern)
+
+    if sizematch.match(value):
+        pass
+    else:
+        raise ValueError("File size MUST be integer with suffix 'B' as unit.")
+
+
+def check_mime_type(value: str) -> None:
+    '''
+    Check encoding format value is in MIME type format.
+    If not, raise ValueError.
+    '''
+    pattern = r"(application|multipart|video|model|message|image|example|font|audio|text)/[\w\-\.\+]+"
+    sizematch = re.compile(pattern)
+
+    if sizematch.match(value):
+        pass
+    else:
+        raise ValueError("File size MUST be integer with suffix 'B' as unit.")
 
 
 class RootDataEntity(DefaultEntity):
@@ -161,6 +201,7 @@ class File(DataEntity):
             idtype = is_url_or_path(self["@id"])
         except ValueError:
             raise TypeError("Value of '@id' MUST be URL of file path.") from None
+
         if idtype == "url":
             required_keys["sdDatePublished"] = str
         elif idtype == "path":
@@ -176,6 +217,8 @@ class File(DataEntity):
                 check_type(self, k, v)
             except KeyError:
                 pass
+
+        check_content_size(self["contentSize"])
 
     def validate(self) -> None:
         # TODO: impl.
