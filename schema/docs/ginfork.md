@@ -3,7 +3,7 @@
 See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg/blob/main/schema/README.md) for more information.
 
 ## GinMonitoring
-
+Monitoring function for the GIN-fork platform.
 | Property | Type | Description | Example |
 | --- | --- | --- | --- |
 | `@id` | `str` | Required. MUST be index number of monitoring rules with the prefix `#ginmonitoring:`. | `#ginmonitoring:1` |
@@ -13,7 +13,7 @@ See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg
 | `datasetStructure` | `Literal["with_code", "for_parameter"]` | Required. MUST choose either `with_code` or `for_parameter`. Indicates a kind of dataset structure used in the research workflow. | `bio` |
 
 ## File
-
+A file monitored in the GIN-fork platform.
 | Property | Type | Description | Example |
 | --- | --- | --- | --- |
 | `@id` | `str` | Required. MUST be either a URI Path relative to the top directory of your repository (stated in the identifier term of RootDataEntity) or an absolute URI. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded. | `config/setting.txt` |

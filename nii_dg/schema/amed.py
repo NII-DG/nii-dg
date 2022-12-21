@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import datetime
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, Entity
+from nii_dg.entity import Entity
 from nii_dg.schema import (DataDownload, HostingInstitution, Organization,
                            Person, RepositoryObject)
 from nii_dg.schema import RootDataEntity as BaseRootDataEntity
-from nii_dg.utils import github_branch, github_repo
+from nii_dg.utils import github_branch, github_repo  # noqa
 
 
 def check_type(ent: Entity, key: str, type: Union[type, List[type]]) -> None:
@@ -36,7 +34,6 @@ def check_required_key(ent: Entity, key: str) -> None:
             key=key,
             entity=ent.__class__.__name__
         )) from None
-
 
 
 class RootDataEntity(BaseRootDataEntity):
