@@ -95,6 +95,27 @@ def check_mime_type(value: str) -> None:
         raise ValueError("File size MUST be integer with suffix 'B' as unit.")
 
 
+def check_sha256(value: str) -> None:
+    '''
+    Check sha256 value is in SHA256 format.
+    If not, raise ValueError.
+    '''
+    pattern = r"(?:[^a-fA-F\d]|\b)([a-fA-F\d]{64})(?:[^a-fA-F\d]|\b)"
+    shamatch = re.compile(pattern)
+
+    if shamatch.match(value):
+        pass
+    else:
+        raise ValueError("Sha256 hash format is wrong.")
+
+
+def check_date(value: str) -> None:
+    '''
+    Check date is in format "YYYY-MM-DD".
+    If not, raise ValueError.
+    '''
+
+
 class RootDataEntity(DefaultEntity):
     """\
     See https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#direct-properties-of-the-root-data-entity.
@@ -219,6 +240,15 @@ class File(DataEntity):
                 pass
 
         check_content_size(self["contentSize"])
+
+        try:
+            check_mime_type(self["encodingFormat"])
+            check_sha256(self["sha256"])
+            if is_url_or_path(self["url"]) != "url":
+                raise ValueError
+            datetime.datetime.strptime(self["sdDatePublished"], "%Y-%m-%d")
+        except KeyError:
+            pass
 
     def validate(self) -> None:
         # TODO: impl.

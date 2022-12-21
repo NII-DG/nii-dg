@@ -34,7 +34,7 @@ RootDataEntity:
       example: '[{"@id": "https://orcid.org/0000-0001-2345-6789"}]'
       description: Required. MUST be an array of @id term of Person entity. Indicates all data creators involved in this research project.
     hostingInstitution:
-      expected_type: HostingInstituion
+      expected_type: HostingInstitution
       example: '{ "@id": "https://ror.org/04ksd4g47" }'
       description: Required. Indicates hosting institution of the data set.
     dataManager:
