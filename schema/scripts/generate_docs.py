@@ -26,7 +26,7 @@ See [GitHub - {repo} - schema/README.md](https://github.com/{repo}/blob/main/sch
 
 TEMPLATE_ENTITY = """\
 ## {entity_name}
-
+{description}
 | Property | Type | Description | Example |
 | --- | --- | --- | --- |
 """
@@ -48,8 +48,8 @@ def main(args: List[str]) -> None:
         schema_name = schema_file.stem
         docs = TEMPLATE_DOCS.format(schema_name=schema_name, repo=REPO_NAME)
         for entity_name, entity in schema.items():
-            docs += TEMPLATE_ENTITY.format(entity_name=entity_name)
-            for prop_name, prop in entity.items():
+            docs += TEMPLATE_ENTITY.format(entity_name=entity_name, description=entity["description"])
+            for prop_name, prop in entity["props"].items():
                 docs += TEMPLATE_PROP.format(
                     prop_name=prop_name,
                     expected_type=prop["expected_type"],
