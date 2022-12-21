@@ -3,7 +3,7 @@ DMPMetadata:
   props:
     '@id':
       expected_type: str
-      example: \#AMED-DMP
+      example: '#AMED-DMP'
       description: Required. MUST be the name with prefix `#`.
     about:
       expected_type: RootDataEntity
@@ -13,10 +13,6 @@ DMPMetadata:
       expected_type: str
       example: AMED-DMP
       description: Required. MUST be `AMED-DMP`. Indicates the DMP format used by your project.
-    funder:
-      expected_type: List[Organization]
-      example: '[{"@id": "https://ror.org/01b9y6c26"}]'
-      description: Required. Funding agencies of the research project. MUST be an array of @id term of Organization entity.
     funding:
       expected_type: str
       example: Acceleration Transformative Research for Medical Innovation

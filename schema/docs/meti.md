@@ -6,10 +6,9 @@ See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg
 Metadata of research project that is the subject of this data management plan.
 | Property | Type | Description | Example |
 | --- | --- | --- | --- |
-| `@id` | `str` | Required. MUST be the name with prefix `#`. | `\#METI-DMP` |
+| `@id` | `str` | Required. MUST be the name with prefix `#`. | `#METI-DMP` |
 | `about` | `RootDataEntity` | Required. MUST be `{"@id": "./"}`. Indicates this DMP is about research project that the data stated in RootDataEntity are generated. | `{"@id": "./"}` |
 | `name` | `str` | Required. MUST be `METI-DMP`. Indicates the DMP format used by your project. | `METI-DMP` |
-| `funder` | `List[Organization]` | Required. Funding agencies of the research project. MUST be an array of @id term of Organization entity. | `[{"@id": "https://ror.org/01b9y6c26"}]` |
 | `creator` | `List[Person]` | Required. MUST be an array of @id term of Person entity. Indicates all data creators involved in this research project. | `[{"@id": "https://orcid.org/0000-0001-2345-6789"}]` |
 | `repository` | `RepositoryObject` | Can be added when all data set is managed in a single repository. MUST be @id term of RepositoryObject entity. Indicates repository where the data is managed. | `{ "@id": "https://doi.org/xxxxxxxx" }` |
 | `distribution` | `DataDownload` | Can be added when accessRights has `open access` and all open-access data set is available from a single URL. MUST be @id term of DataDownload entity. Indicates where the download URL of the data set. | `{"@id": "https://zenodo.org/record/example"}` |

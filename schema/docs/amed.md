@@ -6,10 +6,9 @@ See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg
 Metadata of research project that is the subject of this data management plan.
 | Property | Type | Description | Example |
 | --- | --- | --- | --- |
-| `@id` | `str` | Required. MUST be the name with prefix `#`. | `\#AMED-DMP` |
+| `@id` | `str` | Required. MUST be the name with prefix `#`. | `#AMED-DMP` |
 | `about` | `RootDataEntity` | Required. MUST be `{"@id": "./"}`. Indicates this DMP is about research project that the data stated in RootDataEntity are generated. | `{"@id": "./"}` |
 | `name` | `str` | Required. MUST be `AMED-DMP`. Indicates the DMP format used by your project. | `AMED-DMP` |
-| `funder` | `List[Organization]` | Required. Funding agencies of the research project. MUST be an array of @id term of Organization entity. | `[{"@id": "https://ror.org/01b9y6c26"}]` |
 | `funding` | `str` | Required. Indicates the name of funding program. | `Acceleration Transformative Research for Medical Innovation` |
 | `chiefResearcher` | `Person` | Required. MUST be @id term of Person entity. Indicates chief researcher or representative of the research project. | `{"@id": "https://orcid.org/0000-0001-2345-6789"}` |
 | `creator` | `List[Person]` | Required. MUST be an array of @id term of Person entity. Indicates all data creators involved in this research project. | `[{"@id": "https://orcid.org/0000-0001-2345-6789"}]` |

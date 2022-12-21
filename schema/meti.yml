@@ -3,7 +3,7 @@ DMPMetadata:
   props:
     '@id':
       expected_type: str
-      example: \#METI-DMP
+      example: '#METI-DMP'
       description: Required. MUST be the name with prefix `#`.
     about:
       expected_type: RootDataEntity
@@ -13,10 +13,6 @@ DMPMetadata:
       expected_type: str
       example: METI-DMP
       description: Required. MUST be `METI-DMP`. Indicates the DMP format used by your project.
-    funder:
-      expected_type: List[Organization]
-      example: '[{"@id": "https://ror.org/01b9y6c26"}]'
-      description: Required. Funding agencies of the research project. MUST be an array of @id term of Organization entity.
     creator:
       expected_type: List[Person]
       example: '[{"@id": "https://orcid.org/0000-0001-2345-6789"}]'
@@ -49,7 +45,7 @@ DMP:
       example: Result data calculated by Newton's method
       description: Required. Indicates data description in DMP.
     hostingInstitution:
-      expected_type: HostingInstituion
+      expected_type: HostingInstitution
       example: '{ "@id": "https://ror.org/04ksd4g47" }'
       description: Required. Indicates hosting institution of the data set.
     wayOfManage:
@@ -69,9 +65,9 @@ DMP:
       example: '2023-04-01'
       description: Required when accessRights has `embargoed access`. MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
     creator:
-      expected_type: List[Affiliation]
+      expected_type: List[Organization]
       example: '[{"@id": "https://ror.org/04ksd4g47"}]'
-      description: Required. MUST be an array of Affiliation entities. Indicates the organization which created the data set.
+      description: Required. MUST be an array of Organization entities. Indicates the organization which created the data set.
     measurementTechnique:
       expected_type: str
       example: Obtained using simulation software.

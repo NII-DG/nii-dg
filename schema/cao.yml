@@ -3,7 +3,7 @@ DMPMetadata:
   props:
     '@id':
       expected_type: str
-      example: \#CAO-DMP
+      example: '#CAO-DMP'
       description: Required. MUST be the name with prefix `#`.
     about:
       expected_type: RootDataEntity
@@ -13,10 +13,6 @@ DMPMetadata:
       expected_type: str
       example: CAO-DMP
       description: Required. MUST be `CAO-DMP`. Indicates the DMP format used by your project.
-    funder:
-      expected_type: List[Funder]
-      example: '[{"@id": "https://ror.org/01b9y6c26"}]'
-      description: Required. Funding agencies of the research project. MUST be an array of @id term of Organization entity.
     creator:
       expected_type: List[Person]
       example: '[{"@id": "https://orcid.org/0000-0001-2345-6789"}]'
@@ -93,7 +89,7 @@ DMP:
       example: 100GB
       description: Optional. MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition.
     hostingInstitution:
-      expected_type: HostingInstituion
+      expected_type: HostingInstitution
       example: '{ "@id": "https://ror.org/04ksd4g47" }'
       description: Required. Indicates hosting institution of the data set.
     dataManager:
@@ -118,7 +114,7 @@ Person:
     affiliation:
       expected_type: Organization
       example: '{"@id": "https://ror.org/04ksd4g47"}'
-      description: Required. Affiliation which the person belongs to. MUST be a @id term of the DMP entity.
+      description: Required. Affiliation which the person belongs to. MUST be a @id term of the Organization entity.
     email:
       expected_type: str
       example: ichiro@example.com
@@ -130,7 +126,7 @@ Person:
     eradResearcherNumber:
       expected_type: str
       example: '001234567'
-      description: Required when the person has e-Rad researcher number. Indicates e-Rad researcher number.
+      description: Required when the person is data manager or has e-Rad researcher number. Indicates e-Rad researcher number.
 File:
   description: A file included in the research project, e.g. text file, script file and images.
   props:

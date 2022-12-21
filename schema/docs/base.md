@@ -9,6 +9,7 @@ A Dataset that represents the RO-Crate. For more information, see https://www.re
 | `@id` | `str` | Required. MUST be `./`. | `./` |
 | `name` | `str` | Required. Title of the research project. | `Example Research Project` |
 | `description` | `str` | Optional. Description of the research project. | `This research project aims to reveal the effect of xxx.` |
+| `funder` | `List[Organization]` | Required. Funding agencies of the research project. MUST be an array of @id term of Organization entity. | `[{"@id": "https://ror.org/01b9y6c26"}]` |
 | `dateCreated` | `str` | Automatically added to the entity when you generate RO-Crate with as_jsonld() method. MUST be a string in ISO 8601 date format and a timestamp down to milliseconds. The time zone is UTC. Indicates timestamp the RO-Crate itself was created. | `2022-12-09T10:48:07.976+00:00` |
 | `hasPart` | `List[Union[Dataset, File]]` | Required. MUST be an array of Dataset and File entities that indicate files and directories as subjects of data governance. If there is no file to include, MUST be empty list. | `[{"@id": "config/"}, {"@id": "config/config.txt"}]` |
 

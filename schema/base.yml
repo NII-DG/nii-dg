@@ -13,6 +13,10 @@ RootDataEntity:
       expected_type: str
       example: This research project aims to reveal the effect of xxx.
       description: Optional. Description of the research project.
+    funder:
+      expected_type: List[Organization]
+      example: '[{"@id": "https://ror.org/01b9y6c26"}]'
+      description: Required. Funding agencies of the research project. MUST be an array of @id term of Organization entity.
     dateCreated:
       expected_type: str
       example: '2022-12-09T10:48:07.976+00:00'
