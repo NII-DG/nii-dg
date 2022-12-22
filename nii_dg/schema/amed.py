@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from nii_dg.entity import Entity
+from nii_dg.entity import DataEntity, Entity
 from nii_dg.schema import (DataDownload, HostingInstitution, Organization,
                            Person, RepositoryObject)
 from nii_dg.schema import RootDataEntity as BaseRootDataEntity
@@ -84,6 +85,27 @@ class RootDataEntity(BaseRootDataEntity):
                 check_type(self, k, v)
             except KeyError:
                 pass
+
+    def validate(self) -> None:
+        # TODO: impl.
+        pass
+
+
+class File(DataEntity):
+    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id=id, props=props)
+
+    @property
+    def schema(self) -> str:
+        return Path(__file__).stem
+
+    def as_jsonld(self) -> Dict[str, Any]:
+        self.check_props()
+        return super().as_jsonld()
+
+    def check_props(self) -> None:
+        # TODO: impl.
+        pass
 
     def validate(self) -> None:
         # TODO: impl.
