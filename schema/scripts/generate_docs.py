@@ -38,9 +38,10 @@ TEMPLATE_PROP = """\
 
 def main(args: List[str]) -> None:
     try:
-        if len(args) != 2:
-            raise Exception("Usage: generate_docs.py <schema_file> > <generated_docs>")
+        if len(args) != 3:
+            raise Exception("Usage: generate_docs.py <schema_file> <generated_docs>")
         schema_file = Path(args[1]).resolve()
+        dst = Path(args[2]).resolve()
         if not schema_file.exists():
             raise Exception(f"Schema file {schema_file} does not exist")
         with schema_file.open("r", encoding="utf-8") as f:
@@ -58,7 +59,8 @@ def main(args: List[str]) -> None:
                 )
             docs += "\n"
 
-        print(docs.strip() + "\n")
+        with dst.open("w", encoding="utf-8") as f:
+            f.write(docs.strip() + "\n")
 
     except Exception as e:
         print(e)
