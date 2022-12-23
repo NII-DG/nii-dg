@@ -8,8 +8,8 @@ from typing import Any, Dict, List, Optional, Union
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, Entity
 from nii_dg.error import PropsError, UnexpectedImplementationError
 from nii_dg.utils import (check_content_size, check_prop_type,
-                          check_required_key, github_branch, github_repo,
-                          load_entity_expected_types)
+                          check_required_key, check_sha256, github_branch,
+                          github_repo, load_entity_expected_types)
 
 
 class RootDataEntity(DefaultEntity):
@@ -103,14 +103,15 @@ class File(DataEntity):
         #     raise TypeError("Value of '@id' MUST be URL of file path.") from None
 
         check_content_size(self, "contentSize")
-        # try:
-        #     check_mime_type(self["encodingFormat"])
-        #     check_sha256(self["sha256"])
-        #     if is_url_or_path(self["url"]) != "url":
-        #         raise ValueError
-        #     datetime.datetime.strptime(self["sdDatePublished"], "%Y-%m-%d")
-        # except KeyError:
-        #     pass
+
+        try:
+            # check_mime_type(self["encodingFormat"])
+            check_sha256(self)
+            # if is_url_or_path(self["url"]) != "url":
+            #     raise ValueError
+            # datetime.datetime.strptime(self["sdDatePublished"], "%Y-%m-%d")
+        except KeyError:
+            pass
 
     def validate(self) -> None:
         # TODO: impl.
