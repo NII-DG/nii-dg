@@ -16,10 +16,12 @@ setup(
     author="NII",
     python_requires=">=3.7",
     platforms="any",
-    packages=["nii_dg"],
+    packages=["nii_dg", "nii_dg/schema"],
+    package_data={"nii_dg": ["schema/*.yml"]},
     install_requires=[
-        "pyyaml",
         "flask",
+        "pyyaml",
+        "typeguard",
     ],
     tests_require=[
         "flake8",
