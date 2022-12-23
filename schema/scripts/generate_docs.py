@@ -27,12 +27,12 @@ See [GitHub - {repo} - schema/README.md](https://github.com/{repo}/blob/main/sch
 TEMPLATE_ENTITY = """\
 ## {entity_name}
 {description}
-| Property | Type | Description | Example |
-| --- | --- | --- | --- |
+| Property | Type | Required? | Description | Example |
+| --- | --- | --- | --- | --- |
 """
 
 TEMPLATE_PROP = """\
-| `{prop_name}` | `{expected_type}` | {description} | `{example}` |
+| `{prop_name}` | `{expected_type}` | {required} | {description} | `{example}` |
 """
 
 
@@ -54,6 +54,7 @@ def main(args: List[str]) -> None:
                 docs += TEMPLATE_PROP.format(
                     prop_name=prop_name,
                     expected_type=prop["expected_type"],
+                    required=prop["required"],
                     description=prop["description"],
                     example=prop["example"],
                 )
