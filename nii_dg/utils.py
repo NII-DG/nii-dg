@@ -115,38 +115,34 @@ def check_prop_type(entity: "Entity", prop: str, value: Any, expected_type: str)
         raise UnexpectedImplementationError(e)
 
 
-def check_type(ent: Entity, key: str, type: Union[type, List[type]]) -> None:
-    """
-    Check the type of the value is correct.
-    If not correct, raise TypeError.
-    """
-    if isinstance(type, list):
-        for e in ent[key]:
-            if not isinstance(e, type[0]):
-                raise TypeError("Elements of '{key}' list MUST be {typename}.".format(
-                    key=key,
-                    typename=type[0].__name__
-                ))
-    else:
-        if not isinstance(ent[key], type):
-            raise TypeError("The value of '{key}' MUST be {typename}.".format(
-                key=key,
-                typename=type.__name__
-            ))
+# def check_type(ent: Entity, key: str, type: Union[type, List[type]]) -> None:
+#     """
+#     Check the type of the value is correct.
+#     If not correct, raise TypeError.
+#     """
+#     if isinstance(type, list):
+#         for e in ent[key]:
+#             if not isinstance(e, type[0]):
+#                 raise TypeError("Elements of '{key}' list MUST be {typename}.".format(
+#                     key=key,
+#                     typename=type[0].__name__
+#                 ))
+#     else:
+#         if not isinstance(ent[key], type):
+#             raise TypeError("The value of '{key}' MUST be {typename}.".format(
+#                 key=key,
+#                 typename=type.__name__
+#             ))
 
 
-def check_required_key(ent: Entity, key: str) -> None:
+def check_required_key(ent: "Entity", required_terms: List[str]) -> None:
     """
     Check required key is existing or not.
     If not, raise TypeError.
     """
-    try:
-        ent[key]
-    except KeyError:  # define validation error
-        raise TypeError("The required term '{key}' is not found in the {entity}.".format(
-            key=key,
-            entity=ent.__class__.__name__
-        )) from None
+    for k in required_terms:
+        if k not in ent.keys():
+            raise PropsError(f"The term {k} is required in {ent}.")
 
 
 def is_url_or_path(value: str) -> Optional[str]:

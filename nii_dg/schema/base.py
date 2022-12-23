@@ -7,7 +7,8 @@ from typing import Any, Dict, List, Optional, Union
 
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, Entity
 from nii_dg.error import PropsError, UnexpectedImplementationError
-from nii_dg.utils import github_branch, github_repo
+from nii_dg.utils import (check_prop_type, check_required_key, github_branch,
+                          github_repo, load_entity_expected_types)
 
 
 class RootDataEntity(DefaultEntity):
@@ -41,37 +42,23 @@ class RootDataEntity(DefaultEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        """
-        Check properties based on the schema of RootDataEntity.
-        - @id: Set './' at the constructor. No checl is done here.
-        - name: Required. MUST be string.
-        - description: Optional. MUST be string.
-        - funder: Required. MUST be an array of Organization entity.
-        - dateCreated: 自動生成?
-        - creator: Required. Must be an array of Person entity.
-        - repository: Optional. Must be RepositoryObject entity.
-        - distribution: Optional. Must be DataDownload entity.
-        - hasPart: Will be set at RO-Crate Class. No check is done here.
-        """
-        required_keys: Dict[str, Union[type, List[type]]] = {
-            "name": str,
-            "funder": [Organization],
-            "creator": [Person]
-        }
-        optional_keys: Dict[str, Union[type, List[type]]] = {
-            "description": str,
-            "repository": RepositoryObject,
-            "distribution": DataDownload
-        }
+        required_terms: List[str] = [
+            "@id",
+            "@type",
+            "name",
+            "funder"
+        ]
+        check_required_key(self, required_terms)
 
-        for k in required_keys:
-            check_required_key(self, k)
+        type_schema = load_entity_expected_types(self.schema, self.__class__.__name__)
 
-        for k, v in {**required_keys, **optional_keys}.items():
+        for k, v in self.items():
             try:
-                check_type(self, k, v)
+                if k in ["@type", "@context"]:
+                    continue
+                check_prop_type(self, k, v, type_schema[k])
             except KeyError:
-                pass
+                raise PropsError(f"The term {k} is not defined as a usable property in {self}.") from None
 
     def validate(self) -> None:
         # TODO: impl.
@@ -91,26 +78,23 @@ class File(DataEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        """
-        Check properties based on the schema of File.
-        - @id: Required. MUST be path to the file or URL.
-        - name: Required. MUST be string.
-        - contentSize: Required. MUST be an integer of the file size with the suffix `B` as a unit, bytes.
-        - encodingFormat: Optional. MUST be MIME type.
-        - sha256: Optional. MUST be the SHA-2 SHA256 hash of the file.
-        - url: Optional. Must be URL.
-        - sdDatePublished: Required when the file is from outside the RO-Crate Root. MUST be a string in ISO 8601 date format.
-        """
-        required_keys: Dict[str, Union[type, List[type]]] = {
-            "@id": str,
-            "name": str,
-            "contentSize": str,
-        }
-        optional_keys: Dict[str, Union[type, List[type]]] = {
-            "encodingFormat": str,
-            "sha256": str,
-            "url": str
-        }
+        required_terms: List[str] = [
+            "@id",
+            "@type",
+            "name",
+            "contentSize"
+        ]
+        check_required_key(self, required_terms)
+
+        type_schema = load_entity_expected_types(self.schema, self.__class__.__name__)
+
+        for k, v in self.items():
+            try:
+                if k in ["@type", "@context"]:
+                    continue
+                check_prop_type(self, k, v, type_schema[k])
+            except KeyError:
+                raise PropsError(f"The term {k} is not defined as a usable property in {self}.") from None
 
         try:
             idtype = is_url_or_path(self["@id"])
