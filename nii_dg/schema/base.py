@@ -7,8 +7,9 @@ from typing import Any, Dict, List, Optional, Union
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, Entity
 from nii_dg.error import PropsError, UnexpectedImplementationError
 from nii_dg.utils import (check_allprops_type, check_content_size,
-                          check_isodate, check_mime_type, check_required_key,
-                          check_sha256, check_uri, github_branch, github_repo)
+                          check_isodate, check_mime_type, check_required_props,
+                          check_sha256, check_uri, github_branch, github_repo,
+                          load_entity_schema)
 
 
 class RootDataEntity(DefaultEntity):
@@ -48,8 +49,12 @@ class RootDataEntity(DefaultEntity):
             "name",
             "funder"
         ]
-        check_required_key(self, required_terms)
-        check_allprops_type(self)
+
+        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        requires = [prop for prop in schema["required_list"] if prop not in ["dateCreated", "hasPart"]]
+
+        check_required_props(self, requires)
+        check_allprops_type(self, schema["type_dict"])
 
     def validate(self) -> None:
         # TODO: impl.

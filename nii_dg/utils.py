@@ -28,7 +28,7 @@ def github_branch() -> str:
     return "develop"
 
 
-def load_entity_expected_types(schema: str, entity: str) -> Dict[str, str]:
+def load_entity_schema(schema: str, entity: str) -> Dict[str, Any]:
     schema_file = Path(__file__).resolve().parent.joinpath(f"schema/{schema}.yml")
     if not schema_file.exists():
         raise PropsError(f"Tried to load {entity} from schema/{schema}.yml, but this file is not found.")
@@ -36,7 +36,11 @@ def load_entity_expected_types(schema: str, entity: str) -> Dict[str, str]:
         schema_obj = yaml.safe_load(f)
     if entity not in schema_obj:
         raise PropsError(f"Tried to load {entity} from schema/{schema}.yml, but this entity is not found.")
-    return {p_name: p_obj["expected_type"] for p_name, p_obj in schema_obj[entity]["props"].items()}
+
+    entity_schema: Dict[str, Union[Dict[str, str], List[str]]] = {}
+    entity_schema["type_dict"] = {p_name: p_obj["expected_type"] for p_name, p_obj in schema_obj[entity]["props"].items()}
+    entity_schema["required_list"] = [p_name for p_name, p_obj in schema_obj[entity]["props"].items() if p_obj["required"] == "Required."]
+    return entity_schema
 
 
 def import_entity_class(schema: str, entity: str) -> Any:
@@ -117,22 +121,21 @@ def check_prop_type(entity: "Entity", prop: str, value: Any, expected_type: str)
         raise UnexpectedImplementationError(e)
 
 
-def check_allprops_type(entity: "Entity") -> None:
+def check_allprops_type(entity: "Entity", typedict: Dict[str, str]) -> None:
     """
     Check the type of property by referring schema.yml.
     """
-    type_schema = load_entity_expected_types(entity.schema, entity.__class__.__name__)
 
     for k, v in entity.items():
         try:
             if k in ["@type", "@context"]:
                 continue
-            check_prop_type(entity, k, v, type_schema[k])
+            check_prop_type(entity, k, v, typedict[k])
         except KeyError:
             raise PropsError(f"The term {k} is not defined as a usable property in {entity}.") from None
 
 
-def check_required_key(entity: "Entity", required_terms: List[str]) -> None:
+def check_required_props(entity: "Entity", required_terms: List[str]) -> None:
     """
     Check required key is existing or not.
     If not, raise TypeError.
