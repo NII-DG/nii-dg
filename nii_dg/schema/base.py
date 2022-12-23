@@ -7,9 +7,9 @@ from typing import Any, Dict, List, Optional, Union
 
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, Entity
 from nii_dg.error import PropsError, UnexpectedImplementationError
-from nii_dg.utils import (check_content_size, check_mime_type, check_prop_type,
-                          check_required_key, check_sha256, github_branch,
-                          github_repo, load_entity_expected_types)
+from nii_dg.utils import (check_allprops_type, check_content_size,
+                          check_isodate, check_mime_type, check_required_key,
+                          check_sha256, check_uri, github_branch, github_repo)
 
 
 class RootDataEntity(DefaultEntity):
@@ -50,16 +50,7 @@ class RootDataEntity(DefaultEntity):
             "funder"
         ]
         check_required_key(self, required_terms)
-
-        type_schema = load_entity_expected_types(self.schema, self.__class__.__name__)
-
-        for k, v in self.items():
-            try:
-                if k in ["@type", "@context"]:
-                    continue
-                check_prop_type(self, k, v, type_schema[k])
-            except KeyError:
-                raise PropsError(f"The term {k} is not defined as a usable property in {self}.") from None
+        check_allprops_type(self)
 
     def validate(self) -> None:
         # TODO: impl.
@@ -86,30 +77,22 @@ class File(DataEntity):
             "contentSize"
         ]
         check_required_key(self, required_terms)
-
-        type_schema = load_entity_expected_types(self.schema, self.__class__.__name__)
-
-        for k, v in self.items():
-            try:
-                if k in ["@type", "@context"]:
-                    continue
-                check_prop_type(self, k, v, type_schema[k])
-            except KeyError:
-                raise PropsError(f"The term {k} is not defined as a usable property in {self}.") from None
+        check_allprops_type(self)
 
         # try:
         #     idtype = is_url_or_path(self["@id"])
         # except ValueError:
         #     raise TypeError("Value of '@id' MUST be URL of file path.") from None
 
+        if check_uri(self, "@id") == "abs_path":
+            raise PropsError(f"The @id value in {self} MUST be URL or relative path to the file, not absolute path.")
         check_content_size(self, "contentSize")
 
         try:
             check_mime_type(self)
             check_sha256(self)
-            # if is_url_or_path(self["url"]) != "url":
-            #     raise ValueError
-            # datetime.datetime.strptime(self["sdDatePublished"], "%Y-%m-%d")
+            check_uri(self, "url", "url")
+            check_isodate(self, "sdDatePublished")
         except KeyError:
             pass
 
