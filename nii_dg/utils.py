@@ -135,14 +135,14 @@ def check_prop_type(entity: "Entity", prop: str, value: Any, expected_type: str)
 #             ))
 
 
-def check_required_key(ent: "Entity", required_terms: List[str]) -> None:
+def check_required_key(entity: "Entity", required_terms: List[str]) -> None:
     """
     Check required key is existing or not.
     If not, raise TypeError.
     """
     for k in required_terms:
-        if k not in ent.keys():
-            raise PropsError(f"The term {k} is required in {ent}.")
+        if k not in entity.keys():
+            raise PropsError(f"The term {k} is required in {entity}.")
 
 
 def is_url_or_path(value: str) -> Optional[str]:
@@ -167,18 +167,16 @@ def is_url_or_path(value: str) -> Optional[str]:
     raise ValueError
 
 
-def check_content_size(value: str) -> None:
+def check_content_size(entity: "Entity", key: str) -> None:
     """
-    Check file size value is in regulation format.
-    If not, raise ValueError.
+    Check file size value is in the defined format.
+    When it is wrong, return None.
     """
-    pattern = "[0-9]+B"
+    pattern = r"^\d+[KMGTP]B$"
     sizematch = re.compile(pattern)
 
-    if sizematch.match(value):
-        pass
-    else:
-        raise ValueError("File size MUST be integer with suffix 'B' as unit.")
+    if sizematch.fullmatch(entity[key]) is None:
+        raise PropsError(f"The value of {key} in {entity} does not match the defined format. See {entity.context}")
 
 
 def check_mime_type(value: str) -> None:

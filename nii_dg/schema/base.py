@@ -7,8 +7,9 @@ from typing import Any, Dict, List, Optional, Union
 
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, Entity
 from nii_dg.error import PropsError, UnexpectedImplementationError
-from nii_dg.utils import (check_prop_type, check_required_key, github_branch,
-                          github_repo, load_entity_expected_types)
+from nii_dg.utils import (check_content_size, check_prop_type,
+                          check_required_key, github_branch, github_repo,
+                          load_entity_expected_types)
 
 
 class RootDataEntity(DefaultEntity):
@@ -96,40 +97,24 @@ class File(DataEntity):
             except KeyError:
                 raise PropsError(f"The term {k} is not defined as a usable property in {self}.") from None
 
-        try:
-            idtype = is_url_or_path(self["@id"])
-        except ValueError:
-            raise TypeError("Value of '@id' MUST be URL of file path.") from None
+        # try:
+        #     idtype = is_url_or_path(self["@id"])
+        # except ValueError:
+        #     raise TypeError("Value of '@id' MUST be URL of file path.") from None
 
-        if idtype == "url":
-            required_keys["sdDatePublished"] = str
-        elif idtype == "path":
-            if self["@id"].endswith('/'):
-                raise ValueError("Value of '@id' in File entity MUST not end with '/'.")
-            optional_keys["sdDatePublished"] = str
-
-        for k in required_keys:
-            check_required_key(self, k)
-
-        for k, v in {**required_keys, **optional_keys}.items():
-            try:
-                check_type(self, k, v)
-            except KeyError:
-                pass
-
-        check_content_size(self["contentSize"])
-
-        try:
-            check_mime_type(self["encodingFormat"])
-            check_sha256(self["sha256"])
-            if is_url_or_path(self["url"]) != "url":
-                raise ValueError
-            datetime.datetime.strptime(self["sdDatePublished"], "%Y-%m-%d")
-        except KeyError:
-            pass
+        check_content_size(self, "contentSize")
+        # try:
+        #     check_mime_type(self["encodingFormat"])
+        #     check_sha256(self["sha256"])
+        #     if is_url_or_path(self["url"]) != "url":
+        #         raise ValueError
+        #     datetime.datetime.strptime(self["sdDatePublished"], "%Y-%m-%d")
+        # except KeyError:
+        #     pass
 
     def validate(self) -> None:
         # TODO: impl.
+        # @idがURLの場合にsdDatePublishedの存在チェック
         pass
 
 
