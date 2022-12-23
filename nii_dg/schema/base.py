@@ -2,118 +2,12 @@
 # coding: utf-8
 
 import datetime
-import re
-import urllib.parse
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, Entity
+from nii_dg.error import PropsError, UnexpectedImplementationError
 from nii_dg.utils import github_branch, github_repo
-
-
-def check_type(ent: Entity, key: str, type: Union[type, List[type]]) -> None:
-    '''
-    Check the type of the value is correct.
-    If not correct, raise TypeError.
-    '''
-    if isinstance(type, list):
-        for e in ent[key]:
-            if not isinstance(e, type[0]):
-                raise TypeError("Elements of '{key}' list MUST be {typename}.".format(
-                    key=key,
-                    typename=type[0].__name__
-                ))
-    else:
-        if not isinstance(ent[key], type):
-            raise TypeError("The value of '{key}' MUST be {typename}.".format(
-                key=key,
-                typename=type.__name__
-            ))
-
-
-def check_required_key(ent: Entity, key: str) -> None:
-    '''
-    Check required key is existing or not.
-    If not, raise TypeError.
-    '''
-    try:
-        ent[key]
-    except KeyError:  # define validation error
-        raise TypeError("The required term '{key}' is not found in the {entity}.".format(
-            key=key,
-            entity=ent.__class__.__name__
-        )) from None
-
-
-def is_url_or_path(value: str) -> Optional[str]:
-    '''
-    Check value is in format of URL or path.
-    If not either, raise ValueError.
-    '''
-    encoded_value = urllib.parse.quote(value, safe="!#$&'()*+,/:;=?@[]\\")
-
-    urlpattern = r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
-    urlmatch = re.compile(urlpattern)
-
-    if urlmatch.match(encoded_value):
-        return "url"
-
-    pathpattern = r"[\w/:%\.\\]+"
-    pathmatch = re.compile(pathpattern)
-
-    if pathmatch.match(encoded_value):
-        return "path"
-
-    raise ValueError
-
-
-def check_content_size(value: str) -> None:
-    '''
-    Check file size value is in regulation format.
-    If not, raise ValueError.
-    '''
-    pattern = "[0-9]+B"
-    sizematch = re.compile(pattern)
-
-    if sizematch.match(value):
-        pass
-    else:
-        raise ValueError("File size MUST be integer with suffix 'B' as unit.")
-
-
-def check_mime_type(value: str) -> None:
-    '''
-    Check encoding format value is in MIME type format.
-    If not, raise ValueError.
-    '''
-    pattern = r"(application|multipart|video|model|message|image|example|font|audio|text)/[\w\-\.\+]+"
-    sizematch = re.compile(pattern)
-
-    if sizematch.match(value):
-        pass
-    else:
-        raise ValueError("File size MUST be integer with suffix 'B' as unit.")
-
-
-def check_sha256(value: str) -> None:
-    '''
-    Check sha256 value is in SHA256 format.
-    If not, raise ValueError.
-    '''
-    pattern = r"(?:[^a-fA-F\d]|\b)([a-fA-F\d]{64})(?:[^a-fA-F\d]|\b)"
-    shamatch = re.compile(pattern)
-
-    if shamatch.match(value):
-        pass
-    else:
-        raise ValueError("Sha256 hash format is wrong.")
-
-
-def check_date(value: str) -> None:
-    '''
-    Check date is in format "YYYY-MM-DD".
-    If not, raise ValueError.
-    '''
 
 
 class RootDataEntity(DefaultEntity):
@@ -147,7 +41,7 @@ class RootDataEntity(DefaultEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        '''
+        """
         Check properties based on the schema of RootDataEntity.
         - @id: Set './' at the constructor. No checl is done here.
         - name: Required. MUST be string.
@@ -158,7 +52,7 @@ class RootDataEntity(DefaultEntity):
         - repository: Optional. Must be RepositoryObject entity.
         - distribution: Optional. Must be DataDownload entity.
         - hasPart: Will be set at RO-Crate Class. No check is done here.
-        '''
+        """
         required_keys: Dict[str, Union[type, List[type]]] = {
             "name": str,
             "funder": [Organization],
@@ -197,7 +91,7 @@ class File(DataEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        '''
+        """
         Check properties based on the schema of File.
         - @id: Required. MUST be path to the file or URL.
         - name: Required. MUST be string.
@@ -206,7 +100,7 @@ class File(DataEntity):
         - sha256: Optional. MUST be the SHA-2 SHA256 hash of the file.
         - url: Optional. Must be URL.
         - sdDatePublished: Required when the file is from outside the RO-Crate Root. MUST be a string in ISO 8601 date format.
-        '''
+        """
         required_keys: Dict[str, Union[type, List[type]]] = {
             "@id": str,
             "name": str,
