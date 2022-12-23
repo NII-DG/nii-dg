@@ -4,22 +4,22 @@ RootDataEntity:
     '@id':
       expected_type: str
       example: ./
-      description: Required. MUST be `./`.
+      description: MUST be `./`.
       required: Required.
     name:
       expected_type: str
       example: Example Research Project
-      description: Required. Title of the research project.
+      description: Title of the research project.
       required: Required.
     description:
       expected_type: str
       example: This research project aims to reveal the effect of xxx.
-      description: Optional. Description of the research project.
+      description: Description of the research project.
       required: Optional.
     funder:
       expected_type: List[Organization]
       example: '[{"@id": "https://ror.org/01b9y6c26"}]'
-      description: Required. Funding agencies of the research project. MUST be an array of @id term of Organization entity.
+      description: Funding agencies of the research project. MUST be an array of @id term of Organization entity.
       required: Required.
     dateCreated:
       expected_type: str
@@ -29,7 +29,7 @@ RootDataEntity:
     hasPart:
       expected_type: List[Union[Dataset, File]]
       example: '[{"@id": "config/"}, {"@id": "config/config.txt"}]'
-      description: Required. MUST be an array of Dataset and File entities that indicate files and directories as subjects of data governance. If there is no file to include, MUST be empty list.
+      description: MUST be an array of Dataset and File entities that indicate files and directories as subjects of data governance. If there is no file to include, MUST be empty list.
       required: Required.
 File:
   description: A file included in the research project, e.g. text file, script file and images.
@@ -37,141 +37,171 @@ File:
     '@id':
       expected_type: str
       example: config/setting.txt
-      description: Required. MUST be either a URI Path relative to RO-Crate root or an absolute URI from which is downdable. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+      description: MUST be either a URI Path relative to RO-Crate root or an absolute URI from which is downdable. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+      required: Required.
     name:
       expected_type: str
       example: setting.txt
-      description: Required. Indicates the file name.
+      description: Indicates the file name.
+      required: Required.
     contentSize:
       expected_type: str
       example: 1560B
-      description: Required. MUST be an integer of the file size with the suffix `B` as a unit, bytes. If necessary, you can also use "KB", "MB", "GB", "TB" and "PB" as a unit. It will be used in the validation of the size listed in DMP.
+      description: MUST be an integer of the file size with the suffix `B` as a unit, bytes. If necessary, you can also use "KB", "MB", "GB", "TB" and "PB" as a unit. It will be used in the validation of the size listed in DMP.
+      required: Required.
     encodingFormat:
       expected_type: str
       example: text/plain
-      description: Optional. MUST be MIME type. Do not use "x-" prefix in MIME type. Indicates file format.
+      description: MUST be MIME type. Do not use "x-" prefix in MIME type. Indicates file format.
+      required: Optional.
     sha256:
       expected_type: str
       example: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       description: Optional. MUST be the SHA-2 SHA256 hash of the file.
+      required: Optional.
     url:
       expected_type: str
       example: https://github.com/username/repository/file
-      description: Optional. MUST be a direct URL to the file.
+      description: MUST be a direct URL to the file.
+      required: Optional.
     sdDatePublished:
       expected_type: str
       example: '2022-12-01'
-      description: Required when the file is from outside the RO-Crate Root. Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
+      description: Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
+      required: Required when the file is from outside the RO-Crate Root.
 Dataset:
   description: A folder of the files included in the research project.
   props:
     '@id':
       expected_type: str
       example: config/
-      description: Required. MUST be either a URI Path relative to the RO-Crate root (stated in the identifier term of RootDataEntity) or an absolute URI. MUST end with `/`. Indicates the path to the directory.
+      description: MUST be either a URI Path relative to the RO-Crate root (stated in the identifier term of RootDataEntity) or an absolute URI. MUST end with `/`. Indicates the path to the directory.
+      required: Required.
     name:
       expected_type: str
       example: config
-      description: Required. Indicates directory name.
+      description: Indicates directory name.
+      required: Required.
     url:
       expected_type: str
       example: https://github.com/username/repository/directory
-      description: Optional. MUST be a direct URL to the directory.
+      description: MUST be a direct URL to the directory.
+      required: Optional.
 Organization:
   description: An organization related to the research project, e.g. university, research institution and funding agency.
   props:
     '@id':
       expected_type: str
       example: https://ror.org/04ksd4g47
-      description: Required. MUST be the URL of the organization. ROR ID is recommended.
+      description: MUST be the URL of the organization. ROR ID is recommended.
+      required: Required.
     name:
       expected_type: str
       example: National Institute of Informatics
-      description: Required. Name of the organization.
+      description: Name of the organization.
+      required: Required.
     alias:
       expected_type: str
       example: NII
-      description: Optional. Another writing of a name of the organization.
+      description: Another writing of a name of the organization.
+      required: Optional.
     description:
       expected_type: str
       example: Japan's only general academic research institution seeking to create future value in the new discipline of informatics.
-      description: Optional. Description of the organization.
+      description: Description of the organization.
+      required: Optional.
 Person:
   description: A person who contributes to the research project, e.g. researcher.
   props:
     '@id':
       expected_type: str
       example: https://orcid.org/0000-0001-2345-6789
-      description: Required. MUST be URL of the person. ORCID ID is recommended.
+      description: MUST be URL of the person. ORCID ID is recommended.
+      required: Required.
     name:
       expected_type: str
       example: Ichiro Suzuki
-      description: Required. Name of the person. MUST be in the order of first name, and family name.
+      description: Name of the person. MUST be in the order of first name, and family name.
+      required: Required.
     alias:
       expected_type: str
       example: S. Ichiro
-      description: Optional. Another writing of a name of the person.
+      description: Another writing of a name of the person.
+      required: Optional.
     affiliation:
       expected_type: Organization
       example: '{"@id": "https://ror.org/04ksd4g47"}'
-      description: Required. Affiliation which the person belongs to. MUST be a @id term of the Organization entity.
+      description: Affiliation which the person belongs to. MUST be a @id term of the Organization entity.
+      required: Required.
     email:
       expected_type: str
       example: ichiro@example.com
-      description: Required. Email address of the person.
+      description: Email address of the person.
+      required: Required.
     telephone:
       expected_type: str
       example: '03-0000-0000'
-      description: Optional. Phone number of the person.
+      description: Phone number of the person.
+      required: Optional.
 License:
   description: A license granted to the data.
   props:
     '@id':
       expected_type: str
       example: 'https://www.apache.org/licenses/LICENSE-2.0'
-      description: Required. MUST be URL of the license.
+      description: MUST be URL of the license.
+      required: Required.
     name:
       expected_type: str
       example: Apache License 2.0
-      description: Required. Name of the license.
+      description: Name of the license.
+      required: Required.
     description:
       expected_type: str
       example: the licensed defined by Apache Software Foundation
-      description: Optional. Description of the license.
+      description: Description of the license.
+      required: Optional.
 RepositoryObject:
   description: A repository where the research data is managed in
   props:
     '@id':
       expected_type: str
       example: 'https://doi.org/xxxxxxxx'
-      description: Required. MUST be URL of the repository. DOI link is recommended.
+      description: MUST be URL of the repository. DOI link is recommended.
+      required: Required.
     name:
       expected_type: str
       example: Gakunin RDM
-      description: Required. Indicates a name of the repository.
+      description: Indicates a name of the repository.
+      required: Required.
     description:
       expected_type: str
       example: Repository managed by NII.
-      description: Optional. Indicates a description of the repository.
+      description: Indicates a description of the repository.
+      required: Optional.
 DataDownload:
   description: Downloadable dataset from the research project.
   props:
     '@id':
       expected_type: str
       example: https://zenodo.org/record/example
-      description: Required. MUST be a reachable URL.
+      description: MUST be a reachable URL.
+      required: Required.
     description:
       expected_type: str
       example: All data set is available from this URL as a zip file.
-      description: Optional. Indicates a description of the download.
+      description: Indicates a description of the download.
+      required: Optional.
     sha256:
       expected_type: str
       example: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-      description: Optional. MUST be the SHA-2 SHA256 hash of the download file.
+      description: MUST be the SHA-2 SHA256 hash of the download file.
+      required: Optional.
     uploadDate:
       expected_type: str
       example: '2022-12-01'
-      description: Optional. MUST be a string in ISO 8601 date format. Indicates the date when this data set was uploaded to this site.
+      description: MUST be a string in ISO 8601 date format. Indicates the date when this data set was uploaded to this site.
+      required: Optional.
 HostingInstitution:
   # based on Organization entity
   description: An organization that has responsibility of managing research data.
@@ -179,35 +209,43 @@ HostingInstitution:
     '@id':
       expected_type: str
       example: https://ror.org/04ksd4g47
-      description: Required. MUST be the URL of the organization. ROR ID is recommended.
+      description: MUST be the URL of the organization. ROR ID is recommended.
+      required: Required.
     name:
       expected_type: str
       example: National Institute of Informatics
-      description: Required. Name of the organization.
+      description: Name of the organization.
+      required: Required.
     description:
       expected_type: str
       example: Japan's only general academic research institution seeking to create future value in the new discipline of informatics.
-      description: Optional. Description of the organization.
+      description: Description of the organization.
+      required: Optional.
     address:
       expected_type: str
       example: '2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430'
-      description: Required. Physical address of the organization.
+      description: Physical address of the organization.
+      required: Required.
 ContactPoint:
   description: A contact information.
   props:
     '@id':
       expected_type: str
       example: '#mailto:contact@example.com'
-      description: Required. MUST be email with the prefix `#mailto:` or be phone number with the prefix `#callto:`.
+      description: MUST be email with the prefix `#mailto:` or be phone number with the prefix `#callto:`.
+      required: Required.
     name:
       expected_type: str
       example: Sample Inc., Open-Science department, data management unit
-      description: Required. Name of a person or a department in charge of managing data set.
+      description: Name of a person or a department in charge of managing data set.
+      required: Required.
     email:
       expected_type: str
       example: contact@example.com
-      description: Required either email or telephone (described in the next section). Email address as contact information.
+      description: Email address as contact information.
+      required: Required either email or telephone (described in the next section).
     telephone:
       expected_type: str
       example: '03-0000-0000'
-      description: Required either email (described in the previous section) or telephone. Phone number as contact information.
+      description: Phone number as contact information.
+      required: Required either email (described in the previous section) or telephone.
