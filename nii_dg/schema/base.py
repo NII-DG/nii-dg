@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -78,11 +77,6 @@ class File(DataEntity):
         ]
         check_required_key(self, required_terms)
         check_allprops_type(self)
-
-        # try:
-        #     idtype = is_url_or_path(self["@id"])
-        # except ValueError:
-        #     raise TypeError("Value of '@id' MUST be URL of file path.") from None
 
         if check_uri(self, "@id") == "abs_path":
             raise PropsError(f"The @id value in {self} MUST be URL or relative path to the file, not absolute path.")
