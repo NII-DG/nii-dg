@@ -207,3 +207,25 @@ def check_isodate(entity: "Entity", key: str) -> None:
         datetime.date.fromisoformat(entity[key])
     except ValueError:
         raise PropsError(f"The value of {key} in {entity} is not in the ISO 8601 date format.") from None
+
+
+def check_email(entity: "Entity", key: str) -> None:
+    """
+    Check email format.
+    """
+    pattern = r"^[\w\-_]+(.[\w\-_]+)*@([\w][\w\-]*[\w]\.)+[A-Za-z]{2,}$"
+    emailmatch = re.compile(pattern)
+
+    if emailmatch.fullmatch(entity[key]) is None:
+        raise PropsError(f"The value of {key} in {entity} is not correct email format.")
+
+
+def check_phonenumber(entity: "Entity", key: str) -> None:
+    """
+    Check phone-number format.
+    """
+    pattern = r"(^0(\d{1}\-?\d{4}|\d{2}\-?\d{3}|\d{3}\-?\d{2}|\d{4}\-?\d{1})\-?\d{4}$|^0[5789]0\-?\d{4}\-?\d{4}$)"
+    phonematch = re.compile(pattern)
+
+    if phonematch.fullmatch(entity[key]) is None:
+        raise PropsError(f"The value of {key} in {entity} is not correct email format.")

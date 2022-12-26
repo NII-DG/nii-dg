@@ -55,7 +55,7 @@ DMP:
     keyword:
       expected_type: str
       example: Informatics
-      description: Required. Indicates research filed of the data set. Basically it is the same as that of research project, stated in RootDataEntity.
+      description: Required. Indicates research filed of the data set. Basically it is the same as that of research project, stated in DMPMetadata entityDMPMetadata entity.
     accessRights:
       expected_type: Literal["open access", "restricted access", "embargoed access", "metadata only access"]
       example: open access
