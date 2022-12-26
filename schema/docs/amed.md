@@ -47,7 +47,7 @@ A file included in the research project, e.g. text file, script file and images.
 | `encodingFormat` | `str` | Optional. | MUST be MIME type. Do not use "x-" prefix in MIME type. Indicates file format. | `text/plain` |
 | `sha256` | `str` | Optional. | MUST be the SHA-2 SHA256 hash of the file. | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | `url` | `str` | Optional. | MUST be a direct URL to the file. | `https://github.com/username/repository/file` |
-| `sdDatePublished` | `str` | Required when the file is from outside the RO-Crate Root. | Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format. | `2022-12-01` |
+| `sdDatePublished` | `str` | Required when the file is from outside the repository. | Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format. | `2022-12-01` |
 
 ## ClinicalResearchResistration
 Identifier information that is registered to clinical research resistration service.

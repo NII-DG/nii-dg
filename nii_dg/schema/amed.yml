@@ -165,7 +165,7 @@ File:
     sdDatePublished:
       expected_type: str
       example: '2022-12-01'
-      required: Required when the file is from outside the RO-Crate Root.
+      required: Required when the file is from outside the repository.
       description: Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
 ClinicalResearchResistration:
   description: Identifier information that is registered to clinical research resistration service.

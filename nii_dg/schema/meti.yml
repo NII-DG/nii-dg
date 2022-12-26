@@ -106,7 +106,7 @@ File:
     '@id':
       expected_type: str
       example: config/setting.txt
-      description: Required. MUST be either a URI Path relative to the top directory of your repository (stated in the identifier term of RootDataEntity) or an absolute URI. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+      description: Required. MUST be either a URI Path relative to the top directory of your repository (stated in DMP entity) or an absolute URI. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
     name:
       expected_type: str
       example: setting.txt
@@ -134,4 +134,4 @@ File:
     sdDatePublished:
       expected_type: str
       example: '2022-12-01'
-      description: Required when the file is from outside the RO-Crate Root. Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
+      description: Required when the file is from outside the repository. Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
