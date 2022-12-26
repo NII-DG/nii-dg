@@ -97,12 +97,12 @@ DMP:
     repository:
       expected_type: RepositoryObject
       example: '{ "@id": "https://doi.org/xxxxxxxx" }'
-      required: Required. When all data set is managed in a single repository, it can be omitted instead of adding to RootDataEntity.
+      required: Required. When all data set is managed in a single repository, it can be omitted instead of adding to DMPMetadata entity.
       description: MUST be @id term of the RepositoryObject entity. Indicates repository where the data is managed.
     distribution:
       expected_type: DataDownload
       example: '{"@id": "https://zenodo.org/record/example"}'
-      required: Required when accessRights has `open access`. When all open-access data set is available from a single URL, it can be omitted instead of adding to RootDataEntity.
+      required: Required when accessRights has `open access`. When all open-access data set is available from a single URL, it can be omitted instead of adding to DMPMetadata entity.
       description: MUST be @id term of the DataDownload entity. Indicates where the download URL of the data set.
     contentSize:
       expected_type: Literal["1GB", "10GB", "100GB", "over100GB"]
@@ -164,7 +164,7 @@ File:
       expected_type: str
       example: config/setting.txt
       required: Required.
-      description: MUST be either a URI Path relative to the top directory of your repository (stated in DMP entity) or an absolute URI. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+      description: MUST be either a URI Path relative to the top directory of your repository (stated in DMP entity) or an absolute URI. When the file is from outside this research project, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
     name:
       expected_type: str
       example: setting.txt
@@ -198,5 +198,5 @@ File:
     sdDatePublished:
       expected_type: str
       example: '2022-12-01'
-      required: Required when the file is from outside the repository.
+      required: Required when the file is from outside this research project.
       description: Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
