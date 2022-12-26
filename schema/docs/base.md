@@ -51,7 +51,7 @@ A person who contributes to the research project, e.g. researcher.
 | `alias` | `str` | Optional. | Another writing of a name of the person. | `S. Ichiro` |
 | `affiliation` | `Organization` | Required. | Affiliation which the person belongs to. MUST be a @id term of the Organization entity. | `{"@id": "https://ror.org/04ksd4g47"}` |
 | `email` | `str` | Required. | Email address of the person. | `ichiro@example.com` |
-| `telephone` | `str` | Optional. | Phone number of the person. | `03-0000-0000` |
+| `telephone` | `str` | Optional. | Phone number of the person. Hyphen can be used as a separator. | `03-0000-0000` |
 
 ## License
 A license granted to the data.
