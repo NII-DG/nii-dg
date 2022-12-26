@@ -24,7 +24,7 @@ DMPMetadata:
     distribution:
       expected_type: DataDownload
       example: '{"@id": "https://zenodo.org/record/example"}'
-      description: Can be added when accesRights have `open access` and all open-access data set is available from a single URL. MUST be @id term of DataDownload entity. Indicates where the download URL of the data set.
+      description: Can be added when accesRights in tied DMP entity has `open access` and all open-access data set is available from a single URL. MUST be @id term of DataDownload entity. Indicates where the download URL of the data set.
     keyword:
       expected_type: str
       example: Informatics

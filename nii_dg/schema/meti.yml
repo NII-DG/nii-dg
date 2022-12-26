@@ -95,7 +95,7 @@ DMP:
     distribution:
       expected_type: DataDownload
       example: '{"@id": "https://zenodo.org/record/example"}'
-      description: Required when accessRights has `open access`. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, it can be omitted instead of adding to RootDataEntity. Indicates where the download URL of the data set.
+      description: Required when accessRights in tied DMP entity has `open access`. MUST be @id term of the DataDownload entity. When all open-access data set is available from a single URL, it can be omitted instead of adding to RootDataEntity. Indicates where the download URL of the data set.
     contactPoint:
       expected_type: ContactPoint
       example: '{ "@id": "#mailto:contact@example.com" }'

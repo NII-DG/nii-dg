@@ -2,89 +2,62 @@
 # coding: utf-8
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional
 
-from nii_dg.entity import DataEntity, Entity
-from nii_dg.schema import (DataDownload, HostingInstitution, Organization,
-                           Person, RepositoryObject)
-from nii_dg.schema import RootDataEntity as BaseRootDataEntity
-from nii_dg.utils import github_branch, github_repo  # noqa
-
-
-def check_type(ent: Entity, key: str, type: Union[type, List[type]]) -> None:
-    if isinstance(type, list):
-        for e in ent[key]:
-            if not isinstance(e, type[0]):
-                raise TypeError("Elements of '{key}' list MUST be {typename}.".format(
-                    key=key,
-                    typename=type[0].__name__
-                ))
-    else:
-        if not isinstance(ent[key], type):
-            raise TypeError("The value of '{key}' MUST be {typename}.".format(
-                key=key,
-                typename=type.__name__
-            ))
+from nii_dg.entity import ContextualEntity, DataEntity
+from nii_dg.error import PropsError
+from nii_dg.utils import (check_allprops_type, check_content_size,  # noqa
+                          check_isodate, check_mime_type, check_required_props,
+                          check_sha256, check_uri, load_entity_schema)
 
 
-def check_required_key(ent: Entity, key: str) -> None:
-    try:
-        ent[key]
-    except KeyError:  # define validation error
-        raise TypeError("The required term '{key}' is not found in the {entity}.".format(
-            key=key,
-            entity=ent.__class__.__name__
-        )) from None
-
-
-class RootDataEntity(BaseRootDataEntity):
-    """\
-    See https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#direct-properties-of-the-root-data-entity.
-    """
-
+class DMPMetadata(ContextualEntity):
     def __init__(self, props: Optional[Dict[str, Any]] = None):
-        super().__init__()
+        super().__init__(id="#AMED-DMP", props=props)
+        self["name"] = "AMED-DMP"
+
+    @property
+    def schema(self) -> str:
+        return Path(__file__).stem
+
+    def as_jsonld(self) -> Dict[str, Any]:
+        self.check_props()
+        return super().as_jsonld()
 
     def check_props(self) -> None:
-        '''
-        Check properties based on the schema of RootDataEntity.
-        - @id: Set './' at the constructor. No checl is done here.
-        - name: Required. MUST be string.
-        - description: Optional. MUST be string.
-        - funder: Required. MUST be an array of Organization entity.
-        - funding: Required. MUST be string.
-        - chiefResearcher: Required. MUST be Person entity.
-        - dateCreated: 自動生成?
-        - creator: Required. Must be an array of Person entity.
-        - hostingInstitution: Required. MUST be Organization entity.
-        - dataManager: Required. Must be Person entity.
-        - repository: Required. Must be RepositoryObject entity.
-        - distribution: Optional. Must be DataDownload entity.
-        - hasPart: Will be set at RO-Crate Class. No check is done here.
-        '''
-        required_keys: Dict[str, Union[type, List[type]]] = {
-            "name": str,
-            "funder": [Organization],
-            "funding": str,
-            "chiefResearcher": Person,
-            "creator": [Person],
-            "hostingInstitution": HostingInstitution,
-            "dataManager": Person
-        }
-        optional_keys: Dict[str, Union[type, List[type]]] = {
-            "description": str,
-            "repository": RepositoryObject,
-            "distribution": DataDownload
-        }
+        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        requires = [prop for prop in schema["required_list"] if prop not in ["@id", "name"]]
 
-        for k in required_keys:
-            check_required_key(self, k)
+        check_required_props(self, requires)
+        check_allprops_type(self, schema["type_dict"])
 
-        for k, v in {**required_keys, **optional_keys}.items():
-            try:
-                check_type(self, k, v)
-            except KeyError:
-                pass
+    def validate(self) -> None:
+        # TODO: impl.
+        pass
+
+
+class DMP(ContextualEntity):
+    def __init__(self, id: int, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id="#dmp:" + str(id), props=props)
+
+    @property
+    def schema(self) -> str:
+        return Path(__file__).stem
+
+    def as_jsonld(self) -> Dict[str, Any]:
+        self.check_props()
+        return super().as_jsonld()
+
+    def check_props(self) -> None:
+        schema = load_entity_schema(self.schema, self.__class__.__name__)
+
+        check_required_props(self, schema["required_list"])
+        check_allprops_type(self, schema["type_dict"])
+
+        try:
+            check_isodate(self, "availabilityStarts")
+        except KeyError:
+            pass
 
     def validate(self) -> None:
         # TODO: impl.
@@ -104,8 +77,47 @@ class File(DataEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        schema = load_entity_schema(self.schema, self.__class__.__name__)
+
+        check_required_props(self, schema["required_list"])
+        check_allprops_type(self, schema["type_dict"])
+
+        if check_uri(self, "@id") == "abs_path":
+            raise PropsError(f"The @id value in {self} MUST be URL or relative path to the file, not absolute path.")
+        check_content_size(self, "contentSize")
+
+        try:
+            check_mime_type(self)
+            check_sha256(self)
+            check_uri(self, "url", "url")
+            check_isodate(self, "sdDatePublished")
+        except KeyError:
+            pass
+
+    def validate(self) -> None:
         # TODO: impl.
         pass
+
+
+class ClinicalResearchResistration(ContextualEntity):
+    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id=id, props=props)
+
+    @property
+    def schema(self) -> str:
+        return Path(__file__).stem
+
+    def as_jsonld(self) -> Dict[str, Any]:
+        self.check_props()
+        return super().as_jsonld()
+
+    def check_props(self) -> None:
+        schema = load_entity_schema(self.schema, self.__class__.__name__)
+
+        check_required_props(self, schema["required_list"])
+        check_allprops_type(self, schema["type_dict"])
+
+        check_uri(self, "@id", "url")
 
     def validate(self) -> None:
         # TODO: impl.
