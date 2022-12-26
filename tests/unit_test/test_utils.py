@@ -2,7 +2,7 @@
 # coding: utf-8
 from typing import Any, List, Literal, Union
 
-import pytest
+import pytest  # noqa: F401
 
 from nii_dg.error import PropsError
 from nii_dg.schema.amed import File as AmedFile
