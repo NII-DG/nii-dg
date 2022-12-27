@@ -67,3 +67,7 @@ def test_as_jsonld() -> None:
     }
 
     assert ent.as_jsonld() == jsonld
+
+
+def test_validate() -> None:
+  pass

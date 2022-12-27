@@ -64,30 +64,6 @@ class DMP(ContextualEntity):
         pass
 
 
-class Person(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema(self) -> str:
-        return Path(__file__).stem
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
-
-    def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
-        requires = [prop for prop in schema["required_list"] if prop not in ["@id", "name"]]
-
-        check_required_props(self, requires)
-        check_allprops_type(self, schema["type_dict"])
-
-    def validate(self) -> None:
-        # TODO: impl.
-        pass
-
-
 class File(DataEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)

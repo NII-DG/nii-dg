@@ -61,3 +61,7 @@ def test_as_jsonld() -> None:
     }
 
     assert root.as_jsonld() == jsonld
+
+
+def test_validate() -> None:
+    pass
