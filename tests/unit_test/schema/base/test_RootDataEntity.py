@@ -23,8 +23,29 @@ def test_check_props() -> None:
     root = RootDataEntity()
 
     # error
-    with pytest.raises(PropsError):
+    with pytest.raises(PropsError) as e1:
         root.check_props()
+    assert str(e1.value) == "The term name is required in <Dataset ./>."
+
+    with pytest.raises(PropsError) as e2:
+        root["name"] = "test"
+        root.check_props()
+    assert str(e2.value) == "The term funder is required in <Dataset ./>."
+
+    with pytest.raises(PropsError) as e3:
+        root["funder"] = "test"
+        root.check_props()
+    assert str(e3.value) == "The type of funder in <Dataset ./> MUST be a list; got str instead."
+
+    with pytest.raises(PropsError) as e4:
+        root["funder"] = ["test"]
+        root.check_props()
+    assert str(e4.value) == "The type of funder[0] in <Dataset ./> MUST be nii_dg.schema.base.Organization; got str instead."
+
+    with pytest.raises(PropsError) as e5:
+        root["funder"] = [Organization("https://example.com")]
+        root.check_props()
+    assert str(e5.value) == "The type of funder[0] in <Dataset ./> MUST be nii_dg.schema.base.Organization; got str instead."
 
 
 def test_as_jsonld() -> None:

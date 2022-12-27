@@ -4,7 +4,7 @@
 import pytest  # noqa: F401
 
 from nii_dg.error import PropsError
-from nii_dg.schema.amed import DMPMetadata
+from nii_dg.schema.amed import DMP, DMPMetadata
 from nii_dg.schema.base import HostingInstitution, Person, RootDataEntity
 
 
@@ -101,4 +101,31 @@ def test_check_props() -> None:
 
 
 def test_as_jsonld() -> None:
-    pass
+    ent = DMPMetadata(
+        {
+            "funding": "test funding"
+        })
+    ent["about"] = RootDataEntity()
+    sample_person = Person("https://example.com/person")
+    ent["chiefResearcher"] = sample_person
+    ent["creator"] = [sample_person]
+    ent["dataManager"] = sample_person
+
+    ent["hostingInstitution"] = HostingInstitution("https://example.com")
+    ent["hasPart"] = [DMP(1)]
+
+    jsonld = {
+        "@id": "#AMED-DMP",
+        "@type": "DMPMetadata",
+        "name": "AMED-DMP",
+        "about": {"@id": "./"},
+        "funding": "test funding",
+        "chiefResearcher": {"@id": "https://example.com/person"},
+        "creator": [{"@id": "https://example.com/person"}],
+        "dataManager": {"@id": "https://example.com/person"},
+        "hostingInstitution": {"@id": "https://example.com"},
+        "hasPart": [{"@id": "#dmp:1"}],
+        "@context": "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/amed/DMPMetadata.json"
+    }
+
+    assert ent.as_jsonld() == jsonld
