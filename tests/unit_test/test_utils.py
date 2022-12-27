@@ -9,7 +9,7 @@ from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import RootDataEntity
 from nii_dg.utils import (check_content_size, check_email, check_isodate,
-                          check_mime_type, check_required_key, check_sha256,
+                          check_mime_type, check_required_props, check_sha256,
                           check_uri, convert_string_type_to_python_type,
                           import_entity_class, load_entity_expected_types)
 
@@ -72,7 +72,7 @@ def test_check_allprop_type() -> None:
     pass
 
 
-def test_check_required_key() -> None:
+def test_check_required_props() -> None:
     # TODO impl. after impl. schema/base.py
     pass
 

@@ -70,7 +70,7 @@ class Person(BasePerson):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-   def check_props(self) -> None:
+    def check_props(self) -> None:
         schema = load_entity_schema(self.schema, self.__class__.__name__)
         requires = [prop for prop in schema["required_list"] if prop not in ["@id", "name"]]
 

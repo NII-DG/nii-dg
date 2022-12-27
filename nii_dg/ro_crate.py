@@ -6,6 +6,7 @@ Definition of RO-Crate class.
 """
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -56,6 +57,7 @@ class ROCrate():
 
     def as_jsonld(self) -> Dict[str, Any]:
         # add dateCreated to RootDataEntity
+        self.root["dateCreated"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
         return {
             "@context": self.BASE_CONTEXT,
             "@graph": [e.as_jsonld() for e in self.default_entities + self.data_entities + self.contextual_entities]  # type: ignore
