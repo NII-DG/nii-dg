@@ -55,7 +55,7 @@ class DMP(ContextualEntity):
         check_allprops_type(self, schema["type_dict"])
 
         try:
-            check_isodate(self, "availabilityStarts")
+            check_isodate(self, "availabilityStarts", "future")
         except KeyError:
             pass
 
@@ -90,7 +90,7 @@ class File(DataEntity):
             check_mime_type(self)
             check_sha256(self)
             check_uri(self, "url", "url")
-            check_isodate(self, "sdDatePublished")
+            check_isodate(self, "sdDatePublished", "past")
         except KeyError:
             pass
 

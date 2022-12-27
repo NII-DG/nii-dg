@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, Entity
-from nii_dg.error import PropsError, UnexpectedImplementationError
+from nii_dg.error import (GovernanceError, PropsError,
+                          UnexpectedImplementationError)
 from nii_dg.utils import (check_allprops_type, check_content_size, check_email,
                           check_isodate, check_mime_type, check_phonenumber,
                           check_required_props, check_sha256, check_uri,
@@ -81,14 +83,16 @@ class File(DataEntity):
             check_mime_type(self)
             check_sha256(self)
             check_uri(self, "url", "url")
-            check_isodate(self, "sdDatePublished")
+            check_isodate(self, "sdDatePublished", "past")
         except KeyError:
             pass
 
     def validate(self) -> None:
         # TODO: impl.
         # @idがURLの場合にsdDatePublishedの存在チェック
-        pass
+        if check_uri(self, "@id") == "url":
+            if "sdDatePublished" not in self.keys():
+                raise GovernanceError(f"The term sdDatePublished MUST be included in {self}.")
 
 
 class Dataset(DataEntity):

@@ -30,12 +30,13 @@ def test_check_props() -> None:
 
 
 def test_as_jsonld() -> None:
-    ent = File("test", {"name": "test"})
+    ent = File("test", {"name": "test", "contentSize": "100GB"})
 
     jsonld = {
         "@id": "test",
         "@type": "File",
         "name": "test",
+        "contentSize": "100GB",
         "@context": "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/File.json"
     }
 

@@ -60,7 +60,7 @@ class File(DataEntity):
             check_mime_type(self)
             check_sha256(self)
             check_uri(self, "url", "url")
-            check_isodate(self, "sdDatePublished")
+            check_isodate(self, "sdDatePublished", "past")
         except KeyError:
             pass
 
