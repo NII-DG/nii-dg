@@ -4,8 +4,10 @@
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from nii_dg.entity import ContextualEntity, DataEntity
+from nii_dg.entity import ContextualEntity
 from nii_dg.error import PropsError
+from nii_dg.schema.base import File as BaseFile
+from nii_dg.schema.base import Person as BasePerson
 from nii_dg.utils import (check_allprops_type, check_content_size,  # noqa
                           check_isodate, check_mime_type, check_required_props,
                           check_sha256, check_uri, load_entity_schema)
@@ -64,19 +66,11 @@ class DMP(ContextualEntity):
         pass
 
 
-class Person(ContextualEntity):
+class Person(BasePerson):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @property
-    def schema(self) -> str:
-        return Path(__file__).stem
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
-
-    def check_props(self) -> None:
+   def check_props(self) -> None:
         schema = load_entity_schema(self.schema, self.__class__.__name__)
         requires = [prop for prop in schema["required_list"] if prop not in ["@id", "name"]]
 
@@ -89,17 +83,9 @@ class Person(ContextualEntity):
         pass
 
 
-class File(DataEntity):
+class File(BaseFile):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
-
-    @property
-    def schema(self) -> str:
-        return Path(__file__).stem
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
 
     def check_props(self) -> None:
         schema = load_entity_schema(self.schema, self.__class__.__name__)
