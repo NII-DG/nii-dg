@@ -19,8 +19,12 @@ class DMPMetadata(ContextualEntity):
         self["name"] = "CAO-DMP"
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
@@ -43,8 +47,12 @@ class DMP(ContextualEntity):
         super().__init__(id="#dmp:" + str(id), props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()

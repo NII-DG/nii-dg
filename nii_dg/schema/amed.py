@@ -42,6 +42,11 @@ class DMPMetadata(ContextualEntity):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
+        if self.id != "#AMED-DMP":
+            raise PropsError("The value of @id property of DMPMetadata entity in AMED MUST be '#AMED-DMP'.")
+        if self["name"] != "AMED-DMP":
+            raise PropsError("The value of @name property of DMPMetadata entity in AMED MUST be 'AMED-DMP'.")
+
     def validate(self) -> None:
         # TODO: impl.
         pass
@@ -52,8 +57,12 @@ class DMP(ContextualEntity):
         super().__init__(id="#dmp:" + str(id), props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
@@ -113,8 +122,12 @@ class ClinicalResearchRegistration(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()

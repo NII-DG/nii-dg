@@ -38,16 +38,23 @@ class RootDataEntity(DefaultEntity):
         )
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        schema = load_entity_def_from_schema_file(self.schema, self.__class__.__name__)
         requires = [prop for prop in schema["required_list"] if prop not in ["dateCreated", "hasPart"]]
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        check_unexpected_props(self, entity_def)
+        check_required_props(self, entity_def)
+        check_all_prop_types(self, entity_def)
 
         check_required_props(self, requires)
         check_all_prop_types(self, schema["type_dict"])
@@ -62,8 +69,12 @@ class File(DataEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
@@ -101,8 +112,12 @@ class Dataset(DataEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
@@ -134,8 +149,12 @@ class Organization(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
@@ -164,8 +183,12 @@ class Person(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
@@ -195,8 +218,12 @@ class License(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
@@ -220,8 +247,12 @@ class RepositoryObject(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
@@ -245,8 +276,12 @@ class DataDownload(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
@@ -298,8 +333,12 @@ class ContactPoint(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
