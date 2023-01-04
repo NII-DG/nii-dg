@@ -280,6 +280,9 @@ def check_erad_researcher_number(value: str) -> None:
     """
     Confirm check digit
     """
+    if len(value) != 8:
+        raise ValueError
+
     check_digit = int(value[0])
     sum_val = 0
     for i, num in enumerate(value):
@@ -290,7 +293,7 @@ def check_erad_researcher_number(value: str) -> None:
         else:
             sum_val += int(num)
 
-    if sum_val != check_digit:
+    if (sum_val % 10) != check_digit:
         raise ValueError
 
 
