@@ -7,13 +7,14 @@ import mimetypes
 import re
 from pathlib import Path
 from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
-                    Optional, Union)
+                    Optional, TypedDict, Union)
 from urllib.parse import quote, urlparse
 
 import yaml
 from typeguard import check_type as ori_check_type
 
-from nii_dg.error import PropsError, UnexpectedImplementationError
+from nii_dg.error import (GovernanceError, PropsError,
+                          UnexpectedImplementationError)
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
@@ -29,7 +30,12 @@ def github_branch() -> str:
     return "develop"
 
 
-EntityDef = NewType("EntityDef", Dict[str, Dict[str, Union[str, bool]]])
+class EntityDefDict(TypedDict):
+    expected_type: str
+    required: bool
+
+
+EntityDef = NewType("EntityDef", Dict[str, EntityDefDict])
 
 
 def load_entity_def_from_schema_file(schema_name: str, entity_name: str) -> EntityDef:
@@ -117,7 +123,10 @@ def convert_string_type_to_python_type(type_str: str, schema_name: Optional[str]
 
 
 def check_prop_type(entity: "Entity", prop: str, value: Any, expected_type: str) -> None:
-    excepted_python_type = convert_string_type_to_python_type(expected_type, entity.schema)
+    """
+    Check the type of each property by referring schema.yml.
+    """
+    excepted_python_type = convert_string_type_to_python_type(expected_type, entity.schema_name)
     try:
         ori_check_type(prop, value, excepted_python_type)
     except TypeError as e:
@@ -131,7 +140,7 @@ def check_prop_type(entity: "Entity", prop: str, value: Any, expected_type: str)
 
 def check_all_prop_types(entity: "Entity", entity_def: EntityDef) -> None:
     """
-    Check the type of property by referring schema.yml.
+    Check the type of all property in the entity by referring schema.yml.
     Called after check_unexpected_props().
     """
     for prop, prop_def in entity_def.items():
@@ -157,10 +166,9 @@ def check_required_props(entity: "Entity", entity_def: EntityDef) -> None:
         if prop not in entity.keys():
             raise PropsError(f"The term {prop} is required in {entity}.")
 
-# TODO 名前もイケてない
 
-
-def check_content_formats(entity: "Entity", format_rules: Dict[str, Callable[str]]) -> None:
+def check_content_formats(entity: "Entity", format_rules: Dict[str, Callable[[str], None]]) -> None:
+    # TODO 名前もイケてない
     """\
     expected as called after check_required_props(), check_all_prop_types(), check_unexpected_props()
     """
@@ -168,14 +176,14 @@ def check_content_formats(entity: "Entity", format_rules: Dict[str, Callable[str
         if prop in entity:
             try:
                 check_method(entity[prop])
-            except ValueError:
+            except (TypeError, ValueError):
                 raise PropsError(f"The term {prop} in {entity} is invalid format.") from None
         else:
             # Because optional field
             pass
 
 
-def check_uri(entity: "Entity", key: str, is_url: Optional[Literal["url"]] = None) -> str:
+def classify_uri(entity: "Entity", key: str) -> str:
     """
     Check the value is URI.
     Return 'URL' when the value starts with 'http' or 'https'
@@ -189,79 +197,93 @@ def check_uri(entity: "Entity", key: str, is_url: Optional[Literal["url"]] = Non
 
     if parsed.scheme in ["http", "https"] and parsed.netloc != "":
         return "URL"
-    elif is_url:
-        raise PropsError(f"The term {key} in {entity} MUST be URL.")
-    elif parsed.scheme != "" or encoded_uri.startswith(("/", "\\")):
+    if parsed.scheme != "" or encoded_uri.startswith(("/", "\\")):
         return "abs_path"
-    else:
-        return "rel_path"
+    return "rel_path"
 
 
-def check_content_size(entity: "Entity", key: str) -> None:
+def check_url(value: str) -> None:
+    """
+    Check the value is URL.
+    If not, raise ValueError.
+    """
+    encoded_url = quote(value, safe="!#$&'()*+,/:;=?@[]\\")
+    parsed = urlparse(encoded_url)
+
+    if parsed.scheme not in ["http", "https"] or parsed.netloc == "":
+        raise ValueError
+
+
+def check_content_size(value: str) -> None:
     """
     Check file size value is in the defined format.
+    If not, raise ValueError.
     """
     pattern = r"^\d+[KMGTP]?B$"
-    sizematch = re.compile(pattern)
+    size_match = re.compile(pattern)
 
-    if sizematch.fullmatch(entity[key]) is None:
-        raise PropsError(f"The value of {key} in {entity} does not match the defined format. See {entity.context}")
+    if size_match.fullmatch(value) is None:
+        raise ValueError
 
 
-def check_mime_type(entity: "Entity") -> None:
+def check_mime_type(value: str) -> None:
     """
     Check encoding format value is in MIME type format.
     """
     # TODO: mimetypeの辞書がOSによって差分があるのをどう吸収するか, 例えばtext/markdown
 
-    if mimetypes.guess_extension(entity["encodingFormat"]) is None:
-        raise PropsError(f"The value of encodingFormat in {entity} does not match the MIME type.")
+    if mimetypes.guess_extension(value) is None:
+        raise ValueError
 
 
-def check_sha256(entity: "Entity") -> None:
+def check_sha256(value: str) -> None:
     """
     Check sha256 value is in SHA256 format.
     """
     pattern = r"(?:[^a-fA-F\d]|\b)([a-fA-F\d]{64})(?:[^a-fA-F\d]|\b)"
-    shamatch = re.compile(pattern)
+    sha_match = re.compile(pattern)
 
-    if shamatch.fullmatch(entity["sha256"]) is None:
-        raise PropsError(f"The value of sha256 in {entity} is not a hash generated by the SHA-256 algorithm.")
+    if sha_match.fullmatch(value) is None:
+        raise ValueError
 
 
-def check_isodate(entity: "Entity", key: str, past_or_future: Optional[Literal["past", "future"]] = None) -> None:
+def check_isodate(value: str) -> None:
     """
     Check date is in ISO 8601 format "YYYY-MM-DD".
     """
-    try:
-        isodate = datetime.date.fromisoformat(entity[key])
-    except ValueError:
-        raise PropsError(f"The value of {key} in {entity} is not in the ISO 8601 date format.") from None
-
-    today = datetime.date.today()
-    if past_or_future == "past" and (today - isodate).days < 0:
-        raise PropsError(f"The value of sdDatePublished in {entity} MUST be the date in the past.")
-    if past_or_future == "future" and (today - isodate).days > 0:
-        raise PropsError(f"The value of sdDatePublished in {entity} MUST be the date in the future.")
+    datetime.date.fromisoformat(value)
 
 
-def check_email(entity: "Entity", key: str) -> None:
+def check_email(value: str) -> None:
     """
     Check email format.
     """
     pattern = r"^[\w\-_]+(.[\w\-_]+)*@([\w][\w\-]*[\w]\.)+[A-Za-z]{2,}$"
     email_match = re.compile(pattern)
 
-    if email_match.fullmatch(entity[key]) is None:
-        raise PropsError(f"The value of {key} in {entity} is not correct email format.")
+    if email_match.fullmatch(value) is None:
+        raise ValueError
 
 
-def check_phonenumber(entity: "Entity", key: str) -> None:
+def check_phonenumber(value: str) -> None:
     """
     Check phone-number format.
     """
     pattern = r"(^0(\d{1}\-?\d{4}|\d{2}\-?\d{3}|\d{3}\-?\d{2}|\d{4}\-?\d{1})\-?\d{4}$|^0[5789]0\-?\d{4}\-?\d{4}$)"
     phone_match = re.compile(pattern)
 
-    if phone_match.fullmatch(entity[key]) is None:
-        raise PropsError(f"The value of {key} in {entity} is not correct email format.")
+    if phone_match.fullmatch(value) is None:
+        raise ValueError
+
+
+def govern_isodate(entity: "Entity", key: str, past_or_future: Optional[Literal["past", "future"]] = None) -> None:
+    """
+    Check date is in ISO 8601 format "YYYY-MM-DD".
+    """
+    isodate = datetime.date.fromisoformat(entity[key])
+
+    today = datetime.date.today()
+    if past_or_future == "past" and (today - isodate).days < 0:
+        raise GovernanceError(f"The value of sdDatePublished in {entity} MUST be the date in the past.")
+    if past_or_future == "future" and (today - isodate).days > 0:
+        raise GovernanceError(f"The value of sdDatePublished in {entity} MUST be the date in the future.")

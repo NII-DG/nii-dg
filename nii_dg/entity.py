@@ -93,16 +93,24 @@ class Entity(TypedMutableMapping):
         return template.format(
             repo=github_repo(),
             branch=github_branch(),
-            schema=self.schema,
+            schema=self.schema_name,
             entity=self.type,
         )
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         """\
         Implementation of this method is required in each subclass using comment-outed code.
         """
         # return Path(__file__).stem
+        raise NotImplementedError
+
+    @property
+    def entity_name(self) -> str:
+        """\
+        Implementation of this method is required in each subclass using comment-outed code.
+        """
+        # return self.__class__.__name__
         raise NotImplementedError
 
     def check_props(self) -> None:
