@@ -38,7 +38,7 @@ File:
       expected_type: str
       example: config/setting.txt
       required: Required.
-      description: MUST be either a URI Path relative to RO-Crate root or an absolute URI from which is downdable. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+      description: MUST be either a URI Path relative to RO-Crate root or an absolute URI from which is downloadable. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
     name:
       expected_type: str
       example: setting.txt

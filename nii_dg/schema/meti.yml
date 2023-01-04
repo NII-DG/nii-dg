@@ -73,7 +73,7 @@ DMP:
       expected_type: str
       example: To ensure market competitiveness for commercialization
       required: Required when accessRights has `restricted access`, `embargoed access` or `metadata only access`.
-      description: Indicates why access to the data set is ristricted and embargoed.
+      description: Indicates why access to the data set is restricted and embargoed.
     availabilityStarts:
       expected_type: str
       example: '2023-04-01'

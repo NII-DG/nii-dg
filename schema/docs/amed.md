@@ -3,7 +3,6 @@
 See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg/blob/main/schema/README.md) for more information.
 
 ## DMPMetadata
-
 Metadata of research project that is the subject of this data management plan.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -20,7 +19,6 @@ Metadata of research project that is the subject of this data management plan.
 | `hasPart` | `List[DMP]` | Required. | MUST be an array of DMP entity, which is included in this DMP. | `[{ "@id": "#dmp:1" }, { "@id": "#dmp:2" }]` |
 
 ## DMP
-
 Data management plan for each data collection, e.g. creators of the data collection, access rights, and how to cite the data collection.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -29,8 +27,8 @@ Data management plan for each data collection, e.g. creators of the data collect
 | `description` | `str` | Required. | Indicates data description in DMP. | `Result data calculated by Newton's method` |
 | `keyword` | `str` | Required. | Indicates category of the data set. | `biological origin data` |
 | `accessRights` | `Literal["Unshared", "Restricted Closed Sharing", "Restricted Open Sharing", "Unrestricted Open Sharing"]` | Required. | MUST choose one from `Unshared`, `Restricted Closed Sharing`, `Restricted Open Sharing` and `Unrestricted Open Sharing`. Indicates the availability of the data set. | `Unrestricted Open Sharing` |
-| `availabilityStarts` | `str` | Required when accessRights has `Unshared` or `Restricted Closed Sharing`. If the dataset will not be open sharing e.g. because data set contains personal information, MUST describe the reason of unsharing or closed sharing in the following property, accessRightsInfo. | MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification. Indicates when the data will be open sharing status. | `2023-04-01` |
-| `accessRightsInfo` | `str` | Required when accessRights has `Unshared` or `Restricted Closed Sharing` and there is no availabilityStarts term. | Reason of keep unsharing or closed sharing status. | `Because the dataset contains personal information.` |
+| `availabilityStarts` | `str` | Required when accessRights has `Unshared` or `Restricted Closed Sharing`. If the dataset will not be open sharing e.g. because data set contains personal information, MUST describe the reason of unshared or closed sharing in the following property, accessRightsInfo. | MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification. Indicates when the data will be open sharing status. | `2023-04-01` |
+| `accessRightsInfo` | `str` | Required when accessRights has `Unshared` or `Restricted Closed Sharing` and there is no availabilityStarts term. | Reason of keep unshared or closed sharing status. | `Because the dataset contains personal information.` |
 | `repository` | `RepositoryObject` | Required. When all data set is managed in a single repository, it can be omitted instead of adding to DMPMetadata entity. | Indicates repository where the data is managed. | `{ "@id": "https://doi.org/xxxxxxxx" }` |
 | `distribution` | `DataDownload` | Required when accessRights has `open access`. When all open-access data set is available from a single URL, it can be omitted instead of adding to DMPMetadata entity. | MUST be @id term of the DataDownload entity. Indicates where the download URL of the data set. | `{ "@id": "https://zenodo.org/record/example" }` |
 | `contentSize` | `Literal["1GB", "10GB", "100GB", "over100GB"]` | Optional. | MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition. | `100GB` |
@@ -39,7 +37,6 @@ Data management plan for each data collection, e.g. creators of the data collect
 | `identifier` | `List[ClinicalResearchRegistration]` | Optional. | MUST be array of @id term of ClinicalResearchRegistration entity. When you use clinical research registry service (e.g. jRCT, UMIN-CTR), it can be added @id term of ClinicalResearchRegistration entity of them. Indicates identifier of data set. | `[{"@id": "https://jrct.niph.go.jp/latest-detail/jRCT202211111111"}]` |
 
 ## File
-
 A file included in the research project, e.g. text file, script file and images.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -53,7 +50,6 @@ A file included in the research project, e.g. text file, script file and images.
 | `sdDatePublished` | `str` | Required when the file is from outside this research project. | Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format. | `2022-12-01` |
 
 ## ClinicalResearchRegistration
-
 Identifier information that is registered to clinical research Registration service.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
