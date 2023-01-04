@@ -92,7 +92,7 @@ class File(BaseFile):
         pass
 
 
-class ClinicalResearchResistration(ContextualEntity):
+class ClinicalResearchRegistration(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 

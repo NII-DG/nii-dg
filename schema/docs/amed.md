@@ -3,6 +3,7 @@
 See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg/blob/main/schema/README.md) for more information.
 
 ## DMPMetadata
+
 Metadata of research project that is the subject of this data management plan.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -19,6 +20,7 @@ Metadata of research project that is the subject of this data management plan.
 | `hasPart` | `List[DMP]` | Required. | MUST be an array of DMP entity, which is included in this DMP. | `[{ "@id": "#dmp:1" }, { "@id": "#dmp:2" }]` |
 
 ## DMP
+
 Data management plan for each data collection, e.g. creators of the data collection, access rights, and how to cite the data collection.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -34,9 +36,10 @@ Data management plan for each data collection, e.g. creators of the data collect
 | `contentSize` | `Literal["1GB", "10GB", "100GB", "over100GB"]` | Optional. | MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition. | `100GB` |
 | `gotInformedConsent` | `Literal["yes", "no", "unknown"]` | Required. | MUST choose one from `yes`, `no` or `unknown`. Indicates whether you got informed consent from subjects. | `yes` |
 | `informedConsentFormat` | `Literal["AMED", "other"]` | Required when gotInformedConsent has `yes`. | MUST be either `AMED` or `others`. Indicates format of informed consent you used in this research to collect data. Whichever format you used, it must include the agreement for possibility that the data, including personal information, will be provided to third parties for purposes other than academic research. | `AMED` |
-| `identifier` | `List[ClinicalResearchResistration]` | Optional. | MUST be array of @id term of ClinicalResearchResistration entity. When you use clinical research registry service (e.g. jRCT, UMIN-CTR), it can be added @id term of ClinicalResearchResistration entity of them. Indicates identifier of data set. | `[{"@id": "https://jrct.niph.go.jp/latest-detail/jRCT202211111111"}]` |
+| `identifier` | `List[ClinicalResearchRegistration]` | Optional. | MUST be array of @id term of ClinicalResearchRegistration entity. When you use clinical research registry service (e.g. jRCT, UMIN-CTR), it can be added @id term of ClinicalResearchRegistration entity of them. Indicates identifier of data set. | `[{"@id": "https://jrct.niph.go.jp/latest-detail/jRCT202211111111"}]` |
 
 ## File
+
 A file included in the research project, e.g. text file, script file and images.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -49,8 +52,9 @@ A file included in the research project, e.g. text file, script file and images.
 | `url` | `str` | Optional. | MUST be a direct URL to the file. | `https://github.com/username/repository/file` |
 | `sdDatePublished` | `str` | Required when the file is from outside this research project. | Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format. | `2022-12-01` |
 
-## ClinicalResearchResistration
-Identifier information that is registered to clinical research resistration service.
+## ClinicalResearchRegistration
+
+Identifier information that is registered to clinical research Registration service.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be URL where your registered information is available. | `https://jrct.niph.go.jp/latest-detail/jRCT202211111111` |

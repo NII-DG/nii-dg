@@ -4,7 +4,7 @@
 import pytest  # noqa: F401
 
 from nii_dg.error import PropsError
-from nii_dg.schema.amed import DMP, ClinicalResearchResistration
+from nii_dg.schema.amed import DMP, ClinicalResearchRegistration
 from nii_dg.schema.base import DataDownload, RepositoryObject
 
 
@@ -72,7 +72,7 @@ def test_as_jsonld() -> None:
     })
     ent["repository"] = RepositoryObject("https://example.com/repository")
     ent["distribution"] = DataDownload("https://example.com/datadownload")
-    ent["identifier"] = [ClinicalResearchResistration("https://example.com/jrct")]
+    ent["identifier"] = [ClinicalResearchRegistration("https://example.com/jrct")]
 
     jsonld = {
         "@id": "#dmp:1",
