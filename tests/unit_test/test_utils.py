@@ -87,7 +87,7 @@ def test_check_unexpected_props() -> None:
 
 def test_check_required_props() -> None:
     root = RootDataEntity()
-    entity_def: EntityDef = {
+    entity_def: EntityDef = {  # type:ignore
         "test_prop": {
             "expected_type": "str",
             "required": True
