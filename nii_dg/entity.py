@@ -29,9 +29,11 @@ class Entity(TypedMutableMapping):
 
         self["@id"] = id
         self["@type"] = self.__class__.__name__
+        # self["@context"] = TODO
         self.update(props or {})
 
     def __setitem__(self, key: str, value: Any) -> None:
+        # TODO: @context, @id, @type は書き換え不可にする
         self.data[key] = value
 
     def __getitem__(self, key: str) -> Any:

@@ -7,9 +7,10 @@ from typing import Any, Dict, Optional
 from nii_dg.entity import ContextualEntity
 from nii_dg.error import PropsError
 from nii_dg.schema.base import File as BaseFile
-from nii_dg.utils import (check_allprops_type, check_content_size,  # noqa
+from nii_dg.utils import (check_all_prop_types, check_content_size,
                           check_isodate, check_mime_type, check_required_props,
-                          check_sha256, check_uri, load_entity_schema)
+                          check_sha256, check_unexpected_props, check_uri,
+                          load_entity_def_from_schema_file)
 
 
 class DMPMetadata(ContextualEntity):
@@ -18,19 +19,28 @@ class DMPMetadata(ContextualEntity):
         self["name"] = "AMED-DMP"
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
-        requires = [prop for prop in schema["required_list"] if prop not in ["@id", "name"]]
-
-        check_required_props(self, requires)
-        check_allprops_type(self, schema["type_dict"])
+        """\
+        memo:
+        - 欲している (required) prop があるか -> check required
+        - optional prop -> あればチェック type
+        - 全然知らんやつ prop -> 例外
+        """
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        check_unexpected_props(self, entity_def)
+        check_required_props(self, entity_def)
+        check_all_prop_types(self, entity_def)
 
     def validate(self) -> None:
         # TODO: impl.
@@ -50,10 +60,10 @@ class DMP(ContextualEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        schema = load_entity_def_from_schema_file(self.schema, self.__class__.__name__)
 
         check_required_props(self, schema["required_list"])
-        check_allprops_type(self, schema["type_dict"])
+        check_all_prop_types(self, schema["type_dict"])
 
         try:
             check_isodate(self, "availabilityStarts", "future")
@@ -70,10 +80,16 @@ class File(BaseFile):
         super().__init__(id=id, props=props)
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        schema = load_entity_def_from_schema_file(self.schema, self.__class__.__name__)
 
         check_required_props(self, schema["required_list"])
-        check_allprops_type(self, schema["type_dict"])
+        check_all_prop_types(self, schema["type_dict"])
+
+        # check_content_formats(self, {
+        #     "contentSize", check_content_size,
+        #     "url", check_uri,
+        #     "sha256", check_sha256,
+        # })
 
         if check_uri(self, "@id") == "abs_path":
             raise PropsError(f"The @id value in {self} MUST be URL or relative path to the file, not absolute path.")
@@ -105,10 +121,10 @@ class ClinicalResearchRegistration(ContextualEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        schema = load_entity_def_from_schema_file(self.schema, self.__class__.__name__)
 
         check_required_props(self, schema["required_list"])
-        check_allprops_type(self, schema["type_dict"])
+        check_all_prop_types(self, schema["type_dict"])
 
         check_uri(self, "@id", "url")
 
