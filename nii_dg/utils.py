@@ -276,6 +276,24 @@ def check_phonenumber(value: str) -> None:
         raise ValueError
 
 
+def check_erad_researcher_number(value: str) -> None:
+    """
+    Confirm check digit
+    """
+    check_digit = int(value[0])
+    sum_val = 0
+    for i, num in enumerate(value):
+        if i == 0:
+            continue
+        if i % 2 == 0:
+            sum_val += int(num) * 2
+        else:
+            sum_val += int(num)
+
+    if sum_val != check_digit:
+        raise ValueError
+
+
 def govern_isodate(entity: "Entity", key: str, past_or_future: Optional[Literal["past", "future"]] = None) -> None:
     """
     Check date is in ISO 8601 format "YYYY-MM-DD".

@@ -9,10 +9,10 @@ from nii_dg.error import PropsError
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import Person as BasePerson
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
-                          check_content_size, check_isodate, check_mime_type,
-                          check_required_props, check_sha256,
-                          check_unexpected_props, check_url, classify_uri,
-                          load_entity_def_from_schema_file)
+                          check_content_size, check_erad_researcher_number,
+                          check_isodate, check_mime_type, check_required_props,
+                          check_sha256, check_unexpected_props, check_url,
+                          classify_uri, load_entity_def_from_schema_file)
 
 
 class DMPMetadata(ContextualEntity):
@@ -90,7 +90,9 @@ class Person(BasePerson):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
-        # e-radのcheckdigit
+        check_content_formats(self, {
+            "eradResearcherNumber": check_erad_researcher_number
+        })
 
     def validate(self) -> None:
         # TODO: impl.
