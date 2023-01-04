@@ -24,7 +24,7 @@ Contents from data management plan that is (will be) submitted to the funding ag
 | `hostingInstitution` | `HostingInstitution` | Required. | Indicates hosting institution of the data set. | `{ "@id": "https://ror.org/04ksd4g47" }` |
 | `wayOfManage` | `Literal["commissioned", "self-managed"]` | Required. | Indicated how the data set is managed. | `commissioned` |
 | `accessRights` | `Literal["open access", "restricted access", "embargoed access", "metadata only access"]` | Required. | MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicates the availability of the data set. | `open access` |
-| `reasonForConcealment` | `str` | Required when accessRights has `restricted access`, `embargoed access` or `metadata only access`. | Indicates why access to the data set is ristricted and embargoed. | `To ensure market competitiveness for commercialization` |
+| `reasonForConcealment` | `str` | Required when accessRights has `restricted access`, `embargoed access` or `metadata only access`. | Indicates why access to the data set is restricted and embargoed. | `To ensure market competitiveness for commercialization` |
 | `availabilityStarts` | `str` | Required when accessRights has `embargoed access`. | MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification. | `2023-04-01` |
 | `creator` | `List[Organization]` | Required. | MUST be an array of Organization entities. Indicates the organization which created the data set. | `[{"@id": "https://ror.org/04ksd4g47"}]` |
 | `measurementTechnique` | `str` | Optional. | An explanation of the technique for collecting data. | `Obtained using simulation software.` |

@@ -11,7 +11,7 @@ Metadata of research project that is the subject of this data management plan.
 | `name` | `str` | Required. | MUST be `CAO-DMP`. Indicates the DMP format used by your project. | `CAO-DMP` |
 | `creator` | `List[Person]` | Required. | MUST be an array of @id term of Person entity. Indicates all data creators involved in this research project. | `[{"@id": "https://orcid.org/0000-0001-2345-6789"}]` |
 | `repository` | `RepositoryObject` | Can be added when all data set is managed in a single repository. | MUST be @id term of RepositoryObject entity. Indicates repository where the data is managed. | `{ "@id": "https://doi.org/xxxxxxxx" }` |
-| `distribution` | `DataDownload` | Can be added when accesRights in tied DMP entity has `open access` and all open-access data set is available from a single URL. | MUST be @id term of DataDownload entity. Indicates where the download URL of the data set. | `{"@id": "https://zenodo.org/record/example"}` |
+| `distribution` | `DataDownload` | Can be added when accessRights in tied DMP entity has `open access` and all open-access data set is available from a single URL. | MUST be @id term of DataDownload entity. Indicates where the download URL of the data set. | `{"@id": "https://zenodo.org/record/example"}` |
 | `keyword` | `str` | Required. | Indicates research filed of the project. | `Informatics` |
 | `eradProjectId` | `str` | Required when your project has e-Rad project ID. | Indicates e-Rad project ID. | `123456` |
 | `hasPart` | `List[DMP]` | Required. | MUST be an array of DMP entity, which is included in this DMP. | `[{ "@id": "#dmp:1" }, { "@id": "#dmp:2" }]` |

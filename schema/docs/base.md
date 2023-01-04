@@ -17,7 +17,7 @@ A Dataset that represents the RO-Crate. For more information, see https://www.re
 A file included in the research project, e.g. text file, script file and images.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
-| `@id` | `str` | Required. | MUST be either a URI Path relative to RO-Crate root or an absolute URI from which is downdable. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded. | `config/setting.txt` |
+| `@id` | `str` | Required. | MUST be either a URI Path relative to RO-Crate root or an absolute URI from which is downloadable. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded. | `config/setting.txt` |
 | `name` | `str` | Required. | Indicates the file name. | `setting.txt` |
 | `contentSize` | `str` | Required. | MUST be an integer of the file size with the suffix `B` as a unit, bytes. If necessary, you can also use "KB", "MB", "GB", "TB" and "PB" as a unit. It will be used in the validation of the size listed in DMP. | `1560B` |
 | `encodingFormat` | `str` | Optional. | MUST be MIME type. Do not use "x-" prefix in MIME type. Indicates file format. | `text/plain` |

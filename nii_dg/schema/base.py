@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional
 
-from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, Entity
-from nii_dg.error import (GovernanceError, PropsError,
-                          UnexpectedImplementationError)
-from nii_dg.utils import (check_allprops_type, check_content_size, check_email,
-                          check_isodate, check_mime_type, check_phonenumber,
-                          check_required_props, check_sha256, check_uri,
-                          github_branch, github_repo, load_entity_schema)
+from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity
+from nii_dg.error import GovernanceError, PropsError
+from nii_dg.utils import (EntityDef, check_all_prop_types,
+                          check_content_formats, check_content_size,
+                          check_email, check_isodate, check_mime_type,
+                          check_phonenumber, check_required_props,
+                          check_sha256, check_unexpected_props, check_url,
+                          classify_uri, github_branch, github_repo,
+                          govern_isodate, load_entity_def_from_schema_file)
 
 
 class RootDataEntity(DefaultEntity):
@@ -32,24 +33,29 @@ class RootDataEntity(DefaultEntity):
         return template.format(
             repo=github_repo(),
             branch=github_branch(),
-            schema=self.schema,
+            schema=self.schema_name,
             entity="RootDataEntity",
         )
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
-        requires = [prop for prop in schema["required_list"] if prop not in ["dateCreated", "hasPart"]]
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        entity_def_of_root: EntityDef = {prop: obj for prop, obj in entity_def.items() if prop not in ["dateCreated", "hasPart"]}  # type: ignore
 
-        check_required_props(self, requires)
-        check_allprops_type(self, schema["type_dict"])
+        check_unexpected_props(self, entity_def)
+        check_required_props(self, entity_def_of_root)
+        check_all_prop_types(self, entity_def)
 
     def validate(self) -> None:
         # TODO: impl.
@@ -61,38 +67,46 @@ class File(DataEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        check_unexpected_props(self, entity_def)
+        check_required_props(self, entity_def)
+        check_all_prop_types(self, entity_def)
 
-        check_required_props(self, schema["required_list"])
-        check_allprops_type(self, schema["type_dict"])
-
-        if check_uri(self, "@id") == "abs_path":
+        if classify_uri(self, "@id") == "abs_path":
             raise PropsError(f"The @id value in {self} MUST be URL or relative path to the file, not absolute path.")
-        check_content_size(self, "contentSize")
 
-        try:
-            check_mime_type(self)
-            check_sha256(self)
-            check_uri(self, "url", "url")
-            check_isodate(self, "sdDatePublished", "past")
-        except KeyError:
-            pass
+        check_content_formats(self, {
+            "contentSize": check_content_size,
+            "url": check_url,
+            "sha256": check_sha256,
+            "encodingFormat": check_mime_type,
+            "sdDatePublished": check_isodate
+        })
 
     def validate(self) -> None:
         # TODO: impl.
         # @idがURLの場合にsdDatePublishedの存在チェック
-        if check_uri(self, "@id") == "url":
+        if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"The term sdDatePublished MUST be included in {self}.")
+
+        try:
+            govern_isodate(self, "sdDatePublished", "past")
+        except KeyError:
+            pass
 
 
 class Dataset(DataEntity):
@@ -100,28 +114,32 @@ class Dataset(DataEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_required_props(self, schema["required_list"])
-        check_allprops_type(self, schema["type_dict"])
+        check_unexpected_props(self, entity_def)
+        check_required_props(self, entity_def)
+        check_all_prop_types(self, entity_def)
 
         if not self["@id"].endswith("/"):
             raise PropsError(f"The @id value in {self} MUST end with '/'.")
-        if check_uri(self, "@id") != "rel_path":
+        if classify_uri(self, "@id") != "rel_path":
             raise PropsError(f"The @id value in {self} MUST be relative path to the directory, neither absolute path nor URL.")
 
-        try:
-            check_uri(self, "url", "url")
-        except KeyError:
-            pass
+        check_content_formats(self, {
+            "url": check_url
+        })
 
     def validate(self) -> None:
         # TODO: impl.
@@ -133,25 +151,28 @@ class Organization(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_required_props(self, schema["required_list"])
-        check_allprops_type(self, schema["type_dict"])
+        check_unexpected_props(self, entity_def)
+        check_required_props(self, entity_def)
+        check_all_prop_types(self, entity_def)
 
-        check_uri(self, "@id", "url")
-
-        try:
-            check_uri(self, "url", "url")
-        except KeyError:
-            pass
+        check_content_formats(self, {
+            "@id": check_url,
+            "url": check_url
+        })
 
     def validate(self) -> None:
         # TODO: impl.
@@ -163,26 +184,29 @@ class Person(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_required_props(self, schema["required_list"])
-        check_allprops_type(self, schema["type_dict"])
+        check_unexpected_props(self, entity_def)
+        check_required_props(self, entity_def)
+        check_all_prop_types(self, entity_def)
 
-        check_uri(self, "@id", "url")
-        check_email(self, "email")
-
-        try:
-            check_phonenumber(self, "telephone")
-        except KeyError:
-            pass
+        check_content_formats(self, {
+            "@id": check_url,
+            "email": check_email,
+            "telephone": check_phonenumber
+        })
 
     def validate(self) -> None:
         # TODO: impl.
@@ -194,20 +218,27 @@ class License(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_required_props(self, schema["required_list"])
-        check_allprops_type(self, schema["type_dict"])
+        check_unexpected_props(self, entity_def)
+        check_required_props(self, entity_def)
+        check_all_prop_types(self, entity_def)
 
-        check_uri(self, "@id", "url")
+        check_content_formats(self, {
+            "@id": check_url
+        })
 
     def validate(self) -> None:
         # TODO: impl.
@@ -219,20 +250,27 @@ class RepositoryObject(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_required_props(self, schema["required_list"])
-        check_allprops_type(self, schema["type_dict"])
+        check_unexpected_props(self, entity_def)
+        check_required_props(self, entity_def)
+        check_all_prop_types(self, entity_def)
 
-        check_uri(self, "@id", "url")
+        check_content_formats(self, {
+            "@id": check_url
+        })
 
     def validate(self) -> None:
         # TODO: impl.
@@ -244,26 +282,29 @@ class DataDownload(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_required_props(self, schema["required_list"])
-        check_allprops_type(self, schema["type_dict"])
+        check_unexpected_props(self, entity_def)
+        check_required_props(self, entity_def)
+        check_all_prop_types(self, entity_def)
 
-        check_uri(self, "@id", "url")
-
-        try:
-            check_sha256(self)
-            check_isodate(self, "uploadDate")
-        except KeyError:
-            pass
+        check_content_formats(self, {
+            "@id": check_url,
+            "sha256": check_sha256,
+            "uploadDate": check_isodate
+        })
 
     def validate(self) -> None:
         # TODO: impl.
@@ -275,17 +316,16 @@ class HostingInstitution(Organization):
         super().__init__(id=id, props=props)
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_required_props(self, schema["required_list"])
-        check_allprops_type(self, schema["type_dict"])
+        check_unexpected_props(self, entity_def)
+        check_required_props(self, entity_def)
+        check_all_prop_types(self, entity_def)
 
-        check_uri(self, "@id", "url")
-
-        try:
-            check_uri(self, "url", "url")
-        except KeyError:
-            pass
+        check_content_formats(self, {
+            "@id": check_url,
+            "url": check_url
+        })
 
     def validate(self) -> None:
         # TODO: impl.
@@ -297,24 +337,28 @@ class ContactPoint(ContextualEntity):
         super().__init__(id=id, props=props)
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_required_props(self, schema["required_list"])
-        check_allprops_type(self, schema["type_dict"])
+        check_unexpected_props(self, entity_def)
+        check_required_props(self, entity_def)
+        check_all_prop_types(self, entity_def)
 
-        try:
-            check_email(self, "email")
-            check_phonenumber(self, "telephone")
-        except KeyError:
-            pass
+        check_content_formats(self, {
+            "email": check_email,
+            "telephone": check_phonenumber
+        })
 
     def validate(self) -> None:
         # TODO: impl.

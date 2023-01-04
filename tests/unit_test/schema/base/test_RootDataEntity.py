@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # coding: utf-8
-from typing import Any, List, Literal, Union
 
 import pytest  # noqa: F401
 
@@ -16,7 +15,7 @@ def test_init() -> None:
 
 def test_schema() -> None:
     root = RootDataEntity()
-    assert root.schema == "base"
+    assert root.schema_name == "base"
 
 
 def test_check_props() -> None:
@@ -42,11 +41,6 @@ def test_check_props() -> None:
         root.check_props()
     assert str(e4.value) == "The type of funder[0] in <Dataset ./> MUST be nii_dg.schema.base.Organization; got str instead."
 
-    with pytest.raises(PropsError) as e5:
-        root["funder"] = [Organization("https://example.com")]
-        root.check_props()
-    assert str(e5.value) == "The type of funder[0] in <Dataset ./> MUST be nii_dg.schema.base.Organization; got str instead."
-
 
 def test_as_jsonld() -> None:
     root = RootDataEntity({"name": "test"})
@@ -56,11 +50,12 @@ def test_as_jsonld() -> None:
         "@id": "./",
         "@type": "Dataset",
         "name": "test",
-        "funder": [{"@id": "https://example.com"}],
-        "@context": "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/RootDataEntity.json"
+        "funder": [{"@id": "https://example.com"}]
     }
 
-    assert root.as_jsonld() == jsonld
+    ent_in_json = root.as_jsonld()
+    del ent_in_json["@context"]
+    assert ent_in_json == jsonld
 
 
 def test_validate() -> None:
