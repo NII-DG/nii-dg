@@ -185,7 +185,12 @@ def main(args: List[str]) -> None:
             sample_ent_json=sample_ent_json,
             rootdataentity_option=rootdataentity_option)
 
-        test_file_path = Path(str((Path(__file__).resolve()).parent) + "/" + schema_name + "/test_" + entity_name + ".py").resolve()
+        test_file_dir_path = Path(str((Path(__file__).resolve()).parent) + "/" + schema_name).resolve()
+        if test_file_dir_path.exists() is False:
+            test_file_dir_path.mkdir()
+
+        test_file_path = Path(str(test_file_dir_path) + "/test_" + entity_name + ".py").resolve()
+
         with test_file_path.open("w", encoding="utf-8") as f:
             f.write(scripts.strip() + "\n")
 
