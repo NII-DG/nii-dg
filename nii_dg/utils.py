@@ -297,14 +297,16 @@ def check_erad_researcher_number(value: str) -> None:
         raise ValueError
 
 
-def verify_is_past_date(date: str) -> bool:
+def verify_is_past_date(entity: "Entity", key: str) -> Optional[bool]:
     """
     Check the date is past or not.
     """
     try:
-        iso_date = datetime.date.fromisoformat(date)
+        iso_date = datetime.date.fromisoformat(entity["key"])
+    except KeyError:
+        return None
     except ValueError:
-        raise PropsError(f"The value {date} is invalid date format. MUST be 'YYYY-MM-DD'.") from None
+        raise PropsError(f"The value of {key} in {entity} is invalid date format. MUST be 'YYYY-MM-DD'.") from None
 
     today = datetime.date.today()
     if (today - iso_date).days < 0:
