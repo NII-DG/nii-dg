@@ -26,11 +26,7 @@ def test_init() -> None:
     assert ent["@id"] == "{id_example}"
     assert ent["@type"] == "{entity_type}"
     assert ent.schema_name == "{schema_name}"
-
-
-def test_check_props() -> None:
-    # TO BE UPDATED
-    pass
+    assert ent.entity_name == "{entity_name}"
 
 
 def test_as_jsonld() -> None:
@@ -40,8 +36,13 @@ def test_as_jsonld() -> None:
     jsonld = {sample_ent_json}
 
     ent_in_json = ent.as_jsonld()
-    del ent_in_json["@context"]
+    del ent_in_json["@context"]{rootdataentity_option}
     assert ent_in_json == jsonld
+
+
+def test_check_props() -> None:
+    # TO BE UPDATED
+    pass
 
 
 def test_validate() -> None:
@@ -152,36 +153,33 @@ def main(args: List[str]) -> None:
             )
 
         empty_dict: Dict[Any, Any] = {}
+        entity_type = entity_name
+        entity_id = empty_dict
+        rootdataentity_option = "\n"
+
         if entity_name == "RootDataEntity":
             sample_ent_json["@type"] = "Dataset"
-            scripts += COMMON_METHODS.format(
-                entity_name=entity_name,
-                entity_type="Dataset",
-                schema_name=schema_name,
-                id=empty_dict,
-                id_example=sample_ent_json["@id"],
-                set_properties=set_properties,
-                sample_ent_json=sample_ent_json)
+            entity_type = "Dataset"
+            rootdataentity_option = ', ent_in_json["dateCreated"], ent_in_json["hasPart"]\n'
 
         elif entity_name == "DMPMetadata":
-            scripts += COMMON_METHODS.format(
-                entity_name=entity_name,
-                entity_type=entity_name,
-                schema_name=schema_name,
-                id=empty_dict,
-                id_example=sample_ent_json["@id"],
-                set_properties=set_properties,
-                sample_ent_json=sample_ent_json)
+            pass
+
+        elif entity_name == "DMP":
+            entity_id = sample_ent_json["@id"].replace("#dmp:", "")
 
         else:
-            scripts += COMMON_METHODS.format(
-                entity_name=entity_name,
-                entity_type=entity_name,
-                schema_name=schema_name,
-                id="\""+sample_ent_json["@id"]+"\"",
-                id_example=sample_ent_json["@id"],
-                set_properties=set_properties,
-                sample_ent_json=sample_ent_json)
+            entity_id = "\"" + sample_ent_json["@id"] + "\""
+
+        scripts += COMMON_METHODS.format(
+            entity_name=entity_name,
+            entity_type=entity_type,
+            schema_name=schema_name,
+            id=entity_id,
+            id_example=sample_ent_json["@id"],
+            set_properties=set_properties,
+            sample_ent_json=sample_ent_json,
+            rootdataentity_option=rootdataentity_option)
 
         test_file_path = Path(os.path.dirname(os.path.abspath(__file__)) + "/" + schema_name + "/test_" + entity_name + ".py").resolve()
         with test_file_path.open("w", encoding="utf-8") as f:

@@ -1,46 +1,42 @@
 #!/usr/bin/env python3
 # coding: utf-8
-from typing import Any, List, Literal, Union
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
 from nii_dg.schema.ginfork import GinMonitoring
+
+from nii_dg.schema.base import RootDataEntity
 
 
 def test_init() -> None:
-    ent = GinMonitoring("test")
-    assert ent["@id"] == "test"
+    ent = GinMonitoring("#ginmonitoring:1")
+    assert ent["@id"] == "#ginmonitoring:1"
     assert ent["@type"] == "GinMonitoring"
-
-
-def test_schema() -> None:
-    ent = GinMonitoring("test")
-    assert ent.schema == "ginfork"
-
-
-def test_check_props() -> None:
-    ent = GinMonitoring("test")
-    pass
-
-    # error
-    # with pytest.raises(PropsError) as e1:
-    #     ent.check_props()
-    # assert str(e1.value) == "The term name is required in <Dataset ./>."
+    assert ent.schema_name == "ginfork"
+    assert ent.entity_name == "GinMonitoring"
 
 
 def test_as_jsonld() -> None:
-    ent = GinMonitoring("test", {"name": "test"})
+    ent = GinMonitoring("#ginmonitoring:1")
 
-    jsonld = {
-        "@id": "test",
-        "@type": "GinMonitoring",
-        "name": "test",
-        "@context": "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/ginfork/GinMonitoring.json"
-    }
+    ent["about"] = RootDataEntity("./")
+    ent["contentSize"] = "100GB"
+    ent["workflowIdentifier"] = "bio"
+    ent["datasetStructure"] = "bio"
 
-    assert ent.as_jsonld() == jsonld
+    jsonld = {'@type': 'GinMonitoring', '@id': '#ginmonitoring:1', 'about': {'@id': './'}, 'contentSize': '100GB', 'workflowIdentifier': 'bio', 'datasetStructure': 'bio'}
+
+    ent_in_json = ent.as_jsonld()
+    del ent_in_json["@context"]
+
+    assert ent_in_json == jsonld
+
+
+def test_check_props() -> None:
+    # TO BE UPDATED
+    pass
 
 
 def test_validate() -> None:
+    # TO BE UPDATED
     pass
