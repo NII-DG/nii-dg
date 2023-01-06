@@ -8,10 +8,11 @@ from nii_dg.error import PropsError
 from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import RootDataEntity
-from nii_dg.utils import (EntityDef, check_content_size, check_email,
-                          check_erad_researcher_number, check_isodate,
-                          check_mime_type, check_phonenumber, check_prop_type,
-                          check_required_props, check_sha256, check_url,
+from nii_dg.utils import (EntityDef, check_all_prop_types, check_content_size,
+                          check_email, check_erad_researcher_number,
+                          check_isodate, check_mime_type, check_phonenumber,
+                          check_prop_type, check_required_props, check_sha256,
+                          check_unexpected_props, check_url,
                           convert_string_type_to_python_type,
                           import_entity_class,
                           load_entity_def_from_schema_file)
@@ -20,6 +21,10 @@ from nii_dg.utils import (EntityDef, check_content_size, check_email,
 def test_load_entity_def_from_schema_file() -> None:
     excepted_entity_def = load_entity_def_from_schema_file("base", "RootDataEntity")
     assert excepted_entity_def["@id"] == {"expected_type": "str", "required": True}
+    assert excepted_entity_def["name"] == {"expected_type": "str", "required": True}
+    assert excepted_entity_def["description"] == {"expected_type": "str", "required": False}
+    assert excepted_entity_def["dateCreated"] == {"expected_type": "str", "required": True}
+    assert excepted_entity_def["hasPart"] == {"expected_type": "List[Union[Dataset, File]]", "required": True}
 
     # error
     with pytest.raises(PropsError):
@@ -62,27 +67,47 @@ def test_convert_string_type_to_python_type() -> None:
     # error
     with pytest.raises(PropsError):
         convert_string_type_to_python_type("FooBar", "base")
+    with pytest.raises(PropsError):
         convert_string_type_to_python_type("RootDataEntity", "foobar")
 
 
 def test_check_prop_type() -> None:
-    root = RootDataEntity()
+    ent = BaseFile("text.txt")
 
     # nothing is occurred with correct format
-    check_prop_type(root, "@id", "./", "str")
+    check_prop_type(ent, "@id", "test.txt", "str")
 
+    # error
     with pytest.raises(PropsError):
-        check_prop_type(root, "@id", "./", "int")
+        check_prop_type(ent, "@id", "test.txt", "int")
 
 
 def test_check_all_prop_types() -> None:
-    # TODO impl. after impl. schema/base.py
-    pass
+    ent = BaseFile("text.txt", {"test_prop": 1})
+    entity_def: EntityDef = {  # type:ignore
+        "test_prop": {
+            "expected_type": "str",
+            "required": False
+        }
+    }
+
+    # error
+    with pytest.raises(PropsError):
+        check_all_prop_types(ent, entity_def)
 
 
 def test_check_unexpected_props() -> None:
-    # TODO impl. after impl. schema/base.py
-    pass
+    ent = BaseFile("text.txt", {"undefined_prop": "test"})
+    entity_def: EntityDef = {  # type:ignore
+        "@id": {
+            "expected_type": "str",
+            "required": True
+        }
+    }
+
+    # error
+    with pytest.raises(PropsError):
+        check_unexpected_props(ent, entity_def)
 
 
 def test_check_required_props() -> None:
@@ -156,42 +181,53 @@ def test_check_isodate() -> None:
     # nothing is occurred with correct format
     check_isodate("2023-01-01")
 
+
+@pytest.mark.parametrize('wrong_date', [  # type:ignore
+    "20230131", "2023Jan31", "2023-31-01", "2023/01/31", "2023131", "2023-02-31"])
+def test_check_isodate_error(wrong_date) -> None:
     # error
     with pytest.raises(ValueError):
-        check_isodate("20230101")
-
-    with pytest.raises(ValueError):
-        check_isodate("2023Jan01")
-
-    with pytest.raises(ValueError):
-        check_isodate("2023-31-01")
+        check_isodate(wrong_date)
 
 
-def test_check_email() -> None:
+@pytest.mark.parametrize('correct_email', [  # type:ignore
+    "test@example.com", "test1234@example.co.jp"])
+def test_check_email(correct_email) -> None:
     # nothing is occurred with correct format
-    check_email("test@example.com")
-    check_email("test@example.co.jp")
+    check_email(correct_email)
 
+
+@pytest.mark.parametrize('wrong_email', [  # type:ignore
+    "test@", "@example.co.jp", ".test@example.com"])
+def test_check_email_error(wrong_email) -> None:
     with pytest.raises(ValueError):
-        check_email("abc@")
+        check_email(wrong_email)
 
 
-def test_check_phonenumber() -> None:
+@pytest.mark.parametrize('correct_phone_number', [  # type:ignore
+    "01-2345-6789", "0123456789", "090-1234-5678", "09012345678"])
+def test_check_phone_number(correct_phone_number) -> None:
     # nothing is occurred with correct format
-    check_phonenumber("01-2345-6789")
-    check_phonenumber("0123456789")
-    check_phonenumber("090-1234-5678")
-    check_phonenumber("09012345678")
+    check_phonenumber(correct_phone_number)
 
+
+@pytest.mark.parametrize('wrong_phone_number', [  # type:ignore
+    "123-456", "090-12-345678", "01-2345-678a"])
+def test_check_phone_number_error(wrong_phone_number) -> None:
     with pytest.raises(ValueError):
-        check_phonenumber("123-456")
+        check_phonenumber(wrong_phone_number)
 
 
-def test_check_erad_researcher_number() -> None:
+@pytest.mark.parametrize('correct_researcher_number', [  # type:ignore
+    "01234567"])
+def test_check_erad_researcher_number(correct_researcher_number) -> None:
     # nothing is occurred with correct format
-    check_erad_researcher_number("01234567")
+    check_erad_researcher_number(correct_researcher_number)
 
+
+@pytest.mark.parametrize('wrong_researcher_number', [  # type:ignore
+    "0123456", "00123456", "0123456a", "0123-4567"])
+def test_check_erad_researcher_number_error(wrong_researcher_number) -> None:
     # error
     with pytest.raises(ValueError):
-        check_erad_researcher_number("00123")
-        check_erad_researcher_number("00123456")
+        check_erad_researcher_number(wrong_researcher_number)
