@@ -53,8 +53,12 @@ def test_validate() -> None:
 
 def add_example_value(
         obj: Dict[str, Any], entity_list: List[str], set_properties: str, import_entities: Set[str], import_entities_from_base: Set[str], child_id: Any = None) -> tuple[str, Set[str], Set[str]]:
-    if obj["expected_type"] in ["str", "bool"] or obj["expected_type"].startswith("Literal"):
+    if obj["expected_type"] == "str" or obj["expected_type"].startswith("Literal"):
         set_properties += "\"{value}\"".format(
+            value=obj["example"]
+        )
+    elif obj["expected_type"] == "bool":
+        set_properties += "{value}".format(
             value=obj["example"]
         )
     elif obj["expected_type"].startswith("List["):
