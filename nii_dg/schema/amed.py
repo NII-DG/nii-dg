@@ -11,7 +11,8 @@ from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           check_content_size, check_isodate, check_mime_type,
                           check_required_props, check_sha256,
                           check_unexpected_props, check_url, classify_uri,
-                          load_entity_def_from_schema_file)
+                          load_entity_def_from_schema_file,
+                          verify_is_date_past)
 
 
 class DMPMetadata(ContextualEntity):
@@ -80,9 +81,11 @@ class DMP(ContextualEntity):
             "availabilityStarts": check_isodate
         })
 
+        if verify_is_date_past(self["availabilityStarts"]):
+            raise PropsError("The value of availabilityStarts MUST be the date of future.")
+
     def validate(self) -> None:
         # TODO: impl.
-        # govern_isodate(self, "availabilityStarts", "future")
         pass
 
 
@@ -116,13 +119,12 @@ class File(BaseFile):
             "sdDatePublished": check_isodate
         })
 
+        if verify_is_date_past(self["sdDatePublished"]) is False:
+            raise PropsError("The value of sdDatePublished MUST not be the date of future.")
+
     def validate(self) -> None:
-        pass
         # TODO: impl.
-        # try:
-        #     govern_isodate(self, "sdDatePublished", "past")
-        # except KeyError:
-        #     pass
+        pass
 
 
 class ClinicalResearchRegistration(ContextualEntity):

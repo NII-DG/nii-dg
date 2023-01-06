@@ -2,7 +2,6 @@
 # coding: utf-8
 
 import ast
-import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Set
@@ -186,10 +185,9 @@ def main(args: List[str]) -> None:
             sample_ent_json=sample_ent_json,
             rootdataentity_option=rootdataentity_option)
 
-        test_file_path = Path(os.path.dirname(os.path.abspath(__file__)) + "/" + schema_name + "/test_" + entity_name + ".py").resolve()
+        test_file_path = Path(str((Path(__file__).resolve()).parent) + "/" + schema_name + "/test_" + entity_name + ".py").resolve()
         with test_file_path.open("w", encoding="utf-8") as f:
             f.write(scripts.strip() + "\n")
-        # print(scripts)
 
 
 if __name__ == "__main__":

@@ -22,9 +22,9 @@ def test_as_jsonld() -> None:
     ent["about"] = RootDataEntity({})
     ent["contentSize"] = "100GB"
     ent["workflowIdentifier"] = "bio"
-    ent["datasetStructure"] = "bio"
+    ent["datasetStructure"] = "with_code"
 
-    jsonld = {'@type': 'GinMonitoring', '@id': '#ginmonitoring:1', 'about': {'@id': './'}, 'contentSize': '100GB', 'workflowIdentifier': 'bio', 'datasetStructure': 'bio'}
+    jsonld = {'@type': 'GinMonitoring', '@id': '#ginmonitoring:1', 'about': {'@id': './'}, 'contentSize': '100GB', 'workflowIdentifier': 'bio', 'datasetStructure': 'with_code'}
 
     ent_in_json = ent.as_jsonld()
     del ent_in_json["@context"]

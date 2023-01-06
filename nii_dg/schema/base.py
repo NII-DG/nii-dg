@@ -12,7 +12,8 @@ from nii_dg.utils import (EntityDef, check_all_prop_types,
                           check_phonenumber, check_required_props,
                           check_sha256, check_unexpected_props, check_url,
                           classify_uri, github_branch, github_repo,
-                          govern_isodate, load_entity_def_from_schema_file)
+                          load_entity_def_from_schema_file,
+                          verify_is_date_past)
 
 
 class RootDataEntity(DefaultEntity):
@@ -96,17 +97,15 @@ class File(DataEntity):
             "sdDatePublished": check_isodate
         })
 
+        if verify_is_date_past(self["sdDatePublished"]) is False:
+            raise PropsError("The value of sdDatePublished MUST not be the date of future.")
+
     def validate(self) -> None:
         # TODO: impl.
         # @idがURLの場合にsdDatePublishedの存在チェック
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"The term sdDatePublished MUST be included in {self}.")
-
-        try:
-            govern_isodate(self, "sdDatePublished", "past")
-        except KeyError:
-            pass
 
 
 class Dataset(DataEntity):

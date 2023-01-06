@@ -5,7 +5,7 @@ import datetime
 import importlib
 import mimetypes
 import re
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
                     Optional, TypedDict, Union)
 from urllib.parse import quote, urlparse
@@ -197,7 +197,7 @@ def classify_uri(entity: "Entity", key: str) -> str:
 
     if parsed.scheme in ["http", "https"] and parsed.netloc != "":
         return "URL"
-    if parsed.scheme != "" or encoded_uri.startswith(("/", "\\")):
+    if PurePosixPath(encoded_uri).is_absolute() or PureWindowsPath(encoded_uri).is_absolute():
         return "abs_path"
     return "rel_path"
 
@@ -297,14 +297,16 @@ def check_erad_researcher_number(value: str) -> None:
         raise ValueError
 
 
-def govern_isodate(entity: "Entity", key: str, past_or_future: Optional[Literal["past", "future"]] = None) -> None:
+def verify_is_date_past(date: str) -> bool:
     """
-    Check date is in ISO 8601 format "YYYY-MM-DD".
+    Check the date is past or not.
     """
-    isodate = datetime.date.fromisoformat(entity[key])
+    try:
+        iso_date = datetime.date.fromisoformat(date)
+    except ValueError:
+        raise PropsError(f"The value {date} is invalid date format. MUST be 'YYYY-MM-DD'.") from None
 
     today = datetime.date.today()
-    if past_or_future == "past" and (today - isodate).days < 0:
-        raise GovernanceError(f"The value of sdDatePublished in {entity} MUST be the date in the past.")
-    if past_or_future == "future" and (today - isodate).days > 0:
-        raise GovernanceError(f"The value of sdDatePublished in {entity} MUST be the date in the future.")
+    if (today - iso_date).days < 0:
+        return False
+    return True
