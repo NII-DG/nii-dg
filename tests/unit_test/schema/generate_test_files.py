@@ -98,7 +98,7 @@ def add_example_value(
             child_id = ast.literal_eval(obj["example"])
         child_id_str = "\"" + child_id["@id"] + "\""
 
-        if obj["expected_type"] == "DMPMetadata":
+        if obj["expected_type"] in ["RootDataEntity", "DMPMetadata"]:
             child_id_str = {}
         elif obj["expected_type"] == "DMP":
             child_id_str = child_id_str.replace("#dmp:", "")
@@ -107,6 +107,7 @@ def add_example_value(
             Entity=obj["expected_type"],
             id=child_id_str
         )
+
         if obj["expected_type"] in entity_list:
             import_entities.add(obj["expected_type"])
         else:
@@ -130,7 +131,7 @@ def main(args: List[str]) -> None:
 
         for prop_name, obj in entity["props"].items():
 
-            if obj["example"].startswith(("{", "[")):
+            if obj["example"].startswith(("{", "[")) or obj["expected_type"] == "bool":
                 sample_ent_json[prop_name] = ast.literal_eval(obj["example"])
             else:
                 sample_ent_json[prop_name] = obj["example"]

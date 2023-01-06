@@ -23,7 +23,7 @@ GinMonitoring:
       expected_type: Literal["basic", "bio", "nuero"]
     datasetStructure:
       description: MUST choose either `with_code` or `for_parameter`. Indicates a kind of dataset structure used in the research workflow.
-      example: bio
+      example: with_code
       required: Required.
       expected_type: Literal["with_code", "for_parameter"]
 File:

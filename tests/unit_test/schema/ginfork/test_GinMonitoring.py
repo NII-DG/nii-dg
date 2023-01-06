@@ -19,7 +19,7 @@ def test_init() -> None:
 def test_as_jsonld() -> None:
     ent = GinMonitoring(1)
 
-    ent["about"] = RootDataEntity("./")
+    ent["about"] = RootDataEntity({})
     ent["contentSize"] = "100GB"
     ent["workflowIdentifier"] = "bio"
     ent["datasetStructure"] = "bio"

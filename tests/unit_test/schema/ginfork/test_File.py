@@ -25,7 +25,7 @@ def test_as_jsonld() -> None:
     ent["sdDatePublished"] = "2022-12-01"
     ent["experimentPackageFlag"] = True
 
-    jsonld = {'@type': 'File', '@id': 'config/setting.txt', 'name': 'setting.txt', 'contentSize': '1560B', 'encodingFormat': 'text/plain', 'sha256': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'url': 'https://github.com/username/repository/file', 'sdDatePublished': '2022-12-01', 'experimentPackageFlag': 'True'}
+    jsonld = {'@type': 'File', '@id': 'config/setting.txt', 'name': 'setting.txt', 'contentSize': '1560B', 'encodingFormat': 'text/plain', 'sha256': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'url': 'https://github.com/username/repository/file', 'sdDatePublished': '2022-12-01', 'experimentPackageFlag': True}
 
     ent_in_json = ent.as_jsonld()
     del ent_in_json["@context"]
