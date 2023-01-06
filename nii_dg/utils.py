@@ -302,7 +302,7 @@ def verify_is_past_date(entity: "Entity", key: str) -> Optional[bool]:
     Check the date is past or not.
     """
     try:
-        iso_date = datetime.date.fromisoformat(entity["key"])
+        iso_date = datetime.date.fromisoformat(entity[key])
     except KeyError:
         return None
     except ValueError:

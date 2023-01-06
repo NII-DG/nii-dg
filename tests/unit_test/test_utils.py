@@ -30,6 +30,7 @@ def test_load_entity_def_from_schema_file() -> None:
     # error
     with pytest.raises(PropsError):
         load_entity_def_from_schema_file("base", "FooBar")
+    with pytest.raises(PropsError):
         load_entity_def_from_schema_file("foobar", "RootDataEntity")
 
 
@@ -39,6 +40,7 @@ def test_import_entity_class() -> None:
     # error
     with pytest.raises(PropsError):
         import_entity_class("base", "FooBar")
+    with pytest.raises(PropsError):
         import_entity_class("foobar", "RootDataEntity")
 
 
@@ -69,7 +71,7 @@ def test_convert_string_type_to_python_type() -> None:
     with pytest.raises(PropsError):
         convert_string_type_to_python_type("FooBar", "base")
     with pytest.raises(PropsError):
-        convert_string_type_to_python_type("RootDataEntity", "foobar")
+        convert_string_type_to_python_type("DMPMetadata", "foobar")
 
 
 def test_check_prop_type() -> None:
@@ -220,14 +222,14 @@ def test_check_phone_number_error(wrong_phone_number) -> None:
 
 
 @pytest.mark.parametrize('correct_researcher_number', [  # type:ignore
-    "01234567"])
+    "01234567", "00123456"])
 def test_check_erad_researcher_number(correct_researcher_number) -> None:
     # nothing is occurred with correct format
     check_erad_researcher_number(correct_researcher_number)
 
 
 @pytest.mark.parametrize('wrong_researcher_number', [  # type:ignore
-    "0123456", "00123456", "0123456a", "0123-4567"])
+    "0123456", "0123456a", "0123-4567"])
 def test_check_erad_researcher_number_error(wrong_researcher_number) -> None:
     # error
     with pytest.raises(ValueError):
@@ -235,5 +237,12 @@ def test_check_erad_researcher_number_error(wrong_researcher_number) -> None:
 
 
 def test_verify_is_past_date() -> None:
-    assert verify_is_past_date("1900-01-01") is True
-    assert verify_is_past_date("9999-01-01") is True
+    ent = BaseFile("sample.txt")
+
+    assert verify_is_past_date(ent, "not_existing_prop") is None
+
+    ent["date"] = "1900-01-01"
+    assert verify_is_past_date(ent, "date")
+
+    ent["date"] = "9999-01-01"
+    assert verify_is_past_date(ent, "date") is False
