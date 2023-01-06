@@ -59,6 +59,11 @@ EntityName1:
   - The `description` field MUST indicate the definition (what the property indicates) and the input format.
   - The `required` field MUST indicate whether this property is required. The value MUST be either "Required.", "Optional." or a statement description e.g. "Required when you are data manager.". This field is used to verify the presence of a property based on the value "Required.".
 
+When `UNION` type is used in expected_type:
+- MUST be used with `LIST`, e.g. `LIST[UNION[Person, Organization]]`.
+- MUST be used with Entity type.　When you want to line up str or int, expected_type MUST be `str` and make it a single string, separated by commas, e.g. `"cat, dog, pig"`.
+- The order in example MUST be aligned with the order in Union. For example, when expected_type is `LIST[UNION[Person, Organization]]`, example MUST be in order of Person to Organization, like `[{"@id":"#John Doe"},{"@id":"Harvard University"}]`.
+
 ## Memo
 
 1. オレオレ yaml で base.yml と amed.yml を書く

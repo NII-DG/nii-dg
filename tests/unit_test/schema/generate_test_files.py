@@ -183,7 +183,7 @@ def main(args: List[str]) -> None:
                 set_properties=set_properties,
                 sample_ent_json=sample_ent_json)
 
-        test_file_path = Path(os.path.dirname(os.path.abspath(__file__)) + "/" + schema_name + "/sample_test_" + entity_name + ".py").resolve()
+        test_file_path = Path(os.path.dirname(os.path.abspath(__file__)) + "/" + schema_name + "/test_" + entity_name + ".py").resolve()
         with test_file_path.open("w", encoding="utf-8") as f:
             f.write(scripts.strip() + "\n")
         # print(scripts)
