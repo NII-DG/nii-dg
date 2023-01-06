@@ -13,7 +13,7 @@ from nii_dg.utils import (EntityDef, check_all_prop_types,
                           check_sha256, check_unexpected_props, check_url,
                           classify_uri, github_branch, github_repo,
                           load_entity_def_from_schema_file,
-                          verify_is_date_past)
+                          verify_is_past_date)
 
 
 class RootDataEntity(DefaultEntity):
@@ -97,7 +97,7 @@ class File(DataEntity):
             "sdDatePublished": check_isodate
         })
 
-        if verify_is_date_past(self["sdDatePublished"]) is False:
+        if verify_is_past_date(self["sdDatePublished"]) is False:
             raise PropsError("The value of sdDatePublished MUST not be the date of future.")
 
     def validate(self) -> None:

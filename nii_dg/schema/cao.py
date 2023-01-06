@@ -13,7 +13,7 @@ from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           check_isodate, check_mime_type, check_required_props,
                           check_sha256, check_unexpected_props, check_url,
                           classify_uri, load_entity_def_from_schema_file,
-                          verify_is_date_past)
+                          verify_is_past_date)
 
 
 class DMPMetadata(ContextualEntity):
@@ -74,7 +74,7 @@ class DMP(ContextualEntity):
         check_content_formats(self, {
             "availabilityStarts": check_isodate
         })
-        if verify_is_date_past(self["availabilityStarts"]):
+        if verify_is_past_date(self["availabilityStarts"]):
             raise PropsError("The value of availabilityStarts MUST be the date of future.")
 
     def validate(self) -> None:
@@ -138,7 +138,7 @@ class File(BaseFile):
             "sdDatePublished": check_isodate
         })
 
-        if verify_is_date_past(self["sdDatePublished"]) is False:
+        if verify_is_past_date(self["sdDatePublished"]) is False:
             raise PropsError("The value of sdDatePublished MUST not be the date of future.")
 
     def validate(self) -> None:

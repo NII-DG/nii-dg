@@ -297,7 +297,7 @@ def check_erad_researcher_number(value: str) -> None:
         raise ValueError
 
 
-def verify_is_date_past(date: str) -> bool:
+def verify_is_past_date(date: str) -> bool:
     """
     Check the date is past or not.
     """

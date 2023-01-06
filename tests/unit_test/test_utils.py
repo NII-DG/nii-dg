@@ -15,7 +15,8 @@ from nii_dg.utils import (EntityDef, check_all_prop_types, check_content_size,
                           check_unexpected_props, check_url,
                           convert_string_type_to_python_type,
                           import_entity_class,
-                          load_entity_def_from_schema_file)
+                          load_entity_def_from_schema_file,
+                          verify_is_past_date)
 
 
 def test_load_entity_def_from_schema_file() -> None:
@@ -231,3 +232,8 @@ def test_check_erad_researcher_number_error(wrong_researcher_number) -> None:
     # error
     with pytest.raises(ValueError):
         check_erad_researcher_number(wrong_researcher_number)
+
+
+def test_verify_is_past_date() -> None:
+    assert verify_is_past_date("1900-01-01") is True
+    assert verify_is_past_date("9999-01-01") is True
