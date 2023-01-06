@@ -53,7 +53,7 @@ def test_validate() -> None:
 
 def add_example_value(
         obj: Dict[str, Any], entity_list: List[str], set_properties: str, import_entities: Set[str], import_entities_from_base: Set[str], child_id: Any = None) -> tuple[str, Set[str], Set[str]]:
-    if obj["expected_type"] == "str" or obj["expected_type"].startswith("Literal"):
+    if obj["expected_type"] in ["str", "bool"] or obj["expected_type"].startswith("Literal"):
         set_properties += "\"{value}\"".format(
             value=obj["example"]
         )
@@ -154,22 +154,22 @@ def main(args: List[str]) -> None:
 
         empty_dict: Dict[Any, Any] = {}
         entity_type = entity_name
-        entity_id = empty_dict
+        entity_id = "\"" + sample_ent_json["@id"] + "\""
         rootdataentity_option = "\n"
 
         if entity_name == "RootDataEntity":
             sample_ent_json["@type"] = "Dataset"
             entity_type = "Dataset"
+            entity_id = empty_dict
             rootdataentity_option = ', ent_in_json["dateCreated"], ent_in_json["hasPart"]\n'
 
         elif entity_name == "DMPMetadata":
-            pass
-
-        elif entity_name == "DMP":
-            entity_id = sample_ent_json["@id"].replace("#dmp:", "")
-
+            entity_id = empty_dict
+        elif entity_name in ["DMP", "GinMonitoring"]:
+            start = sample_ent_json["@id"].find(":") + 1
+            entity_id = sample_ent_json["@id"][start:]
         else:
-            entity_id = "\"" + sample_ent_json["@id"] + "\""
+            pass
 
         scripts += COMMON_METHODS.format(
             entity_name=entity_name,

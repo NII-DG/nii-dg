@@ -9,7 +9,7 @@ from nii_dg.schema.base import RootDataEntity
 
 
 def test_init() -> None:
-    ent = GinMonitoring("#ginmonitoring:1")
+    ent = GinMonitoring(1)
     assert ent["@id"] == "#ginmonitoring:1"
     assert ent["@type"] == "GinMonitoring"
     assert ent.schema_name == "ginfork"
@@ -17,7 +17,7 @@ def test_init() -> None:
 
 
 def test_as_jsonld() -> None:
-    ent = GinMonitoring("#ginmonitoring:1")
+    ent = GinMonitoring(1)
 
     ent["about"] = RootDataEntity("./")
     ent["contentSize"] = "100GB"

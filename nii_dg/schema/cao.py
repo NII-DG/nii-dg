@@ -84,16 +84,19 @@ class Person(BasePerson):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
+    @property
+    def schema_name(self) -> str:
+        return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
+
     def check_props(self) -> None:
-<<<<<<< HEAD
-        schema = load_entity_schema(self.schema, self.__class__.__name__)
-        requires = [prop for prop in schema["required_list"] if prop not in ["@id", "name"]]
-=======
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
         check_unexpected_props(self, entity_def)
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
->>>>>>> working-kaho
 
         check_content_formats(self, {
             "eradResearcherNumber": check_erad_researcher_number
@@ -107,6 +110,14 @@ class Person(BasePerson):
 class File(BaseFile):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
+
+    @property
+    def schema_name(self) -> str:
+        return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def check_props(self) -> None:
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)

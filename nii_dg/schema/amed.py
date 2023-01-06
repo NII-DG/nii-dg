@@ -90,6 +90,14 @@ class File(BaseFile):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
+    @property
+    def schema_name(self) -> str:
+        return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
+
     def check_props(self) -> None:
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
