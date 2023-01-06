@@ -29,9 +29,11 @@ class Entity(TypedMutableMapping):
 
         self["@id"] = id
         self["@type"] = self.__class__.__name__
+        # self["@context"] = TODO
         self.update(props or {})
 
     def __setitem__(self, key: str, value: Any) -> None:
+        # TODO: @context, @id, @type は書き換え不可にする
         self.data[key] = value
 
     def __getitem__(self, key: str) -> Any:
@@ -91,16 +93,24 @@ class Entity(TypedMutableMapping):
         return template.format(
             repo=github_repo(),
             branch=github_branch(),
-            schema=self.schema,
+            schema=self.schema_name,
             entity=self.type,
         )
 
     @property
-    def schema(self) -> str:
+    def schema_name(self) -> str:
         """\
         Implementation of this method is required in each subclass using comment-outed code.
         """
         # return Path(__file__).stem
+        raise NotImplementedError
+
+    @property
+    def entity_name(self) -> str:
+        """\
+        Implementation of this method is required in each subclass using comment-outed code.
+        """
+        # return self.__class__.__name__
         raise NotImplementedError
 
     def check_props(self) -> None:

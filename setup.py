@@ -28,6 +28,7 @@ setup(
         "isort",
         "mypy",
         "pytest",
+        "types-PyYAML",
     ],
     extras_require={
         "tests": [
@@ -35,6 +36,7 @@ setup(
             "isort",
             "mypy",
             "pytest",
+            "types-PyYAML",
         ],
     },
     classifiers=[

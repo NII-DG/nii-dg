@@ -13,6 +13,7 @@ from nii_dg.utils import convert_string_type_to_python_type
 Prop = TypedDict("Prop", {
     "description": str,
     "example": str,
+    "required": str,
     "expected_type": str,
 })
 prop_keys = set(Prop.__annotations__.keys())
