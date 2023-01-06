@@ -16,7 +16,7 @@ def test_init() -> None:
 
 def test_schema() -> None:
     ent = DMP(1)
-    assert ent.schema == "amed"
+    assert ent.schema_name == "amed"
 
 
 def test_check_props() -> None:

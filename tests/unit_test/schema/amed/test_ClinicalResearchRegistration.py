@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # coding: utf-8
-from typing import Any, List, Literal, Union
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
 from nii_dg.schema.amed import ClinicalResearchRegistration
 
 
@@ -16,7 +14,7 @@ def test_init() -> None:
 
 def test_schema() -> None:
     ent = ClinicalResearchRegistration("https://example.com/ClinicalResearchRegistration")
-    assert ent.schema == "amed"
+    assert ent.schema_name == "amed"
 
 
 def test_check_props() -> None:

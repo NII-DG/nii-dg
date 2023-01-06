@@ -16,7 +16,7 @@ def test_init() -> None:
 
 def test_schema() -> None:
     ent = File("/test")
-    assert ent.schema == "amed"
+    assert ent.schema_name == "amed"
 
 
 def test_check_props() -> None:
@@ -70,4 +70,4 @@ def test_as_jsonld() -> None:
 
 
 def test_validate() -> None:
-  pass
+    pass

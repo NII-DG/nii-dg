@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # coding: utf-8
-from typing import Any, List, Literal, Union
 
 import pytest  # noqa: F401
 
@@ -16,7 +15,7 @@ def test_init() -> None:
 
 def test_schema() -> None:
     ent = ContactPoint("https://example.com/ContactPoint")
-    assert ent.schema == "base"
+    assert ent.schema_name == "base"
 
 
 def test_check_props() -> None:
