@@ -74,7 +74,7 @@ class File(BaseFile):
         })
 
         if verify_is_past_date(self, "sdDatePublished") is False:
-            raise PropsError("The value of sdDatePublished MUST not be the date of future.")
+            raise PropsError("The value of sdDatePublished MUST be the date of past.")
 
     def validate(self) -> None:
         # TODO: impl.

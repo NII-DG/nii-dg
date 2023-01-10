@@ -77,7 +77,7 @@ def test_convert_string_type_to_python_type() -> None:
 def test_check_prop_type() -> None:
     ent = BaseFile("text.txt")
 
-    # nothing is occurred with correct format
+    # no error occurs with correct format
     check_prop_type(ent, "@id", "test.txt", "str")
 
     # error
@@ -201,7 +201,7 @@ def test_check_email(correct_email) -> None:
 
 
 @pytest.mark.parametrize('wrong_email', [  # type:ignore
-    "test@", "@example.co.jp", ".test@example.com"])
+    "test@", "@example.co.jp", "testatexample.co.jp", ".test@example.com", "test.@example.com", "sample..test@example.com"])
 def test_check_email_error(wrong_email) -> None:
     with pytest.raises(ValueError):
         check_email(wrong_email)
