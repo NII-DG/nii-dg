@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
-from nii_dg.error import PropsError
+from nii_dg.error import GovernanceError, PropsError
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           check_content_size, check_isodate, check_mime_type,
@@ -78,7 +78,8 @@ class DMP(ContextualEntity):
 
     def validate(self) -> None:
         # TODO: impl.
-        # check_isodate(self, "availabilityStarts", "future")
+        # accessRightsによってreasonForConcealment,availabilityStarts, isAccessibleForFree,license, contactPointの存在確認
+        # repository,distributionのチェック
         pass
 
 
@@ -117,4 +118,7 @@ class File(BaseFile):
 
     def validate(self) -> None:
         # TODO: impl.
-        pass
+        # @idがURLの場合にsdDatePublishedの存在チェック
+        if classify_uri(self, "@id") == "url":
+            if "sdDatePublished" not in self.keys():
+                raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")

@@ -105,7 +105,7 @@ class File(DataEntity):
         # @idがURLの場合にsdDatePublishedの存在チェック
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
-                raise GovernanceError(f"The term sdDatePublished MUST be included in {self}.")
+                raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")
 
 
 class Dataset(DataEntity):
@@ -360,5 +360,6 @@ class ContactPoint(ContextualEntity):
         })
 
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        # emailかtelephoneのどちらかが必要
+        if any(map(self.keys().__contains__, ("email", "telephone"))) is False:
+            raise GovernanceError(f"Either property email or telephone is required in {self}.")
