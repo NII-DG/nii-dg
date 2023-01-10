@@ -78,9 +78,23 @@ class DMP(ContextualEntity):
 
     def validate(self) -> None:
         # TODO: impl.
-        # accessRightsによってreasonForConcealment,availabilityStarts, isAccessibleForFree,license, contactPointの存在確認
-        # repository,distributionのチェック
-        pass
+        if self["accessRights"] != "open access" and "reasonForConcealment" not in self.keys():
+            raise GovernanceError("The property reasonForConcealment is required in {self}.")
+        if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
+            raise GovernanceError("The property availabilityStarts is required in {self}.")
+        if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self.keys():
+            raise GovernanceError("The property isAccessibleForFree is required in {self}.")
+        if self["accessRights"] == "open access" and "license" not in self.keys():
+            raise GovernanceError("The property license is required in {self}.")
+        if self["accessRights"] in ["open access", "restricted access"] and "contactPoint" not in self.keys():
+            raise GovernanceError("The property contactPoint is required in {self}.")
+
+        if "repository" not in self.keys():
+            # TODO: DMPMetadataエンティティを見に行く,なければGovernanceError
+            pass
+        if self["accessRights"] == "open access" and "distribution" not in self.keys():
+            # TODO: DMPMetadataエンティティを見に行く,なければGovernanceError
+            pass
 
 
 class File(BaseFile):
@@ -117,8 +131,6 @@ class File(BaseFile):
             raise PropsError("The value of sdDatePublished MUST not be the date of future.")
 
     def validate(self) -> None:
-        # TODO: impl.
-        # @idがURLの場合にsdDatePublishedの存在チェック
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")

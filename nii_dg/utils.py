@@ -3,8 +3,10 @@
 
 import datetime
 import importlib
+import json
 import mimetypes
 import re
+import urllib.request
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
                     Optional, TypedDict, Union)
@@ -312,3 +314,25 @@ def verify_is_past_date(entity: "Entity", key: str) -> Optional[bool]:
     if (today - iso_date).days < 0:
         return False
     return True
+
+
+def get_name_from_ror(ror_id: str) -> List[str]:
+    """
+    Get organization name from ror.
+    """
+    api_url = "https://api.ror.org/organizations/" + ror_id
+    req = urllib.request.Request(api_url)
+
+    try:
+        with urllib.request.urlopen(req) as res:
+            body = json.load(res)
+    except urllib.error.HTTPError as httperr:
+        if httperr.code == 404:
+            raise GovernanceError(f"ROR ID {ror_id} does not exist.")
+        raise UnexpectedImplementationError from httperr
+    except urllib.error.URLError as err:
+        raise UnexpectedImplementationError from err
+
+    name_list: List[str] = body["aliases"]
+    name_list.append(body["name"])
+    return name_list

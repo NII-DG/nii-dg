@@ -49,7 +49,7 @@ DMPMetadata:
     distribution:
       expected_type: DataDownload
       example: '{"@id": "https://zenodo.org/record/example"}'
-      required: Can be added when accessRights in tied DMP entity has `open access` and all open-access data set is available from a single URL.
+      required: Can be added when accessRights in tied DMP entity has `Unrestricted Open Sharing` and all Unrestricted-Open-Sharing data set is available from a single URL.
       description: MUST be @id term of DataDownload entity. Indicates where the download URL of the data set.
     hasPart:
       expected_type: List[DMP]
@@ -102,7 +102,7 @@ DMP:
     distribution:
       expected_type: DataDownload
       example: '{ "@id": "https://zenodo.org/record/example" }'
-      required: Required when accessRights has `open access`. When all open-access data set is available from a single URL, it can be omitted instead of adding to DMPMetadata entity.
+      required: Required when accessRights has `Unrestricted Open Sharing`. When all Unrestricted-Open-Sharing data set is available from a single URL, it can be omitted instead of adding to DMPMetadata entity.
       description: MUST be @id term of the DataDownload entity. Indicates where the download URL of the data set.
     contentSize:
       expected_type: Literal["1GB", "10GB", "100GB", "over100GB"]

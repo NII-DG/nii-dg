@@ -4,7 +4,7 @@ from typing import Any, List, Literal, Union
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
+from nii_dg.error import GovernanceError, PropsError
 from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import RootDataEntity
@@ -14,7 +14,7 @@ from nii_dg.utils import (EntityDef, check_all_prop_types, check_content_size,
                           check_prop_type, check_required_props, check_sha256,
                           check_unexpected_props, check_url,
                           convert_string_type_to_python_type,
-                          import_entity_class,
+                          get_name_from_ror, import_entity_class,
                           load_entity_def_from_schema_file,
                           verify_is_past_date)
 
@@ -246,3 +246,11 @@ def test_verify_is_past_date() -> None:
 
     ent["date"] = "9999-01-01"
     assert verify_is_past_date(ent, "date") is False
+
+
+def test_get_name_from_ror() -> None:
+    assert get_name_from_ror("04ksd4g47") == ["Kokuritsu Jōhōgaku Kenkyūjo", "National Institute of Informatics"]
+
+    # error
+    with pytest.raises(GovernanceError):
+        get_name_from_ror("000000000")

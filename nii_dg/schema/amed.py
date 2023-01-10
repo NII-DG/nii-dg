@@ -85,11 +85,21 @@ class DMP(ContextualEntity):
             raise PropsError("The value of availabilityStarts MUST be the date of future.")
 
     def validate(self) -> None:
-        # TODO: impl.
-        # accessRightsによってavailabilityStarts, accessRightsInfoの存在確認
-        # repository, distributionがないときDMPを確認
-        # gotInformedConsentによってinformedConsentFormatの存在確認
-        pass
+
+        if self["accessRights"] in ["Unshared", "Restricted Closed Sharing"]:
+            if any(map(self.keys().__contains__, ("availabilityStarts", "accessRightsInfo"))) is False:
+                raise GovernanceError(
+                    f"The property availabilityStarts is required in {self}. If you keep data unshared, property AccessRightsInfo is required instead.")
+
+        if "repository" not in self.keys():
+            # TODO: DMPMetadataエンティティを見に行く,なければGovernanceError
+            pass
+        if self["accessRights"] == "Unrestricted Open Sharing" and "distribution" not in self.keys():
+            # TODO: DMPMetadataエンティティを見に行く,なければGovernanceError
+            pass
+
+        if self["gotInformedConsent"] == "yes" and "informedConsentFormat" not in self.keys():
+            raise GovernanceError(f"The property informedConsentFormat is required in {self}.")
 
 
 class File(BaseFile):
@@ -127,7 +137,6 @@ class File(BaseFile):
 
     def validate(self) -> None:
         # TODO: impl.
-        # @idがURLの場合にsdDatePublishedの存在チェック
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")
