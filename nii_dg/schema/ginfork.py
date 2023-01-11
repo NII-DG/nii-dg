@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
-from nii_dg.error import PropsError
+from nii_dg.error import GovernanceError, PropsError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
@@ -39,9 +39,9 @@ class GinMonitoring(ContextualEntity):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         # TODO: impl.
-        monitor_file_size(self["contentSize"])
+        monitor_file_size(rocrate, self["contentSize"])
 
 
 class File(BaseFile):
@@ -82,9 +82,25 @@ class File(BaseFile):
         pass
 
 
-def monitor_file_size(size: str) -> None:
+def monitor_file_size(rocrate: ROCrate, size: str) -> None:
     """
     File size sum が規定値を超えていないことを確認
     """
     # TODO: impl.
-    pass
+    units = ["B", "KB", "MB", "GB", "TB", "PB"]
+    unit = units.index(size[-2:])
+    limit = int(size[:-2])
+
+    file_size_sum: float = 0
+    for e in rocrate.get_entities(File):
+        if e["contentSize"][-2:] in units:
+            file_unit = units.index(e["contentSize"][-2:])
+            file_size = int(e["contentSize"][:-2])
+        else:
+            file_unit = 0
+            file_size = int(e["contentSize"][:-1])
+
+        file_size_sum += round(file_size / 1024 ** (unit - file_unit), 2)
+
+    if file_size_sum > limit:
+        raise GovernanceError("The total file size of monitored ginfork file is larger than the defined size.")

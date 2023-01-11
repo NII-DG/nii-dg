@@ -55,6 +55,13 @@ class ROCrate():
             else:
                 raise TypeError("Invalid entity type")  # TODO: define exception
 
+    def get_entities(self, entity_name: Any) -> List[Entity]:
+        entity_list = []
+        for e in self.default_entities + self.data_entities + self.contextual_entities:
+            if isinstance(e, entity_name):
+                entity_list.append(e)
+        return entity_list
+
     def as_jsonld(self) -> Dict[str, Any]:
         # add dateCreated to RootDataEntity
         self.root["dateCreated"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
