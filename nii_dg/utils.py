@@ -6,12 +6,12 @@ import importlib
 import json
 import mimetypes
 import re
-import urllib.request
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
                     Optional, TypedDict, Union)
 from urllib.parse import quote, urlparse
 
+import requests
 import yaml
 from typeguard import check_type as ori_check_type
 
@@ -342,18 +342,18 @@ def get_name_from_ror(ror_id: str) -> List[str]:
     Get organization name from ror.
     """
     api_url = "https://api.ror.org/organizations/" + ror_id
-    req = urllib.request.Request(api_url)
 
     try:
-        with urllib.request.urlopen(req) as res:
-            body = json.load(res)
-    except urllib.error.HTTPError as httperr:
-        if httperr.code == 404:
-            raise GovernanceError(f"ROR ID {ror_id} does not exist.")
+        res = requests.get(api_url, timeout=(10.0, 30.0))
+        res.raise_for_status()
+    except requests.HTTPError as httperr:
+        if res.status_code == 404:
+            raise GovernanceError(f"ROR ID {ror_id} does not exist.") from None
         raise UnexpectedImplementationError from httperr
-    except urllib.error.URLError as err:
+    except Exception as err:
         raise UnexpectedImplementationError from err
 
+    body = res.json()
     name_list: List[str] = body["aliases"]
     name_list.append(body["name"])
     return name_list
