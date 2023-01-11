@@ -10,8 +10,9 @@ from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import RootDataEntity
 from nii_dg.utils import (EntityDef, check_all_prop_types, check_content_size,
                           check_email, check_erad_researcher_number,
-                          check_isodate, check_mime_type, check_phonenumber,
-                          check_prop_type, check_required_props, check_sha256,
+                          check_isodate, check_mime_type, check_orcid_id,
+                          check_phonenumber, check_prop_type,
+                          check_required_props, check_sha256,
                           check_unexpected_props, check_url,
                           convert_string_type_to_python_type,
                           get_name_from_ror, import_entity_class,
@@ -234,6 +235,21 @@ def test_check_erad_researcher_number_error(wrong_researcher_number) -> None:
     # error
     with pytest.raises(ValueError):
         check_erad_researcher_number(wrong_researcher_number)
+
+
+@pytest.mark.parametrize('correct_orcid_id', [  # type:ignore
+    "0000-0002-3849-163X", "1234-5678-9101-1128"])
+def test_check_orcid_id(correct_orcid_id) -> None:
+    # nothing is occurred with correct format
+    check_orcid_id(correct_orcid_id)
+
+
+@pytest.mark.parametrize('wrong_orcid_id', [  # type:ignore
+    "0000123456778900", "1234-5678-9101-1121", "0000-0002-3849-167X"])
+def test_check_orcid_id_error(wrong_orcid_id) -> None:
+    # error
+    with pytest.raises(PropsError):
+        check_orcid_id(wrong_orcid_id)
 
 
 def test_verify_is_past_date() -> None:

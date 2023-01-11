@@ -299,6 +299,27 @@ def check_erad_researcher_number(value: str) -> None:
         raise ValueError
 
 
+def check_orcid_id(value: str) -> None:
+    """
+    Check orcid id format and checksum.
+    """
+    pattern = r"^(\d{4}-){3}\d{3}[\dX]$"
+    orcidid_match = re.compile(pattern)
+
+    if orcidid_match.fullmatch(value) is None:
+        raise PropsError(f"Orcid ID {value} is invalid.")
+
+    if value[-1] == "X":
+        checksum = 10
+    else:
+        checksum = int(value[-1])
+    sum_val = 0
+    for num in value.replace("-", "")[:-1]:
+        sum_val = (sum_val + int(num)) * 2
+    if (12 - (sum_val % 11)) % 11 != checksum:
+        raise PropsError(f"Orcid ID {value} is invalid.")
+
+
 def verify_is_past_date(entity: "Entity", key: str) -> Optional[bool]:
     """
     Check the date is past or not.

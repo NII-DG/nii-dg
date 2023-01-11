@@ -9,10 +9,11 @@ from nii_dg.error import GovernanceError, PropsError
 from nii_dg.utils import (EntityDef, check_all_prop_types,
                           check_content_formats, check_content_size,
                           check_email, check_isodate, check_mime_type,
-                          check_phonenumber, check_required_props,
-                          check_sha256, check_unexpected_props, check_url,
-                          classify_uri, get_name_from_ror, github_branch,
-                          github_repo, load_entity_def_from_schema_file,
+                          check_orcid_id, check_phonenumber,
+                          check_required_props, check_sha256,
+                          check_unexpected_props, check_url, classify_uri,
+                          get_name_from_ror, github_branch, github_repo,
+                          load_entity_def_from_schema_file,
                           verify_is_past_date)
 
 
@@ -172,8 +173,8 @@ class Organization(ContextualEntity):
         })
 
     def validate(self) -> None:
-        if self["@id"].startswith("https://ror.org/"):
-            ror_namelist = get_name_from_ror(self["@id"][16:])
+        if self.id.startswith("https://ror.org/"):
+            ror_namelist = get_name_from_ror(self.id[16:])
             if self["name"] not in ror_namelist:
                 raise GovernanceError(f"The value of name property in {self} MUST be same as the registered name in ROR.")
 
@@ -206,6 +207,9 @@ class Person(ContextualEntity):
             "email": check_email,
             "telephone": check_phonenumber
         })
+
+        if self.id.startswith("https://orcid.org/"):
+            check_orcid_id(self.id[18:])
 
     def validate(self) -> None:
         # TODO: impl.
