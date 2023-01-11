@@ -8,11 +8,11 @@ from nii_dg.error import GovernanceError, PropsError
 from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import RootDataEntity
-from nii_dg.utils import (EntityDef, check_all_prop_types, check_content_size,
-                          check_email, check_erad_researcher_number,
-                          check_isodate, check_mime_type, check_orcid_id,
-                          check_phonenumber, check_prop_type,
-                          check_required_props, check_sha256,
+from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
+                          check_content_size, check_email,
+                          check_erad_researcher_number, check_isodate,
+                          check_mime_type, check_orcid_id, check_phonenumber,
+                          check_prop_type, check_required_props, check_sha256,
                           check_unexpected_props, check_url,
                           convert_string_type_to_python_type,
                           get_name_from_ror, import_entity_class,
@@ -250,6 +250,15 @@ def test_check_orcid_id_error(wrong_orcid_id) -> None:
     # error
     with pytest.raises(PropsError):
         check_orcid_id(wrong_orcid_id)
+
+
+def test_access_url() -> None:
+    # nothing is occurred with correct format
+    access_url("https://example.com/")
+
+    # error
+    with pytest.raises(GovernanceError):
+        access_url("https://www.nii.ac.jp/not_existing")
 
 
 def test_verify_is_past_date() -> None:

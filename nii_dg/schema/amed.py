@@ -7,11 +7,11 @@ from typing import Any, Dict, Optional
 from nii_dg.entity import ContextualEntity
 from nii_dg.error import GovernanceError, PropsError
 from nii_dg.schema.base import File as BaseFile
-from nii_dg.utils import (check_all_prop_types, check_content_formats,
-                          check_content_size, check_isodate, check_mime_type,
-                          check_required_props, check_sha256,
-                          check_unexpected_props, check_url, classify_uri,
-                          load_entity_def_from_schema_file,
+from nii_dg.utils import (access_url, check_all_prop_types,
+                          check_content_formats, check_content_size,
+                          check_isodate, check_mime_type, check_required_props,
+                          check_sha256, check_unexpected_props, check_url,
+                          classify_uri, load_entity_def_from_schema_file,
                           verify_is_past_date)
 
 
@@ -170,5 +170,4 @@ class ClinicalResearchRegistration(ContextualEntity):
         })
 
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        access_url(self.id)

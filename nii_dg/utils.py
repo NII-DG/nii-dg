@@ -337,6 +337,20 @@ def verify_is_past_date(entity: "Entity", key: str) -> Optional[bool]:
     return True
 
 
+def access_url(url: str) -> None:
+    """
+    Check the url is accessible.
+    """
+    try:
+        res = requests.get(url, timeout=(10.0, 30.0))
+        res.raise_for_status()
+    except requests.HTTPError as httperr:
+        msg = str(httperr)
+        raise GovernanceError(f"URL is not accessible. {msg}") from None
+    except Exception as err:
+        raise UnexpectedImplementationError from err
+
+
 def get_name_from_ror(ror_id: str) -> List[str]:
     """
     Get organization name from ror.

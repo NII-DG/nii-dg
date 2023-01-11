@@ -6,6 +6,7 @@ from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
 from nii_dg.error import PropsError
+from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           check_content_size, check_isodate, check_mime_type,
@@ -40,7 +41,7 @@ class GinMonitoring(ContextualEntity):
 
     def validate(self) -> None:
         # TODO: impl.
-        pass
+        monitor_file_size(self["contentSize"])
 
 
 class File(BaseFile):
@@ -79,3 +80,11 @@ class File(BaseFile):
     def validate(self) -> None:
         # TODO: impl.
         pass
+
+
+def monitor_file_size(size: str) -> None:
+    """
+    File size sum が規定値を超えていないことを確認
+    """
+    # TODO: impl.
+    pass

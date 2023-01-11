@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity
 from nii_dg.error import GovernanceError, PropsError
-from nii_dg.utils import (EntityDef, check_all_prop_types,
+from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_content_formats, check_content_size,
                           check_email, check_isodate, check_mime_type,
                           check_orcid_id, check_phonenumber,
@@ -177,6 +177,8 @@ class Organization(ContextualEntity):
             ror_namelist = get_name_from_ror(self.id[16:])
             if self["name"] not in ror_namelist:
                 raise GovernanceError(f"The value of name property in {self} MUST be same as the registered name in ROR.")
+        else:
+            access_url(self.id)
 
 
 class Person(ContextualEntity):
@@ -212,8 +214,7 @@ class Person(ContextualEntity):
             check_orcid_id(self.id[18:])
 
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        access_url(self.id)
 
 
 class License(ContextualEntity):
@@ -244,8 +245,7 @@ class License(ContextualEntity):
         })
 
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        access_url(self.id)
 
 
 class RepositoryObject(ContextualEntity):
@@ -310,8 +310,7 @@ class DataDownload(ContextualEntity):
         })
 
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        access_url(self.id)
 
 
 class HostingInstitution(Organization):

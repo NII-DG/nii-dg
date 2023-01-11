@@ -8,9 +8,10 @@ from nii_dg.entity import ContextualEntity
 from nii_dg.error import GovernanceError, PropsError
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import Person as BasePerson
-from nii_dg.utils import (check_all_prop_types, check_content_formats,
-                          check_content_size, check_erad_researcher_number,
-                          check_isodate, check_mime_type, check_orcid_id,
+from nii_dg.utils import (access_url, check_all_prop_types,
+                          check_content_formats, check_content_size,
+                          check_erad_researcher_number, check_isodate,
+                          check_mime_type, check_orcid_id,
                           check_required_props, check_sha256,
                           check_unexpected_props, check_url, classify_uri,
                           load_entity_def_from_schema_file,
@@ -121,8 +122,7 @@ class Person(BasePerson):
             check_orcid_id(self.id[18:])
 
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        access_url(self.id)
 
 
 class File(BaseFile):
