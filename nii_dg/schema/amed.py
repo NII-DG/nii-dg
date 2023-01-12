@@ -44,7 +44,7 @@ class DMPMetadata(ContextualEntity):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
-        if self.id != "#AMED-DMP":
+        if self["@id"] != "#AMED-DMP":
             raise PropsError("The value of @id property of DMPMetadata entity in AMED MUST be '#AMED-DMP'.")
         if self["name"] != "AMED-DMP":
             raise PropsError("The value of name property of DMPMetadata entity in AMED MUST be 'AMED-DMP'.")
@@ -170,4 +170,4 @@ class ClinicalResearchRegistration(ContextualEntity):
         })
 
     def validate(self) -> None:
-        access_url(self.id)
+        access_url(self["@id"])

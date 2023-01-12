@@ -39,7 +39,7 @@ class DMPMetadata(ContextualEntity):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
-        if self.id != "#METI-DMP":
+        if self["@id"] != "#METI-DMP":
             raise PropsError("The value of @id property of DMPMetadata entity in METI MUST be '#METI-DMP'.")
         if self["name"] != "METI-DMP":
             raise PropsError("The value of name property of DMPMetadata entity in METI MUST be 'METI-DMP'.")

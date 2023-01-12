@@ -173,12 +173,12 @@ class Organization(ContextualEntity):
         })
 
     def validate(self) -> None:
-        if self.id.startswith("https://ror.org/"):
-            ror_namelist = get_name_from_ror(self.id[16:])
+        if self["@id"].startswith("https://ror.org/"):
+            ror_namelist = get_name_from_ror(self["@id"][16:])
             if self["name"] not in ror_namelist:
                 raise GovernanceError(f"The value of name property in {self} MUST be same as the registered name in ROR.")
         else:
-            access_url(self.id)
+            access_url(self["@id"])
 
 
 class Person(ContextualEntity):
@@ -210,11 +210,11 @@ class Person(ContextualEntity):
             "telephone": check_phonenumber
         })
 
-        if self.id.startswith("https://orcid.org/"):
-            check_orcid_id(self.id[18:])
+        if self["@id"].startswith("https://orcid.org/"):
+            check_orcid_id(self["@id"][18:])
 
     def validate(self) -> None:
-        access_url(self.id)
+        access_url(self["@id"])
 
 
 class License(ContextualEntity):
@@ -245,7 +245,7 @@ class License(ContextualEntity):
         })
 
     def validate(self) -> None:
-        access_url(self.id)
+        access_url(self["@id"])
 
 
 class RepositoryObject(ContextualEntity):
@@ -310,7 +310,7 @@ class DataDownload(ContextualEntity):
         })
 
     def validate(self) -> None:
-        access_url(self.id)
+        access_url(self["@id"])
 
 
 class HostingInstitution(Organization):
