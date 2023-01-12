@@ -16,7 +16,7 @@ def test_init() -> None:
 
 def test_schema() -> None:
     ent = RepositoryObject("https://example.com/RepositoryObject")
-    assert ent.schema == "base"
+    assert ent.schema_name == "base"
 
 
 def test_check_props() -> None:

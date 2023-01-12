@@ -5,13 +5,14 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
-from nii_dg.error import PropsError
+from nii_dg.error import GovernanceError, PropsError
 from nii_dg.schema.base import File as BaseFile
-from nii_dg.utils import (check_all_prop_types, check_content_formats,
-                          check_content_size, check_isodate, check_mime_type,
-                          check_required_props, check_sha256,
-                          check_unexpected_props, check_url, classify_uri,
-                          load_entity_def_from_schema_file)
+from nii_dg.utils import (access_url, check_all_prop_types,
+                          check_content_formats, check_content_size,
+                          check_isodate, check_mime_type, check_required_props,
+                          check_sha256, check_unexpected_props, check_url,
+                          classify_uri, load_entity_def_from_schema_file,
+                          verify_is_past_date)
 
 
 class DMPMetadata(ContextualEntity):
@@ -80,15 +81,38 @@ class DMP(ContextualEntity):
             "availabilityStarts": check_isodate
         })
 
+        if verify_is_past_date(self, "availabilityStarts"):
+            raise PropsError("The value of availabilityStarts MUST be the date of future.")
+
     def validate(self) -> None:
-        # TODO: impl.
-        # govern_isodate(self, "availabilityStarts", "future")
-        pass
+
+        if self["accessRights"] in ["Unshared", "Restricted Closed Sharing"]:
+            if any(map(self.keys().__contains__, ("availabilityStarts", "accessRightsInfo"))) is False:
+                raise GovernanceError(
+                    f"The property availabilityStarts is required in {self}. If you keep data unshared, property AccessRightsInfo is required instead.")
+
+        if "repository" not in self.keys():
+            # TODO: DMPMetadataエンティティを見に行く,なければGovernanceError
+            pass
+        if self["accessRights"] == "Unrestricted Open Sharing" and "distribution" not in self.keys():
+            # TODO: DMPMetadataエンティティを見に行く,なければGovernanceError
+            pass
+
+        if self["gotInformedConsent"] == "yes" and "informedConsentFormat" not in self.keys():
+            raise GovernanceError(f"The property informedConsentFormat is required in {self}.")
 
 
 class File(BaseFile):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
+
+    @property
+    def schema_name(self) -> str:
+        return Path(__file__).stem
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def check_props(self) -> None:
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
@@ -108,13 +132,14 @@ class File(BaseFile):
             "sdDatePublished": check_isodate
         })
 
+        if verify_is_past_date(self, "sdDatePublished") is False:
+            raise PropsError("The value of sdDatePublished MUST not be the date of future.")
+
     def validate(self) -> None:
-        pass
         # TODO: impl.
-        # try:
-        #     govern_isodate(self, "sdDatePublished", "past")
-        # except KeyError:
-        #     pass
+        if classify_uri(self, "@id") == "url":
+            if "sdDatePublished" not in self.keys():
+                raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")
 
 
 class ClinicalResearchRegistration(ContextualEntity):
@@ -145,5 +170,4 @@ class ClinicalResearchRegistration(ContextualEntity):
         })
 
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        access_url(self.id)

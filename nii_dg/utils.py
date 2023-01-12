@@ -3,13 +3,15 @@
 
 import datetime
 import importlib
+import json
 import mimetypes
 import re
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
                     Optional, TypedDict, Union)
 from urllib.parse import quote, urlparse
 
+import requests
 import yaml
 from typeguard import check_type as ori_check_type
 
@@ -197,7 +199,7 @@ def classify_uri(entity: "Entity", key: str) -> str:
 
     if parsed.scheme in ["http", "https"] and parsed.netloc != "":
         return "URL"
-    if parsed.scheme != "" or encoded_uri.startswith(("/", "\\")):
+    if PurePosixPath(encoded_uri).is_absolute() or PureWindowsPath(encoded_uri).is_absolute():
         return "abs_path"
     return "rel_path"
 
@@ -297,14 +299,75 @@ def check_erad_researcher_number(value: str) -> None:
         raise ValueError
 
 
-def govern_isodate(entity: "Entity", key: str, past_or_future: Optional[Literal["past", "future"]] = None) -> None:
+def check_orcid_id(value: str) -> None:
     """
-    Check date is in ISO 8601 format "YYYY-MM-DD".
+    Check orcid id format and checksum.
     """
-    isodate = datetime.date.fromisoformat(entity[key])
+    pattern = r"^(\d{4}-){3}\d{3}[\dX]$"
+    orcidid_match = re.compile(pattern)
+
+    if orcidid_match.fullmatch(value) is None:
+        raise PropsError(f"Orcid ID {value} is invalid.")
+
+    if value[-1] == "X":
+        checksum = 10
+    else:
+        checksum = int(value[-1])
+    sum_val = 0
+    for num in value.replace("-", "")[:-1]:
+        sum_val = (sum_val + int(num)) * 2
+    if (12 - (sum_val % 11)) % 11 != checksum:
+        raise PropsError(f"Orcid ID {value} is invalid.")
+
+
+def verify_is_past_date(entity: "Entity", key: str) -> Optional[bool]:
+    """
+    Check the date is past or not.
+    """
+    try:
+        iso_date = datetime.date.fromisoformat(entity[key])
+    except KeyError:
+        return None
+    except ValueError:
+        raise PropsError(f"The value of {key} in {entity} is invalid date format. MUST be 'YYYY-MM-DD'.") from None
 
     today = datetime.date.today()
-    if past_or_future == "past" and (today - isodate).days < 0:
-        raise GovernanceError(f"The value of sdDatePublished in {entity} MUST be the date in the past.")
-    if past_or_future == "future" and (today - isodate).days > 0:
-        raise GovernanceError(f"The value of sdDatePublished in {entity} MUST be the date in the future.")
+    if (today - iso_date).days < 0:
+        return False
+    return True
+
+
+def access_url(url: str) -> None:
+    """
+    Check the url is accessible.
+    """
+    try:
+        res = requests.get(url, timeout=(10.0, 30.0))
+        res.raise_for_status()
+    except requests.HTTPError as httperr:
+        msg = str(httperr)
+        raise GovernanceError(f"URL is not accessible. {msg}") from None
+    except Exception as err:
+        raise UnexpectedImplementationError from err
+
+
+def get_name_from_ror(ror_id: str) -> List[str]:
+    """
+    Get organization name from ror.
+    """
+    api_url = "https://api.ror.org/organizations/" + ror_id
+
+    try:
+        res = requests.get(api_url, timeout=(10.0, 30.0))
+        res.raise_for_status()
+    except requests.HTTPError as httperr:
+        if res.status_code == 404:
+            raise GovernanceError(f"ROR ID {ror_id} does not exist.") from None
+        raise UnexpectedImplementationError from httperr
+    except Exception as err:
+        raise UnexpectedImplementationError from err
+
+    body = res.json()
+    name_list: List[str] = body["aliases"]
+    name_list.append(body["name"])
+    return name_list

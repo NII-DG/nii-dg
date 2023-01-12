@@ -49,7 +49,7 @@ DMPMetadata:
     distribution:
       expected_type: DataDownload
       example: '{"@id": "https://zenodo.org/record/example"}'
-      required: Can be added when accessRights in tied DMP entity has `open access` and all open-access data set is available from a single URL.
+      required: Can be added when accessRights in tied DMP entity has `Unrestricted Open Sharing` and all Unrestricted-Open-Sharing data set is available from a single URL.
       description: MUST be @id term of DataDownload entity. Indicates where the download URL of the data set.
     hasPart:
       expected_type: List[DMP]
@@ -87,7 +87,7 @@ DMP:
     availabilityStarts:
       expected_type: str
       example: '2023-04-01'
-      required: Required when accessRights has `Unshared` or `Restricted Closed Sharing`. If the dataset will not be open sharing e.g. because data set contains personal information, MUST describe the reason of unshared or closed sharing in the following property, accessRightsInfo.
+      required: Required when accessRights has `Unshared` or `Restricted Closed Sharing`. If the dataset will not be open sharing because it contains personal information or for some other reason, this value is not required, but instead the reason of unshared or closed sharing MUST be described in the following property, accessRightsInfo.
       description: MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification. Indicates when the data will be open sharing status.
     accessRightsInfo:
       expected_type: str
@@ -102,7 +102,7 @@ DMP:
     distribution:
       expected_type: DataDownload
       example: '{ "@id": "https://zenodo.org/record/example" }'
-      required: Required when accessRights has `open access`. When all open-access data set is available from a single URL, it can be omitted instead of adding to DMPMetadata entity.
+      required: Required when accessRights has `Unrestricted Open Sharing`. When all Unrestricted-Open-Sharing data set is available from a single URL, it can be omitted instead of adding to DMPMetadata entity.
       description: MUST be @id term of the DataDownload entity. Indicates where the download URL of the data set.
     contentSize:
       expected_type: Literal["1GB", "10GB", "100GB", "over100GB"]

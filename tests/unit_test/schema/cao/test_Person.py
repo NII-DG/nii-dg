@@ -16,7 +16,7 @@ def test_init() -> None:
 
 def test_schema() -> None:
     ent = Person("test")
-    assert ent.schema == "cao"
+    assert ent.schema_name == "cao"
 
 
 def test_check_props() -> None:

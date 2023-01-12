@@ -22,6 +22,7 @@ setup(
         "flask",
         "pyyaml",
         "typeguard",
+        "requests",
     ],
     tests_require=[
         "flake8",

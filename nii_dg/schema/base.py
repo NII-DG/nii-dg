@@ -6,13 +6,15 @@ from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity
 from nii_dg.error import GovernanceError, PropsError
-from nii_dg.utils import (EntityDef, check_all_prop_types,
+from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_content_formats, check_content_size,
                           check_email, check_isodate, check_mime_type,
-                          check_phonenumber, check_required_props,
-                          check_sha256, check_unexpected_props, check_url,
-                          classify_uri, github_branch, github_repo,
-                          govern_isodate, load_entity_def_from_schema_file)
+                          check_orcid_id, check_phonenumber,
+                          check_required_props, check_sha256,
+                          check_unexpected_props, check_url, classify_uri,
+                          get_name_from_ror, github_branch, github_repo,
+                          load_entity_def_from_schema_file,
+                          verify_is_past_date)
 
 
 class RootDataEntity(DefaultEntity):
@@ -96,17 +98,13 @@ class File(DataEntity):
             "sdDatePublished": check_isodate
         })
 
+        if verify_is_past_date(self, "sdDatePublished") is False:
+            raise PropsError("The value of sdDatePublished MUST not be the date of future.")
+
     def validate(self) -> None:
-        # TODO: impl.
-        # @idがURLの場合にsdDatePublishedの存在チェック
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
-                raise GovernanceError(f"The term sdDatePublished MUST be included in {self}.")
-
-        try:
-            govern_isodate(self, "sdDatePublished", "past")
-        except KeyError:
-            pass
+                raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")
 
 
 class Dataset(DataEntity):
@@ -175,8 +173,12 @@ class Organization(ContextualEntity):
         })
 
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        if self.id.startswith("https://ror.org/"):
+            ror_namelist = get_name_from_ror(self.id[16:])
+            if self["name"] not in ror_namelist:
+                raise GovernanceError(f"The value of name property in {self} MUST be same as the registered name in ROR.")
+        else:
+            access_url(self.id)
 
 
 class Person(ContextualEntity):
@@ -208,9 +210,11 @@ class Person(ContextualEntity):
             "telephone": check_phonenumber
         })
 
+        if self.id.startswith("https://orcid.org/"):
+            check_orcid_id(self.id[18:])
+
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        access_url(self.id)
 
 
 class License(ContextualEntity):
@@ -241,8 +245,7 @@ class License(ContextualEntity):
         })
 
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        access_url(self.id)
 
 
 class RepositoryObject(ContextualEntity):
@@ -307,13 +310,16 @@ class DataDownload(ContextualEntity):
         })
 
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        access_url(self.id)
 
 
 class HostingInstitution(Organization):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
 
     def check_props(self) -> None:
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
@@ -328,8 +334,7 @@ class HostingInstitution(Organization):
         })
 
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        super().validate()
 
 
 class ContactPoint(ContextualEntity):
@@ -361,5 +366,5 @@ class ContactPoint(ContextualEntity):
         })
 
     def validate(self) -> None:
-        # TODO: impl.
-        pass
+        if any(map(self.keys().__contains__, ("email", "telephone"))) is False:
+            raise GovernanceError(f"Either property email or telephone is required in {self}.")

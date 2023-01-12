@@ -16,7 +16,7 @@ def test_init() -> None:
 
 def test_schema() -> None:
     ent = DMPMetadata("test")
-    assert ent.schema == "meti"
+    assert ent.schema_name == "meti"
 
 
 def test_check_props() -> None:
