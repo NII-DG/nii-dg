@@ -21,7 +21,6 @@ def test_as_jsonld() -> None:
     ent = DMPMetadata({})
 
     ent["about"] = RootDataEntity({})
-    ent["name"] = "AMED-DMP"
     ent["funding"] = "Acceleration Transformative Research for Medical Innovation"
     ent["chiefResearcher"] = Person("https://orcid.org/0000-0001-2345-6789")
     ent["creator"] = [Person("https://orcid.org/0000-0001-2345-6789")]
@@ -41,8 +40,31 @@ def test_as_jsonld() -> None:
 
 
 def test_check_props() -> None:
-    # TO BE UPDATED
-    pass
+    ent = DMPMetadata({"unknown_property": "unknown"})
+
+    # error: with unexpected property
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: lack of required properties
+    del ent["unknown_property"]
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: type error
+    ent["about"] = RootDataEntity()
+    ent["funding"] = "Acceleration Transformative Research for Medical Innovation"
+    ent["chiefResearcher"] = "Donald Duck"
+    ent["creator"] = [Person("https://orcid.org/0000-0001-2345-6789")]
+    ent["hostingInstitution"] = HostingInstitution("https://ror.org/04ksd4g47")
+    ent["dataManager"] = Person("https://orcid.org/0000-0001-2345-6789")
+    ent["hasPart"] = [DMP(1), DMP(2)]
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # no error occurs with correct property value
+    ent["chiefResearcher"] = Person("https://orcid.org/0000-0001-2345-6789")
+    ent.check_props()
 
 
 def test_validate() -> None:
