@@ -6,6 +6,7 @@ from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
 from nii_dg.error import GovernanceError, PropsError
+from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (access_url, check_all_prop_types,
                           check_content_formats, check_content_size,
@@ -49,9 +50,10 @@ class DMPMetadata(ContextualEntity):
         if self["name"] != "AMED-DMP":
             raise PropsError("The value of name property of DMPMetadata entity in AMED MUST be 'AMED-DMP'.")
 
-    def validate(self) -> None:
-        # TODO: impl.
-        pass
+    def validate(self, rocrate: ROCrate) -> None:
+        dmp_metadata_ents = rocrate.get_entities(DMPMetadata)
+        if len(dmp_metadata_ents) > 1:
+            raise GovernanceError(f"Only 1 DMPMetadata entity can be contained in ro-crate.")
 
 
 class DMP(ContextualEntity):
@@ -84,19 +86,26 @@ class DMP(ContextualEntity):
         if verify_is_past_date(self, "availabilityStarts"):
             raise PropsError("The value of availabilityStarts MUST be the date of future.")
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
 
         if self["accessRights"] in ["Unshared", "Restricted Closed Sharing"]:
             if any(map(self.keys().__contains__, ("availabilityStarts", "accessRightsInfo"))) is False:
                 raise GovernanceError(
                     f"The property availabilityStarts is required in {self}. If you keep data unshared, property AccessRightsInfo is required instead.")
 
+        dmp_metadata_ents = rocrate.get_entities(DMPMetadata)
+        if len(dmp_metadata_ents) == 0:
+            raise GovernanceError("DMPMetadata Entity MUST be required with DMP entity.")
+
         if "repository" not in self.keys():
-            # TODO: DMPMetadataエンティティを見に行く,なければGovernanceError
-            pass
+            # DMPMetadata entity must have the property instead of DMP entity
+            if "repository" not in dmp_metadata_ents[0].keys():
+                raise GovernanceError(f"Property repository is required in {self}.")
+
         if self["accessRights"] == "Unrestricted Open Sharing" and "distribution" not in self.keys():
-            # TODO: DMPMetadataエンティティを見に行く,なければGovernanceError
-            pass
+            # DMPMetadata entity must have the property instead of DMP entity
+            if "distribution" not in dmp_metadata_ents[0].keys():
+                raise GovernanceError(f"Property distribution is required in {self}.")
 
         if self["gotInformedConsent"] == "yes" and "informedConsentFormat" not in self.keys():
             raise GovernanceError(f"The property informedConsentFormat is required in {self}.")
