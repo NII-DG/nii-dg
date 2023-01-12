@@ -115,6 +115,7 @@ class Person(BasePerson):
         check_all_prop_types(self, entity_def)
 
         check_content_formats(self, {
+            "@id": check_url,
             "eradResearcherNumber": check_erad_researcher_number
         })
 

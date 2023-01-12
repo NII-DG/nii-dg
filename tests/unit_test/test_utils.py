@@ -152,7 +152,7 @@ def test_check_url() -> None:
     check_url("https://example.com")
 
     with pytest.raises(ValueError):
-        check_url("file://documents/file")
+        check_url("file:///documents/file")
     # to be added
 
 

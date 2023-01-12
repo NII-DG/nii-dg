@@ -66,7 +66,7 @@ def test_check_props() -> None:
     with pytest.raises(PropsError):
         ent.check_props()
 
-    # error: sdDatePublished value is not future date
+    # error: availabilityStarts value is not future date
     ent["availabilityStarts"] = "2022-04-01"
     with pytest.raises(PropsError):
         ent.check_props()

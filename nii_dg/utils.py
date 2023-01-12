@@ -212,7 +212,9 @@ def check_url(value: str) -> None:
     encoded_url = quote(value, safe="!#$&'()*+,/:;=?@[]\\")
     parsed = urlparse(encoded_url)
 
-    if parsed.scheme not in ["http", "https"] or parsed.netloc == "":
+    if parsed.scheme not in ["http", "https"]:
+        raise ValueError
+    if parsed.netloc == "":
         raise ValueError
 
 

@@ -76,6 +76,9 @@ class DMP(ContextualEntity):
             "availabilityStarts": check_isodate
         })
 
+        if verify_is_past_date(self, "availabilityStarts"):
+            raise PropsError("The value of availabilityStarts MUST be the date of future.")
+
     def validate(self) -> None:
         # TODO: impl.
         if self["accessRights"] != "open access" and "reasonForConcealment" not in self.keys():
