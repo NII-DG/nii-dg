@@ -1,5 +1,12 @@
 # NII-DGライブラリによるパッケージング (RO-Crate生成) の実行例
 
+# Overview
+
+- 研究データパッケージングのためのSchema定義としてYAMLファイルとPythonモジュールを記述し、これを用いて、データ型やフィールドのrequired属性など検証を自動的に行う。
+- YAMLファイルに記述したSchema定義を元に、閲覧用ドキュメントとしてのMarkdownファイルを生成する。
+
+![nii-dg_lib_overview](https://user-images.githubusercontent.com/31247330/211984174-1ce78018-5e28-4052-92cd-41a0581302ab.png)
+
 ## Installation
 
 Python (version>=3.8) を利用する。
@@ -19,7 +26,9 @@ $ docker run -ti -v $PWD:/app python3-slim bash
 $ cd /app; python3 -m pip install .
 ```
 
-## サンプル実装の実行
+## Execution example
+
+サンプル実装の実行例を示す。
 
 ```
 $ python3 tests/example.py
@@ -84,9 +93,10 @@ $ python3 tests/example.py
 }
 ```
 
-## 仕様
+## 仕様に関するメモ
 
 ### RootDataEntityの生成
+
 ROCrateインスタンスを生成すると、`root`としてRootDataEntityが生成される。
 
 ```python
@@ -97,7 +107,10 @@ ro_crate.root["name"] = "example research project"
 ```
 
 ### エンティティ生成
-生成したいエンティティをimportし、インスタンス生成。プロパティの追加は第二引数(@idが固定のエンティティでは第一引数)の設定でも可能。
+
+生成する対象のエンティティモジュールをimportし、インスタンスを生成する。
+プロパティの追加は第二引数(@idが固定のエンティティでは第一引数)の設定でも可能。
+
 ```python
 from nii_dg.schema.base import Organization
 
@@ -105,13 +118,17 @@ funder = Organization("https://www.nii.ac.jp/", {"name": "National Institute of 
 ```
 
 ### RO-Crateへエンティティ追加
-生成したエンティティはaddメソッドでROCrateインスタンスに追加が必要。
+
+生成したエンティティは `add()` メソッドによりROCrateインスタンスへの追加を行う。
+
 ```python
 ro_crate.add(funder)
 ```
 
 ### JSON-LDに変換
-as_jsonld()メソッドは戻り値としてROCrateインスタンスのJSON-LD形式の辞書を返す。
+
+`as_jsonld()` メソッドは戻り値としてROCrateインスタンスのJSON-LD形式の辞書を返す。
+
 ```python
 json.dumps(ro_crate.as_jsonld())
 ```
