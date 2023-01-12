@@ -63,13 +63,13 @@ def add_example_value(
     elif obj["expected_type"].startswith("List["):
         obj["expected_type"] = obj["expected_type"][5:-1]
 
-        child_id = ast.literal_eval(obj["example"])
-        if len(child_id) == 1:
-            child_id = child_id[0]
+        obj["example"] = ast.literal_eval(obj["example"])
+        if len(obj["example"]) == 1:
+            obj["example"] = obj["example"][0]
 
         set_properties += "["
         set_properties, import_entities, import_entities_from_base = add_example_value(
-            obj, entity_list, set_properties, import_entities, import_entities_from_base, child_id)
+            obj, entity_list, set_properties, import_entities, import_entities_from_base)
         set_properties += "]"
 
     elif obj["expected_type"].startswith("Optional["):
@@ -80,27 +80,43 @@ def add_example_value(
     elif obj["expected_type"].startswith("Union["):
         type_list = obj["expected_type"][6:-1].replace(" ", "").split(",")
 
-        for i, type_str in enumerate(type_list):
+        if isinstance(obj["example"], list):
+            for i, type_str in enumerate(type_list):
+                if i > 0:
+                    set_properties += ", "
+                obj["expected_type"] = type_str
+                child_id = obj["example"][i]
+
+                set_properties, import_entities, import_entities_from_base = add_example_value(
+                    obj, entity_list, set_properties, import_entities, import_entities_from_base, child_id)
+
+        elif obj["example"].startswith("{"):
+            obj["expected_type"] = type_list[0]
+            set_properties, import_entities, import_entities_from_base = add_example_value(
+                obj, entity_list, set_properties, import_entities, import_entities_from_base)
+
+        else:
+            raise ValueError("Only entity type can be used with Union. Example MUST be the dict of @id property.")
+
+    elif child_id is None and isinstance(obj["example"], list):
+        for i, ex in enumerate(obj["example"]):
             if i > 0:
                 set_properties += ", "
-            obj["expected_type"] = type_str
-            if child_id:
-                child_id_dict = child_id[i]
-            else:
-                child_id_dict = ast.literal_eval(obj["example"])
-
+            child_id = ex
             set_properties, import_entities, import_entities_from_base = add_example_value(
-                obj, entity_list, set_properties, import_entities, import_entities_from_base, child_id_dict)
+                obj, entity_list, set_properties, import_entities, import_entities_from_base, child_id)
 
     else:
-        if child_id is None:
+        if child_id is None and isinstance(obj["example"], str):
             child_id = ast.literal_eval(obj["example"])
+        elif child_id is None:
+            child_id = obj["example"]
         child_id_str = "\"" + child_id["@id"] + "\""
 
         if obj["expected_type"] in ["RootDataEntity", "DMPMetadata"]:
             child_id_str = {}
         elif obj["expected_type"] == "DMP":
-            child_id_str = child_id_str.replace("#dmp:", "")
+            child_id_str = int(child_id_str.replace("#dmp:", "").replace("\"", ""))
 
         set_properties += "{Entity}({id})".format(
             Entity=obj["expected_type"],
