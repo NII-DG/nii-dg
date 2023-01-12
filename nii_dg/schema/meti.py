@@ -39,7 +39,7 @@ class DMPMetadata(ContextualEntity):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
-        if self.id != "#METI-DMP":
+        if self["@id"] != "#METI-DMP":
             raise PropsError("The value of @id property of DMPMetadata entity in METI MUST be '#METI-DMP'.")
         if self["name"] != "METI-DMP":
             raise PropsError("The value of name property of DMPMetadata entity in METI MUST be 'METI-DMP'.")
@@ -75,6 +75,9 @@ class DMP(ContextualEntity):
         check_content_formats(self, {
             "availabilityStarts": check_isodate
         })
+
+        if verify_is_past_date(self, "availabilityStarts"):
+            raise PropsError("The value of availabilityStarts MUST be the date of future.")
 
     def validate(self) -> None:
         # TODO: impl.

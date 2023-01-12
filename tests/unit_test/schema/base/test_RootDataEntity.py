@@ -8,55 +8,53 @@ from nii_dg.schema.base import Organization, RootDataEntity
 
 
 def test_init() -> None:
-    root = RootDataEntity()
-    assert root["@id"] == "./"
-    assert root["@type"] == "Dataset"
-
-
-def test_schema() -> None:
-    root = RootDataEntity()
-    assert root.schema_name == "base"
-
-
-def test_check_props() -> None:
-    root = RootDataEntity()
-
-    # error
-    with pytest.raises(PropsError) as e1:
-        root.check_props()
-    assert str(e1.value) == "The term name is required in <Dataset ./>."
-
-    with pytest.raises(PropsError) as e2:
-        root["name"] = "test"
-        root.check_props()
-    assert str(e2.value) == "The term funder is required in <Dataset ./>."
-
-    with pytest.raises(PropsError) as e3:
-        root["funder"] = "test"
-        root.check_props()
-    assert str(e3.value) == "The type of funder in <Dataset ./> MUST be a list; got str instead."
-
-    with pytest.raises(PropsError) as e4:
-        root["funder"] = ["test"]
-        root.check_props()
-    assert str(e4.value) == "The type of funder[0] in <Dataset ./> MUST be nii_dg.schema.base.Organization; got str instead."
+    ent = RootDataEntity({})
+    assert ent["@id"] == "./"
+    assert ent["@type"] == "Dataset"
+    assert ent.schema_name == "base"
+    assert ent.entity_name == "RootDataEntity"
 
 
 def test_as_jsonld() -> None:
-    root = RootDataEntity({"name": "test"})
-    root["funder"] = [Organization("https://example.com", {"name": "test_org"})]
+    ent = RootDataEntity({})
 
-    jsonld = {
-        "@id": "./",
-        "@type": "Dataset",
-        "name": "test",
-        "funder": [{"@id": "https://example.com"}]
-    }
+    ent["name"] = "Example Research Project"
+    ent["description"] = "This research project aims to reveal the effect of xxx."
+    ent["funder"] = [Organization("https://ror.org/01b9y6c26")]
+    ent["dateCreated"] = "2022-12-09T10:48:07.976+00:00"
 
-    ent_in_json = root.as_jsonld()
-    del ent_in_json["@context"]
+    jsonld = {'@type': 'Dataset', '@id': './', 'name': 'Example Research Project', 'description': 'This research project aims to reveal the effect of xxx.',
+              'funder': [{'@id': 'https://ror.org/01b9y6c26'}]}
+
+    ent_in_json = ent.as_jsonld()
+    del ent_in_json["@context"], ent_in_json["dateCreated"]
+
     assert ent_in_json == jsonld
 
 
+def test_check_props() -> None:
+    ent = RootDataEntity({"unknown_property": "unknown"})
+
+    # error: with unexpected property
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: lack of required properties
+    del ent["unknown_property"]
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: type error
+    ent["name"] = "Example Research Project"
+    ent["funder"] = Organization("https://ror.org/01b9y6c26")
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # no error occurs with correct property value
+    ent["funder"] = [Organization("https://ror.org/01b9y6c26")]
+    ent.check_props()
+
+
 def test_validate() -> None:
+    # TO BE UPDATED
     pass

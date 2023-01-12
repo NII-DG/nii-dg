@@ -173,12 +173,12 @@ class Organization(ContextualEntity):
         })
 
     def validate(self) -> None:
-        if self.id.startswith("https://ror.org/"):
-            ror_namelist = get_name_from_ror(self.id[16:])
+        if self["@id"].startswith("https://ror.org/"):
+            ror_namelist = get_name_from_ror(self["@id"][16:])
             if self["name"] not in ror_namelist:
                 raise GovernanceError(f"The value of name property in {self} MUST be same as the registered name in ROR.")
         else:
-            access_url(self.id)
+            access_url(self["@id"])
 
 
 class Person(ContextualEntity):
@@ -210,11 +210,11 @@ class Person(ContextualEntity):
             "telephone": check_phonenumber
         })
 
-        if self.id.startswith("https://orcid.org/"):
-            check_orcid_id(self.id[18:])
+        if self["@id"].startswith("https://orcid.org/"):
+            check_orcid_id(self["@id"][18:])
 
     def validate(self) -> None:
-        access_url(self.id)
+        access_url(self["@id"])
 
 
 class License(ContextualEntity):
@@ -245,7 +245,7 @@ class License(ContextualEntity):
         })
 
     def validate(self) -> None:
-        access_url(self.id)
+        access_url(self["@id"])
 
 
 class RepositoryObject(ContextualEntity):
@@ -271,9 +271,7 @@ class RepositoryObject(ContextualEntity):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
-        check_content_formats(self, {
-            "@id": check_url
-        })
+        classify_uri(self, "@id")
 
     def validate(self) -> None:
         # TODO: impl.
@@ -309,8 +307,11 @@ class DataDownload(ContextualEntity):
             "uploadDate": check_isodate
         })
 
+        if verify_is_past_date(self, "uploadDate") is False:
+            raise PropsError("The value of uploadDate MUST not be the date of future.")
+
     def validate(self) -> None:
-        access_url(self.id)
+        access_url(self["@id"])
 
 
 class HostingInstitution(Organization):
@@ -364,6 +365,15 @@ class ContactPoint(ContextualEntity):
             "email": check_email,
             "telephone": check_phonenumber
         })
+
+        if self["@id"].startswith("#mailto:"):
+            if self["@id"][8:] != self["email"]:
+                raise PropsError(f"The email contained in @id value in {self} doesn't the same as email property.")
+        elif self["@id"].startswith("#callto:"):
+            if self["@id"][8:] != self["telephone"] or self["@id"][8:] != self["telephone"].replace("-", ""):
+                raise PropsError(f"The phone number contained in @id value in {self} doesn't the same as telephone property.")
+        else:
+            raise PropsError(f"The @id value in {self} MUST be start with #mailto: or #callto.")
 
     def validate(self) -> None:
         if any(map(self.keys().__contains__, ("email", "telephone"))) is False:

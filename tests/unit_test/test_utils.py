@@ -13,7 +13,7 @@ from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_erad_researcher_number, check_isodate,
                           check_mime_type, check_orcid_id, check_phonenumber,
                           check_prop_type, check_required_props, check_sha256,
-                          check_unexpected_props, check_url,
+                          check_unexpected_props, check_url, classify_uri,
                           convert_string_type_to_python_type,
                           get_name_from_ror, import_entity_class,
                           load_entity_def_from_schema_file,
@@ -137,8 +137,14 @@ def test_check_content_formats() -> None:
 
 
 def test_classify_uri() -> None:
-    # TODO impl. after impl. schema/base.py
-    pass
+    ent = BaseFile("https://example.com",
+                   {"path1": "file:///document/test",
+                    "path2": "/document/test",
+                    "path3": "document/test"})
+    assert classify_uri(ent, "@id") == "URL"
+    assert classify_uri(ent, "path1") == "abs_path"
+    assert classify_uri(ent, "path2") == "abs_path"
+    assert classify_uri(ent, "path3") == "rel_path"
 
 
 def test_check_url() -> None:
@@ -146,7 +152,7 @@ def test_check_url() -> None:
     check_url("https://example.com")
 
     with pytest.raises(ValueError):
-        check_url("file://documents/file")
+        check_url("file:///documents/file")
     # to be added
 
 

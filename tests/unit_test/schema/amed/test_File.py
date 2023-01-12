@@ -59,17 +59,17 @@ def test_check_props() -> None:
         ent.check_props()
 
     # error: @id value is not relative path nor URL
-    ent["sdDatePublished"] = "2000-01-01"
+    ent["sdDatePublished"] = "9999-12-01"
     with pytest.raises(PropsError):
         ent.check_props()
 
     # error: sdDatePublished value is not past date
-    ent["@id"] = "config/setting/txt"
+    ent["@id"] = "config/setting.txt"
     with pytest.raises(PropsError):
         ent.check_props()
 
     # no error occurs with correct property value
-    ent["sdDatePublished"] = "9999-12-01"
+    ent["sdDatePublished"] = "2000-01-01"
     ent.check_props()
 
 

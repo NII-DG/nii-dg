@@ -41,7 +41,7 @@ class DMPMetadata(ContextualEntity):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
-        if self.id != "#CAO-DMP":
+        if self["@id"] != "#CAO-DMP":
             raise PropsError("The value of @id property of DMPMetadata entity in CAO MUST be '#CAO-DMP'.")
         if self["name"] != "CAO-DMP":
             raise PropsError("The value of name property of DMPMetadata entity in CAO MUST be 'CAO-DMP'.")
@@ -115,14 +115,15 @@ class Person(BasePerson):
         check_all_prop_types(self, entity_def)
 
         check_content_formats(self, {
+            "@id": check_url,
             "eradResearcherNumber": check_erad_researcher_number
         })
 
-        if self.id.startswith("https://orcid.org/"):
-            check_orcid_id(self.id[18:])
+        if self["@id"].startswith("https://orcid.org/"):
+            check_orcid_id(self["@id"][18:])
 
     def validate(self) -> None:
-        access_url(self.id)
+        access_url(self["@id"])
 
 
 class File(BaseFile):

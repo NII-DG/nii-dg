@@ -154,7 +154,7 @@ Person:
       description: Phone number of the person.
     eradResearcherNumber:
       expected_type: str
-      example: '001234567'
+      example: '01234567'
       required: Required when the person is data manager or has e-Rad researcher number.
       description: Indicates e-Rad researcher number.
 File:

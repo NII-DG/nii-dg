@@ -45,7 +45,7 @@ A person who contributes to the research project, e.g. researcher.
 | `affiliation` | `Organization` | Required. | Affiliation which the person belongs to. MUST be a @id term of the Organization entity. | `{"@id": "https://ror.org/04ksd4g47"}` |
 | `email` | `str` | Required. | Email address of the person. | `ichiro@example.com` |
 | `telephone` | `str` | Optional. | Phone number of the person. | `03-0000-0000` |
-| `eradResearcherNumber` | `str` | Required when the person is data manager or has e-Rad researcher number. | Indicates e-Rad researcher number. | `001234567` |
+| `eradResearcherNumber` | `str` | Required when the person is data manager or has e-Rad researcher number. | Indicates e-Rad researcher number. | `01234567` |
 
 ## File
 A file included in the research project, e.g. text file, script file and images.

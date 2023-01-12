@@ -65,7 +65,7 @@ A license granted to the data.
 A repository where the research data is managed in
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
-| `@id` | `str` | Required. | MUST be URL of the repository. DOI link is recommended. | `https://doi.org/xxxxxxxx` |
+| `@id` | `str` | Required. | MUST be URI of the repository. If it is URL and free to access, DOI link is recommended. | `https://doi.org/xxxxxxxx` |
 | `name` | `str` | Required. | Indicates a name of the repository. | `Gakunin RDM` |
 | `description` | `str` | Optional. | Indicates a description of the repository. | `Repository managed by NII.` |
 
