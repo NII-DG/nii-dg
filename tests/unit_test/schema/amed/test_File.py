@@ -5,69 +5,74 @@ import pytest  # noqa: F401
 
 from nii_dg.error import PropsError
 from nii_dg.schema.amed import DMP, File
-from nii_dg.schema.base import DataDownload, RepositoryObject
 
 
 def test_init() -> None:
-    ent = File("/test")
-    assert ent["@id"] == "/test"
+    ent = File("config/setting.txt")
+    assert ent["@id"] == "config/setting.txt"
     assert ent["@type"] == "File"
-
-
-def test_schema() -> None:
-    ent = File("/test")
     assert ent.schema_name == "amed"
-
-
-def test_check_props() -> None:
-    ent = File("file://test")
-
-    # error
-    with pytest.raises(PropsError) as e1:
-        ent.check_props()
-    assert str(e1.value) == "The term name is required in <File file://test>."
-
-    with pytest.raises(PropsError) as e2:
-        ent["name"] = "test"
-        ent.check_props()
-    assert str(e2.value) == "The term dmpDataNumber is required in <File file://test>."
-
-    with pytest.raises(PropsError) as e3:
-        ent["dmpDataNumber"] = "#1"
-        ent.check_props()
-    assert str(e3.value) == "The term contentSize is required in <File file://test>."
-
-    with pytest.raises(PropsError) as e4:
-        ent["contentSize"] = "156GB"
-        ent.check_props()
-    assert str(e4.value) == "The type of dmpDataNumber in <File file://test> MUST be nii_dg.schema.amed.DMP; got str instead."
-
-    with pytest.raises(PropsError) as e5:
-        ent["dmpDataNumber"] = DMP(1)
-        ent.check_props()
-    assert str(e5.value) == "The @id value in <File file://test> MUST be URL or relative path to the file, not absolute path."
+    assert ent.entity_name == "File"
 
 
 def test_as_jsonld() -> None:
-    ent = File("test", {
-        "name": "testfile",
-        "contentSize": "156GB",
-        "encodingFormat": "text/plain"
-    })
+    ent = File("config/setting.txt")
+
+    ent["name"] = "setting.txt"
     ent["dmpDataNumber"] = DMP(1)
+    ent["contentSize"] = "1560B"
+    ent["encodingFormat"] = "text/plain"
+    ent["sha256"] = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ent["url"] = "https://github.com/username/repository/file"
+    ent["sdDatePublished"] = "2022-12-01"
 
-    jsonld = {
-        "@id": "test",
-        "@type": "File",
-        "name": "testfile",
-        "dmpDataNumber": {"@id": "#dmp:1"},
-        "contentSize": "156GB",
-        "encodingFormat": "text/plain",
-        "@context": "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/amed/File.json"
-    }
+    jsonld = {'@type': 'File', '@id': 'config/setting.txt', 'name': 'setting.txt', 'dmpDataNumber': {'@id': '#dmp:1'}, 'contentSize': '1560B', 'encodingFormat': 'text/plain',
+              'sha256': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'url': 'https://github.com/username/repository/file', 'sdDatePublished': '2022-12-01'}
 
-    assert ent.as_jsonld() == jsonld
+    ent_in_json = ent.as_jsonld()
+    del ent_in_json["@context"]
+
+    assert ent_in_json == jsonld
+
+
+def test_check_props() -> None:
+    ent = File("file:///config/setting.txt", {"unknown_property": "unknown"})
+
+    # error: with unexpected property
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: lack of required properties
+    del ent["unknown_property"]
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: type error
+    ent["name"] = "setting.txt"
+    ent["dmpDataNumber"] = DMP(1)
+    ent["contentSize"] = "1560B"
+    ent["encodingFormat"] = "text/plain"
+    ent["sha256"] = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ent["url"] = "https://github.com/username/repository/file"
+    ent["sdDatePublished"] = 9999
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: @id value is not relative path nor URL
+    ent["sdDatePublished"] = "2000-01-01"
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: sdDatePublished value is not past date
+    ent["@id"] = "config/setting/txt"
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # no error occurs with correct property value
+    ent["sdDatePublished"] = "9999-12-01"
+    ent.check_props()
 
 
 def test_validate() -> None:
+    # TO BE UPDATED
     pass

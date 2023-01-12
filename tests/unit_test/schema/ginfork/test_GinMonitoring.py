@@ -3,6 +3,7 @@
 
 import pytest  # noqa: F401
 
+from nii_dg.error import PropsError
 from nii_dg.schema.base import RootDataEntity
 from nii_dg.schema.ginfork import GinMonitoring
 
@@ -33,8 +34,28 @@ def test_as_jsonld() -> None:
 
 
 def test_check_props() -> None:
-    # TO BE UPDATED
-    pass
+    ent = GinMonitoring(1, {"unknown_property": "unknown"})
+
+    # error: with unexpected property
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: lack of required properties
+    del ent["unknown_property"]
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: type error
+    ent["about"] = RootDataEntity()
+    ent["contentSize"] = "10GB"
+    ent["workflowIdentifier"] = "basic"
+    ent["datasetStructure"] = "basic"
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # no error occurs with correct property value
+    ent["datasetStructure"] = "with_code"
+    ent.check_props()
 
 
 def test_validate() -> None:

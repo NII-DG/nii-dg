@@ -115,7 +115,7 @@ def add_example_value(
 
         if obj["expected_type"] in ["RootDataEntity", "DMPMetadata"]:
             child_id_str = {}
-        elif obj["expected_type"] == "DMP":
+        elif obj["expected_type"] in ["DMP", "GinMonitoring"]:
             child_id_str = int(child_id_str.replace("#dmp:", "").replace("\"", ""))
 
         set_properties += "{Entity}({id})".format(
