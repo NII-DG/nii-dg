@@ -271,9 +271,7 @@ class RepositoryObject(ContextualEntity):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
-        check_content_formats(self, {
-            "@id": check_url
-        })
+        classify_uri(self, "@id")
 
     def validate(self) -> None:
         # TODO: impl.
@@ -308,6 +306,9 @@ class DataDownload(ContextualEntity):
             "sha256": check_sha256,
             "uploadDate": check_isodate
         })
+
+        if verify_is_past_date(self, "uploadDate") is False:
+            raise PropsError("The value of uploadDate MUST not be the date of future.")
 
     def validate(self) -> None:
         access_url(self["@id"])
@@ -364,6 +365,15 @@ class ContactPoint(ContextualEntity):
             "email": check_email,
             "telephone": check_phonenumber
         })
+
+        if self["@id"].startswith("#mailto:"):
+            if self["@id"][8:] != self["email"]:
+                raise PropsError(f"The email contained in @id value in {self} doesn't the same as email property.")
+        elif self["@id"].startswith("#callto:"):
+            if self["@id"][8:] != self["telephone"] or self["@id"][8:] != self["telephone"].replace("-", ""):
+                raise PropsError(f"The phone number contained in @id value in {self} doesn't the same as telephone property.")
+        else:
+            raise PropsError(f"The @id value in {self} MUST be start with #mailto: or #callto.")
 
     def validate(self) -> None:
         if any(map(self.keys().__contains__, ("email", "telephone"))) is False:

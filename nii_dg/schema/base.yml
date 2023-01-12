@@ -168,7 +168,7 @@ RepositoryObject:
       expected_type: str
       example: 'https://doi.org/xxxxxxxx'
       required: Required.
-      description: MUST be URL of the repository. DOI link is recommended.
+      description: MUST be URI of the repository. If it is URL and free to access, DOI link is recommended.
     name:
       expected_type: str
       example: Gakunin RDM
