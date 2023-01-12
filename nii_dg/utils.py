@@ -199,7 +199,7 @@ def classify_uri(entity: "Entity", key: str) -> str:
 
     if parsed.scheme in ["http", "https"] and parsed.netloc != "":
         return "URL"
-    if PurePosixPath(encoded_uri).is_absolute() or PureWindowsPath(encoded_uri).is_absolute():
+    if PurePosixPath(encoded_uri).is_absolute() or PureWindowsPath(encoded_uri).is_absolute() or parsed.scheme == "file":
         return "abs_path"
     return "rel_path"
 

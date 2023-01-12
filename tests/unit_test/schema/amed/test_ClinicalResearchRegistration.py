@@ -3,42 +3,61 @@
 
 import pytest  # noqa: F401
 
+from nii_dg.error import PropsError
 from nii_dg.schema.amed import ClinicalResearchRegistration
 
 
 def test_init() -> None:
-    ent = ClinicalResearchRegistration("https://example.com/ClinicalResearchRegistration")
-    assert ent["@id"] == "test"
+    ent = ClinicalResearchRegistration("https://jrct.niph.go.jp/latest-detail/jRCT202211111111")
+    assert ent["@id"] == "https://jrct.niph.go.jp/latest-detail/jRCT202211111111"
     assert ent["@type"] == "ClinicalResearchRegistration"
-
-
-def test_schema() -> None:
-    ent = ClinicalResearchRegistration("https://example.com/ClinicalResearchRegistration")
     assert ent.schema_name == "amed"
-
-
-def test_check_props() -> None:
-    ent = ClinicalResearchRegistration("https://example.com/ClinicalResearchRegistration")
-    pass
-
-    # error
-    # with pytest.raises(PropsError) as e1:
-    #     ent.check_props()
-    # assert str(e1.value) == "The term name is required in <Dataset ./>."
+    assert ent.entity_name == "ClinicalResearchRegistration"
 
 
 def test_as_jsonld() -> None:
-    ent = ClinicalResearchRegistration("https://example.com/ClinicalResearchRegistration", {"name": "test"})
+    ent = ClinicalResearchRegistration("https://jrct.niph.go.jp/latest-detail/jRCT202211111111")
 
-    jsonld = {
-        "@id": "https://example.com/ClinicalResearchRegistration",
-        "@type": "ClinicalResearchRegistration",
-        "name": "test",
-        "@context": "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/amed/ClinicalResearchRegistration.json"
-    }
+    ent["name"] = "Japan Registry of Clinical Trials"
+    ent["value"] = "1234567"
 
-    assert ent.as_jsonld() == jsonld
+    jsonld = {'@type': 'ClinicalResearchRegistration', '@id': 'https://jrct.niph.go.jp/latest-detail/jRCT202211111111',
+              'name': 'Japan Registry of Clinical Trials', 'value': '1234567'}
+
+    ent_in_json = ent.as_jsonld()
+    del ent_in_json["@context"]
+
+    assert ent_in_json == jsonld
+
+
+def test_check_props() -> None:
+    ent = ClinicalResearchRegistration("file:///config/setting.txt", {"unknown_property": "unknown"})
+
+    # error: with unexpected property
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: lack of required properties
+    del ent["unknown_property"]
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: type error
+    ent["name"] = "sample registration service"
+    ent["value"] = 1
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # error: @id value is not URL
+    ent["@id"] = "https://example.com"
+    with pytest.raises(PropsError):
+        ent.check_props()
+
+    # no error occurs with correct property value
+    ent["value"] = "1"
+    ent.check_props()
 
 
 def test_validate() -> None:
+    # TO BE UPDATED
     pass
