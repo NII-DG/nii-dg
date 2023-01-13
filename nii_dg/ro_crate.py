@@ -8,7 +8,7 @@ Definition of RO-Crate class.
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Type
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
                            ROCrateMetadata)
@@ -55,10 +55,10 @@ class ROCrate():
             else:
                 raise TypeError("Invalid entity type")  # TODO: define exception
 
-    def get_entities(self, entity_name: Any) -> List[Entity]:
-        entity_list = []
+    def get_entities(self, entity: Type[Entity]) -> List[Entity]:
+        entity_list: List[Entity] = []
         for e in self.default_entities + self.data_entities + self.contextual_entities:
-            if isinstance(e, entity_name):
+            if type(e) is entity:
                 entity_list.append(e)
         return entity_list
 

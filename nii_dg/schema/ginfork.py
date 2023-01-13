@@ -100,7 +100,7 @@ def monitor_file_size(rocrate: ROCrate, size: str) -> None:
             file_unit = 0
             file_size = int(e["contentSize"][:-1])
 
-        file_size_sum += round(file_size / 1024 ** (unit - file_unit), 2)
+        file_size_sum += round(file_size / 1024 ** (unit - file_unit), 3)
 
     if file_size_sum > limit:
         raise GovernanceError("The total file size of monitored ginfork file is larger than the defined size.")
