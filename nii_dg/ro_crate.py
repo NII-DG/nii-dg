@@ -55,11 +55,17 @@ class ROCrate():
             else:
                 raise TypeError("Invalid entity type")  # TODO: define exception
 
+    def get(self, entity_id: str) -> Optional[Entity]:
+        for ent in self.default_entities + self.data_entities + self.contextual_entities:
+            if ent.id == entity_id:
+                return ent
+        return None
+
     def get_entities(self, entity: Type[Entity]) -> List[Entity]:
         entity_list: List[Entity] = []
-        for e in self.default_entities + self.data_entities + self.contextual_entities:
-            if type(e) is entity:
-                entity_list.append(e)
+        for ent in self.default_entities + self.data_entities + self.contextual_entities:
+            if type(ent) is entity:
+                entity_list.append(ent)
         return entity_list
 
     def as_jsonld(self) -> Dict[str, Any]:
