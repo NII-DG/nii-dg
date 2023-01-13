@@ -6,6 +6,7 @@ Definition of RO-Crate class.
 """
 
 import json
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Type
@@ -69,12 +70,21 @@ class ROCrate():
         return entity_list
 
     def as_jsonld(self) -> Dict[str, Any]:
+        self.check_entities()
         # add dateCreated to RootDataEntity
         self.root["dateCreated"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
         return {
             "@context": self.BASE_CONTEXT,
             "@graph": [e.as_jsonld() for e in self.default_entities + self.data_entities + self.contextual_entities]  # type: ignore
         }
+
+    def check_entities(self) -> None:
+        id_list = []
+        for ent in self.default_entities + self.data_entities + self.contextual_entities:
+            id_list.append(ent.id)
+        dup_id = [id for id, value in Counter(id_list).items() if value > 1]
+        if len(dup_id) > 0:
+            raise ValueError(f"Duplicate @id value found: {dup_id}.")
 
     def dump(self, path: str) -> None:
         """\
