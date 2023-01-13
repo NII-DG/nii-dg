@@ -42,10 +42,12 @@ class DMPMetadata(ContextualEntity):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
-        if self["@id"] != "#CAO-DMP":
+        if self.id != "#CAO-DMP":
             raise PropsError("The value of @id property of DMPMetadata entity in CAO MUST be '#CAO-DMP'.")
         if self["name"] != "CAO-DMP":
             raise PropsError("The value of name property of DMPMetadata entity in CAO MUST be 'CAO-DMP'.")
+        if self.type != self.entity_name:
+            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
         dmp_metadata_ents = rocrate.get_entities(DMPMetadata)
@@ -81,6 +83,8 @@ class DMP(ContextualEntity):
 
         if verify_is_past_date(self, "availabilityStarts"):
             raise PropsError("The value of availabilityStarts MUST be the date of future.")
+        if self.type != self.entity_name:
+            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
         if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
@@ -130,11 +134,13 @@ class Person(BasePerson):
             "eradResearcherNumber": check_erad_researcher_number
         })
 
-        if self["@id"].startswith("https://orcid.org/"):
-            check_orcid_id(self["@id"][18:])
+        if self.id.startswith("https://orcid.org/"):
+            check_orcid_id(self.id[18:])
+        if self.type != self.entity_name:
+            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self) -> None:
-        access_url(self["@id"])
+        access_url(self.id)
 
 
 class File(BaseFile):
@@ -168,6 +174,8 @@ class File(BaseFile):
 
         if verify_is_past_date(self, "sdDatePublished") is False:
             raise PropsError("The value of sdDatePublished MUST not be the date of future.")
+        if self.type != self.entity_name:
+            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self) -> None:
         if classify_uri(self, "@id") == "url":

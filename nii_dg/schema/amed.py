@@ -45,10 +45,13 @@ class DMPMetadata(ContextualEntity):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
-        if self["@id"] != "#AMED-DMP":
+        if self.id != "#AMED-DMP":
             raise PropsError("The value of @id property of DMPMetadata entity in AMED MUST be '#AMED-DMP'.")
         if self["name"] != "AMED-DMP":
             raise PropsError("The value of name property of DMPMetadata entity in AMED MUST be 'AMED-DMP'.")
+
+        if self.type != self.entity_name:
+            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
         dmp_metadata_ents = rocrate.get_entities(DMPMetadata)
@@ -85,6 +88,8 @@ class DMP(ContextualEntity):
 
         if verify_is_past_date(self, "availabilityStarts"):
             raise PropsError("The value of availabilityStarts MUST be the date of future.")
+        if self.type != self.entity_name:
+            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
 
@@ -146,10 +151,12 @@ class File(BaseFile):
 
         if verify_is_past_date(self, "sdDatePublished") is False:
             raise PropsError("The value of sdDatePublished MUST not be the date of future.")
+        if self.type != self.entity_name:
+            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self) -> None:
         # TODO: impl.
-        if classify_uri(self, "@id") == "url":
+        if classify_uri(self, "@id") == "URL":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")
 
@@ -181,8 +188,11 @@ class ClinicalResearchRegistration(ContextualEntity):
             "@id": check_url,
         })
 
+        if self.type != self.entity_name:
+            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+
     def validate(self) -> None:
-        access_url(self["@id"])
+        access_url(self.id)
 
 
 def monitor_file_size(rocrate: ROCrate, entity: DMP) -> None:
