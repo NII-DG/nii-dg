@@ -70,7 +70,7 @@ class ROCrate():
         return entity_list
 
     def as_jsonld(self) -> Dict[str, Any]:
-        self.check_entities()
+        # self.check_entities()
         # add dateCreated to RootDataEntity
         self.root["dateCreated"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
         return {

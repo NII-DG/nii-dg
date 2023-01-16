@@ -78,7 +78,9 @@ class Entity(TypedMutableMapping):
                 ref_data[key] = val
             elif isinstance(val, list):
                 # expected: [Any], [Entity]
-                ref_data[key] = [{"@id": v.id} if isinstance(v, Entity) else v for v in val]
+                temp = [{"@id": v.id} if isinstance(v, Entity) else v for v in val]
+                seen = []
+                ref_data[key] = [v for v in temp if v not in seen and not seen.append(v)]  # type: ignore
             elif isinstance(val, Entity):
                 ref_data[key] = {"@id": val.id}
             else:
