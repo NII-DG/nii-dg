@@ -165,3 +165,7 @@ class ROCrateMetadata(DefaultEntity):
         self["@type"] = "CreativeWork"
         self["conformsTo"] = {"@id": "https://w3id.org/ro/crate/1.1"}
         self["about"] = root
+
+    @property
+    def schema_name(self) -> None:
+        return None

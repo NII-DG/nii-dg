@@ -70,7 +70,7 @@ class ROCrate():
         return entity_list
 
     def as_jsonld(self) -> Dict[str, Any]:
-        # self.check_entities()
+        self.check_entities()
         # add dateCreated to RootDataEntity
         self.root["dateCreated"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
         return {
@@ -79,12 +79,12 @@ class ROCrate():
         }
 
     def check_entities(self) -> None:
-        id_list = []
+        id_context_list = []
         for ent in self.default_entities + self.data_entities + self.contextual_entities:
-            id_list.append(ent.id)
-        dup_id = [id for id, value in Counter(id_list).items() if value > 1]
-        if len(dup_id) > 0:
-            raise ValueError(f"Duplicate @id value found: {dup_id}.")
+            id_context_list.append((ent.id, ent.context))
+        dup_ents = [ent for ent, count in Counter(id_context_list).items() if count > 1]
+        if len(dup_ents) > 0:
+            raise ValueError(f"Duplicate @id and @context value found: {dup_ents}.")
 
     def dump(self, path: str) -> None:
         """\
