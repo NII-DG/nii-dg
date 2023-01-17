@@ -52,6 +52,9 @@ class DMPMetadata(ContextualEntity):
     def validate(self) -> None:
         pass
 
+    def validate_multi_entities(self, rocrate: ROCrate) -> None:
+        pass
+
 
 class DMP(ContextualEntity):
     def __init__(self, id: int, props: Optional[Dict[str, Any]] = None):
@@ -79,7 +82,7 @@ class DMP(ContextualEntity):
             "availabilityStarts": check_isodate
         })
 
-        if self.id.startswith("#dmp:") is False:
+        if not self.id.startswith("#dmp:"):
             raise PropsError(f"The value of @id property of {self} MUST be started with '#dmp:'.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
@@ -89,9 +92,6 @@ class DMP(ContextualEntity):
     def validate(self) -> None:
         if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
             raise GovernanceError(f"An availabilityStarts property is required in {self}.")
-        if verify_is_past_date(self, "availabilityStarts"):
-            raise GovernanceError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
-
         if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self.keys():
             raise GovernanceError(f"An isAccessibleForFree property is required in {self}.")
         if self["accessRights"] == "open access" and "license" not in self.keys():
@@ -176,8 +176,8 @@ class File(BaseFile):
             "sdDatePublished": check_isodate
         })
 
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            raise PropsError(f"The value of sdDatePublished property of {self} MUST not be the date of future.")
+        if not verify_is_past_date(self, "sdDatePublished"):
+            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
@@ -185,8 +185,6 @@ class File(BaseFile):
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            raise GovernanceError(f"The value of sdDatePublished property of {self} MUST not be the date of future.")
 
 
 def monitor_file_size(rocrate: ROCrate, entity: DMP) -> None:

@@ -84,7 +84,7 @@ class DMP(ContextualEntity):
             "availabilityStarts": check_isodate
         })
 
-        if self.id.startswith("#dmp:") is False:
+        if not self.id.startswith("#dmp:"):
             raise PropsError(f"The value of @id property of {self} MUST be started with '#dmp:'.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
@@ -93,9 +93,9 @@ class DMP(ContextualEntity):
 
     def validate(self) -> None:
         if self["accessRights"] in ["Unshared", "Restricted Closed Sharing"]:
-            if any(map(self.keys().__contains__, ("availabilityStarts", "accessRightsInfo"))) is False:
+            if not any(map(self.keys().__contains__, ("availabilityStarts", "accessRightsInfo"))):
                 raise GovernanceError(
-                    f"An availabilityStarts property is required in {self}. If you keep data unshared, property AccessRightsInfo is required instead.")
+                    f"An availabilityStarts property is required in {self}. If you keep data unshared, ab accessRightsInfo property is required instead.")
         if verify_is_past_date(self, "availabilityStarts"):
             raise GovernanceError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
 
@@ -159,8 +159,8 @@ class File(BaseFile):
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"A sdDatePublished property MUST be included in {self}.")
 
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            raise GovernanceError("The value of sdDatePublished property MUST be the date of past.")
+        if not verify_is_past_date(self, "sdDatePublished"):
+            raise GovernanceError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
 
 class ClinicalResearchRegistration(ContextualEntity):

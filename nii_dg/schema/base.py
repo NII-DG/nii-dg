@@ -103,8 +103,8 @@ class File(DataEntity):
             "sdDatePublished": check_isodate
         })
 
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            raise PropsError(f"The value of sdDatePublished property of {self} MUST not be the date of future.")
+        if not verify_is_past_date(self, "sdDatePublished"):
+            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
@@ -328,8 +328,8 @@ class DataDownload(ContextualEntity):
             "uploadDate": check_isodate
         })
 
-        if verify_is_past_date(self, "uploadDate") is False:
-            raise PropsError(f"The value of uploadDate property of {self} MUST not be the date of future.")
+        if not verify_is_past_date(self, "uploadDate"):
+            raise PropsError(f"The value of uploadDate property of {self} MUST be the date of past.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
@@ -405,5 +405,5 @@ class ContactPoint(ContextualEntity):
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self) -> None:
-        if any(map(self.keys().__contains__, ("email", "telephone"))) is False:
+        if not any(map(self.keys().__contains__, ("email", "telephone"))):
             raise GovernanceError(f"Either email property or telephone property is required in {self}.")

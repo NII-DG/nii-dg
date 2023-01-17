@@ -92,3 +92,9 @@ class ROCrate():
         """
         with Path(path).resolve().open("w") as f:
             json.dump(self.as_jsonld(), f, width=1000, indent=2,)
+
+    def validate(self) -> None:
+        for ent in self.default_entities + self.data_entities + self.contextual_entities:
+            ent.validate()
+            if "validate_multi_entities" in dir(ent):
+                ent.validate_multi_entities(self)

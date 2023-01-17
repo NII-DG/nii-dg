@@ -167,5 +167,12 @@ class ROCrateMetadata(DefaultEntity):
         self["about"] = root
 
     @property
-    def schema_name(self) -> None:
-        return None
+    def context(self) -> str:
+        return "default"
+
+    @property
+    def schema_name(self) -> str:
+        return "default_entity"
+
+    def validate(self) -> None:
+        pass
