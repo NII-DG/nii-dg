@@ -46,17 +46,15 @@ class DMPMetadata(ContextualEntity):
         check_all_prop_types(self, entity_def)
 
         if self.id != "#AMED-DMP":
-            raise PropsError("The value of @id property of DMPMetadata entity in AMED MUST be '#AMED-DMP'.")
+            raise PropsError(f"The value of @id property of {self} MUST be '#AMED-DMP'.")
         if self["name"] != "AMED-DMP":
-            raise PropsError("The value of name property of DMPMetadata entity in AMED MUST be 'AMED-DMP'.")
+            raise PropsError(f"The value of name property of {self} MUST be 'AMED-DMP'.")
 
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self, rocrate: ROCrate) -> None:
-        dmp_metadata_ents = rocrate.get_entities(DMPMetadata)
-        if len(dmp_metadata_ents) > 1:
-            raise GovernanceError("Only 1 DMPMetadata entity can be contained in ro-crate.")
+    def validate(self) -> None:
+        pass
 
 
 class DMP(ContextualEntity):
@@ -86,18 +84,25 @@ class DMP(ContextualEntity):
             "availabilityStarts": check_isodate
         })
 
-        if verify_is_past_date(self, "availabilityStarts"):
-            raise PropsError("The value of availabilityStarts MUST be the date of future.")
+        if self.id.startswith("#dmp:") is False:
+            raise PropsError(f"The value of @id property of {self} MUST be started with '#dmp:'.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+        if verify_is_past_date(self, "availabilityStarts"):
+            raise PropsError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
 
-    def validate(self, rocrate: ROCrate) -> None:
-
+    def validate(self) -> None:
         if self["accessRights"] in ["Unshared", "Restricted Closed Sharing"]:
             if any(map(self.keys().__contains__, ("availabilityStarts", "accessRightsInfo"))) is False:
                 raise GovernanceError(
-                    f"The property availabilityStarts is required in {self}. If you keep data unshared, property AccessRightsInfo is required instead.")
+                    f"An availabilityStarts property is required in {self}. If you keep data unshared, property AccessRightsInfo is required instead.")
+        if verify_is_past_date(self, "availabilityStarts"):
+            raise GovernanceError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
 
+        if self["gotInformedConsent"] == "yes" and "informedConsentFormat" not in self.keys():
+            raise GovernanceError(f"An informedConsentFormat property is required in {self}.")
+
+    def validate_multi_entities(self, rocrate: ROCrate) -> None:
         dmp_metadata_ents = rocrate.get_entities(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
             raise GovernanceError("DMPMetadata Entity MUST be required with DMP entity.")
@@ -105,15 +110,12 @@ class DMP(ContextualEntity):
         if "repository" not in self.keys():
             # DMPMetadata entity must have the property instead of DMP entity
             if "repository" not in dmp_metadata_ents[0].keys():
-                raise GovernanceError(f"Property repository is required in {self}.")
+                raise GovernanceError(f"A repository property is required in {self}.")
 
         if self["accessRights"] == "Unrestricted Open Sharing" and "distribution" not in self.keys():
             # DMPMetadata entity must have the property instead of DMP entity
             if "distribution" not in dmp_metadata_ents[0].keys():
-                raise GovernanceError(f"Property distribution is required in {self}.")
-
-        if self["gotInformedConsent"] == "yes" and "informedConsentFormat" not in self.keys():
-            raise GovernanceError(f"The property informedConsentFormat is required in {self}.")
+                raise GovernanceError(f"A distribution property is required in {self}.")
 
         if "contentSize" in self.keys():
             monitor_file_size(rocrate, self)
@@ -139,7 +141,7 @@ class File(BaseFile):
         check_all_prop_types(self, entity_def)
 
         if classify_uri(self, "@id") == "abs_path":
-            raise PropsError(f"The @id value in {self} MUST be URL or relative path to the file, not absolute path.")
+            raise PropsError(f"The value of @id property of {self} MUST be URL or relative path to the file, not absolute path.")
 
         check_content_formats(self, {
             "contentSize": check_content_size,
@@ -149,16 +151,16 @@ class File(BaseFile):
             "sdDatePublished": check_isodate
         })
 
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            raise PropsError("The value of sdDatePublished MUST not be the date of future.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self) -> None:
-        # TODO: impl.
         if classify_uri(self, "@id") == "URL":
             if "sdDatePublished" not in self.keys():
-                raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")
+                raise GovernanceError(f"A sdDatePublished property MUST be included in {self}.")
+
+        if verify_is_past_date(self, "sdDatePublished") is False:
+            raise GovernanceError("The value of sdDatePublished property MUST be the date of past.")
 
 
 class ClinicalResearchRegistration(ContextualEntity):
