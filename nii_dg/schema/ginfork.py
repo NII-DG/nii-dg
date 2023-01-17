@@ -70,7 +70,7 @@ class File(BaseFile):
         check_all_prop_types(self, entity_def)
 
         if classify_uri(self, "@id") == "abs_path":
-            raise PropsError(f"The @id value in {self} MUST be URL or relative path to the file, not absolute path.")
+            raise PropsError(f"The value of @id property of {self} MUST be URL or relative path to the file, not absolute path.")
 
         check_content_formats(self, {
             "contentSize": check_content_size,
@@ -81,7 +81,7 @@ class File(BaseFile):
         })
 
         if verify_is_past_date(self, "sdDatePublished") is False:
-            raise PropsError("The value of sdDatePublished MUST be the date of past.")
+            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 

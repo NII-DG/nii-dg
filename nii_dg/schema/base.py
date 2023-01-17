@@ -93,7 +93,7 @@ class File(DataEntity):
         check_all_prop_types(self, entity_def)
 
         if classify_uri(self, "@id") == "abs_path":
-            raise PropsError(f"The @id value in {self} MUST be URL or relative path to the file, not absolute path.")
+            raise PropsError(f"The @id value of {self} MUST be URL or relative path to the file, not absolute path.")
 
         check_content_formats(self, {
             "contentSize": check_content_size,
@@ -104,7 +104,7 @@ class File(DataEntity):
         })
 
         if verify_is_past_date(self, "sdDatePublished") is False:
-            raise PropsError("The value of sdDatePublished MUST not be the date of future.")
+            raise PropsError(f"The value of sdDatePublished property of {self} MUST not be the date of future.")
 
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
@@ -112,7 +112,7 @@ class File(DataEntity):
     def validate(self) -> None:
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
-                raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")
+                raise GovernanceError(f"A sdDatePublished property is required in {self}.")
 
 
 class Dataset(DataEntity):
@@ -139,9 +139,9 @@ class Dataset(DataEntity):
         check_all_prop_types(self, entity_def)
 
         if not self.id.endswith("/"):
-            raise PropsError(f"The @id value in {self} MUST end with '/'.")
+            raise PropsError(f"The value of @id property of {self} MUST end with '/'.")
         if classify_uri(self, "@id") != "rel_path":
-            raise PropsError(f"The @id value in {self} MUST be relative path to the directory, neither absolute path nor URL.")
+            raise PropsError(f"The value of @id property of {self} MUST be relative path to the directory, neither absolute path nor URL.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
@@ -189,7 +189,7 @@ class Organization(ContextualEntity):
         if self.id.startswith("https://ror.org/"):
             ror_namelist = get_name_from_ror(self.id[16:])
             if self["name"] not in ror_namelist:
-                raise GovernanceError(f"The value of name property in {self} MUST be same as the registered name in ROR.")
+                raise GovernanceError(f"The value of name property of {self} MUST be same as the registered name in ROR.")
         else:
             access_url(self.id)
 
@@ -329,7 +329,7 @@ class DataDownload(ContextualEntity):
         })
 
         if verify_is_past_date(self, "uploadDate") is False:
-            raise PropsError("The value of uploadDate MUST not be the date of future.")
+            raise PropsError(f"The value of uploadDate property of {self} MUST not be the date of future.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
@@ -394,16 +394,16 @@ class ContactPoint(ContextualEntity):
 
         if self.id.startswith("#mailto:"):
             if self.id[8:] != self["email"]:
-                raise PropsError(f"The email contained in @id value in {self} doesn't the same as email property.")
+                raise PropsError(f"The email contained in the value of @id property of {self} is not the same as the value of email property.")
         elif self.id.startswith("#callto:"):
             if self.id[8:] != self["telephone"] or self.id[8:] != self["telephone"].replace("-", ""):
-                raise PropsError(f"The phone number contained in @id value in {self} doesn't the same as telephone property.")
+                raise PropsError(f"The phone number contained in the value of @id property of {self} is not the same as the value of telephone property.")
         else:
-            raise PropsError(f"The @id value in {self} MUST be start with #mailto: or #callto.")
+            raise PropsError(f"The value of @id property of {self} MUST be start with #mailto: or #callto.")
 
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self) -> None:
         if any(map(self.keys().__contains__, ("email", "telephone"))) is False:
-            raise GovernanceError(f"Either property email or telephone is required in {self}.")
+            raise GovernanceError(f"Either email property or telephone property is required in {self}.")
