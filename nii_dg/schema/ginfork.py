@@ -42,10 +42,7 @@ class GinMonitoring(ContextualEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self) -> None:
-        pass
-
-    def validate_multi_entities(self, rocrate: ROCrate) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         # TODO: impl.
         monitor_file_size(rocrate, self["contentSize"])
 
@@ -80,12 +77,12 @@ class File(BaseFile):
             "sdDatePublished": check_isodate
         })
 
-        if not verify_is_past_date(self, "sdDatePublished"):
+        if verify_is_past_date(self, "sdDatePublished") is False:
             raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         # TODO: impl.
         pass
 

@@ -47,7 +47,7 @@ class DMPMetadata(ContextualEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         pass
 
 
@@ -83,7 +83,7 @@ class DMP(ContextualEntity):
         if verify_is_past_date(self, "availabilityStarts"):
             raise PropsError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
 
         if self["accessRights"] != "open access" and "reasonForConcealment" not in self.keys():
             raise GovernanceError(f"A reasonForConcealment property is required in {self}.")
@@ -99,7 +99,6 @@ class DMP(ContextualEntity):
         if self["accessRights"] in ["open access", "restricted access"] and "contactPoint" not in self.keys():
             raise GovernanceError(f"A contactPoint property is required in {self}.")
 
-    def validate_multi_entities(self, rocrate: ROCrate) -> None:
         dmp_metadata_ents = rocrate.get_by_entity_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
             raise GovernanceError("DMPMetadata Entity MUST be required with DMP entity.")
@@ -148,12 +147,12 @@ class File(BaseFile):
             "sdDatePublished": check_isodate
         })
 
-        if not verify_is_past_date(self, "sdDatePublished"):
+        if verify_is_past_date(self, "sdDatePublished") is False:
             raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"A sdDatePublished property is required in {self}.")

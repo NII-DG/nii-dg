@@ -96,6 +96,6 @@ class ROCrate():
 
     def validate(self) -> None:
         for ent in self.default_entities + self.data_entities + self.contextual_entities:
-            ent.validate()
-            if "validate_multi_entities" in dir(ent):
-                ent.validate_multi_entities(self)
+            if isinstance(ent, ROCrateMetadata):
+                continue
+            ent.validate(self)

@@ -12,6 +12,7 @@ from nii_dg.utils import github_branch, github_repo
 
 if TYPE_CHECKING:
     TypedMutableMapping = MutableMapping[str, Any]
+    from nii_dg.ro_crate import ROCrate
 else:
     TypedMutableMapping = MutableMapping
 
@@ -124,7 +125,7 @@ class Entity(TypedMutableMapping):
         # Abstract method
         raise NotImplementedError
 
-    def validate(self) -> None:
+    def validate(self, crate: "ROCrate") -> None:
         """\
         Called at Data Governance validation time.
         Comprehensive validation including the value of props.
@@ -171,8 +172,5 @@ class ROCrateMetadata(DefaultEntity):
         return "default"
 
     @property
-    def schema_name(self) -> str:
-        return "default_entity"
-
-    def validate(self) -> None:
-        pass
+    def entity_name(self) -> str:
+        return self.__class__.__name__

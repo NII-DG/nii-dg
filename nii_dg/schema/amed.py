@@ -53,7 +53,7 @@ class DMPMetadata(ContextualEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         pass
 
 
@@ -91,7 +91,7 @@ class DMP(ContextualEntity):
         if verify_is_past_date(self, "availabilityStarts"):
             raise PropsError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         if self["accessRights"] in ["Unshared", "Restricted Closed Sharing"]:
             if not any(map(self.keys().__contains__, ("availabilityStarts", "accessRightsInfo"))):
                 raise GovernanceError(
@@ -102,7 +102,6 @@ class DMP(ContextualEntity):
         if self["gotInformedConsent"] == "yes" and "informedConsentFormat" not in self.keys():
             raise GovernanceError(f"An informedConsentFormat property is required in {self}.")
 
-    def validate_multi_entities(self, rocrate: ROCrate) -> None:
         dmp_metadata_ents = rocrate.get_by_entity_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
             raise GovernanceError("DMPMetadata Entity MUST be required with DMP entity.")
@@ -154,12 +153,12 @@ class File(BaseFile):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         if classify_uri(self, "@id") == "URL":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"A sdDatePublished property MUST be included in {self}.")
 
-        if not verify_is_past_date(self, "sdDatePublished"):
+        if verify_is_past_date(self, "sdDatePublished") is False:
             raise GovernanceError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
 
@@ -193,7 +192,7 @@ class ClinicalResearchRegistration(ContextualEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         access_url(self.id)
 
 

@@ -49,10 +49,7 @@ class DMPMetadata(ContextualEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self) -> None:
-        pass
-
-    def validate_multi_entities(self, rocrate: ROCrate) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         pass
 
 
@@ -89,7 +86,7 @@ class DMP(ContextualEntity):
         if verify_is_past_date(self, "availabilityStarts"):
             raise PropsError(f"The value of availabilityStarts property in {self} MUST be the date of future.")
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
             raise GovernanceError(f"An availabilityStarts property is required in {self}.")
         if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self.keys():
@@ -97,7 +94,6 @@ class DMP(ContextualEntity):
         if self["accessRights"] == "open access" and "license" not in self.keys():
             raise GovernanceError(f"A license property is required in {self}.")
 
-    def validate_multi_entities(self, rocrate: ROCrate) -> None:
         dmp_metadata_ents = rocrate.get_by_entity_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
             raise GovernanceError("DMPMetadata Entity MUST be required with DMP entity.")
@@ -143,7 +139,7 @@ class Person(BasePerson):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         access_url(self.id)
 
 
@@ -176,12 +172,12 @@ class File(BaseFile):
             "sdDatePublished": check_isodate
         })
 
-        if not verify_is_past_date(self, "sdDatePublished"):
+        if verify_is_past_date(self, "sdDatePublished") is False:
             raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self) -> None:
+    def validate(self, rocrate: ROCrate) -> None:
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")
