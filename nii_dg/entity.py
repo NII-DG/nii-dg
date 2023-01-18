@@ -78,10 +78,17 @@ class Entity(TypedMutableMapping):
                 # These cannot be supported at this stage, should be supported in self.check_props.
                 ref_data[key] = val
             elif isinstance(val, list):
-                # expected: [Any], [Entity]
-                temp = [{"@id": v.id} if isinstance(v, Entity) else v for v in val]
-                seen = []
-                ref_data[key] = [v for v in temp if v not in seen and not seen.append(v)]  # type: ignore
+                # expected: [Any], [Entity], [Entity, Any]
+                fixed_val = []
+                id_set = set()
+                for v in val:
+                    if isinstance(v, Entity):
+                        if v.id not in id_set:
+                            fixed_val.append({"@id": v.id})
+                            id_set.add(v.id)
+                    else:  # case: Any (not Entity)
+                        fixed_val.append(v)
+                ref_data[key] = fixed_val
             elif isinstance(val, Entity):
                 ref_data[key] = {"@id": val.id}
             else:
@@ -132,7 +139,7 @@ class Entity(TypedMutableMapping):
         Implementation of this method is required in each subclass.
         Each method must include comment-outed code.
         """
-        # if self not in rocrate.default_entities  + rocrate.contextual_entities + rocrate.data_entities:
+        # if self not in rocrate.default_entities + rocrate.contextual_entities + rocrate.data_entities:
         #     raise EntityError(f"The entity {self} is not included in argument rocrate.")
 
         # Abstract method
@@ -173,7 +180,7 @@ class ROCrateMetadata(DefaultEntity):
 
     @property
     def context(self) -> str:
-        return "default"
+        return "default"  # TODO: update
 
     @property
     def entity_name(self) -> str:

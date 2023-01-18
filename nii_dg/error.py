@@ -46,3 +46,7 @@ class CrateError(Exception):
     This validation is performed by the check_entities() method (this method is called in dump()) of ROCrate class.
     """
     pass
+    # def __init__(self, message: str, rocrate: "ROCrate", entity: "Entity" = None):
+    #     super().__init__(message)
+    #     self.rocrate = rocrate
+    #     self.entity = entity
