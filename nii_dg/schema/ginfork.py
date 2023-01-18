@@ -100,7 +100,7 @@ def monitor_file_size(rocrate: ROCrate, size: str) -> None:
     limit = int(size[:-2])
 
     file_size_sum: float = 0
-    for e in rocrate.get_entities(File):
+    for e in rocrate.get_by_entity_type(File):
         if e["contentSize"][-2:] in units:
             file_unit = units.index(e["contentSize"][-2:])
             file_size = int(e["contentSize"][:-2])

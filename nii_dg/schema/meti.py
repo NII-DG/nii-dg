@@ -100,7 +100,7 @@ class DMP(ContextualEntity):
             raise GovernanceError(f"A contactPoint property is required in {self}.")
 
     def validate_multi_entities(self, rocrate: ROCrate) -> None:
-        dmp_metadata_ents = rocrate.get_entities(DMPMetadata)
+        dmp_metadata_ents = rocrate.get_by_entity_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
             raise GovernanceError("DMPMetadata Entity MUST be required with DMP entity.")
 
@@ -168,7 +168,7 @@ def monitor_file_size(rocrate: ROCrate, entity: DMP) -> None:
     unit = units.index(size[-2:])
 
     file_size_sum: float = 0
-    for ent in rocrate.get_entities(File):
+    for ent in rocrate.get_by_entity_type(File):
         if ent["dmpDataNumber"] != entity:
             continue
 

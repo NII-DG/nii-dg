@@ -56,13 +56,14 @@ class ROCrate():
             else:
                 raise TypeError("Invalid entity type")  # TODO: define exception
 
-    def get(self, entity_id: str) -> Optional[Entity]:
+    def get_by_id(self, entity_id: str) -> Optional[Entity]:
+        entity_list: List[Entity] = []
         for ent in self.default_entities + self.data_entities + self.contextual_entities:
             if ent.id == entity_id:
-                return ent
-        return None
+                entity_list.append(ent)
+        return entity_list
 
-    def get_entities(self, entity: Type[Entity]) -> List[Entity]:
+    def get_by_entity_type(self, entity: Type[Entity]) -> List[Entity]:
         entity_list: List[Entity] = []
         for ent in self.default_entities + self.data_entities + self.contextual_entities:
             if type(ent) is entity:
