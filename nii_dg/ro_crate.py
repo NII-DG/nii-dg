@@ -88,12 +88,12 @@ class ROCrate():
 
             for val in ent.values():
                 if isinstance(val, Entity) and val not in self.default_entities + self.data_entities + self.contextual_entities:
-                    raise CrateError(f"The entity {val} is not included in this crate.")
+                    raise CrateError(f"The entity {val} is included in entity {ent}, but not included in the crate.")
                 elif isinstance(val, list):
                     # expected: [Any], [Entity]
-                    for ent in [v for v in val if isinstance(v, Entity)]:  # type:ignore
-                        if ent not in self.default_entities + self.data_entities + self.contextual_entities:
-                            raise CrateError(f"The entity {ent} is not included in this crate.")
+                    for ele in [v for v in val if isinstance(v, Entity)]:
+                        if ele not in self.default_entities + self.data_entities + self.contextual_entities:
+                            raise CrateError(f"The entity {ele} is included in entity {ent}, but not included in this crate.")
 
         dup_ents = [ent for ent, count in Counter(id_context_list).items() if count > 1]
         if len(dup_ents) > 0:
