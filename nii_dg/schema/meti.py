@@ -12,7 +12,7 @@ from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           check_content_size, check_isodate, check_mime_type,
                           check_required_props, check_sha256,
                           check_unexpected_props, check_url, classify_uri,
-                          load_entity_def_from_schema_file,
+                          load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
 
 
@@ -124,7 +124,13 @@ class DMP(ContextualEntity):
                 raise GovernanceError(f"A distribution property is required in {self}.")
 
         if "contentSize" in self.keys():
-            monitor_file_size(rocrate, self)
+            sum = sum_file_size(self["contentSize"][-2:], rocrate, File)
+
+            if self["contentSize"] != "over100GB" and sum > int(self["contentSize"][:-2]):
+                raise GovernanceError(f"The total file size included in DMP {self} is larger than the defined size.")
+
+            if self["contentSize"] == "over100GB" and sum < 100:
+                raise GovernanceError(f"The total file size included in DMP {self} is smaller than 100GB.")
 
 
 class File(BaseFile):
@@ -170,32 +176,3 @@ class File(BaseFile):
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"A sdDatePublished property is required in {self}.")
-
-
-def monitor_file_size(rocrate: ROCrate, entity: DMP) -> None:
-    """
-    File size sum が規定値に合っていることを確認
-    """
-    size = entity["contentSize"]
-    units = ["B", "KB", "MB", "GB", "TB", "PB"]
-    unit = units.index(size[-2:])
-    file_size_sum: float = 0
-
-    for ent in rocrate.get_by_entity_type(File):
-        if ent["dmpDataNumber"] != entity:
-            continue
-
-        if ent["contentSize"][-2:] in units:
-            file_unit = units.index(ent["contentSize"][-2:])
-            file_size = int(ent["contentSize"][:-2])
-        else:
-            file_unit = 0
-            file_size = int(ent["contentSize"][:-1])
-
-        file_size_sum += round(file_size / 1024 ** (unit - file_unit), 3)
-
-    if size != "over100GB" and file_size_sum > int(size[:-2]):
-        raise GovernanceError(f"The total file size included in DMP {entity} is larger than the defined size.")
-
-    if size == "over100GB" and file_size_sum < 100:
-        raise GovernanceError(f"The total file size included in DMP {entity} is smaller than 100GB.")

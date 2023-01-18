@@ -12,7 +12,7 @@ from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           check_content_size, check_isodate, check_mime_type,
                           check_required_props, check_sha256,
                           check_unexpected_props, check_url, classify_uri,
-                          load_entity_def_from_schema_file,
+                          load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
 
 
@@ -47,7 +47,9 @@ class GinMonitoring(ContextualEntity):
         if self not in rocrate.contextual_entities:
             raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
-        monitor_file_size(rocrate, self["contentSize"])
+        sum = sum_file_size(self["contentSize"], rocrate, File)
+        if sum > int(self["contentSize"][:-2]):
+            raise GovernanceError(f"The total file size of monitored ginfork file is larger than the size defined in {self}.")
 
 
 class File(BaseFile):
@@ -90,27 +92,3 @@ class File(BaseFile):
         # TODO: impl.
         if self not in rocrate.data_entities:
             raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
-
-def monitor_file_size(rocrate: ROCrate, size: str) -> None:
-    """
-    File size sum が規定値を超えていないことを確認
-    """
-    # TODO: impl.
-    units = ["B", "KB", "MB", "GB", "TB", "PB"]
-    unit = units.index(size[-2:])
-    limit = int(size[:-2])
-    file_size_sum: float = 0
-
-    for e in rocrate.get_by_entity_type(File):
-        if e["contentSize"][-2:] in units:
-            file_unit = units.index(e["contentSize"][-2:])
-            file_size = int(e["contentSize"][:-2])
-        else:
-            file_unit = 0
-            file_size = int(e["contentSize"][:-1])
-
-        file_size_sum += round(file_size / 1024 ** (unit - file_unit), 3)
-
-    if file_size_sum > limit:
-        raise GovernanceError("The total file size of monitored ginfork file is larger than the defined size.")

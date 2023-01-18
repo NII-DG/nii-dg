@@ -7,7 +7,7 @@ import mimetypes
 import re
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
-                    Optional, TypedDict, Union)
+                    Optional, Type, TypedDict, Union)
 from urllib.parse import quote, urlparse
 
 import requests
@@ -16,6 +16,7 @@ from typeguard import check_type as ori_check_type
 
 from nii_dg.error import (GovernanceError, PropsError,
                           UnexpectedImplementationError)
+from nii_dg.ro_crate import ROCrate
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
@@ -372,3 +373,33 @@ def get_name_from_ror(ror_id: str) -> List[str]:
     name_list: List[str] = body["aliases"]
     name_list.append(body["name"])
     return name_list
+
+
+def sum_file_size(size_unit: str, rocrate: ROCrate, entity: Type["Entity"]) -> float:
+    """
+    Sum size of file entities in the specified unit.
+    """
+    units = ["B", "KB", "MB", "GB", "TB", "PB"]
+    file_size_sum: float = 0
+
+    try:
+        unit = units.index(size_unit)
+    except ValueError as err:
+        raise UnexpectedImplementationError from err
+
+    for ent in rocrate.get_by_entity_type(entity):
+        if ent["dmpDataNumber"] != entity:
+            continue
+
+        if ent["contentSize"][-2:] in units:
+            file_unit = units.index(ent["contentSize"][-2:])
+            file_size = int(ent["contentSize"][:-2])
+        elif ent["contentSize"][-1:] in units:
+            file_unit = 0
+            file_size = int(ent["contentSize"][:-1])
+        else:
+            raise UnexpectedImplementationError
+
+        file_size_sum += round(file_size / 1024 ** (unit - file_unit), 3)
+
+    return file_size_sum
