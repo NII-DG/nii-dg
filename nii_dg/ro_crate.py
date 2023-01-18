@@ -56,7 +56,7 @@ class ROCrate():
             else:
                 raise TypeError("Invalid entity type")  # TODO: define exception
 
-    def get_by_id(self, entity_id: str) -> Optional[Entity]:
+    def get_by_id(self, entity_id: str) -> List[Entity]:
         entity_list: List[Entity] = []
         for ent in self.default_entities + self.data_entities + self.contextual_entities:
             if ent.id == entity_id:
@@ -76,7 +76,7 @@ class ROCrate():
         self.root["dateCreated"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
         return {
             "@context": self.BASE_CONTEXT,
-            "@graph": [e.as_jsonld() for e in self.default_entities + self.data_entities + self.contextual_entities]  # type: ignore
+            "@graph": [e.as_jsonld() for e in self.default_entities + self.data_entities + self.contextual_entities]
         }
 
     def check_entities(self) -> None:

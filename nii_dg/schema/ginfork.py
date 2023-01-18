@@ -77,10 +77,11 @@ class File(BaseFile):
             "sdDatePublished": check_isodate
         })
 
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+
+        if verify_is_past_date(self, "sdDatePublished") is False:
+            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
     def validate(self, rocrate: ROCrate) -> None:
         # TODO: impl.
@@ -95,8 +96,8 @@ def monitor_file_size(rocrate: ROCrate, size: str) -> None:
     units = ["B", "KB", "MB", "GB", "TB", "PB"]
     unit = units.index(size[-2:])
     limit = int(size[:-2])
-
     file_size_sum: float = 0
+
     for e in rocrate.get_by_entity_type(File):
         if e["contentSize"][-2:] in units:
             file_unit = units.index(e["contentSize"][-2:])

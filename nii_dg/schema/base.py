@@ -62,6 +62,7 @@ class RootDataEntity(DefaultEntity):
 
         if self.id != "./":
             raise PropsError("The value of @id property of RootDataEntity MUST be './'.")
+
         if self.type != "Dataset":
             raise PropsError("The value of @type property of RootDataEntity MUST be 'Dataset'.")
 
@@ -104,11 +105,11 @@ class File(DataEntity):
             "sdDatePublished": check_isodate
         })
 
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
-
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+
+        if verify_is_past_date(self, "sdDatePublished") is False:
+            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
     def validate(self, rocrate: ROCrate) -> None:
         if classify_uri(self, "@id") == "url":
@@ -139,16 +140,18 @@ class Dataset(DataEntity):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
-        if not self.id.endswith("/"):
-            raise PropsError(f"The value of @id property of {self} MUST end with '/'.")
-        if classify_uri(self, "@id") != "rel_path":
-            raise PropsError(f"The value of @id property of {self} MUST be relative path to the directory, neither absolute path nor URL.")
-        if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
-
         check_content_formats(self, {
             "url": check_url
         })
+
+        if not self.id.endswith("/"):
+            raise PropsError(f"The value of @id property of {self} MUST end with '/'.")
+
+        if classify_uri(self, "@id") != "rel_path":
+            raise PropsError(f"The value of @id property of {self} MUST be relative path to the directory, neither absolute path nor URL.")
+
+        if self.type != self.entity_name:
+            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
         # TODO: impl.
@@ -226,6 +229,7 @@ class Person(ContextualEntity):
 
         if self.id.startswith("https://orcid.org/"):
             check_orcid_id(self.id[18:])
+
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
@@ -329,10 +333,11 @@ class DataDownload(ContextualEntity):
             "uploadDate": check_isodate
         })
 
-        if verify_is_past_date(self, "uploadDate") is False:
-            raise PropsError(f"The value of uploadDate property of {self} MUST be the date of past.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+
+        if verify_is_past_date(self, "uploadDate") is False:
+            raise PropsError(f"The value of uploadDate property of {self} MUST be the date of past.")
 
     def validate(self, rocrate: ROCrate) -> None:
         access_url(self.id)
@@ -362,7 +367,7 @@ class HostingInstitution(Organization):
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        super().validate()
+        super().validate(rocrate)
 
 
 class ContactPoint(ContextualEntity):

@@ -47,6 +47,7 @@ class DMPMetadata(ContextualEntity):
 
         if self.id != "#AMED-DMP":
             raise PropsError(f"The value of @id property of {self} MUST be '#AMED-DMP'.")
+
         if self["name"] != "AMED-DMP":
             raise PropsError(f"The value of name property of {self} MUST be 'AMED-DMP'.")
 
@@ -86,8 +87,10 @@ class DMP(ContextualEntity):
 
         if not self.id.startswith("#dmp:"):
             raise PropsError(f"The value of @id property of {self} MUST be started with '#dmp:'.")
+
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+
         if verify_is_past_date(self, "availabilityStarts"):
             raise PropsError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
 
@@ -96,6 +99,7 @@ class DMP(ContextualEntity):
             if not any(map(self.keys().__contains__, ("availabilityStarts", "accessRightsInfo"))):
                 raise GovernanceError(
                     f"An availabilityStarts property is required in {self}. If you keep data unshared, ab accessRightsInfo property is required instead.")
+
         if verify_is_past_date(self, "availabilityStarts"):
             raise GovernanceError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
 
@@ -153,13 +157,13 @@ class File(BaseFile):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
+        if verify_is_past_date(self, "sdDatePublished") is False:
+            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
+
     def validate(self, rocrate: ROCrate) -> None:
         if classify_uri(self, "@id") == "URL":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"A sdDatePublished property MUST be included in {self}.")
-
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            raise GovernanceError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
 
 class ClinicalResearchRegistration(ContextualEntity):
@@ -203,8 +207,8 @@ def monitor_file_size(rocrate: ROCrate, entity: DMP) -> None:
     size = entity["contentSize"]
     units = ["B", "KB", "MB", "GB", "TB", "PB"]
     unit = units.index(size[-2:])
-
     file_size_sum: float = 0
+
     for ent in rocrate.get_by_entity_type(File):
         if ent["dmpDataNumber"] != entity:
             continue
@@ -220,5 +224,6 @@ def monitor_file_size(rocrate: ROCrate, entity: DMP) -> None:
 
     if size != "over100GB" and file_size_sum > int(size[:-2]):
         raise GovernanceError(f"The total file size included in DMP {entity} is larger than the defined size.")
+
     if size == "over100GB" and file_size_sum < 100:
         raise GovernanceError(f"The total file size included in DMP {entity} is smaller than 100GB.")

@@ -42,8 +42,10 @@ class DMPMetadata(ContextualEntity):
 
         if self.id != "#METI-DMP":
             raise PropsError(f"The value of @id property of {self} MUST be '#METI-DMP'.")
+
         if self["name"] != "METI-DMP":
             raise PropsError(f"The value of name property of {self} MUST be 'METI-DMP'.")
+
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
@@ -80,6 +82,7 @@ class DMP(ContextualEntity):
 
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+
         if verify_is_past_date(self, "availabilityStarts"):
             raise PropsError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
 
@@ -87,15 +90,19 @@ class DMP(ContextualEntity):
 
         if self["accessRights"] != "open access" and "reasonForConcealment" not in self.keys():
             raise GovernanceError(f"A reasonForConcealment property is required in {self}.")
+
         if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
             raise GovernanceError(f"An availabilityStarts property is required in {self}.")
+
         if verify_is_past_date(self, "availabilityStarts"):
             raise GovernanceError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
 
         if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self.keys():
             raise GovernanceError(f"An isAccessibleForFree property is required in {self}.")
+
         if self["accessRights"] == "open access" and "license" not in self.keys():
             raise GovernanceError(f"A license property is required in {self}.")
+
         if self["accessRights"] in ["open access", "restricted access"] and "contactPoint" not in self.keys():
             raise GovernanceError(f"A contactPoint property is required in {self}.")
 
@@ -147,10 +154,11 @@ class File(BaseFile):
             "sdDatePublished": check_isodate
         })
 
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+
+        if verify_is_past_date(self, "sdDatePublished") is False:
+            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
     def validate(self, rocrate: ROCrate) -> None:
         if classify_uri(self, "@id") == "url":
@@ -165,8 +173,8 @@ def monitor_file_size(rocrate: ROCrate, entity: DMP) -> None:
     size = entity["contentSize"]
     units = ["B", "KB", "MB", "GB", "TB", "PB"]
     unit = units.index(size[-2:])
-
     file_size_sum: float = 0
+
     for ent in rocrate.get_by_entity_type(File):
         if ent["dmpDataNumber"] != entity:
             continue
@@ -182,5 +190,6 @@ def monitor_file_size(rocrate: ROCrate, entity: DMP) -> None:
 
     if size != "over100GB" and file_size_sum > int(size[:-2]):
         raise GovernanceError(f"The total file size included in DMP {entity} is larger than the defined size.")
+
     if size == "over100GB" and file_size_sum < 100:
         raise GovernanceError(f"The total file size included in DMP {entity} is smaller than 100GB.")
