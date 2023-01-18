@@ -130,7 +130,11 @@ class Entity(TypedMutableMapping):
         Called at Data Governance validation time.
         Comprehensive validation including the value of props.
         Implementation of this method is required in each subclass.
+        Each method must include comment-outed code.
         """
+        # if self not in rocrate.default_entities  + rocrate.contextual_entities + rocrate.data_entities:
+        #     raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
         # Abstract method
         raise NotImplementedError
 

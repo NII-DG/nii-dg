@@ -20,6 +20,15 @@ class PropsError(Exception):
     pass
 
 
+class EntityError(Exception):
+    """\
+    Error class for entity (checking for entities in crate).
+    Raised at Data Governance validation time.
+    This validation is performed by the validate() method of rocrate class and each subclass.
+    """
+    pass
+
+
 class GovernanceError(Exception):
     """\
     Error class for governance (validating for data governance).

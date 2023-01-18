@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
-from nii_dg.error import GovernanceError, PropsError
+from nii_dg.error import EntityError, GovernanceError, PropsError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
@@ -50,7 +50,8 @@ class DMPMetadata(ContextualEntity):
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        pass
+        if self not in rocrate.contextual_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
 
 
 class DMP(ContextualEntity):
@@ -87,6 +88,8 @@ class DMP(ContextualEntity):
             raise PropsError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
 
     def validate(self, rocrate: ROCrate) -> None:
+        if self not in rocrate.contextual_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
 
         if self["accessRights"] != "open access" and "reasonForConcealment" not in self.keys():
             raise GovernanceError(f"A reasonForConcealment property is required in {self}.")
@@ -161,6 +164,9 @@ class File(BaseFile):
             raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
     def validate(self, rocrate: ROCrate) -> None:
+        if self not in rocrate.data_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"A sdDatePublished property is required in {self}.")

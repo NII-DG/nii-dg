@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
-from nii_dg.error import GovernanceError, PropsError
+from nii_dg.error import EntityError, GovernanceError, PropsError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (access_url, check_all_prop_types,
@@ -34,13 +34,8 @@ class DMPMetadata(ContextualEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
-        """\
-        memo:
-        - 欲している (required) prop があるか -> check required
-        - optional prop -> あればチェック type
-        - 全然知らんやつ prop -> 例外
-        """
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+
         check_unexpected_props(self, entity_def)
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
@@ -55,7 +50,8 @@ class DMPMetadata(ContextualEntity):
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        pass
+        if self not in rocrate.contextual_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
 
 
 class DMP(ContextualEntity):
@@ -95,6 +91,9 @@ class DMP(ContextualEntity):
             raise PropsError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
 
     def validate(self, rocrate: ROCrate) -> None:
+        if self not in rocrate.contextual_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
         if self["accessRights"] in ["Unshared", "Restricted Closed Sharing"]:
             if not any(map(self.keys().__contains__, ("availabilityStarts", "accessRightsInfo"))):
                 raise GovernanceError(
@@ -161,6 +160,9 @@ class File(BaseFile):
             raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
     def validate(self, rocrate: ROCrate) -> None:
+        if self not in rocrate.data_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
         if classify_uri(self, "@id") == "URL":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"A sdDatePublished property MUST be included in {self}.")
@@ -197,6 +199,9 @@ class ClinicalResearchRegistration(ContextualEntity):
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
+        if self not in rocrate.contextual_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
         access_url(self.id)
 
 

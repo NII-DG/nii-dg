@@ -2,11 +2,10 @@
 # coding: utf-8
 
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity
-from nii_dg.error import GovernanceError, PropsError
-from nii_dg.ro_crate import ROCrate
+from nii_dg.error import EntityError, GovernanceError, PropsError
 from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_content_formats, check_content_size,
                           check_email, check_isodate, check_mime_type,
@@ -16,6 +15,9 @@ from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           get_name_from_ror, github_branch, github_repo,
                           load_entity_def_from_schema_file,
                           verify_is_past_date)
+
+if TYPE_CHECKING:
+    from nii_dg.ro_crate import ROCrate
 
 
 class RootDataEntity(DefaultEntity):
@@ -66,9 +68,9 @@ class RootDataEntity(DefaultEntity):
         if self.type != "Dataset":
             raise PropsError("The value of @type property of RootDataEntity MUST be 'Dataset'.")
 
-    def validate(self, rocrate: ROCrate) -> None:
-        # TODO: impl.
-        pass
+    def validate(self, rocrate: "ROCrate") -> None:
+        if self not in rocrate.default_entities + rocrate.contextual_entities + rocrate.data_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
 
 
 class File(DataEntity):
@@ -111,7 +113,10 @@ class File(DataEntity):
         if verify_is_past_date(self, "sdDatePublished") is False:
             raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
-    def validate(self, rocrate: ROCrate) -> None:
+    def validate(self, rocrate: "ROCrate") -> None:
+        if self not in rocrate.data_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"A sdDatePublished property is required in {self}.")
@@ -153,9 +158,9 @@ class Dataset(DataEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self, rocrate: ROCrate) -> None:
-        # TODO: impl.
-        pass
+    def validate(self, rocrate: "ROCrate") -> None:
+        if self not in rocrate.data_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
 
 
 class Organization(ContextualEntity):
@@ -189,7 +194,10 @@ class Organization(ContextualEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self, rocrate: ROCrate) -> None:
+    def validate(self, rocrate: "ROCrate") -> None:
+        if self not in rocrate.contextual_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
         if self.id.startswith("https://ror.org/"):
             ror_namelist = get_name_from_ror(self.id[16:])
             if self["name"] not in ror_namelist:
@@ -233,7 +241,10 @@ class Person(ContextualEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self, rocrate: ROCrate) -> None:
+    def validate(self, rocrate: "ROCrate") -> None:
+        if self not in rocrate.contextual_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
         access_url(self.id)
 
 
@@ -267,7 +278,10 @@ class License(ContextualEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self, rocrate: ROCrate) -> None:
+    def validate(self, rocrate: "ROCrate") -> None:
+        if self not in rocrate.contextual_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
         access_url(self.id)
 
 
@@ -299,9 +313,9 @@ class RepositoryObject(ContextualEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self, rocrate: ROCrate) -> None:
-        # TODO: impl.
-        pass
+    def validate(self, rocrate: "ROCrate") -> None:
+        if self not in rocrate.contextual_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
 
 
 class DataDownload(ContextualEntity):
@@ -339,7 +353,10 @@ class DataDownload(ContextualEntity):
         if verify_is_past_date(self, "uploadDate") is False:
             raise PropsError(f"The value of uploadDate property of {self} MUST be the date of past.")
 
-    def validate(self, rocrate: ROCrate) -> None:
+    def validate(self, rocrate: "ROCrate") -> None:
+        if self not in rocrate.contextual_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
         access_url(self.id)
 
 
@@ -366,8 +383,16 @@ class HostingInstitution(Organization):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self, rocrate: ROCrate) -> None:
-        super().validate(rocrate)
+    def validate(self, rocrate: "ROCrate") -> None:
+        if self not in rocrate.contextual_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
+        if self.id.startswith("https://ror.org/"):
+            ror_namelist = get_name_from_ror(self.id[16:])
+            if self["name"] not in ror_namelist:
+                raise GovernanceError(f"The value of name property of {self} MUST be same as the registered name in ROR.")
+        else:
+            access_url(self.id)
 
 
 class ContactPoint(ContextualEntity):
@@ -410,6 +435,9 @@ class ContactPoint(ContextualEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self, rocrate: ROCrate) -> None:
+    def validate(self, rocrate: "ROCrate") -> None:
+        if self not in rocrate.contextual_entities:
+            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
         if not any(map(self.keys().__contains__, ("email", "telephone"))):
             raise GovernanceError(f"Either email property or telephone property is required in {self}.")
