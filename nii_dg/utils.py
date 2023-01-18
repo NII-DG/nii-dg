@@ -16,10 +16,10 @@ from typeguard import check_type as ori_check_type
 
 from nii_dg.error import (GovernanceError, PropsError,
                           UnexpectedImplementationError)
-from nii_dg.ro_crate import ROCrate
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
+    from nii_dg.ro_crate import ROCrate
 
 
 def github_repo() -> str:
@@ -375,7 +375,7 @@ def get_name_from_ror(ror_id: str) -> List[str]:
     return name_list
 
 
-def sum_file_size(size_unit: str, rocrate: ROCrate, entity: Type["Entity"]) -> float:
+def sum_file_size(size_unit: str, rocrate: "ROCrate", entity: Type["Entity"]) -> float:
     """
     Sum size of file entities in the specified unit.
     """

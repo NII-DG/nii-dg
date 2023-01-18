@@ -9,7 +9,7 @@ import json
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional, Sequence, Type
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
                            ROCrateMetadata)
@@ -59,17 +59,20 @@ class ROCrate():
 
     def get_by_id(self, entity_id: str) -> List[Entity]:
         entity_list: List[Entity] = []
-        for ent in self.default_entities + self.data_entities + self.contextual_entities:
+        for ent in self.get_all_entities():
             if ent.id == entity_id:
                 entity_list.append(ent)
         return entity_list
 
     def get_by_entity_type(self, entity: Type[Entity]) -> List[Entity]:
         entity_list: List[Entity] = []
-        for ent in self.default_entities + self.data_entities + self.contextual_entities:
+        for ent in self.get_all_entities():
             if type(ent) is entity:
                 entity_list.append(ent)
         return entity_list
+
+    def get_all_entities(self) -> Sequence[Entity]:
+        return self.default_entities + self.data_entities + self.contextual_entities  # type:ignore
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_entities()
@@ -77,7 +80,7 @@ class ROCrate():
         self.root["dateCreated"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
         return {
             "@context": self.BASE_CONTEXT,
-            "@graph": [e.as_jsonld() for e in self.default_entities + self.data_entities + self.contextual_entities]
+            "@graph": [e.as_jsonld() for e in self.get_all_entities()]
         }
 
     def check_entities(self) -> None:
@@ -85,16 +88,16 @@ class ROCrate():
         # check existence of entity: @id
         id_context_list = []
 
-        for ent in self.default_entities + self.data_entities + self.contextual_entities:
+        for ent in self.get_all_entities():
             id_context_list.append((ent.id, ent.context))
 
             for val in ent.values():
-                if isinstance(val, Entity) and val not in self.default_entities + self.data_entities + self.contextual_entities:
+                if isinstance(val, Entity) and val not in self.get_all_entities():
                     raise CrateError(f"The entity {val} is included in entity {ent}, but not included in the crate.")
                 elif isinstance(val, list):
                     # expected: [Any], [Entity]
                     for ele in [v for v in val if isinstance(v, Entity)]:
-                        if ele not in self.default_entities + self.data_entities + self.contextual_entities:
+                        if ele not in self.get_all_entities():
                             raise CrateError(f"The entity {ele} is included in entity {ent}, but not included in this crate.")
 
         dup_ents = [ent for ent, count in Counter(id_context_list).items() if count > 1]
@@ -109,7 +112,7 @@ class ROCrate():
             json.dump(self.as_jsonld(), f, width=1000, indent=2,)
 
     def validate(self) -> None:
-        for ent in self.default_entities + self.data_entities + self.contextual_entities:
+        for ent in self.get_all_entities():
             if isinstance(ent, ROCrateMetadata):
                 continue
             ent.validate(self)
