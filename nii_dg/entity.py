@@ -12,6 +12,7 @@ from nii_dg.utils import github_branch, github_repo
 
 if TYPE_CHECKING:
     TypedMutableMapping = MutableMapping[str, Any]
+    from nii_dg.ro_crate import ROCrate
 else:
     TypedMutableMapping = MutableMapping
 
@@ -77,8 +78,17 @@ class Entity(TypedMutableMapping):
                 # These cannot be supported at this stage, should be supported in self.check_props.
                 ref_data[key] = val
             elif isinstance(val, list):
-                # expected: [Any], [Entity]
-                ref_data[key] = [{"@id": v.id} if isinstance(v, Entity) else v for v in val]
+                # expected: [Any], [Entity], [Entity, Any]
+                fixed_val = []
+                id_set = set()
+                for v in val:
+                    if isinstance(v, Entity):
+                        if v.id not in id_set:
+                            fixed_val.append({"@id": v.id})
+                            id_set.add(v.id)
+                    else:  # case: Any (not Entity)
+                        fixed_val.append(v)
+                ref_data[key] = fixed_val
             elif isinstance(val, Entity):
                 ref_data[key] = {"@id": val.id}
             else:
@@ -122,12 +132,16 @@ class Entity(TypedMutableMapping):
         # Abstract method
         raise NotImplementedError
 
-    def validate(self) -> None:
+    def validate(self, crate: "ROCrate") -> None:
         """\
         Called at Data Governance validation time.
         Comprehensive validation including the value of props.
         Implementation of this method is required in each subclass.
+        Each method must include comment-outed code.
         """
+        # if self not in rocrate.default_entities + rocrate.contextual_entities + rocrate.data_entities:
+        #     raise EntityError(f"The entity {self} is not included in argument rocrate.")
+
         # Abstract method
         raise NotImplementedError
 
@@ -163,3 +177,11 @@ class ROCrateMetadata(DefaultEntity):
         self["@type"] = "CreativeWork"
         self["conformsTo"] = {"@id": "https://w3id.org/ro/crate/1.1"}
         self["about"] = root
+
+    @property
+    def context(self) -> str:
+        return "default"  # TODO: update
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__

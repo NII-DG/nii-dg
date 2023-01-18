@@ -39,8 +39,14 @@ class GinMonitoring(ContextualEntity):
         check_required_props(self, entity_def)
         check_all_prop_types(self, entity_def)
 
+        if self.type != self.entity_name:
+            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+
     def validate(self, rocrate: ROCrate) -> None:
         # TODO: impl.
+        if self not in rocrate.contextual_entities:
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
+
         monitor_file_size(rocrate, self["contentSize"])
 
 
@@ -64,7 +70,7 @@ class File(BaseFile):
         check_all_prop_types(self, entity_def)
 
         if classify_uri(self, "@id") == "abs_path":
-            raise PropsError(f"The @id value in {self} MUST be URL or relative path to the file, not absolute path.")
+            raise PropsError(f"The value of @id property of {self} MUST be URL or relative path to the file, not absolute path.")
 
         check_content_formats(self, {
             "contentSize": check_content_size,
@@ -74,12 +80,16 @@ class File(BaseFile):
             "sdDatePublished": check_isodate
         })
 
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            raise PropsError("The value of sdDatePublished MUST be the date of past.")
+        if self.type != self.entity_name:
+            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self) -> None:
+        if verify_is_past_date(self, "sdDatePublished") is False:
+            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
+
+    def validate(self, rocrate: ROCrate) -> None:
         # TODO: impl.
-        pass
+        if self not in rocrate.data_entities:
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
 
 def monitor_file_size(rocrate: ROCrate, size: str) -> None:
@@ -90,9 +100,9 @@ def monitor_file_size(rocrate: ROCrate, size: str) -> None:
     units = ["B", "KB", "MB", "GB", "TB", "PB"]
     unit = units.index(size[-2:])
     limit = int(size[:-2])
-
     file_size_sum: float = 0
-    for e in rocrate.get_entities(File):
+
+    for e in rocrate.get_by_entity_type(File):
         if e["contentSize"][-2:] in units:
             file_unit = units.index(e["contentSize"][-2:])
             file_size = int(e["contentSize"][:-2])
@@ -100,7 +110,7 @@ def monitor_file_size(rocrate: ROCrate, size: str) -> None:
             file_unit = 0
             file_size = int(e["contentSize"][:-1])
 
-        file_size_sum += round(file_size / 1024 ** (unit - file_unit), 2)
+        file_size_sum += round(file_size / 1024 ** (unit - file_unit), 3)
 
     if file_size_sum > limit:
         raise GovernanceError("The total file size of monitored ginfork file is larger than the defined size.")

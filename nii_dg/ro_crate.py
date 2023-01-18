@@ -6,12 +6,14 @@ Definition of RO-Crate class.
 """
 
 import json
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Type
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
                            ROCrateMetadata)
+from nii_dg.error import CrateError, EntityError
 from nii_dg.schema import RootDataEntity
 
 
@@ -53,22 +55,51 @@ class ROCrate():
             elif isinstance(entity, ContextualEntity):
                 self.contextual_entities.append(entity)
             else:
-                raise TypeError("Invalid entity type")  # TODO: define exception
+                raise EntityError("Invalid entity type")
 
-    def get_entities(self, entity_name: Any) -> List[Entity]:
-        entity_list = []
-        for e in self.default_entities + self.data_entities + self.contextual_entities:
-            if isinstance(e, entity_name):
-                entity_list.append(e)
+    def get_by_id(self, entity_id: str) -> List[Entity]:
+        entity_list: List[Entity] = []
+        for ent in self.default_entities + self.data_entities + self.contextual_entities:
+            if ent.id == entity_id:
+                entity_list.append(ent)
+        return entity_list
+
+    def get_by_entity_type(self, entity: Type[Entity]) -> List[Entity]:
+        entity_list: List[Entity] = []
+        for ent in self.default_entities + self.data_entities + self.contextual_entities:
+            if type(ent) is entity:
+                entity_list.append(ent)
         return entity_list
 
     def as_jsonld(self) -> Dict[str, Any]:
+        self.check_entities()
         # add dateCreated to RootDataEntity
         self.root["dateCreated"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
         return {
             "@context": self.BASE_CONTEXT,
-            "@graph": [e.as_jsonld() for e in self.default_entities + self.data_entities + self.contextual_entities]  # type: ignore
+            "@graph": [e.as_jsonld() for e in self.default_entities + self.data_entities + self.contextual_entities]
         }
+
+    def check_entities(self) -> None:
+        # check duplicate entity: @id and @type
+        # check existence of entity: @id
+        id_context_list = []
+
+        for ent in self.default_entities + self.data_entities + self.contextual_entities:
+            id_context_list.append((ent.id, ent.context))
+
+            for val in ent.values():
+                if isinstance(val, Entity) and val not in self.default_entities + self.data_entities + self.contextual_entities:
+                    raise CrateError(f"The entity {val} is included in entity {ent}, but not included in the crate.")
+                elif isinstance(val, list):
+                    # expected: [Any], [Entity]
+                    for ele in [v for v in val if isinstance(v, Entity)]:
+                        if ele not in self.default_entities + self.data_entities + self.contextual_entities:
+                            raise CrateError(f"The entity {ele} is included in entity {ent}, but not included in this crate.")
+
+        dup_ents = [ent for ent, count in Counter(id_context_list).items() if count > 1]
+        if len(dup_ents) > 0:
+            raise CrateError(f"Duplicate @id and @context value found: {dup_ents}.")
 
     def dump(self, path: str) -> None:
         """\
@@ -76,3 +107,14 @@ class ROCrate():
         """
         with Path(path).resolve().open("w") as f:
             json.dump(self.as_jsonld(), f, width=1000, indent=2,)
+
+    def validate(self) -> None:
+        for ent in self.default_entities + self.data_entities + self.contextual_entities:
+            if isinstance(ent, ROCrateMetadata):
+                continue
+            ent.validate(self)
+
+    # def check_entity_existence(self, entity: "Entity") -> None:
+    #     # return len(self.get_by_id(entity_id)) > 0
+    #     if entity not in self.contextual_entities:
+    #         raise ValueError(f"The entity {self} is not included in argument rocrate.")
