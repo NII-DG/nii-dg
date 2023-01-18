@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
-from nii_dg.error import EntityError, GovernanceError, PropsError
+from nii_dg.error import GovernanceError, PropsError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
@@ -45,7 +45,7 @@ class GinMonitoring(ContextualEntity):
     def validate(self, rocrate: ROCrate) -> None:
         # TODO: impl.
         if self not in rocrate.contextual_entities:
-            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
         monitor_file_size(rocrate, self["contentSize"])
 
@@ -89,7 +89,7 @@ class File(BaseFile):
     def validate(self, rocrate: ROCrate) -> None:
         # TODO: impl.
         if self not in rocrate.data_entities:
-            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
 
 def monitor_file_size(rocrate: ROCrate, size: str) -> None:

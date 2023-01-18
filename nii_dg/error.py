@@ -23,8 +23,9 @@ class PropsError(Exception):
 class EntityError(Exception):
     """\
     Error class for entity (checking for entities in crate).
-    Raised at Data Governance validation time.
-    This validation is performed by the validate() method of rocrate class and each subclass.
+    Raised at Entity addition time.
+    The validation is performed by the validate() method of ROCrate class and each subclass.
+    The addition is performed by the add() method of ROCrate class.
     """
     pass
 
@@ -34,5 +35,14 @@ class GovernanceError(Exception):
     Error class for governance (validating for data governance).
     Raised at Data Governance validation time.
     This validation is performed by the validate() method of each subclass.
+    """
+    pass
+
+
+class CrateError(Exception):
+    """\
+    Error class for rocrate (checking for crate).
+    Raised at ROCrate dump time.
+    This validation is performed by the check_entities() method (this method is called in dump()) of ROCrate class.
     """
     pass

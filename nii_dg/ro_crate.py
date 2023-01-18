@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional, Type
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
                            ROCrateMetadata)
+from nii_dg.error import CrateError, EntityError
 from nii_dg.schema import RootDataEntity
 
 
@@ -54,7 +55,7 @@ class ROCrate():
             elif isinstance(entity, ContextualEntity):
                 self.contextual_entities.append(entity)
             else:
-                raise TypeError("Invalid entity type")  # TODO: define exception
+                raise EntityError("Invalid entity type")
 
     def get_by_id(self, entity_id: str) -> List[Entity]:
         entity_list: List[Entity] = []
@@ -81,11 +82,22 @@ class ROCrate():
 
     def check_entities(self) -> None:
         id_context_list = []
+
         for ent in self.default_entities + self.data_entities + self.contextual_entities:
             id_context_list.append((ent.id, ent.context))
+
+            for val in ent.values():
+                if isinstance(val, Entity) and val not in self.default_entities + self.data_entities + self.contextual_entities:
+                    raise CrateError(f"The entity {val} is not included in this crate.")
+                elif isinstance(val, list):
+                    # expected: [Any], [Entity]
+                    for ent in [v for v in val if isinstance(v, Entity)]:  # type:ignore
+                        if ent not in self.default_entities + self.data_entities + self.contextual_entities:
+                            raise CrateError(f"The entity {ent} is not included in this crate.")
+
         dup_ents = [ent for ent, count in Counter(id_context_list).items() if count > 1]
         if len(dup_ents) > 0:
-            raise ValueError(f"Duplicate @id and @context value found: {dup_ents}.")
+            raise CrateError(f"Duplicate @id and @context value found: {dup_ents}.")
 
     def dump(self, path: str) -> None:
         """\

@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity
-from nii_dg.error import EntityError, GovernanceError, PropsError
+from nii_dg.error import GovernanceError, PropsError
 from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_content_formats, check_content_size,
                           check_email, check_isodate, check_mime_type,
@@ -70,7 +70,7 @@ class RootDataEntity(DefaultEntity):
 
     def validate(self, rocrate: "ROCrate") -> None:
         if self not in rocrate.default_entities + rocrate.contextual_entities + rocrate.data_entities:
-            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
 
 class File(DataEntity):
@@ -115,7 +115,7 @@ class File(DataEntity):
 
     def validate(self, rocrate: "ROCrate") -> None:
         if self not in rocrate.data_entities:
-            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
@@ -160,7 +160,7 @@ class Dataset(DataEntity):
 
     def validate(self, rocrate: "ROCrate") -> None:
         if self not in rocrate.data_entities:
-            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
 
 class Organization(ContextualEntity):
@@ -196,7 +196,7 @@ class Organization(ContextualEntity):
 
     def validate(self, rocrate: "ROCrate") -> None:
         if self not in rocrate.contextual_entities:
-            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
         if self.id.startswith("https://ror.org/"):
             ror_namelist = get_name_from_ror(self.id[16:])
@@ -243,7 +243,7 @@ class Person(ContextualEntity):
 
     def validate(self, rocrate: "ROCrate") -> None:
         if self not in rocrate.contextual_entities:
-            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
         access_url(self.id)
 
@@ -280,7 +280,7 @@ class License(ContextualEntity):
 
     def validate(self, rocrate: "ROCrate") -> None:
         if self not in rocrate.contextual_entities:
-            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
         access_url(self.id)
 
@@ -315,7 +315,7 @@ class RepositoryObject(ContextualEntity):
 
     def validate(self, rocrate: "ROCrate") -> None:
         if self not in rocrate.contextual_entities:
-            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
 
 class DataDownload(ContextualEntity):
@@ -355,7 +355,7 @@ class DataDownload(ContextualEntity):
 
     def validate(self, rocrate: "ROCrate") -> None:
         if self not in rocrate.contextual_entities:
-            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
         access_url(self.id)
 
@@ -385,7 +385,7 @@ class HostingInstitution(Organization):
 
     def validate(self, rocrate: "ROCrate") -> None:
         if self not in rocrate.contextual_entities:
-            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
         if self.id.startswith("https://ror.org/"):
             ror_namelist = get_name_from_ror(self.id[16:])
@@ -437,7 +437,7 @@ class ContactPoint(ContextualEntity):
 
     def validate(self, rocrate: "ROCrate") -> None:
         if self not in rocrate.contextual_entities:
-            raise EntityError(f"The entity {self} is not included in argument rocrate.")
+            raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
         if not any(map(self.keys().__contains__, ("email", "telephone"))):
             raise GovernanceError(f"Either email property or telephone property is required in {self}.")
