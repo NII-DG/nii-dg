@@ -15,7 +15,7 @@ Metadata of research project that is the subject of this data management plan.
 | `distribution` | `DataDownload` | Can be added when accessRights in tied DMP entity has `open access` and all open-access data set is available from a single URL. | MUST be @id dictionary of DataDownload entity. Indicates where the download URL of the data set. | `{"@id": "https://zenodo.org/record/example"}` |
 | `keyword` | `str` | Required. | Indicates research filed of the project. | `Informatics` |
 | `eradProjectId` | `str` | Required when your project has e-Rad project ID. | Indicates e-Rad project ID. | `123456` |
-| `hasPart` | `List[DMP]` | Required. | MUST be an array of DMP entity, which is included in this DMP. | `[{ "@id": "#dmp:1" }, { "@id": "#dmp:2" }]` |
+| `hasPart` | `List[DMP]` | Required. | MUST be an array of DMP entity, which is included in this DMP. If no data is created yet, MUST be empty list. | `[{ "@id": "#dmp:1" }, { "@id": "#dmp:2" }]` |
 
 ## DMP
 Contents from data management plan that is (will be) submitted to the funding agency.
@@ -27,7 +27,7 @@ Contents from data management plan that is (will be) submitted to the funding ag
 | `description` | `str` | Required. | Indicates data description in DMP. | `Result data calculated by Newton's method` |
 | `keyword` | `str` | Required. | Indicates research filed of the data set. Basically it is the same as that of research project, stated in DMPMetadata entityDMPMetadata entity. | `Informatics` |
 | `accessRights` | `Literal["open access", "restricted access", "embargoed access", "metadata only access"]` | Required. | MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicates the availability of the data set. | `open access` |
-| `availabilityStarts` | `str` | Required when accessRights has `embargoed access`. | MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification. | `2023-04-01` |
+| `availabilityStarts` | `str` | Required when accessRights has `embargoed access`. | MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification. | `2030-04-01` |
 | `isAccessibleForFree` | `bool` | Required when accessRights has `open access` or `restricted access`. | MUST be a boolean. `True` means the data set is free to access, while `False` means consideration. When accessRights has `open access`, MUST be `True`. | `True` |
 | `license` | `License` | Required when accessRights has `open access`. | MUST be a @id dictionary of License entity. Indicates the license applied for the data. | `{"@id": "https://www.apache.org/licenses/LICENSE-2.0"}` |
 | `usageInfo` | `str` | Optional. | An explanation for citation. | `Contact data manager before usage of this data set.` |

@@ -53,10 +53,23 @@ class DMPMetadata(ContextualEntity):
         if self not in rocrate.contextual_entities:
             raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
+        if "funder" in rocrate.root.keys() and self not in rocrate.root["funder"]:
+            organization = self["funder"]
+            raise GovernanceError(f"The entity {organization} is funder property of {self}, but not included in the list of funder property of RootDataEntity.")
+
+        if len(self["hasPart"]) > 0:
+            if "creator" not in self.keys():
+                raise GovernanceError(f"A creator property is required in {self}.")
+            if "hostingInstitution" not in self.keys():
+                raise GovernanceError(f"A hostingInstitution property is required in {self}.")
+            if "dataManager" not in self.keys():
+                raise GovernanceError(f"A dataManager property is required in {self}.")
+
 
 class DMP(ContextualEntity):
     def __init__(self, id: int, props: Optional[Dict[str, Any]] = None):
         super().__init__(id="#dmp:" + str(id), props=props)
+        self["dataNumber"] = id
 
     @property
     def schema_name(self) -> str:
@@ -81,8 +94,8 @@ class DMP(ContextualEntity):
             "availabilityStarts": check_isodate
         })
 
-        if not self.id.startswith("#dmp:"):
-            raise PropsError(f"The value of @id property of {self} MUST be started with '#dmp:'.")
+        if self.id != "#dmp:" + str(self["dataNumber"]):
+            raise PropsError(f"The value of @id property of {self} MUST be started with '#dmp:'and then the value of dataNumber property MUST come after it.")
 
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
@@ -108,6 +121,9 @@ class DMP(ContextualEntity):
         dmp_metadata_ents = rocrate.get_by_entity_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
             raise GovernanceError("DMPMetadata Entity MUST be required with DMP entity.")
+        dmp_metadata_ent = dmp_metadata_ents[0]
+        if self not in dmp_metadata_ent["hasPart"]:
+            raise GovernanceError(f"DMP entity {self} is not included in the list of hasPart property of {dmp_metadata_ent}.")
 
         if "repository" not in self.keys():
             # DMPMetadata entity must have the property instead of DMP entity

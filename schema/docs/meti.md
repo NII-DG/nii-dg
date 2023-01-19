@@ -10,10 +10,10 @@ Metadata of research project that is the subject of this data management plan.
 | `about` | `RootDataEntity` | Required. | MUST be `{"@id": "./"}`. Indicates this DMP is about research project that the data stated in RootDataEntity are generated. | `{"@id": "./"}` |
 | `name` | `str` | Required. | MUST be `METI-DMP`. Indicates the DMP format used by your project. | `METI-DMP` |
 | `funder` | `Organization` | Required. | Funding agency of the research project. MUST be @id dictionary of Organization entity. When the funder property of RootDataEntity is also used, this Organization entity MUST be included in the funder list in RootDataEntity. | `{"@id": "https://ror.org/01b9y6c26"}` |
-| `creator` | `List[Person]` | Required. | MUST be an array of @id dictionary of Person entity. Indicates all data creators involved in this research project. | `[{"@id": "https://orcid.org/0000-0001-2345-6789"}]` |
+| `creator` | `List[Person]` | Optional. | MUST be an array of @id dictionary of Person entity. Indicates all data creators involved in this research project. | `[{"@id": "https://orcid.org/0000-0001-2345-6789"}]` |
 | `repository` | `RepositoryObject` | Can be added when all data set is managed in a single repository. | MUST be @id dictionary of RepositoryObject entity. Indicates repository where the data is managed. | `{ "@id": "https://doi.org/xxxxxxxx" }` |
 | `distribution` | `DataDownload` | Can be added when accessRights has `open access` and all open-access data set is available from a single URL. | MUST be @id dictionary of DataDownload entity. Indicates where the download URL of the data set. | `{"@id": "https://zenodo.org/record/example"}` |
-| `hasPart` | `List[DMP]` | Required. | MUST be an array of DMP entity, which is included in this DMP. | `[{ "@id": "#dmp:1" }, { "@id": "#dmp:2" }]` |
+| `hasPart` | `List[DMP]` | Required. | MUST be an array of DMP entity, which is included in this DMP. If no data is created yet, MUST be empty list. | `[{ "@id": "#dmp:1" }, { "@id": "#dmp:2" }]` |
 
 ## DMP
 Contents from data management plan that is (will be) submitted to the funding agency.
@@ -27,7 +27,7 @@ Contents from data management plan that is (will be) submitted to the funding ag
 | `wayOfManage` | `Literal["commissioned", "self-managed"]` | Required. | Indicated how the data set is managed. | `commissioned` |
 | `accessRights` | `Literal["open access", "restricted access", "embargoed access", "metadata only access"]` | Required. | MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicates the availability of the data set. | `open access` |
 | `reasonForConcealment` | `str` | Required when accessRights has `restricted access`, `embargoed access` or `metadata only access`. | Indicates why access to the data set is restricted and embargoed. | `To ensure market competitiveness for commercialization` |
-| `availabilityStarts` | `str` | Required when accessRights has `embargoed access`. | MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification. | `2023-04-01` |
+| `availabilityStarts` | `str` | Required when accessRights has `embargoed access`. | MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification. | `2030-04-01` |
 | `creator` | `List[Organization]` | Required. | MUST be an array of Organization entities. Indicates the organization which created the data set. | `[{"@id": "https://ror.org/04ksd4g47"}]` |
 | `measurementTechnique` | `str` | Optional. | An explanation of the technique for collecting data. | `Obtained using simulation software.` |
 | `isAccessibleForFree` | `bool` | Required when accessRights has `open access` or `restricted access`. | MUST be a boolean. `True` means the data set is free to access, while `False` means consideration. When accessRights has `open access`, MUST be `True`. | `True` |

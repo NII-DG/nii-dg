@@ -24,7 +24,7 @@ DMPMetadata:
     creator:
       expected_type: List[Person]
       example: '[{"@id": "https://orcid.org/0000-0001-2345-6789"}]'
-      required: Required.
+      required: Optional.
       description: MUST be an array of @id dictionary of Person entity. Indicates all data creators involved in this research project.
     repository:
       expected_type: RepositoryObject
@@ -40,7 +40,7 @@ DMPMetadata:
       expected_type: List[DMP]
       example: '[{ "@id": "#dmp:1" }, { "@id": "#dmp:2" }]'
       required: Required.
-      description: MUST be an array of DMP entity, which is included in this DMP.
+      description: MUST be an array of DMP entity, which is included in this DMP. If no data is created yet, MUST be empty list.
 DMP:
   description: Contents from data management plan that is (will be) submitted to the funding agency.
   props:
@@ -86,7 +86,7 @@ DMP:
       description: Indicates why access to the data set is restricted and embargoed.
     availabilityStarts:
       expected_type: str
-      example: '2023-04-01'
+      example: '2030-04-01'
       required: Required when accessRights has `embargoed access`.
       description: MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
     creator:

@@ -53,10 +53,15 @@ class DMPMetadata(ContextualEntity):
         if self not in rocrate.contextual_entities:
             raise ValueError(f"The entity {self} is not included in argument rocrate.")
 
+        if "funder" in rocrate.root.keys() and self not in rocrate.root["funder"]:
+            organization = self["funder"]
+            raise GovernanceError(f"The entity {organization} is funder property of {self}, but not included in the list of funder property of RootDataEntity.")
+
 
 class DMP(ContextualEntity):
     def __init__(self, id: int, props: Optional[Dict[str, Any]] = None):
         super().__init__(id="#dmp:" + str(id), props=props)
+        self["dataNumber"] = id
 
     @property
     def schema_name(self) -> str:
@@ -112,14 +117,17 @@ class DMP(ContextualEntity):
         dmp_metadata_ents = rocrate.get_by_entity_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
             raise GovernanceError("DMPMetadata Entity MUST be required with DMP entity.")
+        dmp_metadata_ent = dmp_metadata_ents[0]
+        if self not in dmp_metadata_ent["hasPart"]:
+            raise GovernanceError(f"DMP entity {self} is not included in the list of hasPart property of {dmp_metadata_ent}.")
 
         if "repository" not in self.keys():
-            # DMPMetadata entity must have the property instead of DMP entity
+            # DMPMetadata entity must have the repository property instead of DMP entity
             if "repository" not in dmp_metadata_ents[0].keys():
                 raise GovernanceError(f"A repository property is required in {self}.")
 
         if self["accessRights"] == "open access" and "distribution" not in self.keys():
-            # DMPMetadata entity must have the property instead of DMP entity
+            # DMPMetadata entity must have the accessRights property instead of DMP entity
             if "distribution" not in dmp_metadata_ents[0].keys():
                 raise GovernanceError(f"A distribution property is required in {self}.")
 
