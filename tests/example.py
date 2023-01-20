@@ -37,14 +37,14 @@ def main() -> None:
         "keyword": "Informatics",
         "hasPart": [dmp_1]})
 
-    file_1 = File("file_1.txt",
-                  {"name": "Sample File", "contentSize": "156GB", "dmpDataNumber": dmp_1})
+    file_cao = File("file_1.txt",
+                    {"name": "Sample File", "contentSize": "156GB", "dmpDataNumber": dmp_1})
     file_gin = GinFile("file_1.txt",
                        {"name": "Sample File", "contentSize": "156GB", "experimentPackageFlag": True})
     gin = GinMonitoring(1,
                         {"about": ro_crate.root, "contentSize": "1TB", "workflowIdentifier": "basic", "datasetStructure": "with_code"})
 
-    ro_crate.add(org, creator, repo, dmp_1, dmp_meta, file_1, file_gin, gin)
+    ro_crate.add(org, creator, repo, dmp_1, dmp_meta, file_cao, file_gin, gin)
 
     print(json.dumps(ro_crate.as_jsonld(), indent=2))
 
