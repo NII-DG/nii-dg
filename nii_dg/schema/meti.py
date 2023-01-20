@@ -102,10 +102,16 @@ class DMP(ContextualEntity):
         if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self.keys():
             raise GovernanceError(f"An isAccessibleForFree property is required in {self}.")
 
+        if self["accessRights"] == "open access" and self["isAccessibleForFree"] is False:
+            raise GovernanceError(f"An isAccessibleForFree property of {self} MUST be True.")
+
         if self["accessRights"] == "open access" and "license" not in self.keys():
             raise GovernanceError(f"A license property is required in {self}.")
 
-        if self["accessRights"] in ["open access", "restricted access"] and "contactPoint" not in self.keys():
+        if self["accessRights"] == "open access" and "contentSize" not in self.keys():
+            raise GovernanceError(f"A contentSize property is required in {self}.")
+
+        if self["accessRights"] in ["open access", "restricted access", "embargoed access"] and "contactPoint" not in self.keys():
             raise GovernanceError(f"A contactPoint property is required in {self}.")
 
         dmp_metadata_ents = rocrate.get_by_entity_type(DMPMetadata)
