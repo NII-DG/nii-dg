@@ -5,7 +5,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity
-from nii_dg.error import GovernanceError, PropsError
+from nii_dg.error import (GovernanceError, PropsError,
+                          UnexpectedImplementationError)
 from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_content_formats, check_content_size,
                           check_email, check_isodate, check_mime_type,
@@ -28,6 +29,9 @@ class RootDataEntity(DefaultEntity):
     def __init__(self, props: Optional[Dict[str, Any]] = None):
         super().__init__(id="./", props=props)
         self["@type"] = "Dataset"
+
+    def __init_subclass__(cls) -> None:
+        raise UnexpectedImplementationError("Inheritance of RootDataEntity is not allowed.")
 
     @property
     def context(self) -> str:

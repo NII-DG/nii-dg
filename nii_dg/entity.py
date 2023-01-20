@@ -8,6 +8,7 @@ Definition of Entity base class and its subclasses.
 from collections.abc import MutableMapping
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
+from nii_dg.error import UnexpectedImplementationError
 from nii_dg.utils import github_branch, github_repo
 
 if TYPE_CHECKING:
@@ -180,6 +181,9 @@ class ROCrateMetadata(DefaultEntity):
         self["@type"] = "CreativeWork"
         self["conformsTo"] = {"@id": "https://w3id.org/ro/crate/1.1"}
         self["about"] = root
+
+    def __init_subclass__(cls) -> None:
+        raise UnexpectedImplementationError("Inheritance of ROCrateMetadata is not permitted.Inheritance of ROCrateMetadata is not allowed.")
 
     @property
     def context(self) -> str:

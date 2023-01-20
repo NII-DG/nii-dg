@@ -85,19 +85,17 @@ class ROCrate():
         }
 
     def check_duplicate_entity(self) -> None:
-        pass
-
-    def check_existence_of_entity(self) -> None:
-        pass
-
-    def check_entities(self) -> None:
-        # check duplicate entity: @id and @type
-        # check existence of entity: @id
         id_context_list = []
 
         for ent in self.get_all_entities():
             id_context_list.append((ent.id, ent.context))
 
+        dup_ents = [ent for ent, count in Counter(id_context_list).items() if count > 1]
+        if len(dup_ents) > 0:
+            raise CrateError(f"Duplicate @id and @context value found: {dup_ents}.")
+
+    def check_existence_of_entity(self) -> None:
+        for ent in self.get_all_entities():
             for val in ent.values():
                 if isinstance(val, Entity) and val not in self.get_all_entities():
                     raise CrateError(f"The entity {val} is included in entity {ent}, but not included in the crate.")
@@ -106,10 +104,6 @@ class ROCrate():
                     for ele in [v for v in val if isinstance(v, Entity)]:
                         if ele not in self.get_all_entities():
                             raise CrateError(f"The entity {ele} is included in entity {ent}, but not included in this crate.")
-
-        dup_ents = [ent for ent, count in Counter(id_context_list).items() if count > 1]
-        if len(dup_ents) > 0:
-            raise CrateError(f"Duplicate @id and @context value found: {dup_ents}.")
 
     def dump(self, path: str) -> None:
         """\
