@@ -216,3 +216,9 @@ file_cao = CaoFile("file_1.txt",
 file_gin = GinFile("file_1.txt",
                     {"name": "Sample File", "contentSize": "156GB", "experimentPackageFlag": True})
 ```
+
+## エンティティ単位での型チェック
+エンティティ単位で直接check_props()を呼び出すことも可能。
+```python
+entity.check_props()
+```
