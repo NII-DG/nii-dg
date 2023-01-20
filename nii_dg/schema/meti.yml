@@ -83,7 +83,7 @@ DMP:
       expected_type: str
       example: To ensure market competitiveness for commercialization
       required: Required when accessRights has `restricted access`, `embargoed access` or `metadata only access`.
-      description: Indicates why access to the data set is restricted and embargoed.
+      description: Indicates why access to the data set is restricted or embargoed.
     availabilityStarts:
       expected_type: str
       example: '2030-04-01'
@@ -122,7 +122,7 @@ DMP:
     contentSize:
       expected_type: Literal["1GB", "10GB", "100GB", "over100GB"]
       example: 100GB
-      required: Optional.
+      required: Required when accessRights has `open access`.
       description: MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition.
     distribution:
       expected_type: DataDownload
@@ -132,7 +132,7 @@ DMP:
     contactPoint:
       expected_type: ContactPoint
       example: '{ "@id": "#mailto:contact@example.com" }'
-      required: Required when accessRights has `open access` or `restricted access`.
+      required: Required when accessRights has `open access`, `restricted access` or `embargoed access`.
       description: MUST be @id dictionary of ContactPoint entity. Indicates contact information.
 File:
   description: A file included in the research project, e.g. text file, script file and images.

@@ -26,7 +26,7 @@ Contents from data management plan that is (will be) submitted to the funding ag
 | `hostingInstitution` | `HostingInstitution` | Required. | Indicates hosting institution of the data set. | `{ "@id": "https://ror.org/04ksd4g47" }` |
 | `wayOfManage` | `Literal["commissioned", "self-managed"]` | Required. | Indicated how the data set is managed. | `commissioned` |
 | `accessRights` | `Literal["open access", "restricted access", "embargoed access", "metadata only access"]` | Required. | MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicates the availability of the data set. | `open access` |
-| `reasonForConcealment` | `str` | Required when accessRights has `restricted access`, `embargoed access` or `metadata only access`. | Indicates why access to the data set is restricted and embargoed. | `To ensure market competitiveness for commercialization` |
+| `reasonForConcealment` | `str` | Required when accessRights has `restricted access`, `embargoed access` or `metadata only access`. | Indicates why access to the data set is restricted or embargoed. | `To ensure market competitiveness for commercialization` |
 | `availabilityStarts` | `str` | Required when accessRights has `embargoed access`. | MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification. | `2030-04-01` |
 | `creator` | `List[Organization]` | Required. | MUST be an array of Organization entities. Indicates the organization which created the data set. | `[{"@id": "https://ror.org/04ksd4g47"}]` |
 | `measurementTechnique` | `str` | Optional. | An explanation of the technique for collecting data. | `Obtained using simulation software.` |
@@ -34,9 +34,9 @@ Contents from data management plan that is (will be) submitted to the funding ag
 | `license` | `License` | Required when accessRights has `open access`. | MUST be a @id dictionary of License entity. Indicates the license applied for the data. | `{"@id": "https://www.apache.org/licenses/LICENSE-2.0"}` |
 | `usageInfo` | `str` | Optional. | An explanation for citation. | `Contact data manager before usage of this data set.` |
 | `repository` | `RepositoryObject` | Required. When all data set is managed in a single repository, it can be omitted instead of adding to DMPMetadata entity. | MUST be @id dictionary of the RepositoryObject entity. Indicates repository where the data is managed. | `{ "@id": "https://doi.org/xxxxxxxx" }` |
-| `contentSize` | `Literal["1GB", "10GB", "100GB", "over100GB"]` | Optional. | MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition. | `100GB` |
+| `contentSize` | `Literal["1GB", "10GB", "100GB", "over100GB"]` | Required when accessRights has `open access`. | MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition. | `100GB` |
 | `distribution` | `DataDownload` | Required when accessRights in tied DMP entity has `open access`. When all open-access data set is available from a single URL, it can be omitted instead of adding to DMPMetadata entity. | MUST be @id dictionary of the DataDownload entity.Indicates where the download URL of the data set. | `{"@id": "https://zenodo.org/record/example"}` |
-| `contactPoint` | `ContactPoint` | Required when accessRights has `open access` or `restricted access`. | MUST be @id dictionary of ContactPoint entity. Indicates contact information. | `{ "@id": "#mailto:contact@example.com" }` |
+| `contactPoint` | `ContactPoint` | Required when accessRights has `open access`, `restricted access` or `embargoed access`. | MUST be @id dictionary of ContactPoint entity. Indicates contact information. | `{ "@id": "#mailto:contact@example.com" }` |
 
 ## File
 A file included in the research project, e.g. text file, script file and images.

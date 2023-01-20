@@ -37,6 +37,10 @@ class GovernanceError(Exception):
     This validation is performed by the validate() method of each subclass.
     """
     pass
+    # def __init__(self, message: str, entity: "Entity" = None):
+    #     super().__init__(message)
+    #     self.rocrate = rocrate
+    #     self.entity = entity
 
 
 class CrateError(Exception):

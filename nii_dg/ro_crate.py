@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional, Type
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
                            ROCrateMetadata)
-from nii_dg.error import CrateError, EntityError
+from nii_dg.error import CrateError, EntityError, GovernanceError
 from nii_dg.schema import RootDataEntity
 
 
@@ -113,6 +113,7 @@ class ROCrate():
             json.dump(self.as_jsonld(), f, width=1000, indent=2,)
 
     def validate(self) -> None:
+        self.validation_failure = GovernanceError()
         for ent in self.get_all_entities():
             if isinstance(ent, ROCrateMetadata):
                 continue
