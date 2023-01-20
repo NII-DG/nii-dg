@@ -9,7 +9,7 @@ import json
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Type
+from typing import Any, Dict, List, Optional, Type
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
                            ROCrateMetadata)
@@ -71,17 +71,24 @@ class ROCrate():
                 entity_list.append(ent)
         return entity_list
 
-    def get_all_entities(self) -> Sequence[Entity]:
+    def get_all_entities(self) -> List[Entity]:
         return self.default_entities + self.data_entities + self.contextual_entities  # type:ignore
 
     def as_jsonld(self) -> Dict[str, Any]:
-        self.check_entities()
+        self.check_duplicate_entity()
+        self.check_existence_of_entity()
         # add dateCreated to RootDataEntity
         self.root["dateCreated"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
         return {
             "@context": self.BASE_CONTEXT,
             "@graph": [e.as_jsonld() for e in self.get_all_entities()]
         }
+
+    def check_duplicate_entity(self) -> None:
+        pass
+
+    def check_existence_of_entity(self) -> None:
+        pass
 
     def check_entities(self) -> None:
         # check duplicate entity: @id and @type
