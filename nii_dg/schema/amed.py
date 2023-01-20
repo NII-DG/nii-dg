@@ -50,11 +50,8 @@ class DMPMetadata(ContextualEntity):
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        if self not in rocrate.contextual_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
-        if "funder" in rocrate.root.keys() and self not in rocrate.root["funder"]:
-            organization = self["funder"]
+        organization = self["funder"]
+        if "funder" in rocrate.root.keys() and organization not in rocrate.root["funder"]:
             raise GovernanceError(f"The entity {organization} is funder property of {self}, but not included in the list of funder property of RootDataEntity.")
 
         if len(self["hasPart"]) > 0:
@@ -104,9 +101,6 @@ class DMP(ContextualEntity):
             raise PropsError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        if self not in rocrate.contextual_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
         if self["accessRights"] in ["Unshared", "Restricted Closed Sharing"]:
             if not any(map(self.keys().__contains__, ("availabilityStarts", "accessRightsInfo"))):
                 raise GovernanceError(
@@ -182,9 +176,6 @@ class File(BaseFile):
             raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        if self not in rocrate.data_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
         if classify_uri(self, "@id") == "URL":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"A sdDatePublished property MUST be included in {self}.")
@@ -221,7 +212,4 @@ class ClinicalResearchRegistration(ContextualEntity):
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        if self not in rocrate.contextual_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
         access_url(self.id)

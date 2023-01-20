@@ -52,7 +52,10 @@ class Entity(TypedMutableMapping):
         return len(self.data)
 
     def __repr__(self) -> str:
-        return f"<{self.type} {self.id}>"
+        if isinstance(self, DefaultEntity):
+            return f"<{self.type} {self.id}>"
+        else:
+            return f"<{self.schema_name}.{self.type} {self.id}>"
 
     @property
     def id(self) -> str:

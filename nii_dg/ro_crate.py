@@ -116,8 +116,3 @@ class ROCrate():
             if isinstance(ent, ROCrateMetadata):
                 continue
             ent.validate(self)
-
-    # def check_entity_existence(self, entity: "Entity") -> None:
-    #     # return len(self.get_by_id(entity_id)) > 0
-    #     if entity not in self.contextual_entities:
-    #         raise ValueError(f"The entity {self} is not included in argument rocrate.")

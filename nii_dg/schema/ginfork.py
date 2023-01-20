@@ -44,9 +44,6 @@ class GinMonitoring(ContextualEntity):
 
     def validate(self, rocrate: ROCrate) -> None:
         # TODO: impl.
-        if self not in rocrate.contextual_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
         sum = sum_file_size(self["contentSize"], rocrate, File)
         if sum > int(self["contentSize"][:-2]):
             raise GovernanceError(f"The total file size of monitored ginfork file is larger than the size defined in {self}.")
@@ -90,5 +87,4 @@ class File(BaseFile):
 
     def validate(self, rocrate: ROCrate) -> None:
         # TODO: impl.
-        if self not in rocrate.data_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
+        pass

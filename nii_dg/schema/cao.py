@@ -53,9 +53,6 @@ class DMPMetadata(ContextualEntity):
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        if self not in rocrate.contextual_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
         if "funder" in rocrate.root.keys() and self not in rocrate.root["funder"]:
             organization = self["funder"]
             raise GovernanceError(f"The entity {organization} is funder property of {self}, but not included in the list of funder property of RootDataEntity.")
@@ -99,9 +96,6 @@ class DMP(ContextualEntity):
             raise PropsError(f"The value of availabilityStarts property in {self} MUST be the date of future.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        if self not in rocrate.contextual_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
         if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
             raise GovernanceError(f"An availabilityStarts property is required in {self}.")
 
@@ -169,9 +163,6 @@ class Person(BasePerson):
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        if self not in rocrate.contextual_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
         access_url(self.id)
 
 
@@ -212,9 +203,6 @@ class File(BaseFile):
             raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        if self not in rocrate.data_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")
