@@ -19,9 +19,11 @@ def test_init() -> None:
 
 def test_as_jsonld() -> None:
     ent = DMP(1)
+    person = Person("https://orcid.org/0000-0001-2345-6789")
 
     ent["name"] = "calculated data"
     ent["description"] = "Result data calculated by Newton's method"
+    ent["creator"] = [person]
     ent["keyword"] = "Informatics"
     ent["accessRights"] = "open access"
     ent["availabilityStarts"] = "2023-04-01"
@@ -32,10 +34,10 @@ def test_as_jsonld() -> None:
     ent["distribution"] = DataDownload("https://zenodo.org/record/example")
     ent["contentSize"] = "100GB"
     ent["hostingInstitution"] = HostingInstitution("https://ror.org/04ksd4g47")
-    ent["dataManager"] = Person("https://orcid.org/0000-0001-2345-6789")
+    ent["dataManager"] = person
 
-    jsonld = {'@type': 'DMP', '@id': '#dmp:1', 'name': 'calculated data', 'description': "Result data calculated by Newton's method", 'keyword': 'Informatics', 'accessRights': 'open access', 'availabilityStarts': '2023-04-01', 'isAccessibleForFree': True, 'license': {'@id': 'https://www.apache.org/licenses/LICENSE-2.0'},
-              'usageInfo': 'Contact data manager before usage of this data set.', 'repository': {'@id': 'https://doi.org/xxxxxxxx'}, 'distribution': {'@id': 'https://zenodo.org/record/example'}, 'contentSize': '100GB', 'hostingInstitution': {'@id': 'https://ror.org/04ksd4g47'}, 'dataManager': {'@id': 'https://orcid.org/0000-0001-2345-6789'}}
+    jsonld = {'@type': 'DMP', '@id': '#dmp:1', 'name': 'calculated data', 'description': "Result data calculated by Newton's method", 'dataNumber': 1, 'keyword': 'Informatics', 'accessRights': 'open access', 'availabilityStarts': '2023-04-01', 'isAccessibleForFree': True, 'license': {'@id': 'https://www.apache.org/licenses/LICENSE-2.0'},
+              'usageInfo': 'Contact data manager before usage of this data set.', 'repository': {'@id': 'https://doi.org/xxxxxxxx'}, 'distribution': {'@id': 'https://zenodo.org/record/example'}, 'contentSize': '100GB', 'hostingInstitution': {'@id': 'https://ror.org/04ksd4g47'}, 'dataManager': {'@id': 'https://orcid.org/0000-0001-2345-6789'}, 'creator': [{'@id': 'https://orcid.org/0000-0001-2345-6789'}]}
 
     ent_in_json = ent.as_jsonld()
     del ent_in_json["@context"]
@@ -56,15 +58,18 @@ def test_check_props() -> None:
         ent.check_props()
 
     # error: type error
+    person = Person("https://orcid.org/0000-0001-2345-6789")
+
     ent["name"] = "calculated data"
     ent["description"] = "Result data calculated by Newton's method"
+    ent["creator"] = [person]
     ent["keyword"] = "Informatics"
     ent["accessRights"] = "open access"
     ent["availabilityStarts"] = 9999
     ent["repository"] = RepositoryObject("https://doi.org/xxxxxxxx")
     ent["distribution"] = DataDownload("https://zenodo.org/record/example")
     ent["hostingInstitution"] = HostingInstitution("https://ror.org/04ksd4g47")
-    ent["dataManager"] = Person("https://orcid.org/0000-0001-2345-6789")
+    ent["dataManager"] = person
     with pytest.raises(PropsError):
         ent.check_props()
 

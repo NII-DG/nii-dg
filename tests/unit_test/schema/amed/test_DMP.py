@@ -32,7 +32,7 @@ def test_as_jsonld() -> None:
     ent["informedConsentFormat"] = "AMED"
     ent["identifier"] = [ClinicalResearchRegistration("https://jrct.niph.go.jp/latest-detail/jRCT202211111111")]
 
-    jsonld = {'@type': 'DMP', '@id': '#dmp:1', 'name': 'calculated data', 'description': "Result data calculated by Newton's method", 'keyword': 'biological origin data', 'accessRights': 'Unrestricted Open Sharing', 'availabilityStarts': '9999-04-01', 'accessRightsInfo': 'Because the dataset contains personal information.',
+    jsonld = {'@type': 'DMP', '@id': '#dmp:1', 'name': 'calculated data', 'description': "Result data calculated by Newton's method", 'dataNumber': 1, 'keyword': 'biological origin data', 'accessRights': 'Unrestricted Open Sharing', 'availabilityStarts': '9999-04-01', 'accessRightsInfo': 'Because the dataset contains personal information.',
               'repository': {'@id': 'https://doi.org/xxxxxxxx'}, 'distribution': {'@id': 'https://zenodo.org/record/example'}, 'contentSize': '100GB', 'gotInformedConsent': 'yes', 'informedConsentFormat': 'AMED', 'identifier': [{'@id': 'https://jrct.niph.go.jp/latest-detail/jRCT202211111111'}]}
 
     ent_in_json = ent.as_jsonld()
