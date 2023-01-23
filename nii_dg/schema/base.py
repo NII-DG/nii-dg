@@ -122,7 +122,7 @@ class File(DataEntity):
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"A sdDatePublished property is required in {self}.")
-                # failures.add("sdDatepublished", "This property MUST be required, but not found.")
+                # failures.add("sdDatepublished", "This property is required, but not found.")
         # if len(failures.failure_dict) > 0:
         #     raise failures
 

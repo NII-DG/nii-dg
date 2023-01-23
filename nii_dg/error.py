@@ -25,16 +25,6 @@ class PropsError(Exception):
     pass
 
 
-class EntityError(Exception):
-    """\
-    Error class for entity (checking for entities in crate).
-    Raised at Entity addition time.
-    The validation is performed by the validate() method of ROCrate class and each subclass.
-    The addition is performed by the add() method of ROCrate class.
-    """
-    pass
-
-
 class GovernanceError(Exception):
     """\
     Error class for governance (validating for data governance).
@@ -42,7 +32,7 @@ class GovernanceError(Exception):
     This validation is performed by the validate() method of each subclass.
     """
     pass
-    # def __init__(self, entity: Optional["Entity"] = None) -> None:
+    # def __init__(self, entity: "Entity") -> None:
     #     self.entity = entity
     #     self.failure_dict: Dict[str, str] = {}
 
@@ -51,6 +41,16 @@ class GovernanceError(Exception):
 
     # def add(self, prop: str, message: str) -> None:
     #     self.failure_dict.setdefault(prop, message)
+
+
+class EntityError(Exception):
+    """\
+    Error class for entity (checking for entities in crate).
+    Raised at Entity addition time.
+    The validation is performed by the validate() method of ROCrate class and each subclass.
+    The addition is performed by the add() method of ROCrate class.
+    """
+    pass
 
 
 class CrateError(Exception):

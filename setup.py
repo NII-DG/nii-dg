@@ -30,7 +30,7 @@ setup(
         "mypy",
         "pytest",
         "types-PyYAML",
-        "type-requests",
+        "types-requests",
     ],
     extras_require={
         "tests": [
@@ -39,7 +39,7 @@ setup(
             "mypy",
             "pytest",
             "types-PyYAML",
-            "type-requests",
+            "types-requests",
         ],
     },
     classifiers=[
