@@ -37,7 +37,7 @@ def test_as_jsonld() -> None:
     ent["distribution"] = DataDownload("https://zenodo.org/record/example")
     ent["contactPoint"] = ContactPoint("#mailto:contact@example.com")
 
-    jsonld = {'@type': 'DMP', '@id': '#dmp:1', 'name': 'calculated data', 'description': "Result data calculated by Newton's method", 'hostingInstitution': {'@id': 'https://ror.org/04ksd4g47'}, 'wayOfManage': 'commissioned', 'accessRights': 'open access', 'reasonForConcealment': 'To ensure market competitiveness for commercialization', 'availabilityStarts': '9999-04-01', 'creator': [
+    jsonld = {'@type': 'DMP', '@id': '#dmp:1', 'name': 'calculated data', 'description': "Result data calculated by Newton's method", 'dataNumber': 1, 'hostingInstitution': {'@id': 'https://ror.org/04ksd4g47'}, 'wayOfManage': 'commissioned', 'accessRights': 'open access', 'reasonForConcealment': 'To ensure market competitiveness for commercialization', 'availabilityStarts': '9999-04-01', 'creator': [
         {'@id': 'https://ror.org/04ksd4g47'}], 'measurementTechnique': 'Obtained using simulation software.', 'isAccessibleForFree': True, 'license': {'@id': 'https://www.apache.org/licenses/LICENSE-2.0'}, 'usageInfo': 'Contact data manager before usage of this data set.', 'repository': {'@id': 'https://doi.org/xxxxxxxx'}, 'contentSize': '100GB', 'distribution': {'@id': 'https://zenodo.org/record/example'}, 'contactPoint': {'@id': '#mailto:contact@example.com'}}
 
     ent_in_json = ent.as_jsonld()

@@ -16,7 +16,7 @@ from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_unexpected_props, check_url, classify_uri,
                           convert_string_type_to_python_type,
                           get_name_from_ror, import_entity_class,
-                          load_entity_def_from_schema_file,
+                          load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
 
 
@@ -285,3 +285,8 @@ def test_get_name_from_ror() -> None:
     # error
     with pytest.raises(GovernanceError):
         get_name_from_ror("000000000")
+
+
+def test_sum_file_size() -> None:
+    # TODO:impl
+    pass

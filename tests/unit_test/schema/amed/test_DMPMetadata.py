@@ -19,19 +19,21 @@ def test_init() -> None:
 
 def test_as_jsonld() -> None:
     ent = DMPMetadata({})
+    org = HostingInstitution("https://ror.org/04ksd4g47")
 
     ent["about"] = RootDataEntity({})
+    ent["funder"] = org
     ent["funding"] = "Acceleration Transformative Research for Medical Innovation"
     ent["chiefResearcher"] = Person("https://orcid.org/0000-0001-2345-6789")
     ent["creator"] = [Person("https://orcid.org/0000-0001-2345-6789")]
-    ent["hostingInstitution"] = HostingInstitution("https://ror.org/04ksd4g47")
+    ent["hostingInstitution"] = org
     ent["dataManager"] = Person("https://orcid.org/0000-0001-2345-6789")
     ent["repository"] = RepositoryObject("https://doi.org/xxxxxxxx")
     ent["distribution"] = DataDownload("https://zenodo.org/record/example")
     ent["hasPart"] = [DMP(1), DMP(2)]
 
     jsonld = {'@type': 'DMPMetadata', '@id': '#AMED-DMP', 'about': {'@id': './'}, 'name': 'AMED-DMP', 'funding': 'Acceleration Transformative Research for Medical Innovation', 'chiefResearcher': {'@id': 'https://orcid.org/0000-0001-2345-6789'}, 'creator': [{'@id': 'https://orcid.org/0000-0001-2345-6789'}], 'hostingInstitution': {
-        '@id': 'https://ror.org/04ksd4g47'}, 'dataManager': {'@id': 'https://orcid.org/0000-0001-2345-6789'}, 'repository': {'@id': 'https://doi.org/xxxxxxxx'}, 'distribution': {'@id': 'https://zenodo.org/record/example'}, 'hasPart': [{'@id': '#dmp:1'}, {'@id': '#dmp:2'}]}
+        '@id': 'https://ror.org/04ksd4g47'}, 'dataManager': {'@id': 'https://orcid.org/0000-0001-2345-6789'}, 'repository': {'@id': 'https://doi.org/xxxxxxxx'}, 'distribution': {'@id': 'https://zenodo.org/record/example'}, 'hasPart': [{'@id': '#dmp:1'}, {'@id': '#dmp:2'}], "funder": {'@id': 'https://ror.org/04ksd4g47'}}
 
     ent_in_json = ent.as_jsonld()
     del ent_in_json["@context"]
@@ -52,11 +54,14 @@ def test_check_props() -> None:
         ent.check_props()
 
     # error: type error
+    org = HostingInstitution("https://ror.org/04ksd4g47")
+
     ent["about"] = RootDataEntity()
+    ent["funder"] = org
     ent["funding"] = "Acceleration Transformative Research for Medical Innovation"
     ent["chiefResearcher"] = "Donald Duck"
     ent["creator"] = [Person("https://orcid.org/0000-0001-2345-6789")]
-    ent["hostingInstitution"] = HostingInstitution("https://ror.org/04ksd4g47")
+    ent["hostingInstitution"] = org
     ent["dataManager"] = Person("https://orcid.org/0000-0001-2345-6789")
     ent["hasPart"] = [DMP(1), DMP(2)]
     with pytest.raises(PropsError):

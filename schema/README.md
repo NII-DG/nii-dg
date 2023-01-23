@@ -16,11 +16,18 @@ DMPとしてAMEDを利用する場合
 - 4. `base.md`内に`Person`エンティティ定義があるため、これを採用する
 
 ## How to add new schema
+- Default Entityについては拡張不可。
+- 類似エンティティを拡張する場合...同一スキーマのクラスを継承
+```
+1. スキーマ定義のyamlに定義を追加する。この時、参照する既存エンティティの部分をcopyした上で修正を加える。
+2. validateして.mdを更新。 schema/script/generate_docs.py を利用
+3. nii_dg/schema配下にの対応する.pyにクラスを追加する。この時基底クラスとして参照した既存エンティティを継承する。
+```
 - 類似エンティティを拡張する場合...baseのクラスを継承
 ```
 1. 新たなスキーマ定義となるyamlを書く。この時、base.ymlから参照する既存エンティティの部分をcopyした上で修正を加える。
 2. validateして.mdを生成。 schema/script/generate_docs.py を利用
-3. 対応する.pyをnii_dg/schema配下に作成しクラスを追加する。この時基底クラスとしてbase.ymlからcopyした既存エンティティのclassを継承する。base.yml以外からの継承は不可。
+3. 対応する.pyをnii_dg/schema配下に作成しクラスを追加する。この時基底クラスとしてbase.ymlからcopyした既存エンティティを継承する。base.yml以外の別スキーマからの継承は不可。
 ```
 - 類似のエンティティが存在しない場合
 ```

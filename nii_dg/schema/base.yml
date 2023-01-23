@@ -19,8 +19,8 @@ RootDataEntity:
     funder:
       expected_type: List[Organization]
       example: '[{"@id": "https://ror.org/01b9y6c26"}]'
-      required: Required.
-      description: Funding agencies of the research project. MUST be an array of @id term of Organization entity.
+      required: Optional.
+      description: Funding agencies of the research project. MUST be an array of @id dictionary of Organization entity.
     dateCreated:
       expected_type: str
       example: '2022-12-09T10:48:07.976+00:00'
@@ -76,7 +76,7 @@ Dataset:
       expected_type: str
       example: config/
       required: Required.
-      description: MUST be either a URI Path relative to the RO-Crate root (stated in the identifier term of RootDataEntity) or an absolute URI. MUST end with `/`. Indicates the path to the directory.
+      description: MUST be either a URI Path relative to the RO-Crate root (stated in the identifier property of RootDataEntity) or an absolute URI. MUST end with `/`. Indicates the path to the directory.
     name:
       expected_type: str
       example: config
@@ -132,7 +132,7 @@ Person:
       expected_type: Organization
       example: '{"@id": "https://ror.org/04ksd4g47"}'
       required: Required.
-      description: Affiliation which the person belongs to. MUST be a @id term of the Organization entity.
+      description: Affiliation which the person belongs to. MUST be a @id dictionary of the Organization entity.
     email:
       expected_type: str
       example: ichiro@example.com

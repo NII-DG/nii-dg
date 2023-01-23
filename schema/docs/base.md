@@ -9,7 +9,7 @@ A Dataset that represents the RO-Crate. For more information, see https://www.re
 | `@id` | `str` | Required. | MUST be `./`. | `./` |
 | `name` | `str` | Required. | Title of the research project. | `Example Research Project` |
 | `description` | `str` | Optional. | Description of the research project. | `This research project aims to reveal the effect of xxx.` |
-| `funder` | `List[Organization]` | Required. | Funding agencies of the research project. MUST be an array of @id term of Organization entity. | `[{"@id": "https://ror.org/01b9y6c26"}]` |
+| `funder` | `List[Organization]` | Optional. | Funding agencies of the research project. MUST be an array of @id dictionary of Organization entity. | `[{"@id": "https://ror.org/01b9y6c26"}]` |
 | `dateCreated` | `str` | Required. | Automatically added to the entity when you generate RO-Crate with as_jsonld() method. MUST be a string in ISO 8601 date format and a timestamp down to milliseconds. The time zone is UTC. Indicates timestamp the RO-Crate itself was created. | `2022-12-09T10:48:07.976+00:00` |
 | `hasPart` | `List[Union[Dataset, File]]` | Required. | MUST be an array of Dataset and File entities that indicate files and directories as subjects of data governance. If there is no file to include, MUST be empty list. | `[{"@id": "config/"}, {"@id": "config/config.txt"}]` |
 
@@ -29,7 +29,7 @@ A file included in the research project, e.g. text file, script file and images.
 A folder of the files included in the research project.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
-| `@id` | `str` | Required. | MUST be either a URI Path relative to the RO-Crate root (stated in the identifier term of RootDataEntity) or an absolute URI. MUST end with `/`. Indicates the path to the directory. | `config/` |
+| `@id` | `str` | Required. | MUST be either a URI Path relative to the RO-Crate root (stated in the identifier property of RootDataEntity) or an absolute URI. MUST end with `/`. Indicates the path to the directory. | `config/` |
 | `name` | `str` | Required. | Indicates directory name. | `config` |
 | `url` | `str` | Optional. | MUST be a direct URL to the directory. | `https://github.com/username/repository/directory` |
 
@@ -49,7 +49,7 @@ A person who contributes to the research project, e.g. researcher.
 | `@id` | `str` | Required. | MUST be URL of the person. ORCID ID is recommended. | `https://orcid.org/0000-0001-2345-6789` |
 | `name` | `str` | Required. | Name of the person. MUST be in the order of first name, and family name. | `Ichiro Suzuki` |
 | `alias` | `str` | Optional. | Another writing of a name of the person. | `S. Ichiro` |
-| `affiliation` | `Organization` | Required. | Affiliation which the person belongs to. MUST be a @id term of the Organization entity. | `{"@id": "https://ror.org/04ksd4g47"}` |
+| `affiliation` | `Organization` | Required. | Affiliation which the person belongs to. MUST be a @id dictionary of the Organization entity. | `{"@id": "https://ror.org/04ksd4g47"}` |
 | `email` | `str` | Required. | Email address of the person. | `ichiro@example.com` |
 | `telephone` | `str` | Optional. | Phone number of the person. Hyphen can be used as a separator. | `03-0000-0000` |
 

@@ -15,7 +15,7 @@ from nii_dg.utils import (access_url, check_all_prop_types,
                           check_mime_type, check_orcid_id,
                           check_required_props, check_sha256,
                           check_unexpected_props, check_url, classify_uri,
-                          load_entity_def_from_schema_file,
+                          load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
 
 
@@ -53,13 +53,15 @@ class DMPMetadata(ContextualEntity):
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        if self not in rocrate.contextual_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
+        if "funder" in rocrate.root.keys() and self not in rocrate.root["funder"]:
+            organization = self["funder"]
+            raise GovernanceError(f"The entity {organization} is funder property of {self}, but not included in the list of funder property of RootDataEntity.")
 
 
 class DMP(ContextualEntity):
     def __init__(self, id: int, props: Optional[Dict[str, Any]] = None):
         super().__init__(id="#dmp:" + str(id), props=props)
+        self["dataNumber"] = id
 
     @property
     def schema_name(self) -> str:
@@ -94,9 +96,6 @@ class DMP(ContextualEntity):
             raise PropsError(f"The value of availabilityStarts property in {self} MUST be the date of future.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        if self not in rocrate.contextual_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
         if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
             raise GovernanceError(f"An availabilityStarts property is required in {self}.")
 
@@ -109,6 +108,9 @@ class DMP(ContextualEntity):
         dmp_metadata_ents = rocrate.get_by_entity_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
             raise GovernanceError("DMPMetadata Entity MUST be required with DMP entity.")
+        dmp_metadata_ent = dmp_metadata_ents[0]
+        if self not in dmp_metadata_ent["hasPart"]:
+            raise GovernanceError(f"DMP entity {self} is not included in the list of hasPart property of {dmp_metadata_ent}.")
 
         if "repository" not in self.keys():
             # DMPMetadata entity must have the property instead of DMP entity
@@ -121,7 +123,13 @@ class DMP(ContextualEntity):
                 raise GovernanceError(f"A distribution property is required in {self}.")
 
         if "contentSize" in self.keys():
-            monitor_file_size(rocrate, self)
+            sum = sum_file_size(self["contentSize"][-2:], rocrate, File)
+
+            if self["contentSize"] != "over100GB" and sum > int(self["contentSize"][:-2]):
+                raise GovernanceError(f"The total file size included in DMP {self} is larger than the defined size.")
+
+            if self["contentSize"] == "over100GB" and sum < 100:
+                raise GovernanceError(f"The total file size included in DMP {self} is smaller than 100GB.")
 
 
 class Person(BasePerson):
@@ -155,9 +163,6 @@ class Person(BasePerson):
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        if self not in rocrate.contextual_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
         access_url(self.id)
 
 
@@ -198,38 +203,6 @@ class File(BaseFile):
             raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
     def validate(self, rocrate: ROCrate) -> None:
-        if self not in rocrate.data_entities:
-            raise ValueError(f"The entity {self} is not included in argument rocrate.")
-
         if classify_uri(self, "@id") == "url":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")
-
-
-def monitor_file_size(rocrate: ROCrate, entity: DMP) -> None:
-    """
-    File size sum が規定値に合っていることを確認
-    """
-    size = entity["contentSize"]
-    units = ["B", "KB", "MB", "GB", "TB", "PB"]
-    unit = units.index(size[-2:])
-    file_size_sum: float = 0
-
-    for ent in rocrate.get_by_entity_type(File):
-        if ent["dmpDataNumber"] != entity:
-            continue
-
-        if ent["contentSize"][-2:] in units:
-            file_unit = units.index(ent["contentSize"][-2:])
-            file_size = int(ent["contentSize"][:-2])
-        else:
-            file_unit = 0
-            file_size = int(ent["contentSize"][:-1])
-
-        file_size_sum += round(file_size / 1024 ** (unit - file_unit), 3)
-
-    if size != "over100GB" and file_size_sum > int(size[:-2]):
-        raise GovernanceError(f"The total file size included in DMP {entity} is larger than the defined size.")
-
-    if size == "over100GB" and file_size_sum < 100:
-        raise GovernanceError(f"The total file size included in DMP {entity} is smaller than 100GB.")

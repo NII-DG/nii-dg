@@ -8,6 +8,7 @@ Definition of Entity base class and its subclasses.
 from collections.abc import MutableMapping
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
+from nii_dg.error import UnexpectedImplementationError
 from nii_dg.utils import github_branch, github_repo
 
 if TYPE_CHECKING:
@@ -52,7 +53,10 @@ class Entity(TypedMutableMapping):
         return len(self.data)
 
     def __repr__(self) -> str:
-        return f"<{self.type} {self.id}>"
+        if isinstance(self, DefaultEntity):
+            return f"<{self.type} {self.id}>"
+        else:
+            return f"<{self.schema_name}.{self.type} {self.id}>"
 
     @property
     def id(self) -> str:
@@ -137,11 +141,7 @@ class Entity(TypedMutableMapping):
         Called at Data Governance validation time.
         Comprehensive validation including the value of props.
         Implementation of this method is required in each subclass.
-        Each method must include comment-outed code.
         """
-        # if self not in rocrate.default_entities + rocrate.contextual_entities + rocrate.data_entities:
-        #     raise EntityError(f"The entity {self} is not included in argument rocrate.")
-
         # Abstract method
         raise NotImplementedError
 
@@ -177,6 +177,9 @@ class ROCrateMetadata(DefaultEntity):
         self["@type"] = "CreativeWork"
         self["conformsTo"] = {"@id": "https://w3id.org/ro/crate/1.1"}
         self["about"] = root
+
+    def __init_subclass__(cls) -> None:
+        raise UnexpectedImplementationError("Inheritance of ROCrateMetadata is not permitted.Inheritance of ROCrateMetadata is not allowed.")
 
     @property
     def context(self) -> str:
