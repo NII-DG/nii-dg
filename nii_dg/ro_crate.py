@@ -113,7 +113,13 @@ class ROCrate():
             json.dump(self.as_jsonld(), f, width=1000, indent=2,)
 
     def validate(self) -> None:
+        governance_error = GovernanceError()
         for ent in self.get_all_entities():
             if isinstance(ent, ROCrateMetadata):
                 continue
-            ent.validate(self)
+            try:
+                ent.validate(self)
+            except EntityError as e:
+                governance_error.add_error(e)
+        if len(governance_error.errors) > 0:
+            raise governance_error

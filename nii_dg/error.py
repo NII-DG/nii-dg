@@ -28,10 +28,24 @@ class PropsError(Exception):
 class GovernanceError(Exception):
     """\
     Error class for governance (validating for data governance).
-    Raised at Data Governance validation time.
+    Raised at Data Governance validation time at RO-Crate validate() method.
     This validation is performed by the validate() method of each subclass.
+    For each subclass, EntityError is raised when the validation fails.
+
+    - Error として複数の entity から送出された error (Entity error) がまとめられる
+    - それぞれの元となる entity の情報も持っていてほしい (included in entity error)
+    - また、まとめられた error list を summarize するメソッドもほしい
     """
-    pass
+
+    entityErrors: List[EntityError] = []
+
+    def __init__(self, entityErrors: List[EntityError] = []) -> None:
+        super().__init__("Governance error occurred")
+        self.entityErrors = entityErrors
+
+    def add_error():
+        pass
+
     # def __init__(self, entity: "Entity") -> None:
     #     self.entity = entity
     #     self.failure_dict: Dict[str, str] = {}
