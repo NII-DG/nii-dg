@@ -176,9 +176,14 @@ class File(BaseFile):
             raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
     def validate(self, rocrate: ROCrate) -> None:
+        # failures = GovernanceError(self)
+
         if classify_uri(self, "@id") == "URL":
             if "sdDatePublished" not in self.keys():
                 raise GovernanceError(f"A sdDatePublished property MUST be included in {self}.")
+                # failures.add("sdDatepublished", "This property MUST be required, but not found.")
+        # if len(failures.failure_dict) > 0:
+        #     raise failures
 
 
 class ClinicalResearchRegistration(ContextualEntity):

@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 # coding: utf-8
+from typing import TYPE_CHECKING, Dict, Optional
+
+if TYPE_CHECKING:
+    from nii_dg.entity import Entity
+
 
 class UnexpectedImplementationError(Exception):
     """\
@@ -37,10 +42,15 @@ class GovernanceError(Exception):
     This validation is performed by the validate() method of each subclass.
     """
     pass
-    # def __init__(self, message: str, entity: "Entity" = None):
-    #     super().__init__(message)
-    #     self.rocrate = rocrate
+    # def __init__(self, entity: Optional["Entity"] = None) -> None:
     #     self.entity = entity
+    #     self.failure_dict: Dict[str, str] = {}
+
+    # def __str__(self) -> str:
+    #     return str({repr(self.entity): self.failure_dict})
+
+    # def add(self, prop: str, message: str) -> None:
+    #     self.failure_dict.setdefault(prop, message)
 
 
 class CrateError(Exception):
