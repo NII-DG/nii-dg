@@ -348,7 +348,7 @@ def access_url(url: str) -> None:
         res.raise_for_status()
     except requests.HTTPError as httperr:
         msg = str(httperr)
-        raise GovernanceError(f"URL is not accessible. {msg}") from None
+        raise ValueError(f"URL is not accessible. {msg}") from None
     except Exception as err:
         raise UnexpectedImplementationError from err
 

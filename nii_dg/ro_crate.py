@@ -13,7 +13,8 @@ from typing import Any, Dict, List, Optional, Type
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
                            ROCrateMetadata)
-from nii_dg.error import CrateError, EntityError, GovernanceError
+from nii_dg.error import (CrateError, EntityError, GovernanceError,
+                          UnexpectedImplementationError)
 from nii_dg.schema import RootDataEntity
 
 
@@ -55,7 +56,7 @@ class ROCrate():
             elif isinstance(entity, ContextualEntity):
                 self.contextual_entities.append(entity)
             else:
-                raise EntityError("Invalid entity type")
+                raise UnexpectedImplementationError("Invalid entity type")
 
     def get_by_id(self, entity_id: str) -> List[Entity]:
         entity_list: List[Entity] = []
@@ -99,7 +100,7 @@ class ROCrate():
             for val in ent.values():
                 if isinstance(val, Entity) and val not in self.get_all_entities():
                     raise CrateError(f"The entity {val} is included in entity {ent}, but not included in the crate.")
-                elif isinstance(val, list):
+                if isinstance(val, list):
                     # expected: [Any], [Entity]
                     for ele in [v for v in val if isinstance(v, Entity)]:
                         if ele not in self.get_all_entities():
@@ -113,13 +114,20 @@ class ROCrate():
             json.dump(self.as_jsonld(), f, width=1000, indent=2,)
 
     def validate(self) -> None:
-        governance_error = GovernanceError()
+        # governance_error = GovernanceError()
+        err_list = []
         for ent in self.get_all_entities():
             if isinstance(ent, ROCrateMetadata):
                 continue
             try:
                 ent.validate(self)
             except EntityError as e:
-                governance_error.add_error(e)
-        if len(governance_error.errors) > 0:
+                # governance_error.add_error(e)
+                err_list.append(e)
+
+        if len(err_list) > 0:
+            # if len(governance_error.entity_errors) > 0:
+            governance_error = GovernanceError(err_list)
             raise governance_error
+            # print(governance_error.entity_errors[0])
+            # raise GovernanceError(err_list[0])

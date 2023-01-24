@@ -55,8 +55,8 @@ class Entity(TypedMutableMapping):
     def __repr__(self) -> str:
         if isinstance(self, DefaultEntity):
             return f"<{self.type} {self.id}>"
-        else:
-            return f"<{self.schema_name}.{self.type} {self.id}>"
+
+        return f"<{self.schema_name}.{self.type} {self.id}>"
 
     @property
     def id(self) -> str:
