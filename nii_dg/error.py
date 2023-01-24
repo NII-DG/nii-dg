@@ -47,8 +47,9 @@ class EntityError(Exception):
 class CrateError(Exception):
     """\
     Error class for rocrate (checking for crate).
-    Raised at ROCrate dump time.
-    This validation is performed by the check_entities() method (this method is called in dump()) of ROCrate class.
+    Raised at ROCrate dump time and Data Governance validation time.
+    The dump is performed by the check_entities() method (this method is called in dump()) of ROCrate class.
+    The validation is performed by the validate() method of each subclass.
     """
 
 

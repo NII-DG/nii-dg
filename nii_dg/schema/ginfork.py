@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
-from nii_dg.error import GovernanceError, PropsError
+from nii_dg.error import EntityError, GovernanceError, PropsError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
@@ -42,11 +42,16 @@ class GinMonitoring(ContextualEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self, rocrate: ROCrate) -> None:
+    def validate(self, crate: ROCrate) -> None:
         # TODO: impl.
-        sum = sum_file_size(self["contentSize"], rocrate, File)
+        validation_failures = EntityError(self)
+
+        sum = sum_file_size(self["contentSize"], crate, File)
         if sum > int(self["contentSize"][:-2]):
-            raise GovernanceError(f"The total file size of monitored ginfork file is larger than the size defined in {self}.")
+            validation_failures.add("contentSize", "The total file size of ginfork.File is larger than the defined size.")
+
+        if len(validation_failures.message_dict) > 0:
+            raise validation_failures
 
 
 class File(BaseFile):
@@ -85,6 +90,6 @@ class File(BaseFile):
         if verify_is_past_date(self, "sdDatePublished") is False:
             raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
-    def validate(self, rocrate: ROCrate) -> None:
+    def validate(self, crate: ROCrate) -> None:
         # TODO: impl.
         pass

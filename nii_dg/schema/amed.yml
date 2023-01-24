@@ -99,7 +99,7 @@ DMP:
       example: '2030-04-01'
       required: Required when accessRights has `Unshared` or `Restricted Closed Sharing`. If the dataset will not be open sharing because it contains personal information or for some other reason, this value is not required, but instead the reason of unshared or closed sharing MUST be described in the following property, accessRightsInfo.
       description: MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification. Indicates when the data will be open sharing status.
-    accessRightsInfo:
+    reasonForConcealment:
       expected_type: str
       example: Because the dataset contains personal information.
       required: Required when accessRights has `Unshared` or `Restricted Closed Sharing` and availabilityStarts property is not included in this entity.

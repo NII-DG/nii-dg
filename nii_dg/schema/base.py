@@ -5,8 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity
-from nii_dg.error import (EntityError, GovernanceError, PropsError,
-                          UnexpectedImplementationError)
+from nii_dg.error import EntityError, PropsError, UnexpectedImplementationError
 from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_content_formats, check_content_size,
                           check_email, check_isodate, check_mime_type,
@@ -121,7 +120,6 @@ class File(DataEntity):
 
         if classify_uri(self, "@id") == "URL":
             if "sdDatePublished" not in self.keys():
-                # raise GovernanceError(f"A sdDatePublished property is required in {self}.")
                 validation_failures.add("sdDatepublished", "This property is required, but not found.")
 
         if len(validation_failures.message_dict) > 0:
@@ -205,7 +203,6 @@ class Organization(ContextualEntity):
         if self.id.startswith("https://ror.org/"):
             ror_namelist = get_name_from_ror(self.id[16:])
             if self["name"] not in ror_namelist:
-                # raise GovernanceError(f"The value of name property of {self} MUST be same as the registered name in ROR.")
                 validation_failures.add("name", f"The value MUST be same as the registered name in ROR. See {self.id}.")
         else:
             try:
@@ -414,7 +411,7 @@ class HostingInstitution(Organization):
         if self.id.startswith("https://ror.org/"):
             ror_namelist = get_name_from_ror(self.id[16:])
             if self["name"] not in ror_namelist:
-                raise GovernanceError(f"The value of name property of {self} MUST be same as the registered name in ROR.")
+                validation_failures.add("name", f"The value MUST be same as the registered name in ROR. See {self.id}.")
         else:
             try:
                 access_url(self.id)
@@ -457,24 +454,24 @@ class ContactPoint(ContextualEntity):
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
         if self.id[:8] not in ["#mailto:", "#callto:"]:
-            raise PropsError(f"The value of @id property of {self} MUST be start with #mailto: or #callto.")
+            raise PropsError(f"The value of @id property of {self} MUST be start with #mailto: or #callto:.")
 
     def validate(self, crate: "ROCrate") -> None:
         validation_failures = EntityError(self)
 
-        if not any(map(self.keys().__contains__, ("email", "telephone"))):
-            # raise GovernanceError(f"Either email property or telephone property is required in {self}.")
-            validation_failures.add("email", "Either email property or telephone property is required.")
-            validation_failures.add("telephone", "Either email property or telephone property is required.")
-
         if self.id.startswith("#mailto:"):
-            if self.id[8:] != self["email"]:
-                # raise PropsError(f"The email contained in the value of @id property of {self} is not the same as the value of email property.")
+            if "email" not in self.keys():
+                validation_failures.add("email", "This property is required, but not found.")
+            elif self.id[8:] != self["email"]:
                 validation_failures.add("@id", "The contained email is not the same as the value of email property.")
+                validation_failures.add("email", "The value is not the same as the email contained in the value of @id property.")
+
         elif self.id.startswith("#callto:"):
-            if self.id[8:] != self["telephone"] or self.id[8:] != self["telephone"].replace("-", ""):
-                # raise PropsError(f"The phone number contained in the value of @id property of {self} is not the same as the value of telephone property.")
+            if "telephone" not in self.keys():
+                validation_failures.add("telephone", "This property is required, but not found.")
+            elif self.id[8:] != self["telephone"] or self.id[8:] != self["telephone"].replace("-", ""):
                 validation_failures.add("@id", "The contained phone number is not the same as the value of telephone property.")
+                validation_failures.add("telephone", "The value is not the same as the phone number contained in the value of @id property.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures
