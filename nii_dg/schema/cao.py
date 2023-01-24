@@ -128,7 +128,12 @@ class DMP(ContextualEntity):
             validation_failures.add("distribution", "This property is required, but not found.")
 
         if "contentSize" in self.keys():
-            sum = sum_file_size(self["contentSize"][-2:], crate, File)
+            target_files = []
+            for ent in crate.get_by_entity_type(File):
+                if ent["dmpDataNumber"] == self:
+                    target_files.append(ent)
+
+            sum = sum_file_size(self["contentSize"][-2:], target_files)
 
             if self["contentSize"] != "over100GB" and sum > int(self["contentSize"][:-2]):
                 validation_failures.add("contentSize", "The total file size included in this DMP is larger than the defined size.")
