@@ -3,7 +3,8 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
+from nii_dg.error import EntityError, PropsError
+from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.meti import DMP, File
 
 
@@ -71,5 +72,18 @@ def test_check_props() -> None:
 
 
 def test_validate() -> None:
-    # TO BE UPDATED
-    pass
+    crate = ROCrate()
+    file = File("https://example.com/config/setting.txt")
+
+    # error: when @id is URL, sdDatePublished is required
+    with pytest.raises(EntityError):
+        file.validate(crate)
+
+    # no error occurs with sdDatePublished property
+    file["sdDatePublished"] = "2000-01-01"
+    file.validate(crate)
+
+    # no error occurs with non-URL @id
+    file["@id"] = "/config/setting.txt"
+    del file["sdDatePublished"]
+    file.validate(crate)

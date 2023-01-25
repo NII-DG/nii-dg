@@ -55,12 +55,15 @@ class DMPMetadata(ContextualEntity):
         if self["about"] != crate.root:
             validation_failures.add("about", f"The value of this property MUST be the RootDataEntity {crate.root}.")
 
-        if "funder" in crate.root.keys() and self not in crate.root["funder"]:
-            organization = self["funder"]
+        organization = self["funder"]
+        if "funder" in crate.root.keys() and organization not in crate.root["funder"]:
             validation_failures.add("funder", f"The entity {organization} is not included in the funder property of RootDataEntity.")
 
         if len(self["hasPart"]) != len(crate.get_by_entity_type(DMP)):
-            diff = set(self["hasPart"]) ^ set(crate.get_by_entity_type(DMP))
+            diff = []
+            for dmp in crate.get_by_entity_type(DMP):
+                if dmp not in self["hasPart"]:
+                    diff.append(dmp)
             validation_failures.add("hasPart", f"There is an omission of DMP entity in the list: {diff}.")
 
         if len(validation_failures.message_dict) > 0:
@@ -126,7 +129,7 @@ class DMP(ContextualEntity):
             validation_failures.add("isAccessibleForFree", "This property is required, but not found.")
 
         if self["accessRights"] == "open access":
-            if self["isAccessibleForFree"] is False:
+            if "isAccessibleForFree" in self.keys() and self["isAccessibleForFree"] is False:
                 validation_failures.add("isAccessibleForFree", "The value MUST be True.")
             if "license" not in self.keys():
                 validation_failures.add("license", "This property is required, but not found.")
@@ -199,9 +202,8 @@ class File(BaseFile):
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
 
-        if classify_uri(self, "@id") == "URL":
-            if "sdDatePublished" not in self.keys():
-                validation_failures.add("sdDatepublished", "This property is required, but not found.")
+        if classify_uri(self, "@id") == "URL" and "sdDatePublished" not in self.keys():
+            validation_failures.add("sdDatepublished", "This property is required, but not found.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures

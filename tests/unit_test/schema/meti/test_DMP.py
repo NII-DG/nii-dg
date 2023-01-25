@@ -3,10 +3,11 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
+from nii_dg.error import CrateError, EntityError, PropsError
+from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import (ContactPoint, DataDownload, HostingInstitution,
                                 License, Organization, RepositoryObject)
-from nii_dg.schema.meti import DMP
+from nii_dg.schema.meti import DMP, DMPMetadata, File
 
 
 def test_init() -> None:
@@ -81,5 +82,56 @@ def test_check_props() -> None:
 
 
 def test_validate() -> None:
-    # TO BE UPDATED
-    pass
+    crate = ROCrate()
+    ent = DMP(1, {"accessRights": "embargoed access"})
+    crate.add(ent)
+
+    # No DMPMetadata entity
+    with pytest.raises(CrateError):
+        ent.validate(crate)
+
+    meta = DMPMetadata()
+    crate.add(meta)
+    # error: availabilityStarts is required
+    # error: repository is required
+    # error: reasonForConcealment is required
+    # error: contactPoint is required
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    ent["availabilityStarts"] = "2000-01-01"
+    ent["reasonForConcealment"] = "Including personal info."
+    ent["repository"] = "https://example.com/repo"
+    ent["contactPoint"] = ContactPoint("#mailto:test@example.com")
+    # error: availabilityStarts MUST be the date of future
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    ent["availabilityStarts"] = "2030-01-01"
+    # no error
+    ent.validate(crate)
+
+    ent["accessRights"] = "open access"
+    # error: availabilityStarts is not required
+    # error: distribution is required
+    # error: license is required
+    # error: isAccessibleForFree is required
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    del ent["availabilityStarts"]
+    ent["distribution"] = DataDownload("https://zenodo.org/record/example")
+    ent["license"] = License("https://example.com/license")
+    ent["isAccessibleForFree"] = False
+    ent["contentSize"] = "10GB"
+    file = File("test", {"contentSize": "11GB", "dmpDataNumber": ent})
+    crate.add(file)
+    # error: file size is over.
+    # error: isAccessibleForFree MUST be True
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    ent["contentSize"] = "100GB"
+    ent["isAccessibleForFree"] = True
+    # no error
+    ent.validate(crate)

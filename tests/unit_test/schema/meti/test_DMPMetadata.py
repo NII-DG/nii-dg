@@ -3,9 +3,10 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
-from nii_dg.schema.base import (DataDownload, Organization, Person,
-                                RepositoryObject, RootDataEntity)
+from nii_dg.error import EntityError, PropsError
+from nii_dg.ro_crate import ROCrate
+from nii_dg.schema.base import (DataDownload, Organization, RepositoryObject,
+                                RootDataEntity)
 from nii_dg.schema.meti import DMP, DMPMetadata
 
 
@@ -60,5 +61,28 @@ def test_check_props() -> None:
 
 
 def test_validate() -> None:
-    # TO BE UPDATED
-    pass
+    rocrate = ROCrate()
+    org = Organization("https://ror.org/04ksd4g47")
+    root = RootDataEntity()
+    meta = DMPMetadata({"funder": org, "hasPart": [], "about": root})
+    rocrate.add(org, meta)
+
+    # error: funder not included in the funder list of RootDataEntity
+    # error: value of about is not the RootDataEntity of the crate
+    with pytest.raises(EntityError):
+        meta.validate(rocrate)
+
+    meta["about"] = rocrate.root
+    rocrate.root["funder"] = [org]
+    # no error
+    meta.validate(rocrate)
+
+    dmp = DMP(2)
+    rocrate.add(dmp)
+    # error: not all DMP entity in the crate is included in hasPart
+    with pytest.raises(EntityError):
+        meta.validate(rocrate)
+
+    meta["hasPart"] = [dmp]
+    # no error
+    meta.validate(rocrate)

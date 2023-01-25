@@ -63,7 +63,10 @@ class DMPMetadata(ContextualEntity):
             validation_failures.add("funder", f"The entity {organization} is not included in the funder property of RootDataEntity.")
 
         if len(self["hasPart"]) != len(crate.get_by_entity_type(DMP)):
-            diff = set(self["hasPart"]) ^ set(crate.get_by_entity_type(DMP))
+            diff = []
+            for dmp in crate.get_by_entity_type(DMP):
+                if dmp not in self["hasPart"]:
+                    diff.append(dmp)
             validation_failures.add("hasPart", f"There is an omission of DMP entity in the list: {diff}.")
 
         if len(validation_failures.message_dict) > 0:
@@ -235,7 +238,7 @@ class File(BaseFile):
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
 
-        if "sdDatePublished" not in self.keys():
+        if classify_uri(self, "@id") == "URL" and "sdDatePublished" not in self.keys():
             validation_failures.add("sdDatePublished", "This property is required, but not found.")
 
         if len(validation_failures.message_dict) > 0:

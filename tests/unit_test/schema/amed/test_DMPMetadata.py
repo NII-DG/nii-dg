@@ -76,7 +76,7 @@ def test_check_props() -> None:
 def test_validate() -> None:
     crate = ROCrate()
     org = HostingInstitution("https://ror.org/04ksd4g47")
-    root = ROCrate()
+    root = RootDataEntity()
     ent = DMPMetadata({"funder": org, "hasPart": [], "about": root})
     crate.add(org, ent)
 
