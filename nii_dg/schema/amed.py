@@ -52,6 +52,9 @@ class DMPMetadata(ContextualEntity):
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
 
+        if self["about"] != crate.root:
+            validation_failures.add("about", f"The value of this property MUST be the RootDataEntity {crate.root}.")
+
         organization = self["funder"]
         if "funder" in crate.root.keys() and organization not in crate.root["funder"]:
             validation_failures.add("funder", f"The entity {organization} is not included in the funder property of RootDataEntity.")
@@ -115,22 +118,24 @@ class DMP(ContextualEntity):
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
 
+        dmp_metadata_ents = crate.get_by_entity_type(DMPMetadata)
+        if len(dmp_metadata_ents) == 0:
+            raise CrateError("Entity DMPMetadata MUST be required with DMP entity.")
+        dmp_metadata_ent = dmp_metadata_ents[0]
+
         if self["accessRights"] in ["Unshared", "Restricted Closed Sharing"] and\
                 not any(map(self.keys().__contains__, ("availabilityStarts", "reasonForConcealment"))):
             validation_failures.add("availabilityStarts",
                                     "This property is required, but not found. If the dataset remains unshared, add reasonForConcealment property instead.")
+
+        if "availabilityStarts" in self.keys() and self["accessRights"] in ["Restricted Open Sharing", "Unrestricted Open Sharing"]:
+            validation_failures.add("availabilityStarts", "This property is not required because the data is accessible at this time.")
 
         if verify_is_past_date(self, "availabilityStarts"):
             validation_failures.add("availabilityStarts", "The value MUST be the date of future.")
 
         if self["gotInformedConsent"] == "yes" and "informedConsentFormat" not in self.keys():
             validation_failures.add("informedConsentFormat", "This property is required, but not found.")
-
-        dmp_metadata_ents = crate.get_by_entity_type(DMPMetadata)
-        if len(dmp_metadata_ents) == 0:
-            raise CrateError("Entity DMPMetadata MUST be required with DMP entity.")
-
-        dmp_metadata_ent = dmp_metadata_ents[0]
 
         if "repository" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
             validation_failures.add("repository", "This property is required, but not found.")

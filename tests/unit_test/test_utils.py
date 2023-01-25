@@ -296,3 +296,4 @@ def test_sum_file_size() -> None:
     file_2 = BaseFile("2", {"contentSize": "10GB"})
 
     assert sum_file_size("GB", [file_1, file_2]) == 25
+    assert sum_file_size("B", []) == 0

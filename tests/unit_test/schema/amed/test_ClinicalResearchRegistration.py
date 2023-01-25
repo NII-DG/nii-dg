@@ -3,7 +3,8 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
+from nii_dg.error import EntityError, PropsError
+from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.amed import ClinicalResearchRegistration
 
 
@@ -59,5 +60,9 @@ def test_check_props() -> None:
 
 
 def test_validate() -> None:
-    # TO BE UPDATED
-    pass
+    crate = ROCrate()
+    ent = ClinicalResearchRegistration("https://google.com/404")
+    crate.add(ent)
+
+    with pytest.raises(EntityError):
+        ent.validate(crate)

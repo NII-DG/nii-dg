@@ -3,7 +3,8 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
+from nii_dg.error import EntityError, PropsError
+from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.amed import DMP, DMPMetadata
 from nii_dg.schema.base import (DataDownload, HostingInstitution, Person,
                                 RepositoryObject, RootDataEntity)
@@ -73,5 +74,36 @@ def test_check_props() -> None:
 
 
 def test_validate() -> None:
-    # TO BE UPDATED
-    pass
+    crate = ROCrate()
+    org = HostingInstitution("https://ror.org/04ksd4g47")
+    root = ROCrate()
+    ent = DMPMetadata({"funder": org, "hasPart": [], "about": root})
+    crate.add(org, ent)
+
+    # error: funder not included in the funder list of RootDataEntity
+    # error: value of about is not the RootDataEntity of the crate
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    ent["about"] = crate.root
+    crate.root["funder"] = [org]
+    # no error
+    ent.validate(crate)
+
+    dmp = DMP("sample")
+    crate.add(dmp)
+    # error: not all DMP entity in the crate is included in hasPart
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    ent["hasPart"] = [dmp]
+    # error: creator, hostingInstitution, dataManager are required
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    ent["hostingInstitution"] = org
+    person = Person("https://example.com/person")
+    ent["creator"] = [person]
+    ent["dataManager"] = person
+    # no error
+    ent.validate(crate)

@@ -107,19 +107,25 @@ class DMP(ContextualEntity):
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
 
+        dmp_metadata_ents = crate.get_by_entity_type(DMPMetadata)
+        if len(dmp_metadata_ents) == 0:
+            raise CrateError("Entity DMPMetadata MUST be required with DMP entity.")
+        dmp_metadata_ent = dmp_metadata_ents[0]
+
         if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
             validation_failures.add("availabilityStarts", "This property is required, but not found.")
+
+        if self["accessRights"] != "embargoed access" and "availabilityStarts" in self.keys():
+            validation_failures.add("availabilityStarts", "This property is not required.")
+
+        if verify_is_past_date(self, "availabilityStarts"):
+            validation_failures.add("availabilityStarts", "The value MUST be the date of future.")
 
         if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self.keys():
             validation_failures.add("isAccessibleForFree", "This property is required, but not found.")
 
         if self["accessRights"] == "open access" and "license" not in self.keys():
             validation_failures.add("license", "This property is required, but not found.")
-
-        dmp_metadata_ents = crate.get_by_entity_type(DMPMetadata)
-        if len(dmp_metadata_ents) == 0:
-            raise CrateError("Entity DMPMetadata MUST be required with DMP entity.")
-        dmp_metadata_ent = dmp_metadata_ents[0]
 
         if "repository" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
             validation_failures.add("repository", "This property is required, but not found.")
