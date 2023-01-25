@@ -61,8 +61,13 @@ def test_check_props() -> None:
 
 def test_validate() -> None:
     crate = ROCrate()
-    ent = ClinicalResearchRegistration("https://google.com/404")
+    ent = ClinicalResearchRegistration("https://example.com/registered_record")
     crate.add(ent)
 
+    # error: not accessible URL
     with pytest.raises(EntityError):
         ent.validate(crate)
+
+    # no error occurs with accessible URL
+    ent["@id"] = "https://example.com"
+    ent.validate(crate)

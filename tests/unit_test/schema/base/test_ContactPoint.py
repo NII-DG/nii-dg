@@ -3,7 +3,8 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
+from nii_dg.error import EntityError, PropsError
+from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import ContactPoint
 
 
@@ -45,7 +46,7 @@ def test_check_props() -> None:
 
     # error: type error
     ent["name"] = "Sample Inc., Open-Science department, data management unit"
-    ent["email"] = ".contact@example.com"
+    ent["email"] = ".test@example.com"
     ent["telephone"] = 12345678901
     with pytest.raises(PropsError):
         ent.check_props()
@@ -55,16 +56,38 @@ def test_check_props() -> None:
     with pytest.raises(PropsError):
         ent.check_props()
 
-    # error: @id doesn't match email
-    ent["email"] = "contact@example.com"
-    with pytest.raises(PropsError):
-        ent.check_props()
-
     # no error occurs with correct property value
     ent["email"] = "test@example.com"
     ent.check_props()
 
 
 def test_validate() -> None:
-    # TO BE UPDATED
-    pass
+    crate = ROCrate()
+    contact = ContactPoint("#mailto:test@example.com")
+
+    # error: email is required
+    with pytest.raises(EntityError):
+        contact.validate(crate)
+
+    contact["email"] = "notmatch@example.com"
+    # error: email is not the same as @id
+    with pytest.raises(EntityError):
+        contact.validate(crate)
+
+    contact["email"] = "test@example.com"
+    # no error occurs
+    contact.validate(crate)
+
+    contact["@id"] = "#callto:09012345678"
+    # error: telephone is required
+    with pytest.raises(EntityError):
+        contact.validate(crate)
+
+    contact["telephone"] = "08012345678"
+    # error: telephone is not the same as @id
+    with pytest.raises(EntityError):
+        contact.validate(crate)
+
+    contact["telephone"] = "09012345678"
+    # no error occurs
+    contact.validate(crate)

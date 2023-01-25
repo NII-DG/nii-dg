@@ -3,7 +3,8 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
+from nii_dg.error import EntityError, PropsError
+from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import Organization
 
 
@@ -59,5 +60,22 @@ def test_check_props() -> None:
 
 
 def test_validate() -> None:
-    # TO BE UPDATED
-    pass
+    crate = ROCrate()
+    org = Organization("https://ror.org/04ksd4g47", {"name": "NII"})
+
+    # error: name is not the same as the name registered in ROR
+    with pytest.raises(EntityError):
+        org.validate(crate)
+
+    # no error occurs with registered name
+    org["name"] = "National Institute of Informatics"
+    org.validate(crate)
+
+    org["@id"] = "https://example.com/organization"
+    # error: not accessible URL
+    with pytest.raises(EntityError):
+        org.validate(crate)
+
+    # no error occurs with accessible URL
+    org["@id"] = "https://example.com"
+    org.validate(crate)

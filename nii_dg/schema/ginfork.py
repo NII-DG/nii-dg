@@ -46,6 +46,9 @@ class GinMonitoring(ContextualEntity):
         # TODO: impl.
         validation_failures = EntityError(self)
 
+        if self["about"] != crate.root:
+            validation_failures.add("about", f"The value of this property MUST be the RootDataEntity {crate.root}.")
+
         sum = sum_file_size(self["contentSize"], crate.get_by_entity_type(File))
         if sum > int(self["contentSize"][:-2]):
             validation_failures.add("contentSize", "The total file size of ginfork.File is larger than the defined size.")

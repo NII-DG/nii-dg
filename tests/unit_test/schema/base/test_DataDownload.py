@@ -3,7 +3,8 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
+from nii_dg.error import EntityError, PropsError
+from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import DataDownload
 
 
@@ -64,5 +65,13 @@ def test_check_props() -> None:
 
 
 def test_validate() -> None:
-    # TO BE UPDATED
-    pass
+    crate = ROCrate()
+    url = DataDownload("https://example.com/url")
+
+    # error: not accessible URL
+    with pytest.raises(EntityError):
+        url.validate(crate)
+
+    # no error occurs with accessible URL
+    url["@id"] = "https://example.com"
+    url.validate(crate)
