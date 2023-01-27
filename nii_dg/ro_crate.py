@@ -127,7 +127,7 @@ class ROCrate():
         Dump the RO-Crate to the specified path.
         """
         with Path(path).resolve().open("w") as f:
-            json.dump(self.as_jsonld(), f, width=1000, indent=2,)
+            json.dump(self.as_jsonld(), f, indent=2,)
 
     def validate(self) -> None:
         governance_error = GovernanceError()

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import os
+from typing import Any
+
 import pytest  # noqa: F401
 
 from nii_dg.error import (CrateError, GovernanceError,
@@ -134,9 +137,20 @@ def test_check_existence_of_entity() -> None:
     crate.check_duplicate_entity()
 
 
-def test_dump() -> None:
-    # TODO
-    pass
+@pytest.fixture  # type:ignore
+def tmp_file() -> Any:
+    with open("tmp.json", "x"):
+        pass
+    yield "tmp.json"
+    os.remove("tmp.json")
+
+
+def test_dump(tmp_file: str) -> None:
+    crate = ROCrate()
+    crate.root["name"] = "test"
+
+    # no error
+    crate.dump(tmp_file)
 
 
 def test_validate() -> None:
