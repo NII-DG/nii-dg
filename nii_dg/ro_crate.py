@@ -58,6 +58,19 @@ class ROCrate():
             else:
                 raise UnexpectedImplementationError("Invalid entity type")
 
+    def delete(self, entity: Entity) -> None:
+        if entity not in self.get_all_entities():
+            raise UnexpectedImplementationError(f"Entity {entity} is not included in this crate.")
+
+        if isinstance(entity, DefaultEntity):
+            self.default_entities.remove(entity)
+        elif isinstance(entity, DataEntity):
+            self.data_entities.remove(entity)
+        elif isinstance(entity, ContextualEntity):
+            self.contextual_entities.remove(entity)
+        else:
+            raise UnexpectedImplementationError("Invalid entity type")
+
     def get_by_id(self, entity_id: str) -> List[Entity]:
         entity_list: List[Entity] = []
         for ent in self.get_all_entities():
