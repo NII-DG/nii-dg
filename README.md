@@ -49,102 +49,174 @@ Document として [./docs/README.md](./docs/README.md) を参照。
 研究データ (実データやメタデータ) のパッケージング、つまり RO-Crate 化を行う。
 そのため、入力としては、研究データとそのメタデータ、出力としては RO-Crate (ro-crate-metadata.json) を生成する。
 
-Packaging におけるインタフェースとして:
+Packaging には、Python library `nii_dg` を用いる。
 
-1. Python library
-2. CLI
-
-が用意されている。
-
-#### Usage: 1.1. Packaging with Python library
-
-Python library の使用例としては、以下のようになる。
+Minimal example:
 
 ```python
-import nii_dg
+from nii_dg.ro_crate import ROCrate
 
-# Generate RO-Crate object [TODO: update this example, now it's not working]
-ro_crate = nii_dg.RO_Crate()
-
-# Add file and author
-file = nii_dg.File('path/to/file')
-author = nii_dg.Author('John Doe', affiliation='NII')
-file.created_by = author
-ro_crate.add_file(file)
-ro_crate.add_author(author)
-
-# Generate RO-Crate metadata
-ro_crate.dump('ro-crate-metadata.json')
+ro_crate = ROCrate()
+ro_crate.root["name"] = "Sample RO-Crate"
+ro_crate.dump("ro-crate-metadata.json")
 ```
 
-また、後述 (at Usage: 1.2.) する JSON ファイルからの生成にも対応している。
-
-```python
-import nii_dg
-
-# Generate RO-Crate object from JSON file
-ro_crate = nii_dg.RO_Crate.from_json('path/to/input.json')
-ro_crate.dump('ro-crate-metadata.json')
-```
-
-#### Usage: 1.2. Packaging with CLI
-
-[TODO: そもそも CLI は必要か？]
-[TODO: JSON からの生成って言っているけど、なんか二度手間感あるのでは？]
-
-CLI では、JSON ファイルからの生成に対応している。
-
-```bash
-$ nii-dg package path/to/input.json
-```
-
-入力となる JSON ファイルの例としては、以下のようなものがある。
+出力として:
 
 ```json
 {
-  "title": "Sample RO-Crate",
-  "author": [
+  "@context": "https://w3id.org/ro/crate/1.1/context",
+  "@graph": [
     {
-      "name": "John Doe",
-      "affiliation": "NII"
-    }
-  ],
-  "files": [
+      "@id": "./",
+      "@type": "Dataset",
+      "hasPart": [],
+      "name": "Sample RO-Crate",
+      "dateCreated": "2023-01-27T04:16:02.470+00:00",
+      "@context": "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/RootDataEntity.json"
+    },
     {
-      "path": "path/to/file",
-      "created_by": "John Doe"
+      "@id": "ro-crate-metadata.json",
+      "@type": "CreativeWork",
+      "conformsTo": {
+        "@id": "https://w3id.org/ro/crate/1.1"
+      },
+      "about": {
+        "@id": "./"
+      }
     }
   ]
 }
 ```
 
-これらの input.json には、研究メタデータの他、DMP(データマネジメントプラン)の情報が含まれている。
+より詳細な説明として、以下の項目を参照。
 
-- DMP の形式
-- プロジェクト名
-- 研究資金提供機関
-- リポジトリ
-- データ作成者
-- データ管理機関
-- データ管理者
-- DMP の記載内容
+また、使用例として、以下が用意されている。
 
-実際の仕様については、[詳細ドキュメント](https://github.com/ascade/nii-dg/blob/9d56cba94da139bf5ec23d5432d48dbafc9d6097/tests/README.md) を参照。
-また、サンプルとして、[サンプル](https://github.com/ascade/nii-dg/blob/f0f76213d5365ab5ed43902028060a335b8edb34/tests/common_sample.json) を用意している。
+- [./tests/example.py](./tests/example.py)
+
+#### RootDataEntity について
+
+上述の Minimal example における 2 つの Entity は、RO-Crate における [RootDataEntity](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html) である。RootDataEntity は以下の 2 つからなる:
+
+- `@type`: `CreativeWork`
+  - RO-Crate metadata file に対する自己記述的な Entity
+  - RO-Crate 自体の様々な metadata が記述される
+  - この metadata の schema は、[./schema/docs/base.md](./schema/docs/base.md) を参照
+- `@type`: `Dataset`
+  - RO-Crate が持つ file を取りまとめる Entity
+  - Data Entity (e.g., `File`, `Dataset`) が `hasPart` として自動的に追加される
+
+この 2 つの Entity は、`ROCrate` インスタンスの生成時に自動的に生成される。`ROCrate.root` により、`CreativeWork` に対応する Entity にアクセスできる。
+
+#### 各 Entity の作成と RO-Crate への追加
+
+Entity は、各 Entity クラスを用いて生成する。
+
+```python
+from nii_dg.schema.base import File
+from nii_dg.schema.base import Organization
+
+file = File("https://example.com/path/to/file", props={"name": "Example file"})
+organization = Organization("https://example.com/path/to/organization", props={"name": "Example organization"})
+
+# 生成後、Entity を ROCrate に追加する
+from nii_dg.ro_crate import ROCrate
+crate = ROCrate()
+crate.add(file, organization)
+```
+
+これらの Entity クラスにおいて、第一引数として `@id` が渡される。また、`props` として、Entity に対する metadata が渡される。
+
+これらの `props` は、Python class の `__set__` として、設定することも可能である。
+
+```python
+file["name"] = "Example file"
+organization["name"] = "Example organization"
+
+# entity を set する場合、`@id` として set される
+crate.root["funder"] = [organization]
+
+# -> {"funder": [{"@id": "https://example.com/path/to/organization"}]}
+```
+
+`base` 以外の schema の Entity においても、同様の操作が可能である。
+
+```python
+from nii_dg.schema.amed import File as AmedFile
+amed_file = AmedFile("https://example.com/path/to/file", props={"name": "Example amed file"})
+```
+
+#### Entity における同一 `@id` の取り扱い
+
+複数の schema を利用する場合、同一の `@id` を持つ Entity が存在する可能性がある。
+これらの Entity は、JSON-LD における別ノードとして扱われるが、内部的には別 `@context` を持つため、別々の Entity として扱われる。
+
+```python
+from nii_dg.schame.amed import File as AmedFile
+from nii_dg.schema.ginfork import File as GinforkFile
+
+amed_file = AmedFile("path/to/file.txt", props={"name": "Example amed file"})
+ginfork_file = GinforkFile("path/to/file.txt", props={"name": "Example ginfork file"})
+```
+
+この場合、JSON-LD において、
+
+```json
+{
+  ...,
+  "@graph": [
+    {
+      "@id": "path/to/file.txt",
+      "@context": "https://example.com/path/to/context/amed.jsonld",
+      "name": "Example amed file"
+    },
+    {
+      "@id": "path/to/file.txt",
+      "@context": "https://example.com/path/to/context/ginfork.jsonld",
+      "name": "Example ginfork file"
+    }
+  ]
+}
+```
+
+のように表現される。metadata の properties などは、`@context` により別の prop として扱われるため (e.g., `amed:name`, `ginfork:name`)、同一の `@id` が存在しても、それぞれ別の metadata が保持される。
+
+#### Entity 単位での型検査と property の検証
+
+本ライブラリでは、JSON-LD 生成時に (`ROCrate.dump`)、Entity が持つ各 prop の型検査が行われる。
+この処理は、別途 `entity.check_props()` として、Entity 単位で行うことも可能である。
 
 ### Usage: 3. Validation
 
-[TODO: not written yet]
+Validation として、`ROCrate.validate()` が用意されている。
 
-- with Python library
-  - `nii-dg.validate(path/to/ro-crate-metadata.json)`
-  - `nii-dg.validate(path/to/ro-crate-metadata.json, rules=<json|string?>)`
-- with CLI
-  - `nii-dg validate path/to/ro-crate-metadata.json`
-  - `nii-dg validate --rules <json|string?> path/to/ro-crate-metadata.json`
-- with REST API
-  - `POST /validate { "ro_crate": <json|string?>, "rules": <json|string?> }`
-  - [TODO: write about authentication]
+```python
+from nii_dg.ro_crate import ROCrate
+crate = ROCrate(from_jsonld="path/to/ro-crate-matadata.json")
+crate.validate()
+```
+
+仕様として、:
+
+- この処理は、各 Entity の `entity.validate()` 処理を呼び出すことにより、行われる
+  - Validation rule は、自然言語では各 schema file (YAML file) にて、実際の処理としては `entity.validate()` にて、定義されている
+- Validation 処理は、最終的に各 entity の結果を取りまとめた後、まとめて結果が表示される
+
+Packaging における型検査 (`entity.check_props()`) と、Validation における検証 (`entity.validate()`) は、基本的に異なる処理である。それぞれの処理の違いとして、:
+
+- `entity.check_props()`:
+  - 各 prop の型検査を行う
+  - つまり、str に対して int を設定するなど、型の不一致を検出する
+  - また、required の prop が設定されているか、などの検査を行う
+- `entity.validate()`:
+  - より高度な検証を行う
+  - 各 prop の「値」が正しいかを検証する
+  - 複数の Entity 間の relation を用いてこれらの値の検証を行う
+
+#### Using REST API Server
+
+[TODO: not written yet]
 
 ## Development
 

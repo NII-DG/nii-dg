@@ -1,5 +1,8 @@
 # NII-DG: Schema
 
+- 研究データパッケージングのための Schema 定義として YAML ファイルと Python モジュールを記述し、これを用いて、データ型やフィールドの required 属性など検証を自動的に行う。
+- YAML ファイルに記述した Schema 定義を元に、閲覧用ドキュメントとしての Markdown ファイルを生成する。
+
 ## How to refer documents
 
 - md の見方
