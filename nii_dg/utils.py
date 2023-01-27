@@ -7,7 +7,7 @@ import mimetypes
 import re
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
-                    Optional, Type, TypedDict, Union)
+                    Optional, TypedDict, Union)
 from urllib.parse import quote, urlparse
 
 import requests
@@ -19,7 +19,7 @@ from nii_dg.error import (GovernanceError, PropsError,
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
-    from nii_dg.ro_crate import ROCrate
+    from nii_dg.ro_crate import ROCrate  # noqa: F401
 
 
 def github_repo() -> str:
