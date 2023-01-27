@@ -38,6 +38,8 @@ $ docker run -it --rm ghcr.io/nii-dg/nii-dg:latest bash
 2. Packaging: パッケージング (RO-Crate 化)
 3. Validation: 検証
 
+![System architecture](https://user-images.githubusercontent.com/26019402/215007490-6f7b10b1-4e0d-4286-b7c6-6882a9c32948.png)
+
 ### Usage: 1. Schema definition
 
 Document として [./docs/README.md](./docs/README.md) を参照。
