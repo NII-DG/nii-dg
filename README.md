@@ -4,8 +4,8 @@
 
 を達成するため、本ライブラリは以下の機能を提供する。
 
-- 研究データ (実データやメタデータ) の標準的なパッケージング (RO-Crate 化)
-- 研究データの検証ルールの定義
+- 研究データ管理のための Metadata Schema とその検証ルールの定義
+- 研究データのパッケージング (RO-Crate 化)
 - 研究データの検証
 
 ## Installation
@@ -27,22 +27,25 @@ $ python3 -m pip install .
 Docker を用いた実行も可能。
 
 ```bash
-$ docker build -t nii-dg .
-$ docker run -it --rm -v $(pwd):/app nii-dg
+$ docker run -it --rm ghcr.io/nii-dg/nii-dg:latest bash
 ```
 
 ## Usage
 
 上記した通り、本ライブラリは 3 つの機能に分かれている。
 
-1. Packaging: パッケージング (RO-Crate 化)
-2. Rules: 検証ルールの定義
+1. Schema definition: Metadata Schema とその検証ルールの定義
+2. Packaging: パッケージング (RO-Crate 化)
 3. Validation: 検証
 
-### Usage: 1. Packaging
+### Usage: 1. Schema definition
+
+Document として [./docs/README.md](./docs/README.md) を参照。
+
+### Usage: 2. Packaging
 
 研究データ (実データやメタデータ) のパッケージング、つまり RO-Crate 化を行う。
-そのため、入力としては、研究データとそのメタデータ、出力としては RO-Crate (ro-crate-metadata.json) が生成される。
+そのため、入力としては、研究データとそのメタデータ、出力としては RO-Crate (ro-crate-metadata.json) を生成する。
 
 Packaging におけるインタフェースとして:
 
@@ -126,17 +129,6 @@ $ nii-dg package path/to/input.json
 
 実際の仕様については、[詳細ドキュメント](https://github.com/ascade/nii-dg/blob/9d56cba94da139bf5ec23d5432d48dbafc9d6097/tests/README.md) を参照。
 また、サンプルとして、[サンプル](https://github.com/ascade/nii-dg/blob/f0f76213d5365ab5ed43902028060a335b8edb34/tests/common_sample.json) を用意している。
-
-### Usage: 2. Rules
-
-検証ルールとして、
-
-- 共通スキーマ: 全ての分野における検証ルール
-- 分野別スキーマ: それぞれの分野における検証ルール and それぞれのプラットフォームごとの検証ルール
-
-がある。
-
-[TODO: Rule 一覧取得]
 
 ### Usage: 3. Validation
 

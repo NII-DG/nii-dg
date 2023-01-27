@@ -1,35 +1,46 @@
 # NII-DG: Schema
 
 ## How to refer documents
-- mdの見方
+
+- md の見方
+
 ```
 1. 自分が利用したいルールの.mdを探す
 2. 該当.md内にあるエンティティはその.md内定義を参照する
 3. 利用したいエンティティが該当.mdにない場合、base.mdを参照する
 4. base.mdに利用したいエンティティがない場合もしくは定義が一致しない場合、新たにエンティティ定義を追加しそれを参照する
 ```
+
 ### example
-DMPとしてAMEDを利用する場合
+
+DMP として AMED を利用する場合
+
 - 1. schema/docs/から`amed.md`を探す
 - 2. エンティティ定義`DMPMetadata`と`DMP`, `File`が見つかる
-- 3. `creator`propertyを追加したいが、`Person`エンティティ定義がないため`base.md`を探す
+- 3. `creator`property を追加したいが、`Person`エンティティ定義がないため`base.md`を探す
 - 4. `base.md`内に`Person`エンティティ定義があるため、これを採用する
 
 ## How to add new schema
-- Default Entityについては拡張不可。
+
+- Default Entity については拡張不可。
 - 類似エンティティを拡張する場合...同一スキーマのクラスを継承
+
 ```
 1. スキーマ定義のyamlに定義を追加する。この時、参照する既存エンティティの部分をcopyした上で修正を加える。
 2. validateして.mdを更新。 schema/script/generate_docs.py を利用
 3. nii_dg/schema配下にの対応する.pyにクラスを追加する。この時基底クラスとして参照した既存エンティティを継承する。
 ```
-- 類似エンティティを拡張する場合...baseのクラスを継承
+
+- 類似エンティティを拡張する場合...base のクラスを継承
+
 ```
 1. 新たなスキーマ定義となるyamlを書く。この時、base.ymlから参照する既存エンティティの部分をcopyした上で修正を加える。
 2. validateして.mdを生成。 schema/script/generate_docs.py を利用
 3. 対応する.pyをnii_dg/schema配下に作成しクラスを追加する。この時基底クラスとしてbase.ymlからcopyした既存エンティティを継承する。base.yml以外の別スキーマからの継承は不可。
 ```
+
 - 類似のエンティティが存在しない場合
+
 ```
 1. 新たなスキーマ定義となるyamlを書く。
 2. validateして.mdを生成。 schema/script/generate_docs.py を利用
@@ -37,13 +48,14 @@ DMPとしてAMEDを利用する場合
 ```
 
 ### How to create .yml
+
 - Place the created YAML file under the directory `schema/`.
 
 ```yaml
 EntityName1:
   description: description of the entity, EntityName1
   props:
-    '@id':
+    "@id":
       expected_type: type_in_python
       example: exampleValue
       description: Format that must be followed.
@@ -67,8 +79,9 @@ EntityName1:
   - The `required` field MUST indicate whether this property is required. The value MUST be either "Required.", "Optional." or a statement description e.g. "Required when you are data manager.". This field is used to verify the presence of a property based on the value "Required.".
 
 When `UNION` type is used in expected_type:
+
 - MUST be used with `LIST`, e.g. `LIST[UNION[Person, Organization]]`.
-- MUST be used with Entity type.　When you want to line up str or int, expected_type MUST be `str` and make it a single string, separated by commas, e.g. `"cat, dog, pig"`.
+- MUST be used with Entity type.　 When you want to line up str or int, expected_type MUST be `str` and make it a single string, separated by commas, e.g. `"cat, dog, pig"`.
 - The order in example MUST be aligned with the order in Union. For example, when expected_type is `LIST[UNION[Person, Organization]]`, example MUST be in order of Person to Organization, like `[{"@id":"#John Doe"},{"@id":"Harvard University"}]`.
 
 ## Memo
@@ -120,18 +133,20 @@ amed.json
 
 2. オレオレ yaml から、md を生成 (自動生成)
 
-3. context 用の json-ld を extityごとに自動生成する。この時、語彙定義のurl として、 2.で自動生成したmd を参照する.
+3. context 用の json-ld を extity ごとに自動生成する。この時、語彙定義の url として、 2.で自動生成した md を参照する.
 
 ### やりたいこと
 
 生成した json ld の entity のなかの context に
+
 ```json
 {
-    "@context": "https://github.com/ascade/nii-dg/schame/context.json/Common/File",
-    "@id": "sample/file.txt",
-    "@type": "File"
+  "@context": "https://github.com/ascade/nii-dg/schame/context.json/Common/File",
+  "@id": "sample/file.txt",
+  "@type": "File"
 }
 ```
+
 とかいたら、
 
 ```
@@ -194,8 +209,8 @@ https://github.com/ascade/nii-dg/schema/context/common/file.json
 - オレオレ json (schema 定義の json)
   - 2 パターン
     - ~~common.json を継承する~~
-    - entity単位でcommon.json を cp する
-      - entity が丸々baseと同じなら省略可能
+    - entity 単位で common.json を cp する
+      - entity が丸々 base と同じなら省略可能
 - python file (schema 定義を反映した rule set / used by generator and validator)
   - 多分こっちの実装も上のパターンと同じにしたほうがなるべく良い
 
@@ -261,9 +276,9 @@ base からの拡張の usecase
   - 参考:[Web Page](https://www.meti.go.jp/policy/innovation_policy/datamanagement.html)
 
 ## memo 12/16
-- ディレクトリトラバースするのか?
-    - しない
 
+- ディレクトリトラバースするのか?
+  - しない
 
 ## vocabulary
 
