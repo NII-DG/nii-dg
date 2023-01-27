@@ -47,7 +47,7 @@ $ docker run -it --rm ghcr.io/NII-DG/nii-dg:latest bash
 
 ### Usage: 1. Schema definition
 
-Document として [./docs/README.md](./docs/README.md) を参照。
+Document として [./schema/README.md](./schema/README.md) を参照。
 
 ### Usage: 2. Packaging
 
