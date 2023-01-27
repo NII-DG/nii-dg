@@ -201,9 +201,12 @@ class Organization(ContextualEntity):
         validation_failures = EntityError(self)
 
         if self.id.startswith("https://ror.org/"):
-            ror_namelist = get_name_from_ror(self.id[16:])
-            if self["name"] not in ror_namelist:
-                validation_failures.add("name", f"The value MUST be same as the registered name in ROR. See {self.id}.")
+            try:
+                ror_namelist = get_name_from_ror(self.id[16:])
+                if self["name"] not in ror_namelist:
+                    validation_failures.add("name", f"The value MUST be same as the registered name in ROR. See {self.id}.")
+            except ValueError as e:
+                validation_failures.add("@id", str(e))
         else:
             try:
                 access_url(self.id)
@@ -409,9 +412,12 @@ class HostingInstitution(Organization):
         validation_failures = EntityError(self)
 
         if self.id.startswith("https://ror.org/"):
-            ror_namelist = get_name_from_ror(self.id[16:])
-            if self["name"] not in ror_namelist:
-                validation_failures.add("name", f"The value MUST be same as the registered name in ROR. See {self.id}.")
+            try:
+                ror_namelist = get_name_from_ror(self.id[16:])
+                if self["name"] not in ror_namelist:
+                    validation_failures.add("name", f"The value MUST be same as the registered name in ROR. See {self.id}.")
+            except ValueError as e:
+                validation_failures.add("@id", str(e))
         else:
             try:
                 access_url(self.id)
