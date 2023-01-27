@@ -220,13 +220,45 @@ Packaging における型検査 (`entity.check_props()`) と、Validation にお
 
 ## Development
 
-[TODO: write for docker development environment]
-[TODO: write about linting, testing, etc.]
+開発環境として Docker を利用する。
+
+```bash
+$ docker compose -f compose.dev.yml up -d --build
+$ docker compose -f compose.dev.yml exec app bash
+
+# in container
+$ something you want to do
+```
+
+### Linter
+
+Linter として、`flake8`, `isort`, `mypy` をそれぞれ用いている。
+
+```bash
+$ bash ./tests/lint_and_style_check/flake8.sh
+$ bash ./tests/lint_and_style_check/isort.sh
+$ bash ./tests/lint_and_style_check/mypy.sh
+
+$ bash ./tests/lint_and_style_check/run_all.sh
+```
+
+また、それぞれの GitHub actions として、以下のように設定されている。
+
+- [flake8](./.github/workflows/flake8.yml)
+- [isort](./.github/workflows/isort.yml)
+- [mypy](./.github/workflows/mypy.yml)
 
 ### Testing
 
-[TODO: Unit test]
-[TODO: Integration test for CLI, REST API]
+`pytest` を用いた Unit Test が用意されている。
+
+```bash
+$ pytest -s ./tests/unit_test
+```
+
+また、GitHub actions として、以下のように設定されている。
+
+- [pytest](./.github/workflows/pytest.yml)
 
 ## License
 
