@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
+import datetime
 from typing import Any, List, Literal, Union
 
 import pytest  # noqa: F401
@@ -263,7 +264,7 @@ def test_access_url() -> None:
     access_url("https://example.com/")
 
     # error
-    with pytest.raises(GovernanceError):
+    with pytest.raises(ValueError):
         access_url("https://www.nii.ac.jp/not_existing")
 
 
@@ -278,6 +279,9 @@ def test_verify_is_past_date() -> None:
     ent["date"] = "9999-01-01"
     assert verify_is_past_date(ent, "date") is False
 
+    ent["date"] = str(datetime.date.today())
+    assert verify_is_past_date(ent, "date")
+
 
 def test_get_name_from_ror() -> None:
     assert get_name_from_ror("04ksd4g47") == ["Kokuritsu Jōhōgaku Kenkyūjo", "National Institute of Informatics"]
@@ -288,5 +292,8 @@ def test_get_name_from_ror() -> None:
 
 
 def test_sum_file_size() -> None:
-    # TODO:impl
-    pass
+    file_1 = BaseFile("1", {"contentSize": "15GB"})
+    file_2 = BaseFile("2", {"contentSize": "10GB"})
+
+    assert sum_file_size("GB", [file_1, file_2]) == 25
+    assert sum_file_size("B", []) == 0

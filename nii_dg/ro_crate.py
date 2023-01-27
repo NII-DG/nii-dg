@@ -13,7 +13,8 @@ from typing import Any, Dict, List, Optional, Type
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
                            ROCrateMetadata)
-from nii_dg.error import CrateError, EntityError, GovernanceError
+from nii_dg.error import (CrateError, EntityError, GovernanceError,
+                          UnexpectedImplementationError)
 from nii_dg.schema import RootDataEntity
 
 
@@ -33,9 +34,9 @@ class ROCrate():
     For the details of RO-Crate, see https://www.researchobject.org/ro-crate/.
     """
 
-    default_entities: List[DefaultEntity] = []
-    data_entities: List[DataEntity] = []
-    contextual_entities: List[ContextualEntity] = []
+    default_entities: List[DefaultEntity]
+    data_entities: List[DataEntity]
+    contextual_entities: List[ContextualEntity]
 
     root: RootDataEntity
 
@@ -43,19 +44,35 @@ class ROCrate():
 
     def __init__(self, from_jsonld: Optional[Dict[str, Any]] = None) -> None:
         self.root = RootDataEntity()
+        self.default_entities = [self.root, ROCrateMetadata(root=self.root)]
+        self.data_entities = []
+        self.contextual_entities = []
         self.root["hasPart"] = self.data_entities
-        self.add(self.root, ROCrateMetadata(root=self.root))
+        # self.add(self.root, ROCrateMetadata(root=self.root))
 
     def add(self, *entities: Entity) -> None:
         for entity in entities:
             if isinstance(entity, DefaultEntity):
-                self.default_entities.append(entity)
-            elif isinstance(entity, DataEntity):
+                raise UnexpectedImplementationError(f"DefaultEntity {self} can't be added to the crate.")
+            if isinstance(entity, DataEntity):
                 self.data_entities.append(entity)
             elif isinstance(entity, ContextualEntity):
                 self.contextual_entities.append(entity)
             else:
-                raise EntityError("Invalid entity type")
+                raise UnexpectedImplementationError("Invalid entity type")
+
+    def delete(self, entity: Entity) -> None:
+        if entity not in self.get_all_entities():
+            raise UnexpectedImplementationError(f"Entity {entity} is not included in this crate.")
+
+        if isinstance(entity, DefaultEntity):
+            raise UnexpectedImplementationError(f"DefaultEntity {self} can't be removed from the crate.")
+        if isinstance(entity, DataEntity):
+            self.data_entities.remove(entity)
+        elif isinstance(entity, ContextualEntity):
+            self.contextual_entities.remove(entity)
+        else:
+            raise UnexpectedImplementationError("Invalid entity type")
 
     def get_by_id(self, entity_id: str) -> List[Entity]:
         entity_list: List[Entity] = []
@@ -99,7 +116,7 @@ class ROCrate():
             for val in ent.values():
                 if isinstance(val, Entity) and val not in self.get_all_entities():
                     raise CrateError(f"The entity {val} is included in entity {ent}, but not included in the crate.")
-                elif isinstance(val, list):
+                if isinstance(val, list):
                     # expected: [Any], [Entity]
                     for ele in [v for v in val if isinstance(v, Entity)]:
                         if ele not in self.get_all_entities():
@@ -114,6 +131,7 @@ class ROCrate():
 
     def validate(self) -> None:
         governance_error = GovernanceError()
+
         for ent in self.get_all_entities():
             if isinstance(ent, ROCrateMetadata):
                 continue
@@ -121,5 +139,6 @@ class ROCrate():
                 ent.validate(self)
             except EntityError as e:
                 governance_error.add_error(e)
-        if len(governance_error.errors) > 0:
+
+        if len(governance_error.entity_errors) > 0:
             raise governance_error

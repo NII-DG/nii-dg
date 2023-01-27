@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
@@ -13,7 +13,6 @@ class UnexpectedImplementationError(Exception):
     In addition, users can generate a RO-Crate by using this library.
     Therefore, this error is raised when the implementation is not as expected.
     """
-    pass
 
 
 class PropsError(Exception):
@@ -22,7 +21,36 @@ class PropsError(Exception):
     Raised at Entity dump time.
     This validation is performed by the check_props() method (this method is called in dump()) of each subclass.
     """
-    pass
+
+
+class EntityError(Exception):
+    """\
+    Error class for entity (checking for entities in crate).
+    Raised at Data Governance validation time at Entity validate() method.
+    This validation is called by RO-Crate validate() method.
+    """
+
+    def __init__(self, entity: "Entity") -> None:
+        self.entity = entity
+        self.message_dict: Dict[str, str] = {}
+
+    def __str__(self) -> str:
+        return str({repr(self.entity): self.message_dict})
+
+    def __repr__(self) -> str:
+        return str({repr(self.entity): self.message_dict})
+
+    def add(self, prop: str, message: str) -> None:
+        self.message_dict.setdefault(prop, message)
+
+
+class CrateError(Exception):
+    """\
+    Error class for rocrate (checking for crate).
+    Raised at ROCrate dump time and Data Governance validation time.
+    The dump is performed by the check_entities() method (this method is called in dump()) of ROCrate class.
+    The validation is performed by the validate() method of each subclass.
+    """
 
 
 class GovernanceError(Exception):
@@ -37,44 +65,14 @@ class GovernanceError(Exception):
     - また、まとめられた error list を summarize するメソッドもほしい
     """
 
-    entityErrors: List[EntityError] = []
+    def __init__(self, entity_errors: Optional[List[EntityError]] = None) -> None:
+        if entity_errors:
+            self.entity_errors = entity_errors
+        else:
+            self.entity_errors = []
 
-    def __init__(self, entityErrors: List[EntityError] = []) -> None:
-        super().__init__("Governance error occurred")
-        self.entityErrors = entityErrors
+    def __str__(self) -> str:
+        return "Validation failures:" + str(self.entity_errors)
 
-    def add_error():
-        pass
-
-    # def __init__(self, entity: "Entity") -> None:
-    #     self.entity = entity
-    #     self.failure_dict: Dict[str, str] = {}
-
-    # def __str__(self) -> str:
-    #     return str({repr(self.entity): self.failure_dict})
-
-    # def add(self, prop: str, message: str) -> None:
-    #     self.failure_dict.setdefault(prop, message)
-
-
-class EntityError(Exception):
-    """\
-    Error class for entity (checking for entities in crate).
-    Raised at Entity addition time.
-    The validation is performed by the validate() method of ROCrate class and each subclass.
-    The addition is performed by the add() method of ROCrate class.
-    """
-    pass
-
-
-class CrateError(Exception):
-    """\
-    Error class for rocrate (checking for crate).
-    Raised at ROCrate dump time.
-    This validation is performed by the check_entities() method (this method is called in dump()) of ROCrate class.
-    """
-    pass
-    # def __init__(self, message: str, rocrate: "ROCrate", entity: "Entity" = None):
-    #     super().__init__(message)
-    #     self.rocrate = rocrate
-    #     self.entity = entity
+    def add_error(self, entity_error: EntityError) -> None:
+        self.entity_errors.append(entity_error)

@@ -348,7 +348,7 @@ def access_url(url: str) -> None:
         res.raise_for_status()
     except requests.HTTPError as httperr:
         msg = str(httperr)
-        raise GovernanceError(f"URL is not accessible. {msg}") from None
+        raise ValueError(f"URL is not accessible. {msg}") from None
     except Exception as err:
         raise UnexpectedImplementationError from err
 
@@ -375,7 +375,7 @@ def get_name_from_ror(ror_id: str) -> List[str]:
     return name_list
 
 
-def sum_file_size(size_unit: str, rocrate: "ROCrate", entity: Type["Entity"]) -> float:
+def sum_file_size(size_unit: str, entity_list: List["Entity"]) -> float:
     """
     Sum size of file entities in the specified unit.
     """
@@ -387,10 +387,7 @@ def sum_file_size(size_unit: str, rocrate: "ROCrate", entity: Type["Entity"]) ->
     except ValueError as err:
         raise UnexpectedImplementationError from err
 
-    for ent in rocrate.get_by_entity_type(entity):
-        if ent["dmpDataNumber"] != entity:
-            continue
-
+    for ent in entity_list:
         if ent["contentSize"][-2:] in units:
             file_unit = units.index(ent["contentSize"][-2:])
             file_size = int(ent["contentSize"][:-2])

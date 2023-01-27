@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
-from nii_dg.error import GovernanceError, PropsError
+from nii_dg.error import CrateError, EntityError, PropsError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import Person as BasePerson
@@ -52,10 +52,25 @@ class DMPMetadata(ContextualEntity):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self, rocrate: ROCrate) -> None:
-        if "funder" in rocrate.root.keys() and self not in rocrate.root["funder"]:
-            organization = self["funder"]
-            raise GovernanceError(f"The entity {organization} is funder property of {self}, but not included in the list of funder property of RootDataEntity.")
+    def validate(self, crate: ROCrate) -> None:
+        validation_failures = EntityError(self)
+
+        if self["about"] != crate.root:
+            validation_failures.add("about", f"The value of this property MUST be the RootDataEntity {crate.root}.")
+
+        organization = self["funder"]
+        if "funder" in crate.root.keys() and organization not in crate.root["funder"]:
+            validation_failures.add("funder", f"The entity {organization} is not included in the funder property of RootDataEntity.")
+
+        if len(self["hasPart"]) != len(crate.get_by_entity_type(DMP)):
+            diff = []
+            for dmp in crate.get_by_entity_type(DMP):
+                if dmp not in self["hasPart"]:
+                    diff.append(dmp)
+            validation_failures.add("hasPart", f"There is an omission of DMP entity in the list: {diff}.")
+
+        if len(validation_failures.message_dict) > 0:
+            raise validation_failures
 
 
 class DMP(ContextualEntity):
@@ -95,41 +110,51 @@ class DMP(ContextualEntity):
         if verify_is_past_date(self, "availabilityStarts"):
             raise PropsError(f"The value of availabilityStarts property in {self} MUST be the date of future.")
 
-    def validate(self, rocrate: ROCrate) -> None:
+    def validate(self, crate: ROCrate) -> None:
+        validation_failures = EntityError(self)
+
+        dmp_metadata_ents = crate.get_by_entity_type(DMPMetadata)
+        if len(dmp_metadata_ents) == 0:
+            raise CrateError("Entity DMPMetadata MUST be required with DMP entity.")
+        dmp_metadata_ent = dmp_metadata_ents[0]
+
         if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
-            raise GovernanceError(f"An availabilityStarts property is required in {self}.")
+            validation_failures.add("availabilityStarts", "This property is required, but not found.")
+
+        if self["accessRights"] != "embargoed access" and "availabilityStarts" in self.keys():
+            validation_failures.add("availabilityStarts", "This property is not required.")
+
+        if verify_is_past_date(self, "availabilityStarts"):
+            validation_failures.add("availabilityStarts", "The value MUST be the date of future.")
 
         if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self.keys():
-            raise GovernanceError(f"An isAccessibleForFree property is required in {self}.")
+            validation_failures.add("isAccessibleForFree", "This property is required, but not found.")
 
         if self["accessRights"] == "open access" and "license" not in self.keys():
-            raise GovernanceError(f"A license property is required in {self}.")
+            validation_failures.add("license", "This property is required, but not found.")
 
-        dmp_metadata_ents = rocrate.get_by_entity_type(DMPMetadata)
-        if len(dmp_metadata_ents) == 0:
-            raise GovernanceError("DMPMetadata Entity MUST be required with DMP entity.")
-        dmp_metadata_ent = dmp_metadata_ents[0]
-        if self not in dmp_metadata_ent["hasPart"]:
-            raise GovernanceError(f"DMP entity {self} is not included in the list of hasPart property of {dmp_metadata_ent}.")
+        if "repository" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
+            validation_failures.add("repository", "This property is required, but not found.")
 
-        if "repository" not in self.keys():
-            # DMPMetadata entity must have the property instead of DMP entity
-            if "repository" not in dmp_metadata_ents[0].keys():
-                raise GovernanceError(f"A repository property is required in {self}.")
-
-        if self["accessRights"] == "open access" and "distribution" not in self.keys():
-            # DMPMetadata entity must have the property instead of DMP entity
-            if "distribution" not in dmp_metadata_ents[0].keys():
-                raise GovernanceError(f"A distribution property is required in {self}.")
+        if self["accessRights"] == "open access" and "distribution" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
+            validation_failures.add("distribution", "This property is required, but not found.")
 
         if "contentSize" in self.keys():
-            sum = sum_file_size(self["contentSize"][-2:], rocrate, File)
+            target_files = []
+            for ent in crate.get_by_entity_type(File):
+                if ent["dmpDataNumber"] == self:
+                    target_files.append(ent)
+
+            sum = sum_file_size(self["contentSize"][-2:], target_files)
 
             if self["contentSize"] != "over100GB" and sum > int(self["contentSize"][:-2]):
-                raise GovernanceError(f"The total file size included in DMP {self} is larger than the defined size.")
+                validation_failures.add("contentSize", "The total file size included in this DMP is larger than the defined size.")
 
             if self["contentSize"] == "over100GB" and sum < 100:
-                raise GovernanceError(f"The total file size included in DMP {self} is smaller than 100GB.")
+                validation_failures.add("contentSize", "The total file size included in this DMP is smaller than 100GB.")
+
+        if len(validation_failures.message_dict) > 0:
+            raise validation_failures
 
 
 class Person(BasePerson):
@@ -162,8 +187,16 @@ class Person(BasePerson):
         if self.type != self.entity_name:
             raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
 
-    def validate(self, rocrate: ROCrate) -> None:
-        access_url(self.id)
+    def validate(self, crate: ROCrate) -> None:
+        validation_failures = EntityError(self)
+
+        try:
+            access_url(self.id)
+        except ValueError as e:
+            validation_failures.add("@id", str(e))
+
+        if len(validation_failures.message_dict) > 0:
+            raise validation_failures
 
 
 class File(BaseFile):
@@ -202,7 +235,11 @@ class File(BaseFile):
         if verify_is_past_date(self, "sdDatePublished") is False:
             raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
 
-    def validate(self, rocrate: ROCrate) -> None:
-        if classify_uri(self, "@id") == "url":
-            if "sdDatePublished" not in self.keys():
-                raise GovernanceError(f"The property sdDatePublished MUST be included in {self}.")
+    def validate(self, crate: ROCrate) -> None:
+        validation_failures = EntityError(self)
+
+        if classify_uri(self, "@id") == "URL" and "sdDatePublished" not in self.keys():
+            validation_failures.add("sdDatePublished", "This property is required, but not found.")
+
+        if len(validation_failures.message_dict) > 0:
+            raise validation_failures

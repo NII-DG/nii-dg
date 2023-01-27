@@ -35,7 +35,7 @@ class Entity(TypedMutableMapping):
         self.update(props or {})
 
     def __setitem__(self, key: str, value: Any) -> None:
-        # TODO: @context, @id, @type は書き換え不可にする
+        # TODO: @context は書き換え不可にする
         self.data[key] = value
 
     def __getitem__(self, key: str) -> Any:
@@ -55,8 +55,8 @@ class Entity(TypedMutableMapping):
     def __repr__(self) -> str:
         if isinstance(self, DefaultEntity):
             return f"<{self.type} {self.id}>"
-        else:
-            return f"<{self.schema_name}.{self.type} {self.id}>"
+
+        return f"<{self.schema_name}.{self.type} {self.id}>"
 
     @property
     def id(self) -> str:
