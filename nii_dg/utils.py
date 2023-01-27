@@ -7,7 +7,7 @@ import mimetypes
 import re
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
-                    Optional, Type, TypedDict, Union)
+                    Optional, TypedDict, Union)
 from urllib.parse import quote, urlparse
 
 import requests
@@ -19,7 +19,6 @@ from nii_dg.error import (GovernanceError, PropsError,
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
-    from nii_dg.ro_crate import ROCrate
 
 
 def github_repo() -> str:
@@ -364,7 +363,7 @@ def get_name_from_ror(ror_id: str) -> List[str]:
         res.raise_for_status()
     except requests.HTTPError as httperr:
         if res.status_code == 404:
-            raise GovernanceError(f"ROR ID {ror_id} does not exist.") from None
+            raise ValueError(f"ROR ID {ror_id} does not exist.") from None
         raise UnexpectedImplementationError from httperr
     except Exception as err:
         raise UnexpectedImplementationError from err
