@@ -34,9 +34,9 @@ class ROCrate():
     For the details of RO-Crate, see https://www.researchobject.org/ro-crate/.
     """
 
-    default_entities: List[DefaultEntity] = []
-    data_entities: List[DataEntity] = []
-    contextual_entities: List[ContextualEntity] = []
+    default_entities: List[DefaultEntity]
+    data_entities: List[DataEntity]
+    contextual_entities: List[ContextualEntity]
 
     root: RootDataEntity
 
@@ -44,6 +44,9 @@ class ROCrate():
 
     def __init__(self, from_jsonld: Optional[Dict[str, Any]] = None) -> None:
         self.root = RootDataEntity()
+        self.default_entities = []
+        self.data_entities = []
+        self.contextual_entities = []
         self.root["hasPart"] = self.data_entities
         self.add(self.root, ROCrateMetadata(root=self.root))
 
