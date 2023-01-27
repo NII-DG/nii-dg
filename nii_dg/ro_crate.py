@@ -44,17 +44,17 @@ class ROCrate():
 
     def __init__(self, from_jsonld: Optional[Dict[str, Any]] = None) -> None:
         self.root = RootDataEntity()
-        self.default_entities = []
+        self.default_entities = [self.root, ROCrateMetadata(root=self.root)]
         self.data_entities = []
         self.contextual_entities = []
         self.root["hasPart"] = self.data_entities
-        self.add(self.root, ROCrateMetadata(root=self.root))
+        # self.add(self.root, ROCrateMetadata(root=self.root))
 
     def add(self, *entities: Entity) -> None:
         for entity in entities:
             if isinstance(entity, DefaultEntity):
-                self.default_entities.append(entity)
-            elif isinstance(entity, DataEntity):
+                raise UnexpectedImplementationError(f"DefaultEntity {self} can't be added to the crate.")
+            if isinstance(entity, DataEntity):
                 self.data_entities.append(entity)
             elif isinstance(entity, ContextualEntity):
                 self.contextual_entities.append(entity)
@@ -66,8 +66,8 @@ class ROCrate():
             raise UnexpectedImplementationError(f"Entity {entity} is not included in this crate.")
 
         if isinstance(entity, DefaultEntity):
-            self.default_entities.remove(entity)
-        elif isinstance(entity, DataEntity):
+            raise UnexpectedImplementationError(f"DefaultEntity {self} can't be removed from the crate.")
+        if isinstance(entity, DataEntity):
             self.data_entities.remove(entity)
         elif isinstance(entity, ContextualEntity):
             self.contextual_entities.remove(entity)
