@@ -14,8 +14,7 @@ import requests
 import yaml
 from typeguard import check_type as ori_check_type
 
-from nii_dg.error import (GovernanceError, PropsError,
-                          UnexpectedImplementationError)
+from nii_dg.error import PropsError, UnexpectedImplementationError
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
