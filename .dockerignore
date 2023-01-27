@@ -1,0 +1,8 @@
+# Ignore everything
+**
+
+!nii_dg
+!README.md
+!schema
+!setup.py
+!tests

@@ -27,7 +27,7 @@ $ python3 -m pip install .
 Docker を用いた実行も可能。
 
 ```bash
-$ docker run -it --rm ghcr.io/nii-dg/nii-dg:latest bash
+$ docker run -it --rm ghcr.io/NII-DG/nii-dg:latest bash
 ```
 
 ## Usage
@@ -259,6 +259,23 @@ $ pytest -s ./tests/unit_test
 また、GitHub actions として、以下のように設定されている。
 
 - [pytest](./.github/workflows/pytest.yml)
+
+## Branch and Release
+
+Branch 管理として、
+
+- `main`: Release の最新
+  - main への直接の push は禁止とする
+- `develop`: 開発用 branch
+- `<other>`: それぞれの機能・修正用の branch
+  - 基本的に、`develop` から `<other>` を切って開発を行い、`develop` にマージする
+
+Release 作業として、`develop` から `main` への PR を作成し、マージする。
+それぞれの Release は、`YYMMDD-<short_commit_hash>` という形式で tag が付与される。[TODO `setup.py` の version をどうするか]
+
+Release 用の GitHub actions として、以下のように設定されている。
+
+- [release](./.github/workflows/release.yml)
 
 ## License
 
