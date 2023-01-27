@@ -63,8 +63,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/nii_dg:${{ env.TAG_NAME }}
-            ghcr.io/${{ github.repository_owner }}/nii_dg:latest
+            ghcr.io/nii-dg/nii-dg:${{ env.TAG_NAME }}
+            ghcr.io/nii-dg/nii-dg:latest
 
   crate_release:
     runs-on: ubuntu-latest
@@ -83,6 +83,6 @@ jobs:
           echo "TAG_NAME=$(date +%y%m%d)_$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Create release
         run: |
-          gh release --repo ${{ github.repository }} create ${{ env.TAG_NAME }} --title ${{ env.TAG_NAME }} --generate-notes dist/nii_dg-1.0.0.tar.gz dist/nii_dg-1.0.0-py3-none-any.whl
+          gh release --repo ${{ github.repository }} create ${{ env.TAG_NAME }} --title ${{ env.TAG_NAME }} --generate-notes nii_dg-1.0.0.tar.gz nii_dg-1.0.0-py3-none-any.whl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
