@@ -165,11 +165,11 @@ class File(BaseFile):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @ property
+    @property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @ property
+    @property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -211,11 +211,11 @@ class ClinicalResearchRegistration(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @ property
+    @property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @ property
+    @property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
