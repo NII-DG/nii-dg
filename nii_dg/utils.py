@@ -364,7 +364,7 @@ def get_name_from_ror(ror_id: str) -> List[str]:
         res.raise_for_status()
     except requests.HTTPError as httperr:
         if res.status_code == 404:
-            raise GovernanceError(f"ROR ID {ror_id} does not exist.") from None
+            raise ValueError(f"ROR ID {ror_id} does not exist.") from None
         raise UnexpectedImplementationError from httperr
     except Exception as err:
         raise UnexpectedImplementationError from err
