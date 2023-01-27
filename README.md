@@ -1,5 +1,10 @@
 # NII-DG: NII Data Governance Library
 
+[![flake8](https://github.com/NII-DG/nii-dg/actions/workflows/flake8.yml/badge.svg?branch=main&event=push)](https://github.com/NII-DG/nii-dg/actions/workflows/flake8.yml)
+[![isort](https://github.com/NII-DG/nii-dg/actions/workflows/isort.yml/badge.svg?branch=main&event=push)](https://github.com/NII-DG/nii-dg/actions/workflows/isort.yml)
+[![mypy](https://github.com/NII-DG/nii-dg/actions/workflows/mypy.yml/badge.svg?branch=main&event=push)](https://github.com/NII-DG/nii-dg/actions/workflows/mypy.yml)
+[![pytest](https://github.com/NII-DG/nii-dg/actions/workflows/pytest.yml/badge.svg?branch=main&event=push)](https://github.com/NII-DG/nii-dg/actions/workflows/pytest.yml)
+
 データガバナンス: `データ管理に対して、組織として、明確な理念のもとに体制を構築し、具体的に実施するようにする`
 
 を達成するため、本ライブラリは以下の機能を提供する。

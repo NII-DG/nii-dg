@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "nii_dg/**"
-      - "tests/**"
-      - "setup.py"
   workflow_dispatch: {}
   pull_request:
     types:
