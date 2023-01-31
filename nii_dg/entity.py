@@ -36,7 +36,6 @@ class Entity(TypedMutableMapping):
 
         self["@id"] = id
         self["@type"] = self.__class__.__name__
-        # self["@context"] = TODO
         self.update(props or {})
 
     def __setitem__(self, key: str, value: Any) -> None:

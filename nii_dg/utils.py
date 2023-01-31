@@ -18,7 +18,6 @@ from nii_dg.error import PropsError, UnexpectedImplementationError
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
-    from nii_dg.ro_crate import ROCrate  # noqa: F401
 
 
 def github_repo() -> str:
