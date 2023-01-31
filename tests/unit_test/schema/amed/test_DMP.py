@@ -3,7 +3,7 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import CrateError, EntityError, PropsError
+from nii_dg.error import CrateError, EntityError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.amed import (DMP, ClinicalResearchRegistration, DMPMetadata,
                                 File)

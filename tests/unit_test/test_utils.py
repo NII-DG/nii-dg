@@ -5,7 +5,7 @@ from typing import Any, List, Literal, Union
 
 import pytest  # noqa: F401
 
-from nii_dg.error import GovernanceError, PropsError
+from nii_dg.error import PropsError
 from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import RootDataEntity
