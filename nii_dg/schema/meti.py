@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
-from nii_dg.error import CrateError, EntityError
+from nii_dg.error import CrateError, EntityError, PropsError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
@@ -41,7 +41,7 @@ class DMPMetadata(ContextualEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         if self.id != "#METI-DMP":
             prop_errors.add("@id", "The value MUST be '#METI-DMP'.")
@@ -101,17 +101,23 @@ class DMP(ContextualEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
-        check_content_formats(self, {
-            "availabilityStarts": check_isodate
-        })
+        try:
+            check_content_formats(self, {
+                "availabilityStarts": check_isodate
+            })
+        except PropsError as e:
+            prop_errors.add_by_dict(str(e))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
-        if verify_is_past_date(self, "availabilityStarts"):
-            prop_errors.add("availabilityStarts", "The value MUST be the date of future.")
+        try:
+            if verify_is_past_date(self, "availabilityStarts"):
+                prop_errors.add("availabilityStarts", "The value MUST be the date of future.")
+        except PropsError as e:
+            prop_errors.add("availabilityStarts", str(e))
 
         if len(prop_errors.message_dict) > 0:
             raise prop_errors
@@ -195,24 +201,30 @@ class File(BaseFile):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         if classify_uri(self, "@id") == "abs_path":
             prop_errors.add("@id", "The value MUST be URL or relative path to the file, not absolute path.")
 
-        check_content_formats(self, {
-            "contentSize": check_content_size,
-            "url": check_url,
-            "sha256": check_sha256,
-            "encodingFormat": check_mime_type,
-            "sdDatePublished": check_isodate
-        })
+        try:
+            check_content_formats(self, {
+                "contentSize": check_content_size,
+                "url": check_url,
+                "sha256": check_sha256,
+                "encodingFormat": check_mime_type,
+                "sdDatePublished": check_isodate
+            })
+        except PropsError as e:
+            prop_errors.add_by_dict(str(e))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
+        try:
+            if verify_is_past_date(self, "sdDatePublished") is False:
+                prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
+        except PropsError as e:
+            prop_errors.add("sdDatePublished", str(e))
 
         if len(prop_errors.message_dict) > 0:
             raise prop_errors

@@ -3,7 +3,7 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import EntityError, PropsError
+from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import DataDownload
 
@@ -36,27 +36,27 @@ def test_check_props() -> None:
     ent = DataDownload("file:///config/setting.txt", {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: lack of required properties
     del ent["unknown_property"]
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: type error
     ent["uploadDate"] = 9999
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: @id value is not URL
     ent["uploadDate"] = "9999-01-01"
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: uploadDate value is not past date
     ent["@id"] = "https://example.com/download"
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # no error occurs with correct property value

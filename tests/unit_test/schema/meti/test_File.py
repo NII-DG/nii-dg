@@ -3,7 +3,7 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import EntityError, PropsError
+from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.meti import DMP, File
 
@@ -40,12 +40,12 @@ def test_check_props() -> None:
     ent = File("file:///config/setting.txt", {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: lack of required properties
     del ent["unknown_property"]
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: type error
@@ -53,17 +53,17 @@ def test_check_props() -> None:
     ent["dmpDataNumber"] = DMP(1)
     ent["contentSize"] = "1560B"
     ent["sdDatePublished"] = 9999
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: @id value is not relative path nor URL
     ent["sdDatePublished"] = "9999-12-01"
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: sdDatePublished value is not past date
     ent["@id"] = "config/setting.txt"
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # no error occurs with correct property value

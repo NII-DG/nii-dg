@@ -17,6 +17,11 @@ if TYPE_CHECKING:
 else:
     TypedMutableMapping = MutableMapping
 
+LD_KEYWORDS = [
+    "@base", "@container", "@context", "@direction", "@graph", "@id", "@import",
+    "@included", "@index", "@json", "@language", "@list", "@nest", "@none", "@prefix",
+    "@propagate", "@protected", "@reverse", "@set", "@type", "@value", "@version", "@vocab"]
+
 
 class Entity(TypedMutableMapping):
     """\

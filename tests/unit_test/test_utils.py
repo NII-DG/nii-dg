@@ -287,7 +287,7 @@ def test_get_name_from_ror() -> None:
     assert get_name_from_ror("04ksd4g47") == ["Kokuritsu Jōhōgaku Kenkyūjo", "National Institute of Informatics"]
 
     # error
-    with pytest.raises(GovernanceError):
+    with pytest.raises(ValueError):
         get_name_from_ror("000000000")
 
 

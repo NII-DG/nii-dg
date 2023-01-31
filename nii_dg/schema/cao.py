@@ -44,7 +44,7 @@ class DMPMetadata(ContextualEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         if self.id != "#CAO-DMP":
             prop_errors.add("@id", "The value MUST be '#CAO-DMP'.")
@@ -104,11 +104,14 @@ class DMP(ContextualEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
-        check_content_formats(self, {
-            "availabilityStarts": check_isodate
-        })
+        try:
+            check_content_formats(self, {
+                "availabilityStarts": check_isodate
+            })
+        except PropsError as e:
+            prop_errors.add_by_dict(str(e))
 
         if self.id != "#dmp:" + str(self["dataNumber"]):
             prop_errors.add("@id", "The value MUST be started with '#dmp:'and then the value of dataNumber property MUST come after it.")
@@ -116,8 +119,11 @@ class DMP(ContextualEntity):
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
-        if verify_is_past_date(self, "availabilityStarts"):
-            prop_errors.add("availabilityStarts", "The value MUST be the date of future.")
+        try:
+            if verify_is_past_date(self, "availabilityStarts"):
+                prop_errors.add("availabilityStarts", "The value MUST be the date of future.")
+        except PropsError as e:
+            prop_errors.add("availabilityStarts", str(e))
 
         if len(prop_errors.message_dict) > 0:
             raise prop_errors
@@ -189,15 +195,21 @@ class Person(BasePerson):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
-        check_content_formats(self, {
-            "@id": check_url,
-            "eradResearcherNumber": check_erad_researcher_number
-        })
+        try:
+            check_content_formats(self, {
+                "@id": check_url,
+                "eradResearcherNumber": check_erad_researcher_number
+            })
+        except PropsError as e:
+            prop_errors.add_by_dict(str(e))
 
-        if self.id.startswith("https://orcid.org/"):
-            check_orcid_id(self.id[18:])
+        try:
+            if type(self.id) is str and self.id.startswith("https://orcid.org/"):
+                check_orcid_id(self.id[18:])
+        except PropsError as e:
+            prop_errors.add("@id", str(e))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
@@ -237,24 +249,30 @@ class File(BaseFile):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         if classify_uri(self, "@id") == "abs_path":
             prop_errors.add("@type", f"The @id value in {self} MUST be URL or relative path to the file, not absolute path.")
 
-        check_content_formats(self, {
-            "contentSize": check_content_size,
-            "encodingFormat": check_mime_type,
-            "sha256": check_sha256,
-            "url": check_url,
-            "sdDatePublished": check_isodate
-        })
+        try:
+            check_content_formats(self, {
+                "contentSize": check_content_size,
+                "encodingFormat": check_mime_type,
+                "sha256": check_sha256,
+                "url": check_url,
+                "sdDatePublished": check_isodate
+            })
+        except PropsError as e:
+            prop_errors.add_by_dict(str(e))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
+        try:
+            if verify_is_past_date(self, "sdDatePublished") is False:
+                prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
+        except PropsError as e:
+            prop_errors.add("sdDatePublished", str(e))
 
         if len(prop_errors.message_dict) > 0:
             raise prop_errors

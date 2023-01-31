@@ -67,12 +67,12 @@ class RootDataEntity(DefaultEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         try:
             check_required_props(self, entity_def_of_root)
         except PropsError as e:
-            prop_errors.update(str(e))
+            prop_errors.add_by_dict(str(e))
 
         if self.id != "./":
             prop_errors.add("@id", "The value MUST be './'.")
@@ -111,7 +111,7 @@ class File(DataEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         if classify_uri(self, "@id") == "abs_path":
             prop_errors.add("@id", "The @id value MUST be URL or relative path to the file, not absolute path.")
@@ -125,13 +125,16 @@ class File(DataEntity):
                 "sdDatePublished": check_isodate
             })
         except PropsError as e:
-            prop_errors.update(str(e))
+            prop_errors.add_by_dict(str(e))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
+        try:
+            if verify_is_past_date(self, "sdDatePublished") is False:
+                prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
+        except PropsError as e:
+            prop_errors.add("sdDatePublished", str(e))
 
         if len(prop_errors.message_dict) > 0:
             raise prop_errors
@@ -171,14 +174,14 @@ class Dataset(DataEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         try:
             check_content_formats(self, {
                 "url": check_url
             })
         except PropsError as e:
-            prop_errors.update(str(e))
+            prop_errors.add_by_dict(str(e))
 
         if not self.id.endswith("/"):
             prop_errors.add("@id", "The value MUST end with '/'.")
@@ -220,7 +223,7 @@ class Organization(ContextualEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         try:
             check_content_formats(self, {
@@ -228,7 +231,7 @@ class Organization(ContextualEntity):
                 "url": check_url
             })
         except PropsError as e:
-            prop_errors.update(str(e))
+            prop_errors.add_by_dict(str(e))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
@@ -280,7 +283,7 @@ class Person(ContextualEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         try:
             check_content_formats(self, {
@@ -289,10 +292,13 @@ class Person(ContextualEntity):
                 "telephone": check_phonenumber
             })
         except PropsError as e:
-            prop_errors.update(str(e))
+            prop_errors.add_by_dict(str(e))
 
-        if self.id.startswith("https://orcid.org/"):
-            check_orcid_id(self.id[18:])
+        try:
+            if type(self.id) is str and self.id.startswith("https://orcid.org/"):
+                check_orcid_id(self.id[18:])
+        except PropsError as e:
+            prop_errors.add("@id", str(e))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
@@ -336,14 +342,14 @@ class License(ContextualEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         try:
             check_content_formats(self, {
                 "@id": check_url
             })
         except PropsError as e:
-            prop_errors.update(str(e))
+            prop_errors.add_by_dict(str(e))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
@@ -387,7 +393,7 @@ class RepositoryObject(ContextualEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         classify_uri(self, "@id")
 
@@ -425,7 +431,7 @@ class DataDownload(ContextualEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         try:
             check_content_formats(self, {
@@ -434,13 +440,16 @@ class DataDownload(ContextualEntity):
                 "uploadDate": check_isodate
             })
         except PropsError as e:
-            prop_errors.update(str(e))
+            prop_errors.add_by_dict(str(e))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
-        if verify_is_past_date(self, "uploadDate") is False:
-            prop_errors.add("uploadDate", "The value MUST be the date of past.")
+        try:
+            if verify_is_past_date(self, "uploadDate") is False:
+                prop_errors.add("uploadDate", "The value MUST be the date of past.")
+        except PropsError as e:
+            prop_errors.add("uploadDate", str(e))
 
         if len(prop_errors.message_dict) > 0:
             raise prop_errors
@@ -473,7 +482,7 @@ class HostingInstitution(Organization):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         try:
             check_content_formats(self, {
@@ -481,7 +490,7 @@ class HostingInstitution(Organization):
                 "url": check_url
             })
         except PropsError as e:
-            prop_errors.update(str(e))
+            prop_errors.add_by_dict(str(e))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
@@ -533,7 +542,7 @@ class ContactPoint(ContextualEntity):
             try:
                 func(self, entity_def)
             except PropsError as e:
-                prop_errors.update(str(e))
+                prop_errors.add_by_dict(str(e))
 
         try:
             check_content_formats(self, {
@@ -541,7 +550,7 @@ class ContactPoint(ContextualEntity):
                 "telephone": check_phonenumber
             })
         except PropsError as e:
-            prop_errors.update(str(e))
+            prop_errors.add_by_dict(str(e))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")

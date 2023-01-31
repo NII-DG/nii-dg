@@ -3,7 +3,7 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import EntityError, PropsError
+from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import (DataDownload, Organization, RepositoryObject,
                                 RootDataEntity)
@@ -37,22 +37,22 @@ def test_as_jsonld() -> None:
 
 
 def test_check_props() -> None:
-    ent = DMPMetadata({"unknown_property": "unknown"})
+    ent = DMPMetadata(props={"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: lack of required properties
     del ent["unknown_property"]
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: type error
     ent["about"] = RootDataEntity({})
     ent["funder"] = "NII"
     ent["hasPart"] = [DMP(1), DMP(2)]
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # no error occurs with correct property value
@@ -64,7 +64,7 @@ def test_validate() -> None:
     rocrate = ROCrate()
     org = Organization("https://ror.org/04ksd4g47")
     root = RootDataEntity()
-    meta = DMPMetadata({"funder": org, "hasPart": [], "about": root})
+    meta = DMPMetadata(props={"funder": org, "hasPart": [], "about": root})
     rocrate.add(org, meta)
 
     # error: funder not included in the funder list of RootDataEntity

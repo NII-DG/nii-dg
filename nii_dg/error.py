@@ -44,8 +44,11 @@ class EntityError(Exception):
     def add(self, prop: str, message: str) -> None:
         self.message_dict.setdefault(prop, message)
 
-    def update(self, messages: str) -> None:
-        self.message_dict.update(ast.literal_eval(messages))
+    def add_by_dict(self, messages: str) -> None:
+        message_dict = ast.literal_eval(messages)
+        key = next(iter(message_dict))
+        value = message_dict[key]
+        self.message_dict.setdefault(key, value)
 
 
 class CrateError(Exception):

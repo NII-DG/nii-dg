@@ -43,15 +43,15 @@ def test_as_jsonld() -> None:
 
 
 def test_check_props() -> None:
-    ent = DMPMetadata({"unknown_property": "unknown"})
+    ent = DMPMetadata(props={"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: lack of required properties
     del ent["unknown_property"]
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: type error
@@ -65,7 +65,7 @@ def test_check_props() -> None:
     ent["hostingInstitution"] = org
     ent["dataManager"] = Person("https://orcid.org/0000-0001-2345-6789")
     ent["hasPart"] = [DMP(1), DMP(2)]
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # no error occurs with correct property value
@@ -77,7 +77,7 @@ def test_validate() -> None:
     crate = ROCrate()
     org = HostingInstitution("https://ror.org/04ksd4g47")
     root = RootDataEntity()
-    ent = DMPMetadata({"funder": org, "hasPart": [], "about": root})
+    ent = DMPMetadata(props={"funder": org, "hasPart": [], "about": root})
     crate.add(org, ent)
 
     # error: funder not included in the funder list of RootDataEntity

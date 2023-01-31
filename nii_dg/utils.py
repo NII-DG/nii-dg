@@ -209,7 +209,7 @@ def classify_uri(entity: "Entity", key: str) -> str:
         encoded_uri = quote(entity[key], safe="!#$&'()*+,/:;=?@[]\\")
         parsed = urlparse(encoded_uri)
     except (TypeError, ValueError):
-        raise PropsError(f"The term {key} in {entity} is invalid URI.") from None
+        raise PropsError(f"The value of {key} in {entity} is invalid URI.") from None
 
     if parsed.scheme in ["http", "https"] and parsed.netloc != "":
         return "URL"
@@ -223,8 +223,11 @@ def check_url(value: str) -> None:
     Check the value is URL.
     If not, raise ValueError.
     """
-    encoded_url = quote(value, safe="!#$&'()*+,/:;=?@[]\\")
-    parsed = urlparse(encoded_url)
+    try:
+        encoded_url = quote(value, safe="!#$&'()*+,/:;=?@[]\\")
+        parsed = urlparse(encoded_url)
+    except (TypeError, ValueError):
+        raise PropsError(f"The value {value} is invalid URI.") from None
 
     if parsed.scheme not in ["http", "https"]:
         raise ValueError
@@ -237,6 +240,9 @@ def check_content_size(value: str) -> None:
     Check file size value is in the defined format.
     If not, raise ValueError.
     """
+    if type(value) is not str:
+        raise TypeError
+
     pattern = r"^\d+[KMGTP]?B$"
     size_match = re.compile(pattern)
 
@@ -249,6 +255,8 @@ def check_mime_type(value: str) -> None:
     Check encoding format value is in MIME type format.
     """
     # TODO: mimetypeの辞書がOSによって差分があるのをどう吸収するか, 例えばtext/markdown
+    if type(value) is not str:
+        raise TypeError
 
     if mimetypes.guess_extension(value) is None:
         raise ValueError
@@ -258,6 +266,9 @@ def check_sha256(value: str) -> None:
     """
     Check sha256 value is in SHA256 format.
     """
+    if type(value) is not str:
+        raise TypeError
+
     pattern = r"(?:[^a-fA-F\d]|\b)([a-fA-F\d]{64})(?:[^a-fA-F\d]|\b)"
     sha_match = re.compile(pattern)
 
@@ -342,10 +353,10 @@ def verify_is_past_date(entity: "Entity", key: str) -> Optional[bool]:
     """
     try:
         iso_date = datetime.date.fromisoformat(entity[key])
-    except KeyError:
+    except (KeyError, TypeError):
         return None
     except ValueError:
-        raise PropsError(f"The value of {key} in {entity} is invalid date format. MUST be 'YYYY-MM-DD'.") from None
+        raise PropsError(f"The value {entity[key]} is invalid date format. MUST be 'YYYY-MM-DD'.") from None
 
     today = datetime.date.today()
     if (today - iso_date).days < 0:
