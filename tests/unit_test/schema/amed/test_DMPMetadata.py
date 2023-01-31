@@ -11,7 +11,7 @@ from nii_dg.schema.base import (DataDownload, HostingInstitution, Person,
 
 
 def test_init() -> None:
-    ent = DMPMetadata({})
+    ent = DMPMetadata(props={})
     assert ent["@id"] == "#AMED-DMP"
     assert ent["@type"] == "DMPMetadata"
     assert ent.schema_name == "amed"
@@ -19,7 +19,7 @@ def test_init() -> None:
 
 
 def test_as_jsonld() -> None:
-    ent = DMPMetadata({})
+    ent = DMPMetadata(props={})
     org = HostingInstitution("https://ror.org/04ksd4g47")
 
     ent["about"] = RootDataEntity({})
@@ -84,7 +84,7 @@ def test_validate() -> None:
     # no error
     ent.validate(crate)
 
-    dmp = DMP("sample")
+    dmp = DMP(1)
     crate.add(dmp)
     # error: not all DMP entity in the crate is included in hasPart
     with pytest.raises(EntityError):

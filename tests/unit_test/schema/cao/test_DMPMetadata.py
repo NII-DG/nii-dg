@@ -11,7 +11,7 @@ from nii_dg.schema.cao import DMP, DMPMetadata
 
 
 def test_init() -> None:
-    ent = DMPMetadata({})
+    ent = DMPMetadata(props={})
     assert ent["@id"] == "#CAO-DMP"
     assert ent["@type"] == "DMPMetadata"
     assert ent.schema_name == "cao"
@@ -19,7 +19,7 @@ def test_init() -> None:
 
 
 def test_as_jsonld() -> None:
-    ent = DMPMetadata({})
+    ent = DMPMetadata(props={})
 
     ent["about"] = RootDataEntity({})
     ent["funder"] = Organization("https://ror.org/04ksd4g47")
