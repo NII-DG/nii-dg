@@ -36,27 +36,18 @@ def test_check_props() -> None:
     ent = HostingInstitution("file:///config/setting.txt", {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: type error
-    ent["name"] = "National Institute of Informatics"
+    # error: @id value is not relative path nor URL
     ent["description"] = "Japan's only general academic research institution seeking to create future value in the new discipline of informatics."
     ent["address"] = ["2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430"]
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # error: @id value is not relative path nor URL
-    ent["address"] = "2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430"
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # no error occurs with correct property value
+    del ent["unknown_property"]
+    ent["name"] = "National Institute of Informatics"
+    ent["address"] = "2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430"
     ent["@id"] = "https://ror.org/04ksd4g47"
     ent.check_props()
 

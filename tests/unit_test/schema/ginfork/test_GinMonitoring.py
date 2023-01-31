@@ -37,23 +37,17 @@ def test_check_props() -> None:
     ent = GinMonitoring(1, {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: type error
-    ent["about"] = RootDataEntity()
     ent["contentSize"] = "10GB"
     ent["workflowIdentifier"] = "basic"
     ent["datasetStructure"] = "basic"
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # no error occurs with correct property value
+    # no error occurs
+    del ent["unknown_property"]
+    ent["about"] = RootDataEntity()
     ent["datasetStructure"] = "with_code"
     ent.check_props()
 

@@ -157,7 +157,7 @@ def check_unexpected_props(entity: "Entity", entity_def: EntityDef) -> None:
     error_dict = {}
     for actual_prop in entity.keys():
         if actual_prop not in entity_def:
-            if actual_prop.startswith("@"):
+            if type(actual_prop) is str and actual_prop.startswith("@"):
                 continue
             error_dict[actual_prop] = "Unexpected property"
     if len(error_dict) > 0:

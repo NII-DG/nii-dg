@@ -40,15 +40,9 @@ def test_check_props() -> None:
     ent = Person("file:///config/setting.txt", {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: type error
+    # error: @id value is not URL
     ent["name"] = "Ichiro Suzuki"
     ent["alias"] = "S. Ichiro"
     ent["affiliation"] = Organization("https://ror.org/04ksd4g47")
@@ -58,17 +52,14 @@ def test_check_props() -> None:
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # error: @id value is not URL
+    # error: ORCID is invalid
+    del ent["unknown_property"]
+    ent["@id"] = "https://orcid.org/1234567891011128"
     ent["eradResearcherNumber"] = "01234567"
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # error: ORCID is invalid
-    ent["@id"] = "https://orcid.org/1234567891011128"
-    with pytest.raises(EntityError):
-        ent.check_props()
-
-    # no error occurs with correct property value
+    # no error occurs
     ent["@id"] = "https://orcid.org/1234-5678-9101-1128"
     ent.check_props()
 

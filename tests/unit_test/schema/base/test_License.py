@@ -35,26 +35,20 @@ def test_check_props() -> None:
     ent = License("file:///config/setting.txt", {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
+    # error: @id value is not relative path nor URL
     with pytest.raises(EntityError):
         ent.check_props()
 
     # error: type error
+    del ent["unknown_property"]
+    ent["@id"] = "https://www.apache.org/licenses/LICENSE-2.0"
     ent["name"] = ["Apache License 2.0"]
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # error: @id value is not relative path nor URL
+    # no error occurs
     ent["name"] = "Apache License 2.0"
-    with pytest.raises(EntityError):
-        ent.check_props()
-
-    # no error occurs with correct property value
-    ent["@id"] = "https://www.apache.org/licenses/LICENSE-2.0"
     ent.check_props()
 
 

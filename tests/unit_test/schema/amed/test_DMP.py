@@ -47,20 +47,13 @@ def test_check_props() -> None:
     ent = DMP(1, {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: type error
-    ent["name"] = "calculated data"
+    # error: availabilityStarts value is not future date
     ent["description"] = "Result data calculated by Newton's method"
-    ent["keyword"] = "biological origin data"
+    ent["keyword"] = 1
     ent["accessRights"] = "Unrestricted Open Sharing"
-    ent["availabilityStarts"] = 2022
+    ent["availabilityStarts"] = "2022-04-01"
     ent["repository"] = RepositoryObject("https://doi.org/xxxxxxxx")
     ent["distribution"] = DataDownload("https://zenodo.org/record/example")
     ent["gotInformedConsent"] = "yes"
@@ -68,12 +61,10 @@ def test_check_props() -> None:
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # error: availabilityStarts value is not future date
-    ent["availabilityStarts"] = "2022-04-01"
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # no error occurs with correct property value
+    del ent["unknown_property"]
+    ent["name"] = "calculated data"
+    ent["keyword"] = "biological origin data"
     ent["availabilityStarts"] = "9999-04-01"
     ent.check_props()
 

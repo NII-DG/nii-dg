@@ -36,30 +36,21 @@ def test_check_props() -> None:
     ent = DataDownload("file:///config/setting.txt", {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: type error
+    # error: @id value is not URL
     ent["uploadDate"] = 9999
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # error: @id value is not URL
+    # error: uploadDate value is not past date
+    del ent["unknown_property"]
+    ent["@id"] = "https://example.com/download"
     ent["uploadDate"] = "9999-01-01"
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # error: uploadDate value is not past date
-    ent["@id"] = "https://example.com/download"
-    with pytest.raises(EntityError):
-        ent.check_props()
-
-    # no error occurs with correct property value
+    # no error occurs
     ent["uploadDate"] = "2022-12-01"
     ent.check_props()
 

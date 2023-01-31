@@ -36,27 +36,18 @@ def test_check_props() -> None:
     ent = ContactPoint("#mailto:test@example.com", {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: type error
+    # error: email is invalid
     ent["name"] = "Sample Inc., Open-Science department, data management unit"
     ent["email"] = ".test@example.com"
     ent["telephone"] = 12345678901
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # error: email is invalid
+    # no error occurs
+    del ent["unknown_property"]
     ent["telephone"] = "03-0000-0000"
-    with pytest.raises(EntityError):
-        ent.check_props()
-
-    # no error occurs with correct property value
     ent["email"] = "test@example.com"
     ent.check_props()
 

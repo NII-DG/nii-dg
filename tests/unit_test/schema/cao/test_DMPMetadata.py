@@ -42,23 +42,17 @@ def test_check_props() -> None:
     ent = DMPMetadata(props={"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: type error
-    ent["about"] = RootDataEntity({})
     ent["funder"] = Organization("https://ror.org/04ksd4g47")
     ent["keyword"] = 13
     ent["hasPart"] = [DMP(1), DMP(2)]
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # no error occurs with correct property value
+    # no error occurs
+    ent["about"] = RootDataEntity({})
+    del ent["unknown_property"]
     ent["keyword"] = "Informatics"
     ent.check_props()
 

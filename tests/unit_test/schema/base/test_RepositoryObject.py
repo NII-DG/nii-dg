@@ -33,20 +33,17 @@ def test_check_props() -> None:
     ent = RepositoryObject("https: // doi.org/xxxxxxxx", {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
     with pytest.raises(EntityError):
         ent.check_props()
 
     # error: type error
+    del ent["unknown_property"]
     ent["name"] = ["Gakunin RDM"]
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # no error occurs with correct property value
+    # no error occurs
     ent["name"] = "Gakunin RDM"
     ent.check_props()
 

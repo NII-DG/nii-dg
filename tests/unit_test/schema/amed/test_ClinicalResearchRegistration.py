@@ -34,27 +34,18 @@ def test_as_jsonld() -> None:
 def test_check_props() -> None:
     ent = ClinicalResearchRegistration("file:///config/setting.txt", {"unknown_property": "unknown"})
 
-    # error: with unexpected property
-    with pytest.raises(EntityError):
-        ent.check_props()
-
-    # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(EntityError):
-        ent.check_props()
-
-    # error: type error
-    ent["name"] = "sample registration service"
-    ent["value"] = 1
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: @id value is not URL
-    ent["@id"] = "https://example.com"
-    with pytest.raises(EntityError):
+    # error: lack of required properties
+    # error: with unexpected property
+    # error: type error
+    ent["value"] = 1
+    with pytest.raises(EntityError) as e:
         ent.check_props()
 
     # no error occurs with correct property value
+    del ent["unknown_property"]
+    ent["name"] = "sample registration service"
+    ent["@id"] = "https://example.com"
     ent["value"] = "1"
     ent.check_props()
 

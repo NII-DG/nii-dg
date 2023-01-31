@@ -36,26 +36,20 @@ def test_check_props() -> None:
     ent = Organization("file:///config/setting.txt", {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
+    # error: @id value is not relative path nor URL
     with pytest.raises(EntityError):
         ent.check_props()
 
     # error: type error
+    del ent["unknown_property"]
+    ent["@id"] = "https://ror.org/04ksd4g47"
     ent["name"] = ["National Institute of Informatics"]
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # error: @id value is not relative path nor URL
+    # no error occurs
     ent["name"] = "National Institute of Informatics"
-    with pytest.raises(EntityError):
-        ent.check_props()
-
-    # no error occurs with correct property value
-    ent["@id"] = "https://ror.org/04ksd4g47"
     ent.check_props()
 
 

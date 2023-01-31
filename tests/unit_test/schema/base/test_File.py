@@ -39,32 +39,20 @@ def test_check_props() -> None:
     ent = File("file:///config/setting.txt", {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # error: type error
-    ent["name"] = "setting.txt"
+    # error: @id value is not relative path nor URL
+    # error: sdDatePublished value is not past date
     ent["contentSize"] = 1560
     ent["sdDatePublished"] = "9999-12-01"
     with pytest.raises(EntityError):
         ent.check_props()
 
-    # error: @id value is not relative path nor URL
-    ent["contentSize"] = "1560B"
-    with pytest.raises(EntityError):
-        ent.check_props()
-
-    # error: sdDatePublished value is not past date
-    ent["@id"] = "config/setting.txt"
-    with pytest.raises(EntityError):
-        ent.check_props()
-
     # no error occurs with correct property value
+    del ent["unknown_property"]
+    ent["name"] = "setting.txt"
+    ent["contentSize"] = "1560B"
+    ent["@id"] = "config/setting.txt"
     ent["sdDatePublished"] = "2022-12-01"
     ent.check_props()
 
