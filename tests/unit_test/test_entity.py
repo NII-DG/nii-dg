@@ -1,16 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import os
-from typing import Any
-
 import pytest  # noqa: F401
 
 from nii_dg.entity import Entity, ROCrateMetadata
-from nii_dg.error import (CrateError, GovernanceError,
-                          UnexpectedImplementationError)
-from nii_dg.ro_crate import (ContextualEntity, DataEntity, DefaultEntity,
-                             ROCrate, ROCrateMetadata)
 from nii_dg.schema.base import RootDataEntity
 
 

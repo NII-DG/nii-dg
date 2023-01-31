@@ -17,7 +17,7 @@ from nii_dg.utils import (access_url, check_all_prop_types,
 
 
 class DMPMetadata(ContextualEntity):
-    def __init__(self, props: Optional[Dict[str, Any]] = None):
+    def __init__(self, id: Optional[str] = None, props: Optional[Dict[str, Any]] = None):
         super().__init__(id="#AMED-DMP", props=props)
         self["name"] = "AMED-DMP"
 
@@ -34,20 +34,26 @@ class DMPMetadata(ContextualEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.add_by_dict(str(e))
 
         if self.id != "#AMED-DMP":
-            raise PropsError(f"The value of @id property of {self} MUST be '#AMED-DMP'.")
+            prop_errors.add("@id", "The value MUST be '#AMED-DMP'.")
 
         if self["name"] != "AMED-DMP":
-            raise PropsError(f"The value of name property of {self} MUST be 'AMED-DMP'.")
+            prop_errors.add("name", "The value MUST be 'AMED-DMP'.")
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The valueMUST be '{self.entity_name}'.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
@@ -96,24 +102,36 @@ class DMP(ContextualEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.add_by_dict(str(e))
 
-        check_content_formats(self, {
-            "availabilityStarts": check_isodate
-        })
+        try:
+            check_content_formats(self, {
+                "availabilityStarts": check_isodate
+            })
+        except PropsError as e:
+            prop_errors.add_by_dict(str(e))
 
         if self.id != "#dmp:" + str(self["dataNumber"]):
-            raise PropsError(f"The value of @id property of {self} MUST be started with '#dmp:'and then the value of dataNumber property MUST come after it.")
+            prop_errors.add("@id", "The value MUST be started with '#dmp:'and then the value of dataNumber property MUST come after it.")
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
-        if verify_is_past_date(self, "availabilityStarts"):
-            raise PropsError(f"The value of availabilityStarts property of {self} MUST be the date of future.")
+        try:
+            if verify_is_past_date(self, "availabilityStarts"):
+                prop_errors.add("availabilityStarts", "The value MUST be the date of future.")
+        except PropsError as e:
+            prop_errors.add("availabilityStarts", str(e))
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
@@ -174,28 +192,40 @@ class File(BaseFile):
         return self.__class__.__name__
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.add_by_dict(str(e))
 
         if classify_uri(self, "@id") == "abs_path":
-            raise PropsError(f"The value of @id property of {self} MUST be URL or relative path to the file, not absolute path.")
+            prop_errors.add("@id", "The value MUST be URL or relative path to the file, not absolute path.")
 
-        check_content_formats(self, {
-            "contentSize": check_content_size,
-            "encodingFormat": check_mime_type,
-            "url": check_url,
-            "sha256": check_sha256,
-            "sdDatePublished": check_isodate
-        })
+        try:
+            check_content_formats(self, {
+                "contentSize": check_content_size,
+                "encodingFormat": check_mime_type,
+                "url": check_url,
+                "sha256": check_sha256,
+                "sdDatePublished": check_isodate
+            })
+        except PropsError as e:
+            prop_errors.add_by_dict(str(e))
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
-        if verify_is_past_date(self, "sdDatePublished") is False:
-            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
+        try:
+            if verify_is_past_date(self, "sdDatePublished") is False:
+                prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
+        except PropsError as e:
+            prop_errors.add("sdDatePublished", str(e))
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
@@ -224,18 +254,27 @@ class ClinicalResearchRegistration(ContextualEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.add_by_dict(str(e))
 
-        check_content_formats(self, {
-            "@id": check_url,
-        })
+        try:
+            check_content_formats(self, {
+                "@id": check_url,
+            })
+        except PropsError as e:
+            prop_errors.add_by_dict(str(e))
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)

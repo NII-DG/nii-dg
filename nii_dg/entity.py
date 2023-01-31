@@ -6,7 +6,7 @@ Definition of Entity base class and its subclasses.
 """
 
 from collections.abc import MutableMapping
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from nii_dg.error import UnexpectedImplementationError
 from nii_dg.utils import github_branch, github_repo
@@ -16,6 +16,11 @@ if TYPE_CHECKING:
     from nii_dg.ro_crate import ROCrate
 else:
     TypedMutableMapping = MutableMapping
+
+LD_KEYWORDS: List[str] = [
+    "@base", "@container", "@context", "@direction", "@graph", "@id", "@import",
+    "@included", "@index", "@json", "@language", "@list", "@nest", "@none", "@prefix",
+    "@propagate", "@protected", "@reverse", "@set", "@type", "@value", "@version", "@vocab"]
 
 
 class Entity(TypedMutableMapping):
@@ -31,11 +36,11 @@ class Entity(TypedMutableMapping):
 
         self["@id"] = id
         self["@type"] = self.__class__.__name__
-        # self["@context"] = TODO
         self.update(props or {})
 
     def __setitem__(self, key: str, value: Any) -> None:
-        # TODO: @context は書き換え不可にする
+        if key.startswith("@") and key not in LD_KEYWORDS:
+            raise KeyError(f"Cannot set {key} as property; property with @ is limited.")
         self.data[key] = value
 
     def __getitem__(self, key: str) -> Any:

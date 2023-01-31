@@ -5,7 +5,7 @@ from typing import Any, List, Literal, Union
 
 import pytest  # noqa: F401
 
-from nii_dg.error import GovernanceError, PropsError
+from nii_dg.error import PropsError
 from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import RootDataEntity
@@ -287,7 +287,7 @@ def test_get_name_from_ror() -> None:
     assert get_name_from_ror("04ksd4g47") == ["Kokuritsu Jōhōgaku Kenkyūjo", "National Institute of Informatics"]
 
     # error
-    with pytest.raises(GovernanceError):
+    with pytest.raises(ValueError):
         get_name_from_ror("000000000")
 
 

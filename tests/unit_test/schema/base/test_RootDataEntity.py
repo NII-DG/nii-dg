@@ -3,7 +3,7 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
+from nii_dg.error import EntityError
 from nii_dg.schema.base import Organization, RootDataEntity
 
 
@@ -36,21 +36,15 @@ def test_check_props() -> None:
     ent = RootDataEntity({"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(PropsError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(PropsError):
-        ent.check_props()
-
     # error: type error
-    ent["name"] = "Example Research Project"
     ent["funder"] = Organization("https://ror.org/01b9y6c26")
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
-    # no error occurs with correct property value
+    # no error occurs
+    del ent["unknown_property"]
+    ent["name"] = "Example Research Project"
     ent["funder"] = [Organization("https://ror.org/01b9y6c26")]
     ent.check_props()
 
