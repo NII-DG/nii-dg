@@ -20,7 +20,7 @@ class PropsError(Exception):
     """\
     Error class for props (checking for entity properties).
     Raised at Entity dump time.
-    This validation is performed by the check_props() method (this method is called in dump()) of each subclass.
+    This validation is performed by the check_props() method (this method is called in as_jsonld()).
     """
 
 
@@ -59,7 +59,10 @@ class CrateError(Exception):
 
 class CheckPropsError(Exception):
     """\
-    To Be Added
+    Error class for checking properties of each included entities.
+    Raised at ROCrate dump time.
+    The dump is performed by the as_jsonld() method (this method is called in dump()) of ROCrate class.
+    The check is performed by the check_props() method of each subclass.
     """
 
     def __init__(self, entity_errors: Optional[List[EntityError]] = None) -> None:
