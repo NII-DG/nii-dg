@@ -58,18 +58,30 @@ class RootDataEntity(DefaultEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
+
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
         entity_def_of_root: EntityDef = {prop: obj for prop, obj in entity_def.items() if prop not in ["dateCreated", "hasPart"]}  # type: ignore
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def_of_root)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.update(str(e))
+
+        try:
+            check_required_props(self, entity_def_of_root)
+        except PropsError as e:
+            prop_errors.update(str(e))
 
         if self.id != "./":
-            raise PropsError("The value of @id property of RootDataEntity MUST be './'.")
+            prop_errors.add("@id", "The value MUST be './'.")
 
         if self.type != "Dataset":
-            raise PropsError("The value of @type property of RootDataEntity MUST be 'Dataset'.")
+            prop_errors.add("@type", "The value MUST be 'Dataset'.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
         pass
@@ -92,28 +104,37 @@ class File(DataEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.update(str(e))
 
         if classify_uri(self, "@id") == "abs_path":
-            raise PropsError(f"The @id value of {self} MUST be URL or relative path to the file, not absolute path.")
+            prop_errors.add("@id", "The @id value MUST be URL or relative path to the file, not absolute path.")
 
-        check_content_formats(self, {
-            "contentSize": check_content_size,
-            "url": check_url,
-            "sha256": check_sha256,
-            "encodingFormat": check_mime_type,
-            "sdDatePublished": check_isodate
-        })
+        try:
+            check_content_formats(self, {
+                "contentSize": check_content_size,
+                "url": check_url,
+                "sha256": check_sha256,
+                "encodingFormat": check_mime_type,
+                "sdDatePublished": check_isodate
+            })
+        except PropsError as e:
+            prop_errors.update(str(e))
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
         if verify_is_past_date(self, "sdDatePublished") is False:
-            raise PropsError(f"The value of sdDatePublished property of {self} MUST be the date of past.")
+            prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
         validation_failures = EntityError(self)
@@ -143,24 +164,33 @@ class Dataset(DataEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.update(str(e))
 
-        check_content_formats(self, {
-            "url": check_url
-        })
+        try:
+            check_content_formats(self, {
+                "url": check_url
+            })
+        except PropsError as e:
+            prop_errors.update(str(e))
 
         if not self.id.endswith("/"):
-            raise PropsError(f"The value of @id property of {self} MUST end with '/'.")
+            prop_errors.add("@id", "The value MUST end with '/'.")
 
         if classify_uri(self, "@id") != "rel_path":
-            raise PropsError(f"The value of @id property of {self} MUST be relative path to the directory, neither absolute path nor URL.")
+            prop_errors.add("@id", "The valueMUST be relative path to the directory, neither absolute path nor URL.")
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
         pass
@@ -183,19 +213,28 @@ class Organization(ContextualEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.update(str(e))
 
-        check_content_formats(self, {
-            "@id": check_url,
-            "url": check_url
-        })
+        try:
+            check_content_formats(self, {
+                "@id": check_url,
+                "url": check_url
+            })
+        except PropsError as e:
+            prop_errors.update(str(e))
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
         validation_failures = EntityError(self)
@@ -234,23 +273,32 @@ class Person(ContextualEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.update(str(e))
 
-        check_content_formats(self, {
-            "@id": check_url,
-            "email": check_email,
-            "telephone": check_phonenumber
-        })
+        try:
+            check_content_formats(self, {
+                "@id": check_url,
+                "email": check_email,
+                "telephone": check_phonenumber
+            })
+        except PropsError as e:
+            prop_errors.update(str(e))
 
         if self.id.startswith("https://orcid.org/"):
             check_orcid_id(self.id[18:])
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
         validation_failures = EntityError(self)
@@ -281,18 +329,27 @@ class License(ContextualEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.update(str(e))
 
-        check_content_formats(self, {
-            "@id": check_url
-        })
+        try:
+            check_content_formats(self, {
+                "@id": check_url
+            })
+        except PropsError as e:
+            prop_errors.update(str(e))
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
         validation_failures = EntityError(self)
@@ -323,16 +380,22 @@ class RepositoryObject(ContextualEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.update(str(e))
 
         classify_uri(self, "@id")
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
         pass
@@ -355,23 +418,32 @@ class DataDownload(ContextualEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.update(str(e))
 
-        check_content_formats(self, {
-            "@id": check_url,
-            "sha256": check_sha256,
-            "uploadDate": check_isodate
-        })
+        try:
+            check_content_formats(self, {
+                "@id": check_url,
+                "sha256": check_sha256,
+                "uploadDate": check_isodate
+            })
+        except PropsError as e:
+            prop_errors.update(str(e))
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
         if verify_is_past_date(self, "uploadDate") is False:
-            raise PropsError(f"The value of uploadDate property of {self} MUST be the date of past.")
+            prop_errors.add("uploadDate", "The value MUST be the date of past.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
         validation_failures = EntityError(self)
@@ -394,19 +466,28 @@ class HostingInstitution(Organization):
         return self.__class__.__name__
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.update(str(e))
 
-        check_content_formats(self, {
-            "@id": check_url,
-            "url": check_url
-        })
+        try:
+            check_content_formats(self, {
+                "@id": check_url,
+                "url": check_url
+            })
+        except PropsError as e:
+            prop_errors.update(str(e))
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
         validation_failures = EntityError(self)
@@ -445,22 +526,31 @@ class ContactPoint(ContextualEntity):
         return super().as_jsonld()
 
     def check_props(self) -> None:
+        prop_errors = EntityError(self)
         entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
 
-        check_unexpected_props(self, entity_def)
-        check_required_props(self, entity_def)
-        check_all_prop_types(self, entity_def)
+        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
+            try:
+                func(self, entity_def)
+            except PropsError as e:
+                prop_errors.update(str(e))
 
-        check_content_formats(self, {
-            "email": check_email,
-            "telephone": check_phonenumber
-        })
+        try:
+            check_content_formats(self, {
+                "email": check_email,
+                "telephone": check_phonenumber
+            })
+        except PropsError as e:
+            prop_errors.update(str(e))
 
         if self.type != self.entity_name:
-            raise PropsError(f"The value of @type property of {self} MUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
         if self.id[:8] not in ["#mailto:", "#callto:"]:
-            raise PropsError(f"The value of @id property of {self} MUST be start with #mailto: or #callto:.")
+            prop_errors.add("@id", "The value MUST be start with #mailto: or #callto:.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
         validation_failures = EntityError(self)

@@ -132,9 +132,8 @@ def check_prop_type(entity: "Entity", prop: str, value: Any, expected_type: str)
         ori_check_type(prop, value, excepted_python_type)
     except TypeError as e:
         ori_msg = str(e)
-        base_msg = ori_msg[:ori_msg.find("must be")]
         type_msg = ori_msg[ori_msg.find("must be") + 8:]
-        raise PropsError(f"The {base_msg.strip()} in {entity} MUST be {type_msg}.") from None
+        raise PropsError(f"The type of this property MUST be {type_msg}.") from None
     except Exception as e:
         raise UnexpectedImplementationError(e)
 
@@ -144,17 +143,26 @@ def check_all_prop_types(entity: "Entity", entity_def: EntityDef) -> None:
     Check the type of all property in the entity by referring schema.yml.
     Called after check_unexpected_props().
     """
+    error_dict = {}
     for prop, prop_def in entity_def.items():
         if prop in entity:
-            check_prop_type(entity, prop, entity[prop], prop_def["expected_type"])
+            try:
+                check_prop_type(entity, prop, entity[prop], prop_def["expected_type"])
+            except PropsError as e:
+                error_dict[prop] = str(e)
+    if len(error_dict) > 0:
+        raise PropsError(error_dict)
 
 
 def check_unexpected_props(entity: "Entity", entity_def: EntityDef) -> None:
+    error_dict = {}
     for actual_prop in entity.keys():
         if actual_prop not in entity_def:
             if actual_prop.startswith("@"):
                 continue
-            raise PropsError(f"Unexpected property: {actual_prop} in {entity}")
+            error_dict[actual_prop] = "Unexpected property"
+    if len(error_dict) > 0:
+        raise PropsError(error_dict)
 
 
 def check_required_props(entity: "Entity", entity_def: EntityDef) -> None:
@@ -162,10 +170,14 @@ def check_required_props(entity: "Entity", entity_def: EntityDef) -> None:
     Check required prop is existing or not.
     If not, raise PropsError.
     """
+    error_dict = {}
     required_props = [k for k, v in entity_def.items() if v["required"]]
     for prop in required_props:
         if prop not in entity.keys():
-            raise PropsError(f"The term {prop} is required in {entity}.")
+            error_dict[prop] = "This property is required, but not found."
+
+    if len(error_dict) > 0:
+        raise PropsError(error_dict)
 
 
 def check_content_formats(entity: "Entity", format_rules: Dict[str, Callable[[str], None]]) -> None:
@@ -173,15 +185,18 @@ def check_content_formats(entity: "Entity", format_rules: Dict[str, Callable[[st
     """\
     expected as called after check_required_props(), check_all_prop_types(), check_unexpected_props()
     """
+    error_dict = {}
     for prop, check_method in format_rules.items():
         if prop in entity:
             try:
                 check_method(entity[prop])
             except (TypeError, ValueError):
-                raise PropsError(f"The term {prop} in {entity} is invalid format.") from None
+                error_dict[prop] = "The value is invalid format."
         else:
             # Because optional field
             pass
+    if len(error_dict) > 0:
+        raise PropsError(error_dict)
 
 
 def classify_uri(entity: "Entity", key: str) -> str:
