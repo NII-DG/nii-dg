@@ -1,7 +1,10 @@
 # type: ignore
 
-from flask import Flask, jsonify, request
+import ast
 
+from flask import Flask, Response, jsonify, request
+
+from nii_dg.error import GovernanceError
 from nii_dg.ro_crate import ROCrate
 
 app = Flask(__name__)
@@ -22,9 +25,17 @@ def validate():
     payload = request.json
     crate_json = payload.get('rocrate')
     crate = ROCrate(from_jsonld=crate_json)
-    age = payload.get('age')
-    return jsonify({"hoge": "fuga"})
+
+    try:
+        crate.validate()
+        return Response(response=jsonify({"status": "SUCCEEDED"}), status=200)
+    except GovernanceError as gov_error:
+        return Response(response=jsonify({"status": "FAILED",
+                                          "failures": ast.literal_eval(str(gov_error))}), status=200)
+    except Exception as error:
+        return Response(response=jsonify({"status": "ERROR: invalid rocrate",
+                                          "error": str(error)}), status=400)
 
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=8888, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
