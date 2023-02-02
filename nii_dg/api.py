@@ -19,10 +19,17 @@ def hello_world() -> str:
 # Governance function
 
 
-@app.route('/', methods=['POST'])
+@app.route('/validate', methods=['POST'])
 def validate():
     # jsonリクエストから値取得
     payload = request.json
+
+    # クエリパラメータ
+    # query = request.form
+    # hoge = query.get("id")
+    # ファイルで取得
+    # f = request.files["file"]
+    # crate_json = json.load(f)
     crate_json = payload.get('rocrate')
     crate = ROCrate(from_jsonld=crate_json)
 
