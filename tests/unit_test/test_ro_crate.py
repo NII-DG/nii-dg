@@ -4,7 +4,7 @@
 import os
 from typing import Any
 
-import pytest  # noqa: F401
+import pytest
 
 from nii_dg.error import (CrateError, GovernanceError,
                           UnexpectedImplementationError)

@@ -1,4 +1,5 @@
-# type: ignore
+#!/usr/bin/env python3
+# coding: utf-8
 
 import ast
 
@@ -20,7 +21,7 @@ def hello_world() -> str:
 
 
 @app.route('/validate', methods=['POST'])
-def validate():
+def validate() -> Response:
     # jsonリクエストから値取得
     payload = request.json
 

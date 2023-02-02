@@ -193,7 +193,7 @@ def test_check_isodate() -> None:
     check_isodate("2023-01-01")
 
 
-@pytest.mark.parametrize('wrong_date', [  # type:ignore
+@pytest.mark.parametrize('wrong_date', [
     "20230131", "2023Jan31", "2023-31-01", "2023/01/31", "2023131", "2023-02-31"])
 def test_check_isodate_error(wrong_date) -> None:
     # error
@@ -201,42 +201,42 @@ def test_check_isodate_error(wrong_date) -> None:
         check_isodate(wrong_date)
 
 
-@pytest.mark.parametrize('correct_email', [  # type:ignore
+@pytest.mark.parametrize('correct_email', [
     "test@example.com", "test1234@example.co.jp"])
 def test_check_email(correct_email) -> None:
     # nothing is occurred with correct format
     check_email(correct_email)
 
 
-@pytest.mark.parametrize('wrong_email', [  # type:ignore
+@pytest.mark.parametrize('wrong_email', [
     "test@", "@example.co.jp", "testatexample.co.jp", ".test@example.com", "test.@example.com", "sample..test@example.com"])
 def test_check_email_error(wrong_email) -> None:
     with pytest.raises(ValueError):
         check_email(wrong_email)
 
 
-@pytest.mark.parametrize('correct_phone_number', [  # type:ignore
+@pytest.mark.parametrize('correct_phone_number', [
     "01-2345-6789", "0123456789", "090-1234-5678", "09012345678"])
 def test_check_phone_number(correct_phone_number) -> None:
     # nothing is occurred with correct format
     check_phonenumber(correct_phone_number)
 
 
-@pytest.mark.parametrize('wrong_phone_number', [  # type:ignore
+@pytest.mark.parametrize('wrong_phone_number', [
     "123-456", "090-12-345678", "01-2345-678a"])
 def test_check_phone_number_error(wrong_phone_number) -> None:
     with pytest.raises(ValueError):
         check_phonenumber(wrong_phone_number)
 
 
-@pytest.mark.parametrize('correct_researcher_number', [  # type:ignore
+@pytest.mark.parametrize('correct_researcher_number', [
     "01234567", "00123456"])
 def test_check_erad_researcher_number(correct_researcher_number) -> None:
     # nothing is occurred with correct format
     check_erad_researcher_number(correct_researcher_number)
 
 
-@pytest.mark.parametrize('wrong_researcher_number', [  # type:ignore
+@pytest.mark.parametrize('wrong_researcher_number', [
     "0123456", "0123456a", "0123-4567"])
 def test_check_erad_researcher_number_error(wrong_researcher_number) -> None:
     # error
@@ -244,14 +244,14 @@ def test_check_erad_researcher_number_error(wrong_researcher_number) -> None:
         check_erad_researcher_number(wrong_researcher_number)
 
 
-@pytest.mark.parametrize('correct_orcid_id', [  # type:ignore
+@pytest.mark.parametrize('correct_orcid_id', [
     "0000-0002-3849-163X", "1234-5678-9101-1128"])
 def test_check_orcid_id(correct_orcid_id) -> None:
     # nothing is occurred with correct format
     check_orcid_id(correct_orcid_id)
 
 
-@pytest.mark.parametrize('wrong_orcid_id', [  # type:ignore
+@pytest.mark.parametrize('wrong_orcid_id', [
     "0000123456778900", "1234-5678-9101-1121", "0000-0002-3849-167X"])
 def test_check_orcid_id_error(wrong_orcid_id) -> None:
     # error
