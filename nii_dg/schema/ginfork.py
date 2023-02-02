@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional
 from nii_dg.entity import ContextualEntity
 from nii_dg.error import EntityError, PropsError
 from nii_dg.ro_crate import ROCrate
+from nii_dg.schema.base import Dataset
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           check_content_size, check_isodate, check_mime_type,
@@ -14,6 +15,11 @@ from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           check_unexpected_props, check_url, classify_uri,
                           load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
+
+REQUIRED_DIRECTORIES = {
+    "with_code": ["source", "input_data", "output_data"],
+    "for_parameter": ["source", "input_data"]
+}
 
 
 class GinMonitoring(ContextualEntity):
@@ -53,11 +59,29 @@ class GinMonitoring(ContextualEntity):
         validation_failures = EntityError(self)
 
         if self["about"] != crate.root:
-            validation_failures.add("about", f"The value of this property MUST be the RootDataEntity {crate.root}.")
+            validation_failures.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
 
-        sum = sum_file_size(self["contentSize"], crate.get_by_entity_type(File))
+        targets = [ent for ent in crate.get_by_entity_type(File) if ent["experimentPackageFlag"] is True]
+        sum = sum_file_size(self["contentSize"][-2:], targets)
         if sum > int(self["contentSize"][:-2]):
-            validation_failures.add("contentSize", "The total file size of ginfork.File is larger than the defined size.")
+            validation_failures.add("contentSize", "The total file size of ginfork.File labeled as an experimental package is larger than the defined size.")
+
+        dir_paths = [dir.id for dir in crate.get_by_entity_type(Dataset)]
+        missing_dirs = []
+        for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]:
+            if dir_name not in [path.split('/')[-2] for path in dir_paths]:
+                missing_dirs.append(dir_name)
+
+        if len(missing_dirs) > 0:
+            validation_failures.add("datasetStructure", f"Couldn't find required directories: named {missing_dirs}.")
+
+        parent_dirs = {dir_name: [path[: -(len(dir_name) + 1)] for path in dir_paths if path.split('/')[-2] == dir_name]
+                       for dir_name in ["source", "input_data", "output_data"]}
+        if self["datasetStructure"] == "for_parameter" and len(set(parent_dirs["source"]) & set(parent_dirs["input_data"])) == 0:
+            validation_failures.add("datasetStructure", "The parent directories of source dir and input dir are not the same.")
+        if self["datasetStructure"] == "with_code" and\
+                len(set(parent_dirs["source"]) & set(parent_dirs["input_data"]) & set(parent_dirs["output_data"])) == 0:
+            validation_failures.add("datasetStructure", "The parent directories of source dir, input dir and output dir are not the same.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures

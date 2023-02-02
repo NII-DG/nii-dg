@@ -44,9 +44,6 @@ def test_check_props() -> None:
     # error: @id value is not relative path nor URL
     # error: sdDatePublished value is not past date
     ent["contentSize"] = "1560B"
-    ent["encodingFormat"] = "text/plain"
-    ent["sha256"] = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-    ent["url"] = "https://github.com/username/repository/file"
     ent["sdDatePublished"] = "9999-12-01"
     ent["experimentPackageFlag"] = 1
     with pytest.raises(EntityError):
