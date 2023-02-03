@@ -4,8 +4,9 @@
 import pytest  # noqa: F401
 
 from nii_dg.error import EntityError
-from nii_dg.schema.base import RootDataEntity
-from nii_dg.schema.ginfork import GinMonitoring
+from nii_dg.ro_crate import ROCrate
+from nii_dg.schema.base import Dataset, RootDataEntity
+from nii_dg.schema.ginfork import File, GinMonitoring
 
 
 def test_init() -> None:
@@ -53,5 +54,36 @@ def test_check_props() -> None:
 
 
 def test_validate() -> None:
-    # TO BE UPDATED
-    pass
+    crate = ROCrate()
+
+    ent = GinMonitoring(1)
+    ent["about"] = RootDataEntity()
+    ent["contentSize"] = "10GB"
+    ent["workflowIdentifier"] = "basic"
+    ent["datasetStructure"] = "with_code"
+
+    file = File("test/file")
+    file["contentSize"] = "15GB"
+    file["experimentPackageFlag"] = True
+    crate.add(file, ent)
+
+    # error: over filesize
+    # error: about property is unrelated
+    # error: specific named directories are missing; source, input_data and output_data
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    ent["about"] = crate.root
+    file["contentSize"] = "9GB"
+    dir_1 = Dataset("source/", {"name": "source"})
+    dir_2 = Dataset("input_data/", {"name": "input_data"})
+    dir_3 = Dataset("root/output_data/", {"name": "output_data"})
+    crate.add(dir_1, dir_2, dir_3)
+
+    # error: specific named directories are not in the same level
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    dir_3["@id"] = "output_data/"
+    # no error occurred
+    ent.validate(crate)

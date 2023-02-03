@@ -4,6 +4,7 @@
 import pytest  # noqa: F401
 
 from nii_dg.error import EntityError
+from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.ginfork import File
 
 
@@ -44,9 +45,6 @@ def test_check_props() -> None:
     # error: @id value is not relative path nor URL
     # error: sdDatePublished value is not past date
     ent["contentSize"] = "1560B"
-    ent["encodingFormat"] = "text/plain"
-    ent["sha256"] = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-    ent["url"] = "https://github.com/username/repository/file"
     ent["sdDatePublished"] = "9999-12-01"
     ent["experimentPackageFlag"] = 1
     with pytest.raises(EntityError):
@@ -62,5 +60,18 @@ def test_check_props() -> None:
 
 
 def test_validate() -> None:
-    # TO BE UPDATED
-    pass
+    crate = ROCrate()
+    file = File("https://example.com/config/setting.txt")
+
+    # error: when @id is URL, sdDatePublished is required
+    with pytest.raises(EntityError):
+        file.validate(crate)
+
+    # no error occurs with sdDatePublished property
+    file["sdDatePublished"] = "2000-01-01"
+    file.validate(crate)
+
+    # no error occurs with non-URL @id
+    file["@id"] = "/config/setting.txt"
+    del file["sdDatePublished"]
+    file.validate(crate)
