@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import ast
+import json
 
 from flask import Flask, Response, jsonify, request
 
@@ -22,24 +22,28 @@ def hello_world() -> str:
 
 @app.route('/validate', methods=['POST'])
 def validate() -> Response:
-    # jsonリクエストから値取得
-    payload = request.json
+    # ファイルで送信
+    crate_file = request.files.get("ro-crate")
+    if crate_file is None:
+        # TODO
+        raise Exception("need ro-crate-metadata.json")
+    if crate_file.mimetype == "application/json":
+        crate_str = crate_file.read().decode()
+    else:
+        # TODO
+        raise Exception("ro-crate MUST be a json file")
 
     # クエリパラメータ
     # query = request.form
     # hoge = query.get("id")
-    # ファイルで取得
-    # f = request.files["file"]
-    # crate_json = json.load(f)
-    crate_json = payload.get('rocrate')
-    crate = ROCrate(from_jsonld=crate_json)
+    crate = ROCrate(from_jsonld=json.loads(crate_str))
 
     try:
         crate.validate()
         return Response(response=jsonify({"status": "SUCCEEDED"}), status=200)
     except GovernanceError as gov_error:
         return Response(response=jsonify({"status": "FAILED",
-                                          "failures": ast.literal_eval(str(gov_error))}), status=200)
+                                          "failures": json.loads(str(gov_error))}), status=200)
     except Exception as error:
         return Response(response=jsonify({"status": "ERROR: invalid rocrate",
                                           "error": str(error)}), status=400)
