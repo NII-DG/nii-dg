@@ -3,7 +3,7 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import CrateError, EntityError, PropsError
+from nii_dg.error import CrateError, EntityError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import (ContactPoint, DataDownload, HostingInstitution,
                                 License, Organization, RepositoryObject)
@@ -51,33 +51,24 @@ def test_check_props() -> None:
     ent = DMP(1, {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(PropsError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(PropsError):
-        ent.check_props()
-
     # error: type error
-    ent["name"] = "calculated data"
+    # error: availabilityStarts value is not future date
     ent["description"] = "Result data calculated by Newton's method"
     ent["hostingInstitution"] = HostingInstitution("https://ror.org/04ksd4g47")
-    ent["wayOfManage"] = "commissioned"
+    ent["wayOfManage"] = True
     ent["accessRights"] = "open access"
-    ent["availabilityStarts"] = 9999
+    ent["availabilityStarts"] = "2022-12-01"
     ent["creator"] = [Organization("https://ror.org/04ksd4g47")]
     ent["repository"] = RepositoryObject("https://doi.org/xxxxxxxx")
-    with pytest.raises(PropsError):
-        ent.check_props()
-
-    # error: availabilityStarts value is not future date
-    ent["availabilityStarts"] = "2022-12-01"
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # no error occurs with correct property value
+    del ent["unknown_property"]
+    ent["name"] = "calculated data"
     ent["availabilityStarts"] = "9999-12-01"
+    ent["wayOfManage"] = "commissioned"
     ent.check_props()
 
 

@@ -13,8 +13,8 @@ from typing import Any, Dict, List, Optional, Type
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
                            ROCrateMetadata)
-from nii_dg.error import (CrateError, EntityError, GovernanceError,
-                          UnexpectedImplementationError)
+from nii_dg.error import (CheckPropsError, CrateError, EntityError,
+                          GovernanceError, UnexpectedImplementationError)
 from nii_dg.schema import RootDataEntity
 
 
@@ -48,7 +48,6 @@ class ROCrate():
         self.data_entities = []
         self.contextual_entities = []
         self.root["hasPart"] = self.data_entities
-        # self.add(self.root, ROCrateMetadata(root=self.root))
 
     def add(self, *entities: Entity) -> None:
         for entity in entities:
@@ -96,9 +95,21 @@ class ROCrate():
         self.check_existence_of_entity()
         # add dateCreated to RootDataEntity
         self.root["dateCreated"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+
+        check_error = CheckPropsError()
+        graph = []
+        for e in self.get_all_entities():
+            try:
+                graph.append(e.as_jsonld())
+            except EntityError as e:
+                check_error.add_error(e)
+
+        if len(check_error.entity_errors) > 0:
+            raise check_error
+
         return {
             "@context": self.BASE_CONTEXT,
-            "@graph": [e.as_jsonld() for e in self.get_all_entities()]
+            "@graph": graph
         }
 
     def check_duplicate_entity(self) -> None:

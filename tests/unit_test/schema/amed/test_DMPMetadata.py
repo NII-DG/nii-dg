@@ -3,7 +3,7 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import EntityError, PropsError
+from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.amed import DMP, DMPMetadata
 from nii_dg.schema.base import (DataDownload, HostingInstitution, Person,
@@ -11,7 +11,7 @@ from nii_dg.schema.base import (DataDownload, HostingInstitution, Person,
 
 
 def test_init() -> None:
-    ent = DMPMetadata({})
+    ent = DMPMetadata(props={})
     assert ent["@id"] == "#AMED-DMP"
     assert ent["@type"] == "DMPMetadata"
     assert ent.schema_name == "amed"
@@ -19,7 +19,7 @@ def test_init() -> None:
 
 
 def test_as_jsonld() -> None:
-    ent = DMPMetadata({})
+    ent = DMPMetadata(props={})
     org = HostingInstitution("https://ror.org/04ksd4g47")
 
     ent["about"] = RootDataEntity({})
@@ -43,17 +43,10 @@ def test_as_jsonld() -> None:
 
 
 def test_check_props() -> None:
-    ent = DMPMetadata({"unknown_property": "unknown"})
+    ent = DMPMetadata(props={"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(PropsError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(PropsError):
-        ent.check_props()
-
     # error: type error
     org = HostingInstitution("https://ror.org/04ksd4g47")
 
@@ -62,14 +55,15 @@ def test_check_props() -> None:
     ent["funding"] = "Acceleration Transformative Research for Medical Innovation"
     ent["chiefResearcher"] = "Donald Duck"
     ent["creator"] = [Person("https://orcid.org/0000-0001-2345-6789")]
-    ent["hostingInstitution"] = org
     ent["dataManager"] = Person("https://orcid.org/0000-0001-2345-6789")
     ent["hasPart"] = [DMP(1), DMP(2)]
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
-    # no error occurs with correct property value
+    # no error
+    del ent["unknown_property"]
     ent["chiefResearcher"] = Person("https://orcid.org/0000-0001-2345-6789")
+    ent["hostingInstitution"] = org
     ent.check_props()
 
 
@@ -77,7 +71,7 @@ def test_validate() -> None:
     crate = ROCrate()
     org = HostingInstitution("https://ror.org/04ksd4g47")
     root = RootDataEntity()
-    ent = DMPMetadata({"funder": org, "hasPart": [], "about": root})
+    ent = DMPMetadata(props={"funder": org, "hasPart": [], "about": root})
     crate.add(org, ent)
 
     # error: funder not included in the funder list of RootDataEntity
@@ -90,7 +84,7 @@ def test_validate() -> None:
     # no error
     ent.validate(crate)
 
-    dmp = DMP("sample")
+    dmp = DMP(1)
     crate.add(dmp)
     # error: not all DMP entity in the crate is included in hasPart
     with pytest.raises(EntityError):

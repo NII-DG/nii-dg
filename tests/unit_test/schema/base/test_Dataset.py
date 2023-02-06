@@ -3,7 +3,7 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import PropsError
+from nii_dg.error import EntityError
 from nii_dg.schema.base import Dataset
 
 
@@ -33,26 +33,20 @@ def test_check_props() -> None:
     ent = Dataset("file:///config/", {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(PropsError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(PropsError):
+    # error: @id value is not relative path nor URL
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: type error
+    del ent["unknown_property"]
+    ent["@id"] = "config/"
     ent["name"] = 12345
-    with pytest.raises(PropsError):
-        ent.check_props()
-
-    # error: @id value is not relative path nor URL
-    ent["name"] = "config"
-    with pytest.raises(PropsError):
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # no error occurs with correct property value
-    ent["@id"] = "config/"
+    ent["name"] = "config"
     ent.check_props()
 
 

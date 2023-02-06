@@ -3,7 +3,7 @@
 
 import pytest  # noqa: F401
 
-from nii_dg.error import EntityError, PropsError
+from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import License
 
@@ -35,26 +35,20 @@ def test_check_props() -> None:
     ent = License("file:///config/setting.txt", {"unknown_property": "unknown"})
 
     # error: with unexpected property
-    with pytest.raises(PropsError):
-        ent.check_props()
-
     # error: lack of required properties
-    del ent["unknown_property"]
-    with pytest.raises(PropsError):
+    # error: @id value is not relative path nor URL
+    with pytest.raises(EntityError):
         ent.check_props()
 
     # error: type error
-    ent["name"] = ["Apache License 2.0"]
-    with pytest.raises(PropsError):
-        ent.check_props()
-
-    # error: @id value is not relative path nor URL
-    ent["name"] = "Apache License 2.0"
-    with pytest.raises(PropsError):
-        ent.check_props()
-
-    # no error occurs with correct property value
+    del ent["unknown_property"]
     ent["@id"] = "https://www.apache.org/licenses/LICENSE-2.0"
+    ent["name"] = ["Apache License 2.0"]
+    with pytest.raises(EntityError):
+        ent.check_props()
+
+    # no error occurs
+    ent["name"] = "Apache License 2.0"
     ent.check_props()
 
 

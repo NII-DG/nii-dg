@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
+import ast
 from typing import TYPE_CHECKING, Dict, List, Optional
 
 if TYPE_CHECKING:
@@ -19,7 +20,7 @@ class PropsError(Exception):
     """\
     Error class for props (checking for entity properties).
     Raised at Entity dump time.
-    This validation is performed by the check_props() method (this method is called in dump()) of each subclass.
+    This validation is performed by the check_props() method (this method is called in as_jsonld()).
     """
 
 
@@ -43,6 +44,12 @@ class EntityError(Exception):
     def add(self, prop: str, message: str) -> None:
         self.message_dict.setdefault(prop, message)
 
+    def add_by_dict(self, messages: str) -> None:
+        message_dict = ast.literal_eval(messages)
+        key = next(iter(message_dict))
+        value = message_dict[key]
+        self.message_dict.setdefault(key, value)
+
 
 class CrateError(Exception):
     """\
@@ -51,6 +58,27 @@ class CrateError(Exception):
     The dump is performed by the check_entities() method (this method is called in dump()) of ROCrate class.
     The validation is performed by the validate() method of each subclass.
     """
+
+
+class CheckPropsError(Exception):
+    """\
+    Error class for checking properties of each included entities.
+    Raised at ROCrate dump time.
+    The dump is performed by the as_jsonld() method (this method is called in dump()) of ROCrate class.
+    The check is performed by the check_props() method of each subclass.
+    """
+
+    def __init__(self, entity_errors: Optional[List[EntityError]] = None) -> None:
+        if entity_errors:
+            self.entity_errors = entity_errors
+        else:
+            self.entity_errors = []
+
+    def __str__(self) -> str:
+        return "Property-check failures:" + str(self.entity_errors)
+
+    def add_error(self, entity_error: EntityError) -> None:
+        self.entity_errors.append(entity_error)
 
 
 class GovernanceError(Exception):
