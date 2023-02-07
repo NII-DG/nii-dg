@@ -44,7 +44,6 @@ def test_check_props() -> None:
     # error: type error
     # error: @id value is not relative path nor URL
     # error: sdDatePublished value is not past date
-    ent["contentSize"] = "1560B"
     ent["sdDatePublished"] = "9999-12-01"
     ent["experimentPackageFlag"] = 1
     with pytest.raises(EntityError):
@@ -64,10 +63,12 @@ def test_validate() -> None:
     file = File("https://example.com/config/setting.txt")
 
     # error: when @id is URL, sdDatePublished is required
+    # error: contentSize is required
     with pytest.raises(EntityError):
         file.validate(crate)
 
     # no error occurs with sdDatePublished property
+    file["contentSize"] = "150GB"
     file["sdDatePublished"] = "2000-01-01"
     file.validate(crate)
 
