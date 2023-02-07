@@ -38,10 +38,10 @@ paths:
           format: binary
   /crates/{requestId}:
     get:
-      summary: Get information about crate validation status and result
+      summary: Get result of crate validation
       responses:
         '200':
-          description: Successfully get the status of ro-crate validation. Once the validation is completed, the results will also returned.
+          description: Successfully get the result of ro-crate validation.
           content:
             application/json:
               schema:
@@ -56,6 +56,50 @@ paths:
         '400':
           $ref: '#/components/responses/400Error'
       parameters:
+        - $ref: '#/components/parameters/RequestId'
+  /crates/{requestId}/status:
+    get:
+      summary: Get status of validation request
+      responses:
+        '200':
+          description: Successfully get the status of ro-crate validation.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - "status"
+                  - "requestId"
+                properties:
+                  status:
+                    type: string
+                  requestId:
+                    type: string
+        '400':
+          $ref: '#/components/responses/400Error'
+    parameters:
+        - $ref: '#/components/parameters/RequestId'
+  /crates/{requestId}/cancel:
+    get:
+      summary: cancel validation request
+      responses:
+        '200':
+          description: Successfully canceled the ro-crate validation.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - "status"
+                  - "requestId"
+                properties:
+                  status:
+                    type: string
+                  requestId:
+                    type: string
+        '400':
+          $ref: '#/components/responses/400Error'
+    parameters:
         - $ref: '#/components/parameters/RequestId'
   /crates/entities:
     post:
@@ -88,10 +132,10 @@ paths:
           format: binary
   /crates/entities/{requestId}:
     get:
-      summary: Get information about crate partial validation status and result
+      summary: Get result of crate partial validation
       responses:
         '200':
-          description: Successfully get the status of ro-crate validation. Once the validation is completed, the results will also returned.
+          description: Successfully get the result of ro-crate partial validation.
           content:
             application/json:
               schema:
@@ -106,6 +150,53 @@ paths:
                     type: string
                   results:
                     type: object
+        '400':
+          $ref: '#/components/responses/400Error'
+    parameters:
+        - $ref: '#/components/parameters/RequestId'
+  /crates/entities/{requestId}/status:
+    get:
+      summary: Get status of validation request
+      responses:
+        '200':
+          description: Successfully get the status of ro-crate partial validation.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - "status"
+                  - "entityId"
+                properties:
+                  status:
+                    type: string
+                  entityId:
+                    type: string
+        '400':
+          $ref: '#/components/responses/400Error'
+    parameters:
+        - $ref: '#/components/parameters/RequestId'
+  /crates/entities/{requestId}/cancel:
+    get:
+      summary: cancel partial validation request
+      responses:
+        '200':
+          description: Successfully canceled the ro-crate partial validation.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - "status"
+                  - "entityId"
+                  - "requestId"
+                properties:
+                  status:
+                    type: string
+                  entityId:
+                    type: string
+                  requestId:
+                    type: string
         '400':
           $ref: '#/components/responses/400Error'
     parameters:

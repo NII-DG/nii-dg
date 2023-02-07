@@ -3,12 +3,17 @@
 
 import json
 
-from flask import Flask, Response, jsonify, request
+from flask import Flask, Response, abort, jsonify, request
 
 from nii_dg.error import GovernanceError
 from nii_dg.ro_crate import ROCrate
 
 app = Flask(__name__)
+
+
+@app.errorhandler(400)
+def invalid_crate(e: Exception) -> Response:
+    return jsonify(message=str(e)), 400
 
 # sample
 
@@ -20,13 +25,13 @@ def hello_world() -> str:
 # Governance function
 
 
-@app.route('/validate', methods=['POST'])
+@app.route('/crates', methods=['POST'])
 def validate() -> Response:
     # ファイルで送信
     crate_file = request.files.get("ro-crate")
     if crate_file is None:
         # TODO
-        raise Exception("need ro-crate-metadata.json")
+        raise Exception("need ro-crate-metadata.json as a request body")
     if crate_file.mimetype == "application/json":
         crate_str = crate_file.read().decode()
     else:
@@ -44,9 +49,14 @@ def validate() -> Response:
     except GovernanceError as gov_error:
         return Response(response=jsonify({"status": "FAILED",
                                           "failures": json.loads(str(gov_error))}), status=200)
-    except Exception as error:
-        return Response(response=jsonify({"status": "ERROR: invalid rocrate",
-                                          "error": str(error)}), status=400)
+    except Exception:
+        # TODO: 例外クラスを限定する
+        abort(400, description="Invalid Crate")
+
+
+@app.route('/health', methods=['GET'])
+def check_health() -> Response:
+    return Response(status=200)
 
 
 if __name__ == "__main__":
