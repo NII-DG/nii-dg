@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: "NII-DG Core API"
   version: "1.0.0"
-  description: Data governance function
+  description: API to perform data governance of research
 #   contact:
 #     name: Contact Name
 #     email: contact@example.com
@@ -15,7 +15,6 @@ info:
 paths:
   /crates:
     post:
-      operationId: doValidation
       summary: Validate ro-crate of NII schema
       # tags: [ 'Metadata' ]
       responses:
@@ -35,20 +34,11 @@ paths:
        content:
         application/json:
          schema:
-          type: object
-          required:
-            - '@context'
-            - '@graph'
-          properties:
-            '@context':
-              type: string
-            '@graph':
-              type: array
-              items:
-                type: object
+          type: string
+          format: binary
   /crates/{requestId}:
     get:
-      description: Get information about crate validation status
+      summary: Get information about crate validation status and result
       responses:
         '200':
           description: Successfully get the status of ro-crate validation. Once the validation is completed, the results will also returned.
@@ -69,7 +59,6 @@ paths:
         - $ref: '#/components/parameters/RequestId'
   /crates/entities:
     post:
-      operationId: doValidation
       summary: Validate ro-crate of NII schema partially
       # tags: [ 'Metadata' ]
       responses:
@@ -95,13 +84,11 @@ paths:
        content:
         application/json:
          schema:
-          type: object
-          required:
-            - '@context'
-            - '@graph'
+          type: string
+          format: binary
   /crates/entities/{requestId}:
     get:
-      description: Get information about crate partial validation status
+      summary: Get information about crate partial validation status and result
       responses:
         '200':
           description: Successfully get the status of ro-crate validation. Once the validation is completed, the results will also returned.
@@ -111,6 +98,7 @@ paths:
                 type: object
                 required:
                   - "status"
+                  - "entityId"
                 properties:
                   status:
                     type: string
@@ -122,10 +110,9 @@ paths:
           $ref: '#/components/responses/400Error'
     parameters:
         - $ref: '#/components/parameters/RequestId'
-  /healthcheck:
+  /health:
     get:
-      operationId: doValidation
-      summary: for monitoring
+      summary: for health check
       responses:
         '200':
           description: Successfully accessed to API server.
