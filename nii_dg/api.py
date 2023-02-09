@@ -45,9 +45,9 @@ class CrateValidation(threading.Thread):
         #     print('時間のかかる処理が終わりました\n')
 
 
-@app.errorhandler(400)
+@app.errorhandler(404)
 def invalid_crate(e: Exception) -> Response:
-    return jsonify(message=str(e)), 400
+    return jsonify(message=str(e)), 404
 
 # Governance function
 
