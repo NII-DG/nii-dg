@@ -52,9 +52,10 @@ def invalid_crate(e: Exception) -> Response:
 # Governance function
 
 
-@app.route('/crates', methods=['POST'])
+@app.route('/validate', methods=['POST'])
 def post_crates() -> Response:
     crate_file = request.files.get("ro-crate")
+    entity_ids = request.args.get("entityIds")
 
     if crate_file is None:
         # TODO
@@ -88,7 +89,19 @@ def post_crates() -> Response:
     #     abort(400, description="Invalid Crate")
 
 
-@app.route('/health', methods=['GET'])
+@app.route('/<requestId:str>', methods=['GET'])
+def get_result() -> None:
+    # TODO
+    pass
+
+
+@app.route('/<requestId:str>/cancel', methods=['POST'])
+def cancel_process() -> None:
+    # TODO
+    pass
+
+
+@app.route('/healthcheck', methods=['GET'])
 def check_health() -> Response:
     return Response(status=200)
 
