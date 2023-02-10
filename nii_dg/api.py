@@ -15,10 +15,22 @@ from nii_dg.ro_crate import ROCrate
 app = Flask(__name__)
 
 
-def write_to_tmp_file(request_id: str, content: Any) -> None:
-    temp_file: Path = Path.cwd()
-    temp_file.parent.joinpath(request_id).resolve().mkdir(parents=True, exist_ok=True)
-    with temp_file.open(mode="w", encoding="utf-8") as f:
+def get_file_name(request_id: str) -> Path:
+    log_file: Path = Path.cwd().joinpath('log_file', request_id)
+    return log_file
+
+
+def read_log_file(request_id: str) -> str:
+    try:
+        with get_file_name(request_id).open(mode="r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        abort(400, f"Request ID {request_id} is not existing.")
+
+
+def write_to_log_file(request_id: str, content: Any) -> None:
+    get_file_name(request_id).mkdir(parents=True, exist_ok=True)
+    with get_file_name(request_id).open(mode="w", encoding="utf-8") as f:
         f.write(str(content))
 
 
@@ -68,7 +80,7 @@ def post_crates() -> Response:
 
     request_id = str(uuid4())
     # TODO: id記録してvalidate()実行
-    write_to_tmp_file(request_id, "QUEUED")
+    write_to_log_file(request_id, "QUEUED")
     t = CrateValidation(request_id)
     t.start()
     return jsonify({"request_id": request_id}), 200
