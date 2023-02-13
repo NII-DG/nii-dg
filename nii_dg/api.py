@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import json
 import threading
 from pathlib import Path
 from typing import Any
@@ -25,7 +24,7 @@ def read_log_file(request_id: str) -> str:
         with get_file_name(request_id).open(mode="r", encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
-        abort(400, f"Request ID {request_id} is not existing.")
+        abort(400, f"Request ID {request_id} is not existing.")  # type:ignore
 
 
 def write_to_log_file(request_id: str, content: Any) -> None:

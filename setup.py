@@ -31,6 +31,7 @@ setup(
         "pytest",
         "types-PyYAML",
         "types-requests",
+        "types-Flask",
     ],
     extras_require={
         "tests": [
@@ -40,6 +41,7 @@ setup(
             "pytest",
             "types-PyYAML",
             "types-requests",
+            "types-Flask",
         ],
     },
     classifiers=[
