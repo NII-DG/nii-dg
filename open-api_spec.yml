@@ -50,7 +50,7 @@ paths:
         Submit a request to cancel a running validation process.
       responses:
         200:
-          $ref: "#/components/responses/RequestId"
+          $ref: "#/components/responses/RequestIdResponse"
         400:
           $ref: "#/components/responses/BadRequest"
         500:
