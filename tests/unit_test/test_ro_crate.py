@@ -5,7 +5,6 @@ import os
 from typing import Any
 
 import pytest
-
 from nii_dg.error import (CrateError, GovernanceError,
                           UnexpectedImplementationError)
 from nii_dg.ro_crate import (ContextualEntity, DataEntity, DefaultEntity,
