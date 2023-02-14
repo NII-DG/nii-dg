@@ -13,6 +13,11 @@ from nii_dg.ro_crate import (ContextualEntity, DataEntity, DefaultEntity,
 from nii_dg.schema.base import File, Organization, Person, RootDataEntity
 
 
+def test_from_jsonld() -> None:
+    # from ro-crate-metadata.json to ROCrate instance
+    pass
+
+
 def test_add() -> None:
     crate = ROCrate()
 
@@ -137,7 +142,7 @@ def test_check_existence_of_entity() -> None:
     crate.check_duplicate_entity()
 
 
-@pytest.fixture  # type:ignore
+@pytest.fixture
 def tmp_file() -> Any:
     with open("tmp.json", "x"):
         pass
