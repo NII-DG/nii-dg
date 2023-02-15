@@ -9,7 +9,7 @@ from uuid import uuid4
 from flask import (Blueprint, Flask, Response, abort, current_app, jsonify,
                    request)
 
-from nii_dg.error import CrateError, GovernanceError
+from nii_dg.error import CrateError, EntityError, GovernanceError
 from nii_dg.ro_crate import ROCrate
 
 GET_STATUS_CODE = 200
@@ -31,18 +31,33 @@ executor = ThreadPoolExecutor(max_workers=3)
 job_map: Dict[str, Future] = {}
 request_map: Dict[str, Dict[str, Any]] = {}
 
+# --- result wrapper ---
 
-# --- controller ---
+
+def result_wrapper(error_dict: List[EntityError]) -> List[Dict[str, str]]:
+    result_array = []
+    for entity_error in error_dict:
+        entity_dict = {}
+        entity_dict["entityId"] = entity_error.entity.id
+        entity_dict["props"] = entity_error.entity.schema_name + "." + entity_error.entity.type + ":"
+        for prop, reason in entity_error.message_dict.items():
+            reason_dict = entity_dict.copy()
+            reason_dict["props"] += prop
+            reason_dict["reason"] = reason
+            result_array.append(reason_dict)
+    return result_array
+    # --- controller ---
+
 
 app_bp = Blueprint("app", __name__)
 
 
-@app_bp.errorhandler(400)
+@ app_bp.errorhandler(400)
 def invalid_request(e: Exception) -> Response:
     return jsonify(message=str(e)), 400
 
 
-@app_bp.route("/validate", methods=["POST"])
+@ app_bp.route("/validate", methods=["POST"])
 def request_validation() -> Response:
     request_id = str(uuid4())
     request_body = request.json or {}
@@ -63,7 +78,7 @@ def request_validation() -> Response:
     return response
 
 
-@app_bp.route("/<string:request_id>", methods=["GET"])
+@ app_bp.route("/<string:request_id>", methods=["GET"])
 def get_results(request_id: str) -> None:
     if request_id not in job_map:
         abort(400, "request_id not found")
@@ -86,7 +101,10 @@ def get_results(request_id: str) -> None:
             results = job.result()
         elif isinstance(job.exception(), GovernanceError):
             status = "FAILED"
-            results = [str(job.exception().entity_errors)]
+            results = result_wrapper(job.exception().entity_errors)  # type:ignore
+        elif isinstance(job.exception(), CrateError):
+            status = "UNKNOWN"
+            results = [{"Invalid Crate": str(job.exception())}]
         else:
             # TODO
             status = "UNKNOWN"
@@ -103,7 +121,7 @@ def get_results(request_id: str) -> None:
     return response
 
 
-@app_bp.route("/<string:request_id>/cancel", methods=["POST"])
+@ app_bp.route("/<string:request_id>/cancel", methods=["POST"])
 def cancel_validation(request_id: str) -> None:
     if request_id not in job_map:
         abort(400, "request_id not found")
@@ -117,7 +135,7 @@ def cancel_validation(request_id: str) -> None:
     return response
 
 
-@app_bp.route('/healthcheck', methods=['GET'])
+@ app_bp.route('/healthcheck', methods=['GET'])
 def check_health() -> Response:
     return Response(jsonify({"message": "OK"}), status=200)
 
