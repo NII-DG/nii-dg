@@ -84,8 +84,12 @@ def get_results(request_id: str) -> None:
             status = "COMPLETE"
             # TODO: The expected original results are a list of exceptions (or a exception), however here I assume the results are a list of dicts. (which means we need to write a wrapper)
             results = job.result()
-        else:
+        elif isinstance(job.exception(), GovernanceError):
             status = "FAILED"
+            results = [str(job.exception().entity_errors)]
+        else:
+            # TODO
+            status = "UNKNOWN"
             results = [{"err_msg": str(job.exception())}]
 
     response: Response = jsonify({
@@ -117,28 +121,21 @@ def cancel_validation(request_id: str) -> None:
 def check_health() -> Response:
     return Response(jsonify({"message": "OK"}), status=200)
 
+
 # --- job ---
 
 
-def validate(request: Dict[str, Any], entity_ids: Optional[List[str]]) -> List[Dict[str, Any]]:
+def validate(request: Dict[str, Any], entity_ids: Optional[List[str]]) -> List[Any]:
     crate = ROCrate(request)
     if entity_ids:
         # TODO
         pass
     else:
-        try:
-            crate.validate()
-            # TODO
-            pass
-        except GovernanceError as e:
-            # TODO
-            return str(e.entity_errors)
-        except CrateError as ce:
-            # TODO
-            pass
-
+        crate.validate()
+        return []
 
 # --- app ---
+
 
 def create_app() -> Flask:
     app = Flask(__name__)
