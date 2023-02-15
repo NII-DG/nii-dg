@@ -8,6 +8,7 @@ from flask import Flask
 
 from nii_dg.api import create_app
 from nii_dg.ro_crate import ROCrate
+from nii_dg.schema.base import Organization
 
 
 @pytest.fixture()
@@ -33,8 +34,26 @@ def crate_json() -> Dict[str, Any]:
     return crate.as_jsonld()
 
 
+@pytest.fixture()
+def crate_json_error() -> Dict[str, Any]:
+    crate = ROCrate()
+    crate.root["name"] = "test"
+    # correct: National Institute of Informatics
+    nii = Organization("https://ror.org/04ksd4g47", {"name": "NII"})
+    crate.root["funder"] = nii
+    crate.add(nii)
+    return crate.as_jsonld()
+
+
 def test_request(client: Any, crate_json: Dict[str, Any]) -> None:
     result = client.post("/", data=crate_json)
+    response = result.get_json()
+
+    assert 'request_id' in response
+
+
+def test_request_error(client: Any, crate_json_error: Dict[str, Any]) -> None:
+    result = client.post("/", data=crate_json_error)
     response = result.get_json()
 
     assert 'request_id' in response
