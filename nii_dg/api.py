@@ -3,7 +3,7 @@
 
 import threading
 from concurrent.futures import Future, ThreadPoolExecutor
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List
 from uuid import uuid4
 
 from flask import (Blueprint, Flask, Response, abort, current_app, jsonify,
@@ -11,6 +11,10 @@ from flask import (Blueprint, Flask, Response, abort, current_app, jsonify,
 
 from nii_dg.error import CrateError, EntityError, GovernanceError
 from nii_dg.ro_crate import ROCrate
+
+if TYPE_CHECKING:
+    from nii_dg.entity import Entity
+
 
 GET_STATUS_CODE = 200
 POST_STATUS_CODE = 200
@@ -46,7 +50,8 @@ def result_wrapper(error_dict: List[EntityError]) -> List[Dict[str, str]]:
             reason_dict["reason"] = reason
             result_array.append(reason_dict)
     return result_array
-    # --- controller ---
+
+# --- controller ---
 
 
 app_bp = Blueprint("app", __name__)
@@ -70,7 +75,20 @@ def request_validation() -> Response:
         # TODO
         return abort(400, "To data governance, ro-crate-metadata.json is required as a request body.")
 
-    job = executor.submit(validate, request_body, entity_ids)
+    try:
+        crate = ROCrate(request)
+    except Exception:
+        # TODO: exceptionの種類確認
+        abort(400, "Invalid ro-crate.")
+
+    target_entities = []
+    if entity_ids:
+        for entity_id in entity_ids:
+            target_entities.extend(crate.get_by_id(entity_id))
+        if len(target_entities) == 0:
+            abort(400, "The specified entityIds are not found in the crate.")
+
+    job = executor.submit(validate, crate, target_entities)
     job_map[request_id] = job
 
     response: Response = jsonify({"request_id": request_id})
@@ -102,9 +120,6 @@ def get_results(request_id: str) -> None:
         elif isinstance(job.exception(), GovernanceError):
             status = "FAILED"
             results = result_wrapper(job.exception().entity_errors)  # type:ignore
-        elif isinstance(job.exception(), CrateError):
-            status = "UNKNOWN"
-            results = [{"Invalid Crate": str(job.exception())}]
         else:
             # TODO
             status = "UNKNOWN"
@@ -137,20 +152,26 @@ def cancel_validation(request_id: str) -> None:
 
 @ app_bp.route('/healthcheck', methods=['GET'])
 def check_health() -> Response:
-    return Response(jsonify({"message": "OK"}), status=200)
+    return Response(jsonify({"message": "OK"}), status=GET_STATUS_CODE)
 
 
 # --- job ---
 
 
-def validate(request: Dict[str, Any], entity_ids: Optional[List[str]]) -> List[Any]:
-    crate = ROCrate(request)
-    if entity_ids:
-        # TODO
-        pass
+def validate(crate: ROCrate, entities: List["Entity"]) -> List[Any]:
+    if len(entities) > 0:
+        governance_error = GovernanceError()
+        for entity in entities:
+            try:
+                entity.validate(crate)
+            except EntityError as err:
+                governance_error.add_error(err)
+
+        if len(governance_error.entity_errors) > 0:
+            raise governance_error
     else:
         crate.validate()
-        return []
+    return []
 
 # --- app ---
 
