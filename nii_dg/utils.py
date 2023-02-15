@@ -198,17 +198,17 @@ def check_content_formats(entity: "Entity", format_rules: Dict[str, Callable[[st
         raise PropsError(error_dict)
 
 
-def classify_uri(entity: "Entity", key: str) -> str:
+def classify_uri(value: str) -> str:
     """
     Check the value is URI.
     Return 'URL' when the value starts with 'http' or 'https'
     When it is not URL, return 'abs_path' or 'rel_path.
     """
     try:
-        encoded_uri = quote(entity[key], safe="!#$&'()*+,/:;=?@[]\\")
+        encoded_uri = quote(value, safe="!#$&'()*+,/:;=?@[]\\")
         parsed = urlparse(encoded_uri)
     except (TypeError, ValueError):
-        raise PropsError(f"The value of {key} in {entity} is invalid URI.") from None
+        raise ValueError(f"The value {value} is invalid URI.") from None
 
     if parsed.scheme in ["http", "https"] and parsed.netloc != "":
         return "URL"
@@ -225,8 +225,8 @@ def check_url(value: str) -> None:
     try:
         encoded_url = quote(value, safe="!#$&'()*+,/:;=?@[]\\")
         parsed = urlparse(encoded_url)
-    except (TypeError, ValueError):
-        raise PropsError(f"The value {value} is invalid URI.") from None
+    except TypeError:
+        raise ValueError from None
 
     if parsed.scheme not in ["http", "https"]:
         raise ValueError
@@ -333,7 +333,7 @@ def check_orcid_id(value: str) -> None:
     orcidid_match = re.compile(pattern)
 
     if orcidid_match.fullmatch(value) is None:
-        raise PropsError(f"Orcid ID {value} is invalid.")
+        raise ValueError(f"Orcid ID {value} is invalid.")
 
     if value[-1] == "X":
         checksum = 10
@@ -343,21 +343,19 @@ def check_orcid_id(value: str) -> None:
     for num in value.replace("-", "")[:-1]:
         sum_val = (sum_val + int(num)) * 2
     if (12 - (sum_val % 11)) % 11 != checksum:
-        raise PropsError(f"Orcid ID {value} is invalid.")
+        raise ValueError(f"Orcid ID {value} is invalid.")
 
 
 def verify_is_past_date(entity: "Entity", key: str) -> Optional[bool]:
     """
     Check the date is past or not.
     """
-    try:
-        iso_date = datetime.date.fromisoformat(entity[key])
-    except (KeyError, TypeError):
+    if key not in entity.keys():
         return None
-    except ValueError:
-        raise PropsError(f"The value {entity[key]} is invalid date format. MUST be 'YYYY-MM-DD'.") from None
 
+    iso_date = datetime.date.fromisoformat(entity[key])
     today = datetime.date.today()
+
     if (today - iso_date).days < 0:
         return False
     return True

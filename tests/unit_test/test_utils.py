@@ -3,7 +3,7 @@
 import datetime
 from typing import Any, List, Literal, Union
 
-import pytest  # noqa: F401
+import pytest
 
 from nii_dg.error import PropsError
 from nii_dg.schema.amed import File as AmedFile
@@ -138,14 +138,10 @@ def test_check_content_formats() -> None:
 
 
 def test_classify_uri() -> None:
-    ent = BaseFile("https://example.com",
-                   {"path1": "file:///document/test",
-                    "path2": "/document/test",
-                    "path3": "document/test"})
-    assert classify_uri(ent, "@id") == "URL"
-    assert classify_uri(ent, "path1") == "abs_path"
-    assert classify_uri(ent, "path2") == "abs_path"
-    assert classify_uri(ent, "path3") == "rel_path"
+    assert classify_uri("https://example.com") == "URL"
+    assert classify_uri("file:///document/test") == "abs_path"
+    assert classify_uri("/document/test") == "abs_path"
+    assert classify_uri("document/test") == "rel_path"
 
 
 def test_check_url() -> None:
@@ -193,7 +189,7 @@ def test_check_isodate() -> None:
     check_isodate("2023-01-01")
 
 
-@pytest.mark.parametrize('wrong_date', [
+@ pytest.mark.parametrize('wrong_date', [
     "20230131", "2023Jan31", "2023-31-01", "2023/01/31", "2023131", "2023-02-31"])
 def test_check_isodate_error(wrong_date) -> None:
     # error
@@ -201,42 +197,42 @@ def test_check_isodate_error(wrong_date) -> None:
         check_isodate(wrong_date)
 
 
-@pytest.mark.parametrize('correct_email', [
+@ pytest.mark.parametrize('correct_email', [
     "test@example.com", "test1234@example.co.jp"])
 def test_check_email(correct_email) -> None:
     # nothing is occurred with correct format
     check_email(correct_email)
 
 
-@pytest.mark.parametrize('wrong_email', [
+@ pytest.mark.parametrize('wrong_email', [
     "test@", "@example.co.jp", "testatexample.co.jp", ".test@example.com", "test.@example.com", "sample..test@example.com"])
 def test_check_email_error(wrong_email) -> None:
     with pytest.raises(ValueError):
         check_email(wrong_email)
 
 
-@pytest.mark.parametrize('correct_phone_number', [
+@ pytest.mark.parametrize('correct_phone_number', [
     "01-2345-6789", "0123456789", "090-1234-5678", "09012345678"])
 def test_check_phone_number(correct_phone_number) -> None:
     # nothing is occurred with correct format
     check_phonenumber(correct_phone_number)
 
 
-@pytest.mark.parametrize('wrong_phone_number', [
+@ pytest.mark.parametrize('wrong_phone_number', [
     "123-456", "090-12-345678", "01-2345-678a"])
 def test_check_phone_number_error(wrong_phone_number) -> None:
     with pytest.raises(ValueError):
         check_phonenumber(wrong_phone_number)
 
 
-@pytest.mark.parametrize('correct_researcher_number', [
+@ pytest.mark.parametrize('correct_researcher_number', [
     "01234567", "00123456"])
 def test_check_erad_researcher_number(correct_researcher_number) -> None:
     # nothing is occurred with correct format
     check_erad_researcher_number(correct_researcher_number)
 
 
-@pytest.mark.parametrize('wrong_researcher_number', [
+@ pytest.mark.parametrize('wrong_researcher_number', [
     "0123456", "0123456a", "0123-4567"])
 def test_check_erad_researcher_number_error(wrong_researcher_number) -> None:
     # error
@@ -244,18 +240,18 @@ def test_check_erad_researcher_number_error(wrong_researcher_number) -> None:
         check_erad_researcher_number(wrong_researcher_number)
 
 
-@pytest.mark.parametrize('correct_orcid_id', [
+@ pytest.mark.parametrize('correct_orcid_id', [
     "0000-0002-3849-163X", "1234-5678-9101-1128"])
 def test_check_orcid_id(correct_orcid_id) -> None:
     # nothing is occurred with correct format
     check_orcid_id(correct_orcid_id)
 
 
-@pytest.mark.parametrize('wrong_orcid_id', [
+@ pytest.mark.parametrize('wrong_orcid_id', [
     "0000123456778900", "1234-5678-9101-1121", "0000-0002-3849-167X"])
 def test_check_orcid_id_error(wrong_orcid_id) -> None:
     # error
-    with pytest.raises(PropsError):
+    with pytest.raises(ValueError):
         check_orcid_id(wrong_orcid_id)
 
 
@@ -269,7 +265,7 @@ def test_access_url() -> None:
 
 
 def test_verify_is_past_date() -> None:
-    ent = BaseFile("sample.txt")
+    ent = BaseFile("sample.txt", {"wrong_type": 1})
 
     assert verify_is_past_date(ent, "not_existing_prop") is None
 
@@ -281,6 +277,9 @@ def test_verify_is_past_date() -> None:
 
     ent["date"] = str(datetime.date.today())
     assert verify_is_past_date(ent, "date")
+
+    with pytest.raises(TypeError):
+        verify_is_past_date(ent, "wrong_type")
 
 
 def test_get_name_from_ror() -> None:

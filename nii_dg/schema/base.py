@@ -113,8 +113,11 @@ class File(DataEntity):
             except PropsError as e:
                 prop_errors.add_by_dict(str(e))
 
-        if classify_uri(self, "@id") == "abs_path":
-            prop_errors.add("@id", "The @id value MUST be URL or relative path to the file, not absolute path.")
+        try:
+            if classify_uri(self.id) == "abs_path":
+                prop_errors.add("@id", "The @id value MUST be URL or relative path to the file, not absolute path.")
+        except ValueError as error:
+            prop_errors.add("@id", str(error))
 
         try:
             check_content_formats(self, {
@@ -133,8 +136,8 @@ class File(DataEntity):
         try:
             if verify_is_past_date(self, "sdDatePublished") is False:
                 prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
-        except PropsError as e:
-            prop_errors.add("sdDatePublished", str(e))
+        except (TypeError, ValueError):
+            prop_errors.add("sdDatePublished", "The value is invalid date format. MUST be 'YYYY-MM-DD'.")
 
         if len(prop_errors.message_dict) > 0:
             raise prop_errors
@@ -142,7 +145,7 @@ class File(DataEntity):
     def validate(self, crate: "ROCrate") -> None:
         validation_failures = EntityError(self)
 
-        if classify_uri(self, "@id") == "URL":
+        if classify_uri(self.id) == "URL":
             if "sdDatePublished" not in self.keys():
                 validation_failures.add("sdDatepublished", "This property is required, but not found.")
 
@@ -154,11 +157,11 @@ class Dataset(DataEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @property
+    @ property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @property
+    @ property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -186,8 +189,11 @@ class Dataset(DataEntity):
         if not self.id.endswith("/"):
             prop_errors.add("@id", "The value MUST end with '/'.")
 
-        if classify_uri(self, "@id") != "rel_path":
-            prop_errors.add("@id", "The valueMUST be relative path to the directory, neither absolute path nor URL.")
+        try:
+            if classify_uri(self.id) != "rel_path":
+                prop_errors.add("@id", "The value MUST be relative path to the directory, neither absolute path nor URL.")
+        except ValueError as error:
+            prop_errors.add("@id", str(error))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
@@ -203,11 +209,11 @@ class Organization(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @property
+    @ property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @property
+    @ property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -263,11 +269,11 @@ class Person(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @property
+    @ property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @property
+    @ property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -297,7 +303,7 @@ class Person(ContextualEntity):
         try:
             if type(self.id) is str and self.id.startswith("https://orcid.org/"):
                 check_orcid_id(self.id[18:])
-        except PropsError as e:
+        except ValueError as e:
             prop_errors.add("@id", str(e))
 
         if self.type != self.entity_name:
@@ -322,11 +328,11 @@ class License(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @property
+    @ property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @property
+    @ property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -373,11 +379,11 @@ class RepositoryObject(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @property
+    @ property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @property
+    @ property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -395,7 +401,10 @@ class RepositoryObject(ContextualEntity):
             except PropsError as e:
                 prop_errors.add_by_dict(str(e))
 
-        classify_uri(self, "@id")
+        try:
+            classify_uri(self.id)
+        except ValueError as error:
+            prop_errors.add("@id", str(error))
 
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
@@ -411,11 +420,11 @@ class DataDownload(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @property
+    @ property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @property
+    @ property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -448,8 +457,8 @@ class DataDownload(ContextualEntity):
         try:
             if verify_is_past_date(self, "uploadDate") is False:
                 prop_errors.add("uploadDate", "The value MUST be the date of past.")
-        except PropsError as e:
-            prop_errors.add("uploadDate", str(e))
+        except (TypeError, ValueError):
+            prop_errors.add("uploadDate", "The value is invalid date format. MUST be 'YYYY-MM-DD'.")
 
         if len(prop_errors.message_dict) > 0:
             raise prop_errors
@@ -470,7 +479,7 @@ class HostingInstitution(Organization):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @property
+    @ property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -522,11 +531,11 @@ class ContactPoint(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @property
+    @ property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @property
+    @ property
     def entity_name(self) -> str:
         return self.__class__.__name__
 

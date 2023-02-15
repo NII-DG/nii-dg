@@ -46,7 +46,7 @@ class DMPMetadata(ContextualEntity):
         if self.id != "#AMED-DMP":
             prop_errors.add("@id", "The value MUST be '#AMED-DMP'.")
 
-        if self["name"] != "AMED-DMP":
+        if "name" in self.keys() and self["name"] != "AMED-DMP":
             prop_errors.add("name", "The value MUST be 'AMED-DMP'.")
 
         if self.type != self.entity_name:
@@ -127,8 +127,8 @@ class DMP(ContextualEntity):
         try:
             if verify_is_past_date(self, "availabilityStarts"):
                 prop_errors.add("availabilityStarts", "The value MUST be the date of future.")
-        except PropsError as e:
-            prop_errors.add("availabilityStarts", str(e))
+        except (TypeError, ValueError):
+            prop_errors.add("availabilityStarts", "The value is invalid date format. MUST be 'YYYY-MM-DD'.")
 
         if len(prop_errors.message_dict) > 0:
             raise prop_errors
@@ -167,12 +167,12 @@ class DMP(ContextualEntity):
                 if ent["dmpDataNumber"] == self:
                     target_files.append(ent)
 
-            sum = sum_file_size(self["contentSize"][-2:], target_files)
+            sum_size = sum_file_size(self["contentSize"][-2:], target_files)
 
-            if self["contentSize"] != "over100GB" and sum > int(self["contentSize"][:-2]):
+            if self["contentSize"] != "over100GB" and sum_size > int(self["contentSize"][:-2]):
                 validation_failures.add("contentSize", "The total file size included in this DMP is larger than the defined size.")
 
-            if self["contentSize"] == "over100GB" and sum < 100:
+            if self["contentSize"] == "over100GB" and sum_size < 100:
                 validation_failures.add("contentSize", "The total file size included in this DMP is smaller than 100GB.")
 
         if len(validation_failures.message_dict) > 0:
@@ -201,8 +201,11 @@ class File(BaseFile):
             except PropsError as e:
                 prop_errors.add_by_dict(str(e))
 
-        if classify_uri(self, "@id") == "abs_path":
-            prop_errors.add("@id", "The value MUST be URL or relative path to the file, not absolute path.")
+        try:
+            if classify_uri(self.id) == "abs_path":
+                prop_errors.add("@id", "The value MUST be URL or relative path to the file, not absolute path.")
+        except ValueError as error:
+            prop_errors.add("@id", str(error))
 
         try:
             check_content_formats(self, {
@@ -221,8 +224,8 @@ class File(BaseFile):
         try:
             if verify_is_past_date(self, "sdDatePublished") is False:
                 prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
-        except PropsError as e:
-            prop_errors.add("sdDatePublished", str(e))
+        except (TypeError, ValueError):
+            prop_errors.add("sdDatePublished", "The value is invalid date format. MUST be 'YYYY-MM-DD'.")
 
         if len(prop_errors.message_dict) > 0:
             raise prop_errors
@@ -230,7 +233,7 @@ class File(BaseFile):
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
 
-        if classify_uri(self, "@id") == "URL" and "sdDatePublished" not in self.keys():
+        if classify_uri(self.id) == "URL" and "sdDatePublished" not in self.keys():
             validation_failures.add("sdDatepublished", "This property is required, but not found.")
 
         if len(validation_failures.message_dict) > 0:
