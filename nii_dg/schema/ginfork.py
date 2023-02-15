@@ -138,9 +138,6 @@ class File(BaseFile):
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
 
-        if "contentSize" not in self.keys():
-            validation_failures.add("contentSize", "This property is required, but not found.")
-
         if classify_uri(self, "@id") == "URL" and "sdDatePublished" not in self.keys():
             validation_failures.add("sdDatepublished", "This property is required, but not found.")
 
