@@ -9,7 +9,7 @@ from uuid import uuid4
 from flask import (Blueprint, Flask, Response, abort, current_app, jsonify,
                    request)
 
-from nii_dg.error import CrateError, EntityError, GovernanceError
+from nii_dg.error import EntityError, GovernanceError
 from nii_dg.ro_crate import ROCrate
 
 if TYPE_CHECKING:
@@ -24,6 +24,7 @@ JOB_STATUS = [
     "RUNNING",
     "COMPLETE",
     "FAILED",
+    "EXECUTOR_ERROR",
     "CANCELING",
     "CANCELED",
 ]
@@ -66,27 +67,29 @@ def invalid_request(e: Exception) -> Response:
 def request_validation() -> Response:
     request_id = str(uuid4())
     request_body = request.json or {}
-    entity_ids = request.args.get("entityIds", None)
-
-    with current_app.app_context():
-        request_map[request_id] = request_body
+    entity_ids = request.args.getlist("entityIds", None)
 
     if request_body == {}:
         # TODO
         return abort(400, "To data governance, ro-crate-metadata.json is required as a request body.")
 
     try:
-        crate = ROCrate(request)
+        crate = ROCrate(request_body)
     except Exception:
         # TODO: exceptionの種類確認
         abort(400, "Invalid ro-crate.")
 
-    target_entities = []
+    target_entities: List[Entity] = []
     if entity_ids:
         for entity_id in entity_ids:
             target_entities.extend(crate.get_by_id(entity_id))
         if len(target_entities) == 0:
             abort(400, "The specified entityIds are not found in the crate.")
+
+    with current_app.app_context():
+        request_map[request_id] = {
+            "roCrate": request_body,
+            "entityIds": list({ent.id for ent in target_entities})}
 
     job = executor.submit(validate, crate, target_entities)
     job_map[request_id] = job
@@ -115,14 +118,12 @@ def get_results(request_id: str) -> None:
         # COMPLETE or FAILED
         if job.exception() is None:
             status = "COMPLETE"
-            # TODO: The expected original results are a list of exceptions (or a exception), however here I assume the results are a list of dicts. (which means we need to write a wrapper)
             results = job.result()
         elif isinstance(job.exception(), GovernanceError):
             status = "FAILED"
             results = result_wrapper(job.exception().entity_errors)  # type:ignore
         else:
-            # TODO
-            status = "UNKNOWN"
+            status = "EXECUTOR_ERROR"
             results = [{"err_msg": str(job.exception())}]
 
     response: Response = jsonify({

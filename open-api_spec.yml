@@ -137,7 +137,7 @@ components:
           $ref: "#/components/schemas/EntityId"
         prop:
           type: string
-          example: "AmedFile:remoteLocation"
+          example: "amed.File:remoteLocation"
         reason:
           type: string
           example: Unable to fetch remote URL.
