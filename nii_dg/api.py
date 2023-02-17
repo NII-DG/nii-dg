@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import sys
 import threading
 from concurrent.futures import Future, ThreadPoolExecutor
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from uuid import uuid4
 
 from flask import (Blueprint, Flask, Response, abort, current_app, jsonify,
@@ -83,16 +84,16 @@ def request_validation() -> Response:
     if entity_ids:
         for entity_id in entity_ids:
             target_entities.extend(crate.get_by_id(entity_id))
-        if len(target_entities) == 0:
-            abort(400, "The specified entityIds are not found in the crate.")
+            if len(crate.get_by_id(entity_id)) == 0:
+                abort(400, f"Invalid entityId: {entity_id} is not found in the crate.")
+
+    job = executor.submit(validate, crate, target_entities)
 
     with current_app.app_context():
         request_map[request_id] = {
             "roCrate": request_body,
-            "entityIds": list({ent.id for ent in target_entities})}
-
-    job = executor.submit(validate, crate, target_entities)
-    job_map[request_id] = job
+            "entityIds": entity_ids}
+        job_map[request_id] = job
 
     response: Response = jsonify({"request_id": request_id})
     response.status_code = POST_STATUS_CODE
@@ -102,7 +103,7 @@ def request_validation() -> Response:
 @ app_bp.route("/<string:request_id>", methods=["GET"])
 def get_results(request_id: str) -> None:
     if request_id not in job_map:
-        abort(400, "request_id not found")
+        abort(400, f"Request_id {request_id} is not found.")
     job = job_map[request_id]
     req = request_map[request_id]
 
@@ -140,7 +141,7 @@ def get_results(request_id: str) -> None:
 @ app_bp.route("/<string:request_id>/cancel", methods=["POST"])
 def cancel_validation(request_id: str) -> None:
     if request_id not in job_map:
-        abort(400, "request_id not found")
+        abort(400, f"Request_id {request_id} is not found.")
     job = job_map[request_id]
     try_cancel = job.cancel()
     if not try_cancel:
@@ -181,18 +182,24 @@ def create_app() -> Flask:
     app = Flask(__name__)
     app.register_blueprint(app_bp)
 
-    # for debug
-    app.config["FLASK_ENV"] = "development"
-    app.config["DEBUG"] = True
-    app.config["TESTING"] = True
-
     return app
 
 
-def main() -> None:
+def main(env: Optional[str]) -> None:
     app = create_app()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+
+    # for development
+    if env == "dev":
+        app.config["DEBUG"] = True
+        app.config["TESTING"] = True
+    elif env:
+        raise ValueError(f"Invalid argument: {env}")
+
+    app.run(host="0.0.0.0", port=5000)
 
 
 if __name__ == "__main__":
-    main()
+    env = None
+    if len(sys.argv) > 1:
+        env = sys.argv[1]
+    main(env)
