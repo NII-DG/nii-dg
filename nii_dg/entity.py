@@ -63,9 +63,6 @@ class Entity(TypedMutableMapping):
 
         return f"<{self.schema_name}.{self.type} {self.id}>"
 
-    def __init_subclass__(cls) -> None:
-        raise UnexpectedImplementationError("Inheritance of ROCrateMetadata is not allowed. Please use DataEntity or ContextualEntity instead.")
-
     @property
     def id(self) -> str:
         return self.data["@id"]  # type: ignore
