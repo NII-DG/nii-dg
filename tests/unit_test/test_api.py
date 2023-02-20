@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import json
 import time
-from concurrent.futures import Future
 from typing import Any, Dict
 from uuid import uuid4
 
 import pytest
 from flask import Flask
 
-from nii_dg.api import create_app, job_map, request_map
+from nii_dg.api import create_app, executor
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import ContactPoint, File, Organization
 
@@ -66,7 +64,7 @@ def test_validation(client: Any, crate_json: Dict[str, Any]) -> None:
     - RO-Crate whole validation
     - successfully validated and no GovernanceError occurred
     '''
-    req_response = client.post("/validate", json=json.dumps(crate_json))
+    req_response = client.post("/validate", json=crate_json)
     result = req_response.json
 
     assert "request_id" in result
@@ -81,13 +79,16 @@ def test_validation(client: Any, crate_json: Dict[str, Any]) -> None:
     assert result_response["status"] == "COMPLETE"
     assert result_response["results"] == []
 
+    cancel_response = client.post("/" + request_id + "/cancel")
+    assert cancel_response.status_code == 400
+
 
 def test_partial_valiadtion(client: Any, crate_json: Dict[str, Any]) -> None:
     '''\
     - validation only some entities in RO-Crate
     - successfully validated and no GovernanceError occurred
     '''
-    req_response = client.post("/validate", json=json.dumps(crate_json), query_string={"entityId": ["./", "path/to/file"]})
+    req_response = client.post("/validate", json=crate_json, query_string={"entityId": ["./", "path/to/file"]})
     result = req_response.json
 
     assert "request_id" in result
@@ -102,13 +103,16 @@ def test_partial_valiadtion(client: Any, crate_json: Dict[str, Any]) -> None:
     assert result_response["status"] == "COMPLETE"
     assert result_response["results"] == []
 
+    cancel_response = client.post("/" + request_id + "/cancel")
+    assert cancel_response.status_code == 400
+
 
 def test_vaidation_error(client: Any, crate_json_validation_error: Dict[str, Any]) -> None:
     '''\
     - RO-Crate whole validation
     - GovernanceError occurred
     '''
-    req_response = client.post("/validate", json=json.dumps(crate_json_validation_error))
+    req_response = client.post("/validate", json=crate_json_validation_error)
     result = req_response.json
 
     assert "request_id" in result
@@ -138,7 +142,7 @@ def test_partial_vaidation_error(client: Any, crate_json_validation_error: Dict[
     - validation only some entities in RO-Crate
     - GovernanceError occurred
     '''
-    req_response = client.post("/validate", json=json.dumps(crate_json_validation_error), query_string={"entityId": ["#mailto:test@example.com"]})
+    req_response = client.post("/validate", json=crate_json_validation_error, query_string={"entityId": ["#mailto:test@example.com"]})
     result = req_response.json
 
     assert "request_id" in result
@@ -148,7 +152,7 @@ def test_partial_vaidation_error(client: Any, crate_json_validation_error: Dict[
     result_response = client.get("/" + request_id).json
 
     assert result_response["request"]["entityIds"] == []
-    assert result_response["request"]["roCrate"] == crate_json
+    assert result_response["request"]["roCrate"] == crate_json_validation_error
     assert result_response["requestId"] == request_id
     assert result_response["status"] == "FAILED"
     assert result_response["results"] == [
@@ -178,7 +182,7 @@ def test_request_invalid_crate(client: Any, invalid_crate_json: Dict[str, Any]) 
     - status code 400 is returned
     '''
 
-    req_response = client.post("/validate", json=json.dumps(invalid_crate_json))
+    req_response = client.post("/validate", json=invalid_crate_json)
     result = req_response.json
 
     assert req_response.status_code == 400
@@ -190,7 +194,7 @@ def test_invalid_entityids(client: Any, crate_json: Dict[str, Any]) -> None:
     - requests with invalid entityIds
     - status code 400 is returned
     '''
-    req_response = client.post("/validate", json=json.dumps(crate_json), query_string={"entityId": ["unknownId"]})
+    req_response = client.post("/validate", json=crate_json, query_string={"entityId": ["unknownId"]})
     result = req_response.json
 
     assert req_response.status_code == 400
@@ -216,13 +220,29 @@ def test_invalid_requestid_cancel(client: Any) -> None:
     - status code 400 is returned
     '''
     invalid_uuid = str(uuid4())
-    req_response = client.post("/validate" + invalid_uuid + "/cancel")
+    req_response = client.post("/" + invalid_uuid + "/cancel")
     result = req_response.json
 
     assert req_response.status_code == 400
     assert result["message"] == f"request_id {invalid_uuid} is not found."
 
 
-def test_in_queue(client: Any) -> None:
-    test_job: Future = Future()
-    job_map[request_id] = test_job
+def test_in_queue(client: Any, crate_json: Dict[str, Any]) -> None:
+    '''\
+    - successfully canceled the validation request
+    '''
+    # dummy tasks
+    for _ in range(3):
+        executor.submit(time.sleep, 60)
+
+    inqueue_response = client.post("/validate", json=crate_json)
+    request_id = inqueue_response.json["request_id"]
+
+    req_response = client.post("/" + request_id + "/cancel")
+
+    assert req_response.status_code == 200
+
+    canceled_response = client.get("/" + request_id).json
+
+    assert canceled_response["requestId"] == request_id
+    assert canceled_response["status"] == "CANCELED"
