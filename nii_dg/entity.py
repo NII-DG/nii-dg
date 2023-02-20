@@ -63,6 +63,9 @@ class Entity(TypedMutableMapping):
 
         return f"<{self.schema_name}.{self.type} {self.id}>"
 
+    def __init_subclass__(cls) -> None:
+        raise UnexpectedImplementationError("Inheritance of ROCrateMetadata is not allowed. Please use DataEntity or ContextualEntity instead.")
+
     @property
     def id(self) -> str:
         return self.data["@id"]  # type: ignore
@@ -102,18 +105,18 @@ class Entity(TypedMutableMapping):
                 ref_data[key] = {"@id": val.id}
             else:
                 ref_data[key] = val
-        if not isinstance(self, ROCrateMetadata):
+        if isinstance(self, DataEntity) or isinstance(self, ContextualEntity):
+            # DefaultEntity uses the original RO-Crate context.
             ref_data["@context"] = self.context
         return ref_data
 
     @property
     def context(self) -> str:
-        template = "https://raw.githubusercontent.com/{repo}/{branch}/schema/context/{schema}/{entity}.json"
+        template = "https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/schema/context/{schema}.jsonld"
         return template.format(
-            repo=github_repo(),
-            branch=github_branch(),
+            gh_repo=github_repo(),
+            gh_ref=github_branch(),
             schema=self.schema_name,
-            entity=self.type,
         )
 
     @property
@@ -183,13 +186,13 @@ class ROCrateMetadata(DefaultEntity):
         self["conformsTo"] = {"@id": "https://w3id.org/ro/crate/1.1"}
         self["about"] = root
 
-    def __init_subclass__(cls) -> None:
-        raise UnexpectedImplementationError("Inheritance of ROCrateMetadata is not permitted.Inheritance of ROCrateMetadata is not allowed.")
 
-    @property
-    def context(self) -> str:
-        return "default"  # TODO: update
+class RootDataEntity(DefaultEntity):
+    """\
+    A Dataset that represents the RO-Crate. For more information, see https://www.researchobject.org/ro-crate/1.1/root-data-entity.html .
+    """
 
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
+    def __init__(self, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id="./", props=props)
+        self["@type"] = "Dataset"
+        # `hasPart` and `datePublished` are added in `RO-Crate` class.

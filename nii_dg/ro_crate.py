@@ -12,10 +12,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Type
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
-                           ROCrateMetadata)
+                           ROCrateMetadata, RootDataEntity)
 from nii_dg.error import (CheckPropsError, CrateError, EntityError,
                           GovernanceError, UnexpectedImplementationError)
-from nii_dg.schema import RootDataEntity
 
 
 class ROCrate():
@@ -93,8 +92,8 @@ class ROCrate():
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_duplicate_entity()
         self.check_existence_of_entity()
-        # add dateCreated to RootDataEntity
-        self.root["dateCreated"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+        # `datePublished` field is defined in the RO-Crate specification.
+        self.root["datePublished"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
         check_error = CheckPropsError()
         graph = []
