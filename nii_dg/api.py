@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import sys
-import threading
+import os
 from concurrent.futures import Future, ThreadPoolExecutor
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List
 from uuid import uuid4
 
 from flask import (Blueprint, Flask, Response, abort, current_app, jsonify,
                    request)
+from waitress import serve
 
-from nii_dg.error import EntityError, GovernanceError
+from nii_dg.error import (EntityError, GovernanceError,
+                          UnexpectedImplementationError)
 from nii_dg.ro_crate import ROCrate
 
 if TYPE_CHECKING:
@@ -185,21 +186,18 @@ def create_app() -> Flask:
     return app
 
 
-def main(env: Optional[str]) -> None:
+def main() -> None:
     app = create_app()
 
-    # for development
-    if env == "dev":
+    if os.getenv("WSGI_SERVER") == "flask":
         app.config["DEBUG"] = True
         app.config["TESTING"] = True
-    elif env:
-        raise ValueError(f"Invalid argument: {env}")
-
-    app.run(host="0.0.0.0", port=5000)
+        app.run(host="0.0.0.0", port=5000)
+    elif os.getenv("WSGI_SERVER") == "waitress":
+        serve(app, host='0.0.0.0', port=5000, threads=2)
+    else:
+        raise UnexpectedImplementationError
 
 
 if __name__ == "__main__":
-    env = None
-    if len(sys.argv) > 1:
-        env = sys.argv[1]
-    main(env)
+    main()

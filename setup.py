@@ -23,6 +23,7 @@ setup(
         "pyyaml",
         "typeguard",
         "requests",
+        "waitress",
     ],
     tests_require=[
         "flake8",
@@ -32,6 +33,7 @@ setup(
         "types-PyYAML",
         "types-requests",
         "types-Flask",
+        "types-waitress",
     ],
     extras_require={
         "tests": [
@@ -42,6 +44,7 @@ setup(
             "types-PyYAML",
             "types-requests",
             "types-Flask",
+            "types-waitress",
         ],
     },
     classifiers=[

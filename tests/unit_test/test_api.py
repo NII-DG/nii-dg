@@ -235,8 +235,8 @@ def test_in_queue(client: Any, crate_json: Dict[str, Any]) -> None:
     for _ in range(3):
         executor.submit(time.sleep, 60)
 
-    inqueue_response = client.post("/validate", json=crate_json)
-    request_id = inqueue_response.json["request_id"]
+    in_queue_response = client.post("/validate", json=crate_json)
+    request_id = in_queue_response.json["request_id"]
 
     req_response = client.post("/" + request_id + "/cancel")
 
