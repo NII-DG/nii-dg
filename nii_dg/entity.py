@@ -8,7 +8,6 @@ Definition of Entity base class and its subclasses.
 from collections.abc import MutableMapping
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from nii_dg.error import UnexpectedImplementationError
 from nii_dg.utils import github_branch, github_repo
 
 if TYPE_CHECKING:
@@ -183,6 +182,10 @@ class ROCrateMetadata(DefaultEntity):
         self["conformsTo"] = {"@id": "https://w3id.org/ro/crate/1.1"}
         self["about"] = root
 
+    @property
+    def context(self) -> str:
+        return "https://w3id.org/ro/crate/1.1/context"
+
 
 class RootDataEntity(DefaultEntity):
     """\
@@ -193,3 +196,7 @@ class RootDataEntity(DefaultEntity):
         super().__init__(id="./", props=props)
         self["@type"] = "Dataset"
         # `hasPart` and `datePublished` are added in `RO-Crate` class.
+
+    @property
+    def context(self) -> str:
+        return "https://w3id.org/ro/crate/1.1/context"

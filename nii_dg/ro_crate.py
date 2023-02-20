@@ -112,6 +112,15 @@ class ROCrate():
         }
 
     def check_duplicate_entity(self) -> None:
+        """\
+        Check for duplicate entities in the RO-Crate.
+
+        Duplicates, i.e. entities with the same `@id`, are allowed in the JSON-LD specification.
+        For example, a `File` entity in the `base` context and a `File` entity in the `amed` context can have the same `@id` and be included in the crate.
+        This is because the `name` property in each context is treated as different properties, even if they have the same `name` property.
+        However, if two entities with the same `@id` and `@context` exist, and both have a `name` property with different values, it becomes unclear which one is correct.
+        Therefore, this case is considered an error and an exception is raised.
+        """
         id_context_list = []
 
         for ent in self.get_all_entities():

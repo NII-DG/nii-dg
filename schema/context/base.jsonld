@@ -2,17 +2,6 @@
   "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/develop/schema/context/base.jsonld",
   "@version": 1.1,
   "@context": {
-    "RootDataEntity": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/develop/nii_dg/schema/base.yml#RootDataEntity",
-      "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/develop/nii_dg/schema/base.yml#RootDataEntity:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/develop/nii_dg/schema/base.yml#RootDataEntity:name",
-        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/develop/nii_dg/schema/base.yml#RootDataEntity:description",
-        "funder": "https://raw.githubusercontent.com/NII-DG/nii-dg/develop/nii_dg/schema/base.yml#RootDataEntity:funder",
-        "dateCreated": "https://raw.githubusercontent.com/NII-DG/nii-dg/develop/nii_dg/schema/base.yml#RootDataEntity:dateCreated",
-        "hasPart": "https://raw.githubusercontent.com/NII-DG/nii-dg/develop/nii_dg/schema/base.yml#RootDataEntity:hasPart"
-      }
-    },
     "File": {
       "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/develop/nii_dg/schema/base.yml#File",
       "@context": {
