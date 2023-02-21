@@ -77,8 +77,7 @@ ro_crate.dump("ro-crate-metadata.json")
       "@type": "Dataset",
       "hasPart": [],
       "name": "Sample RO-Crate",
-      "dateCreated": "2023-01-27T04:16:02.470+00:00",
-      "@context": "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/RootDataEntity.json"
+      "datePublished": "2023-01-27T04:16:02.470+00:00"
     },
     {
       "@id": "ro-crate-metadata.json",
@@ -102,17 +101,21 @@ ro_crate.dump("ro-crate-metadata.json")
 
 #### RootDataEntity について
 
-上述の Minimal example における 2 つの Entity は、RO-Crate における [RootDataEntity](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html) である。RootDataEntity は以下の 2 つからなる:
+上述の Minimal example における 2 つの Entity は、RO-Crate における [RootDataEntity](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html) である。
+RootDataEntity は以下の 2 つからなる:
 
 - `@type`: `CreativeWork`
+  - > The RO-Crate JSON-LD MUST contain a self-describing RO-Crate Metadata File Descriptor with the @id value ro-crate-metadata.json (or ro-crate-metadata.jsonld in legacy crates) and @type CreativeWork.
+  - Called as `ROCrateMetadata` in this library.
   - RO-Crate metadata file に対する自己記述的な Entity
   - RO-Crate 自体の様々な metadata が記述される
-  - この metadata の schema は、[./schema/docs/base.md](./schema/docs/base.md) を参照
 - `@type`: `Dataset`
+  - > This descriptor MUST have an about property referencing the Root Data Entity, which SHOULD have an @id of ./.
+  - Called as `RootDataEntity` in this library.
   - RO-Crate が持つ file を取りまとめる Entity
   - Data Entity (e.g., `File`, `Dataset`) が `hasPart` として自動的に追加される
 
-この 2 つの Entity は、`ROCrate` インスタンスの生成時に自動的に生成される。`ROCrate.root` により、`CreativeWork` に対応する Entity にアクセスできる。
+この 2 つの Entity は、`ROCrate` インスタンスの生成時に自動的に生成される。`ROCrate.root` により、`RootDataEntity` に対応する Entity にアクセスできる。
 
 #### 各 Entity の作成と RO-Crate への追加
 
@@ -197,8 +200,12 @@ ginfork_file = GinforkFile("path/to/file.txt", props={"name": "Example ginfork f
 Validation として、`ROCrate.validate()` が用意されている。
 
 ```python
+import json
 from nii_dg.ro_crate import ROCrate
-crate = ROCrate(from_jsonld="path/to/ro-crate-matadata.json")
+
+with open("path/to/ro-crate-matadata.json") as f:
+    jsonld = json.load(f)
+crate = ROCrate(jsonld=jsonld)
 crate.validate()
 ```
 

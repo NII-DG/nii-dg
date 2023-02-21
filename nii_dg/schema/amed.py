@@ -50,7 +50,7 @@ class DMPMetadata(ContextualEntity):
             prop_errors.add("name", "The value MUST be 'AMED-DMP'.")
 
         if self.type != self.entity_name:
-            prop_errors.add("@type", f"The valueMUST be '{self.entity_name}'.")
+            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
         if len(prop_errors.message_dict) > 0:
             raise prop_errors

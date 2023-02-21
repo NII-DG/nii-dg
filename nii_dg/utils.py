@@ -22,12 +22,12 @@ if TYPE_CHECKING:
 
 def github_repo() -> str:
     # TODO use environment variable, git command, or const value (where?)
-    return "ascade/nii_dg"
+    return "NII-DG/nii_dg"
 
 
 def github_branch() -> str:
     # TODO use environment variable, git command, or const value (where?)
-    return "develop"
+    return "main"
 
 
 class EntityDefDict(TypedDict):
@@ -60,10 +60,10 @@ def load_entity_def_from_schema_file(schema_name: str, entity_name: str) -> Enti
 def import_entity_class(schema_name: str, entity_name: str) -> Any:
     """\
     Import entity class from schema module.
-    e.g., import_entity_class("base", "RootDataEntity") ->
+    e.g., import_entity_class("base", "File") ->
 
-    from nii_dg.schema.base import RootDataEntity
-    return RootDataEntity
+    from nii_dg.schema.base import File
+    return File
     """
     schema_file = Path(__file__).resolve().parent.joinpath(f"schema/{schema_name}.py")
     if not schema_file.exists():
@@ -117,6 +117,9 @@ def convert_string_type_to_python_type(type_str: str, schema_name: Optional[str]
                     except PropsError:
                         pass
             if entity_class is None:
+                if type_str == "ROCrateMetadata" or type_str == "RootDataEntity":
+                    module = importlib.import_module("nii_dg.entity")
+                    return getattr(module, type_str)
                 raise PropsError(f"Unexpected type: {type_str}")
             else:
                 return entity_class

@@ -4,87 +4,19 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
-from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity
-from nii_dg.error import EntityError, PropsError, UnexpectedImplementationError
-from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
+from nii_dg.entity import ContextualEntity, DataEntity
+from nii_dg.error import EntityError, PropsError
+from nii_dg.utils import (access_url, check_all_prop_types,
                           check_content_formats, check_content_size,
                           check_email, check_isodate, check_mime_type,
                           check_orcid_id, check_phonenumber,
                           check_required_props, check_sha256,
                           check_unexpected_props, check_url, classify_uri,
-                          get_name_from_ror, github_branch, github_repo,
-                          load_entity_def_from_schema_file,
+                          get_name_from_ror, load_entity_def_from_schema_file,
                           verify_is_past_date)
 
 if TYPE_CHECKING:
     from nii_dg.ro_crate import ROCrate
-
-
-class RootDataEntity(DefaultEntity):
-    """\
-    See https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#direct-properties-of-the-root-data-entity.
-    """
-
-    def __init__(self, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id="./", props=props)
-        self["@type"] = "Dataset"
-
-    def __init_subclass__(cls) -> None:
-        raise UnexpectedImplementationError("Inheritance of RootDataEntity is not allowed.")
-
-    @property
-    def context(self) -> str:
-        """/
-        Special context for RootDataEntity.
-        """
-        template = "https://raw.githubusercontent.com/{repo}/{branch}/schema/context/{schema}/{entity}.json"
-        return template.format(
-            repo=github_repo(),
-            branch=github_branch(),
-            schema=self.schema_name,
-            entity="RootDataEntity",
-        )
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
-
-    def check_props(self) -> None:
-        prop_errors = EntityError(self)
-
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
-        entity_def_of_root: EntityDef = {prop: obj for prop, obj in entity_def.items() if prop not in ["dateCreated", "hasPart"]}  # type: ignore
-
-        for func in [check_unexpected_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
-
-        try:
-            check_required_props(self, entity_def_of_root)
-        except PropsError as e:
-            prop_errors.add_by_dict(str(e))
-
-        if self.id != "./":
-            prop_errors.add("@id", "The value MUST be './'.")
-
-        if self.type != "Dataset":
-            prop_errors.add("@type", "The value MUST be 'Dataset'.")
-
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
-
-    def validate(self, crate: "ROCrate") -> None:
-        pass
 
 
 class File(DataEntity):
