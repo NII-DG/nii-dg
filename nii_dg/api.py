@@ -10,8 +10,7 @@ from flask import (Blueprint, Flask, Response, abort, current_app, jsonify,
                    request)
 from waitress import serve
 
-from nii_dg.error import (EntityError, GovernanceError,
-                          UnexpectedImplementationError)
+from nii_dg.error import EntityError, GovernanceError
 from nii_dg.ro_crate import ROCrate
 
 if TYPE_CHECKING:
@@ -66,7 +65,7 @@ def invalid_request(err: Exception) -> Response:
 
 
 @app_bp.errorhandler(500)
-def internal_error() -> Response:
+def internal_error(err: Exception) -> Response:
     return jsonify(message='An internal error occurred.'), 500
 
 
@@ -74,7 +73,7 @@ def internal_error() -> Response:
 def request_validation() -> Response:
     request_id = str(uuid4())
     request_body = request.json or {}
-    entity_ids = request.args.getlist("entityIds", None)
+    entity_ids: List[str] = request.args.getlist("entityIds", None)
 
     if request_body == {}:
         # TODO
@@ -199,12 +198,11 @@ def main() -> None:
         import logging
         waitress_logger = logging.getLogger("waitress")
         waitress_logger.setLevel(logging.INFO)
-    elif os.getenv("WSGI_SERVER") == "flask":
+    else:
+        # for debug
         app.config["DEBUG"] = True
         app.config["TESTING"] = True
         app.run(host="0.0.0.0", port=5000)
-    else:
-        raise UnexpectedImplementationError
 
 
 if __name__ == "__main__":
