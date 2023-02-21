@@ -2,8 +2,8 @@
 # coding: utf-8
 
 import pytest
-from nii_dg.entity import Entity, ROCrateMetadata
-from nii_dg.schema.base import RootDataEntity
+
+from nii_dg.entity import Entity, ROCrateMetadata, RootDataEntity
 
 
 def test_delitem() -> None:

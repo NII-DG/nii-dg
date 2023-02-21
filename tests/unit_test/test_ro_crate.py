@@ -5,11 +5,12 @@ import os
 from typing import Any
 
 import pytest
+
 from nii_dg.error import (CrateError, GovernanceError,
                           UnexpectedImplementationError)
 from nii_dg.ro_crate import (ContextualEntity, DataEntity, DefaultEntity,
-                             ROCrate, ROCrateMetadata)
-from nii_dg.schema.base import File, Organization, Person, RootDataEntity
+                             ROCrate, ROCrateMetadata, RootDataEntity)
+from nii_dg.schema.base import File, Organization, Person
 
 
 def test_from_jsonld() -> None:
@@ -93,8 +94,8 @@ def test_as_json_ld() -> None:
             "@type": "Dataset",
             "name": "test",
             "hasPart": [],
-            "dateCreated":test_dict["@graph"][0]["dateCreated"],
-            "@context": "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/RootDataEntity.json"
+            "datePublished":test_dict["@graph"][0]["datePublished"],
+            "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/base.json"
         },
             {
             "@id": "ro-crate-metadata.json",

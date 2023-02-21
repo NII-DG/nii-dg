@@ -5,10 +5,10 @@ from typing import Any, List, Literal, Union
 
 import pytest
 
+from nii_dg.entity import RootDataEntity
 from nii_dg.error import PropsError
 from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.base import File as BaseFile
-from nii_dg.schema.base import RootDataEntity
 from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_content_size, check_email,
                           check_erad_researcher_number, check_isodate,
@@ -22,28 +22,29 @@ from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
 
 
 def test_load_entity_def_from_schema_file() -> None:
-    excepted_entity_def = load_entity_def_from_schema_file("base", "RootDataEntity")
+    excepted_entity_def = load_entity_def_from_schema_file("base", "Person")
     assert excepted_entity_def["@id"] == {"expected_type": "str", "required": True}
     assert excepted_entity_def["name"] == {"expected_type": "str", "required": True}
-    assert excepted_entity_def["description"] == {"expected_type": "str", "required": False}
-    assert excepted_entity_def["dateCreated"] == {"expected_type": "str", "required": True}
-    assert excepted_entity_def["hasPart"] == {"expected_type": "List[Union[Dataset, File]]", "required": True}
+    assert excepted_entity_def["alias"] == {"expected_type": "str", "required": False}
+    assert excepted_entity_def["affiliation"] == {"expected_type": "Organization", "required": True}
+    assert excepted_entity_def["email"] == {"expected_type": "str", "required": True}
+    assert excepted_entity_def["telephone"] == {"expected_type": "str", "required": False}
 
     # error
     with pytest.raises(PropsError):
         load_entity_def_from_schema_file("base", "FooBar")
     with pytest.raises(PropsError):
-        load_entity_def_from_schema_file("foobar", "RootDataEntity")
+        load_entity_def_from_schema_file("foobar", "Person")
 
 
 def test_import_entity_class() -> None:
-    assert import_entity_class("base", "RootDataEntity") is RootDataEntity
+    assert import_entity_class("base", "File") is BaseFile
 
     # error
     with pytest.raises(PropsError):
         import_entity_class("base", "FooBar")
     with pytest.raises(PropsError):
-        import_entity_class("foobar", "RootDataEntity")
+        import_entity_class("foobar", "File")
 
 
 def test_convert_string_type_to_python_type() -> None:
@@ -64,7 +65,6 @@ def test_convert_string_type_to_python_type() -> None:
 
     # Entity subclass in schema module
     assert convert_string_type_to_python_type("RootDataEntity") is RootDataEntity
-    assert convert_string_type_to_python_type("RootDataEntity", "base") is RootDataEntity
     assert convert_string_type_to_python_type("File", "base") is BaseFile
     assert convert_string_type_to_python_type("List[File]", "base") is List[BaseFile]
     assert convert_string_type_to_python_type("File", "amed") is AmedFile
@@ -116,7 +116,7 @@ def test_check_unexpected_props() -> None:
 
 
 def test_check_required_props() -> None:
-    root = RootDataEntity()
+    ent = BaseFile()
     entity_def: EntityDef = {  # type:ignore
         "test_prop": {
             "expected_type": "str",
@@ -125,11 +125,11 @@ def test_check_required_props() -> None:
     }
 
     with pytest.raises(PropsError):
-        check_required_props(root, entity_def)
+        check_required_props(ent, entity_def)
 
-    # nothing is occurred with correct format
-    root["test_prop"] = "sample_value"
-    check_required_props(root, entity_def)
+    # no error occurred with correct format
+    ent["test_prop"] = "sample_value"
+    check_required_props(ent, entity_def)
 
 
 def test_check_content_formats() -> None:

@@ -2,10 +2,11 @@
 # coding: utf-8
 
 import pytest
+
+from nii_dg.entity import RootDataEntity
 from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
-from nii_dg.schema.base import (DataDownload, Organization, RepositoryObject,
-                                RootDataEntity)
+from nii_dg.schema.base import DataDownload, Organization, RepositoryObject
 from nii_dg.schema.cao import DMP, DMPMetadata
 
 
@@ -63,13 +64,11 @@ def test_validate() -> None:
     ent = DMPMetadata(props={"funder": org, "hasPart": [], "about": root})
     crate.add(org, ent)
 
-    # error: funder not included in the funder list of RootDataEntity
     # error: value of about is not the RootDataEntity of the crate
     with pytest.raises(EntityError):
         ent.validate(crate)
 
     ent["about"] = crate.root
-    crate.root["funder"] = [org]
     # no error
     ent.validate(crate)
 
