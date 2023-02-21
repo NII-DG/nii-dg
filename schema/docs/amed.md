@@ -9,7 +9,7 @@ Metadata of research project that is the subject of this data management plan.
 | `@id` | `str` | Required. | MUST be the name with prefix `#`. | `#AMED-DMP` |
 | `about` | `RootDataEntity` | Required. | MUST be `{"@id": "./"}`. Indicates this DMP is about research project that the data stated in RootDataEntity are generated. | `{"@id": "./"}` |
 | `name` | `str` | Required. | MUST be `AMED-DMP`. Indicates the DMP format used by your project. | `AMED-DMP` |
-| `funder` | `Organization` | Required. | Funding agency of the research project (AMED in most cases). MUST be @id dictionary of Organization entity. When the funder property of RootDataEntity is also used, this Organization entity MUST be included in the funder list in RootDataEntity. | `{"@id": "https://ror.org/01b9y6c26"}` |
+| `funder` | `Organization` | Required. | Funding agency of the research project (AMED in most cases). MUST be @id dictionary of Organization entity. | `{"@id": "https://ror.org/01b9y6c26"}` |
 | `funding` | `str` | Required. | Indicates the name of funding program. | `Acceleration Transformative Research for Medical Innovation` |
 | `chiefResearcher` | `Person` | Required. | MUST be @id dictionary of Person entity. Indicates chief researcher or representative of the research project. | `{"@id": "https://orcid.org/0000-0001-2345-6789"}` |
 | `creator` | `List[Person]` | Required when hasPart property has DMP entities. | MUST be an array of @id dictionary of Person entity. Indicates all data creators involved in this research project. | `[{"@id": "https://orcid.org/0000-0001-2345-6789"}]` |

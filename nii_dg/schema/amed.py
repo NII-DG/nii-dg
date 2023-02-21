@@ -61,10 +61,6 @@ class DMPMetadata(ContextualEntity):
         if self["about"] != crate.root:
             validation_failures.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
 
-        organization = self["funder"]
-        if "funder" in crate.root.keys() and organization not in crate.root["funder"]:
-            validation_failures.add("funder", f"The entity {organization} is not included in the funder property of RootDataEntity.")
-
         if len(self["hasPart"]) > 0:
             if "creator" not in self.keys():
                 validation_failures.add("creator", "This property is required, but not found.")
