@@ -60,12 +60,17 @@ def result_wrapper(error_dict: List[EntityError]) -> List[Dict[str, str]]:
 app_bp = Blueprint("app", __name__)
 
 
-@ app_bp.errorhandler(400)
-def invalid_request(e: Exception) -> Response:
-    return jsonify(message=str(e)), 400
+@app_bp.errorhandler(400)
+def invalid_request(err: Exception) -> Response:
+    return jsonify(message=str(err)), 400
 
 
-@ app_bp.route("/validate", methods=["POST"])
+@app_bp.errorhandler(500)
+def internal_error() -> Response:
+    return jsonify(message='An internal error occurred.'), 500
+
+
+@app_bp.route("/validate", methods=["POST"])
 def request_validation() -> Response:
     request_id = str(uuid4())
     request_body = request.json or {}
@@ -101,7 +106,7 @@ def request_validation() -> Response:
     return response
 
 
-@ app_bp.route("/<string:request_id>", methods=["GET"])
+@app_bp.route("/<string:request_id>", methods=["GET"])
 def get_results(request_id: str) -> None:
     if request_id not in job_map:
         abort(400, f"Request_id {request_id} is not found.")
@@ -139,7 +144,7 @@ def get_results(request_id: str) -> None:
     return response
 
 
-@ app_bp.route("/<string:request_id>/cancel", methods=["POST"])
+@app_bp.route("/<string:request_id>/cancel", methods=["POST"])
 def cancel_validation(request_id: str) -> None:
     if request_id not in job_map:
         abort(400, f"Request_id {request_id} is not found.")
@@ -153,7 +158,7 @@ def cancel_validation(request_id: str) -> None:
     return response
 
 
-@ app_bp.route('/healthcheck', methods=['GET'])
+@app_bp.route('/healthcheck', methods=['GET'])
 def check_health() -> Response:
     return Response(jsonify({"message": "OK"}), status=GET_STATUS_CODE)
 
@@ -189,12 +194,15 @@ def create_app() -> Flask:
 def main() -> None:
     app = create_app()
 
-    if os.getenv("WSGI_SERVER") == "flask":
+    if os.getenv("WSGI_SERVER") == "waitress":
+        serve(app, host='0.0.0.0', port=5000, threads=2)
+        import logging
+        waitress_logger = logging.getLogger("waitress")
+        waitress_logger.setLevel(logging.INFO)
+    elif os.getenv("WSGI_SERVER") == "flask":
         app.config["DEBUG"] = True
         app.config["TESTING"] = True
         app.run(host="0.0.0.0", port=5000)
-    elif os.getenv("WSGI_SERVER") == "waitress":
-        serve(app, host='0.0.0.0', port=5000, threads=2)
     else:
         raise UnexpectedImplementationError
 
