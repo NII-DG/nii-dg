@@ -44,6 +44,7 @@ def invalid_crate_json() -> Dict[str, Any]:
     crate.root["name"] = "test"
     base_json = crate.as_jsonld()
     base_json["unknown"] = "invalid property"
+
     return base_json
 
 
@@ -51,11 +52,12 @@ def invalid_crate_json() -> Dict[str, Any]:
 def crate_json_valiation_error() -> Dict[str, Any]:
     crate = ROCrate()
     crate.root["name"] = "test"
-    # correct: National Institute of Informatics
+    # correct name: National Institute of Informatics
     nii = Organization("https://ror.org/04ksd4g47", {"name": "NII"})
     crate.root["funder"] = [nii]
     cp = ContactPoint("#mailto:test@example.com", {"email": "sample@example.com"})
     crate.add(nii, cp)
+
     return crate.as_jsonld()
 
 
@@ -69,6 +71,7 @@ def test_validation(client: Any, crate_json: Dict[str, Any]) -> None:
 
     assert "request_id" in result
 
+    # wait for validation to finish
     time.sleep(5)
     request_id = result["request_id"]
     result_response = client.get("/" + request_id).json
@@ -93,6 +96,7 @@ def test_partial_valiadtion(client: Any, crate_json: Dict[str, Any]) -> None:
 
     assert "request_id" in result
 
+    # wait for validation to finish
     time.sleep(5)
     request_id = result["request_id"]
     result_response = client.get("/" + request_id).json
@@ -117,6 +121,7 @@ def test_vaidation_error(client: Any, crate_json_validation_error: Dict[str, Any
 
     assert "request_id" in result
 
+    # wait for validation to finish
     time.sleep(5)
     request_id = result["request_id"]
     result_response = client.get("/" + request_id).json
@@ -147,6 +152,7 @@ def test_partial_vaidation_error(client: Any, crate_json_validation_error: Dict[
 
     assert "request_id" in result
 
+    # wait for validation to finish
     time.sleep(5)
     request_id = result["request_id"]
     result_response = client.get("/" + request_id).json
@@ -231,16 +237,21 @@ def test_in_queue(client: Any, crate_json: Dict[str, Any]) -> None:
     '''\
     - successfully canceled the validation request
     '''
-    # dummy tasks
+    # dummy tasks for filling workers
     for _ in range(3):
         executor.submit(time.sleep, 60)
 
-    in_queue_response = client.post("/validate", json=crate_json)
-    request_id = in_queue_response.json["request_id"]
+    enqueue_response = client.post("/validate", json=crate_json)
+    request_id = enqueue_response.json["request_id"]
 
-    req_response = client.post("/" + request_id + "/cancel")
+    in_queue_response = client.post("/" + request_id)
 
-    assert req_response.status_code == 200
+    assert in_queue_response.status_code == 200
+    assert in_queue_response.json["status"] == "QUEUED"
+
+    cancelling_response = client.post("/" + request_id + "/cancel")
+
+    assert cancelling_response.status_code == 200
 
     canceled_response = client.get("/" + request_id).json
 
