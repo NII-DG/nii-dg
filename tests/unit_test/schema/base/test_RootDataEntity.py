@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import pytest  # noqa: F401
-
+import pytest
 from nii_dg.error import EntityError
 from nii_dg.schema.base import Organization, RootDataEntity
 

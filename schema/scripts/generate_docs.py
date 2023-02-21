@@ -16,7 +16,7 @@ prop_keys = set(Prop.__annotations__.keys())
 Entity = Dict[str, Prop]
 Schema = Dict[str, Entity]
 
-REPO_NAME = "ascade/nii-dg"
+REPO_NAME = "NII-DG/nii-dg"
 
 TEMPLATE_DOCS = """\
 # NII-DG: Schema: {schema_name}

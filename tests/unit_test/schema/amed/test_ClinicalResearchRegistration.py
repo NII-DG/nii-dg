@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-
-import pytest  # noqa: F401
-
+import pytest
 from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.amed import ClinicalResearchRegistration
@@ -22,8 +20,8 @@ def test_as_jsonld() -> None:
     ent["name"] = "Japan Registry of Clinical Trials"
     ent["value"] = "1234567"
 
-    jsonld = {'@type': 'ClinicalResearchRegistration', '@id': 'https://jrct.niph.go.jp/latest-detail/jRCT202211111111',
-              'name': 'Japan Registry of Clinical Trials', 'value': '1234567'}
+    jsonld = {"@type": "ClinicalResearchRegistration", "@id": "https://jrct.niph.go.jp/latest-detail/jRCT202211111111",
+              "name": "Japan Registry of Clinical Trials", "value": "1234567"}
 
     ent_in_json = ent.as_jsonld()
     del ent_in_json["@context"]
