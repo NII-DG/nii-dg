@@ -187,11 +187,10 @@ class ROCrate():
             raise governance_error
 
     def from_jsonld(self, jsonld: Dict[str, Any]) -> None:
-        # self.root = RootDataEntity()
-        # self.default_entities = [self.root, ROCrateMetadata(root=self.root)]
-        # self.data_entities = []
-        # self.contextual_entities = []
-        # self.root["hasPart"] = self.data_entities
+        if "@context" not in jsonld:
+            raise CrateError("The JSON-LD doesn't have `@context` property.")
+        if jsonld["@context"] != self.BASE_CONTEXT:
+            raise CrateError(f"The JSON-LD MUST have `{self.BASE_CONTEXT}` as a value of @context property.")
         if "@graph" not in jsonld:
             raise CrateError("The JSON-LD doesn't have `@graph` property.")
 
@@ -205,7 +204,7 @@ class ROCrate():
                 raise CrateError("The JSON-LD includes an entity without `@id` property.")
             type_ = entity.get("@type", None)
             if type_ is None:
-                raise CrateError("The entity {id_} doesn't have `@type` property.")
+                raise CrateError(f"The entity with @id `{id_}` doesn't have `@type` property.")
 
             if id_ == "./" and type_ == "Dataset":
                 root_entity = entity
@@ -214,7 +213,7 @@ class ROCrate():
             else:
                 context = entity.get("@context", None)
                 if context is None:
-                    raise CrateError("The entity <{type_} {id_}> doesn't have `@context` property.")
+                    raise CrateError(f"The entity <{type_} {id_}> doesn't have `@context` property.")
                 schema_name = urlparse(context).path.split("/")[-1].split(".")[0]
                 entity_class = import_entity_class(schema_name, type_)
                 # TODO: 何かしらの抽象化層が必要

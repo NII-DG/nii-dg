@@ -2,7 +2,7 @@
 # coding: utf-8
 
 import os
-from typing import Any
+from typing import Any, Dict
 
 import pytest
 
@@ -11,11 +11,6 @@ from nii_dg.error import (CrateError, GovernanceError,
 from nii_dg.ro_crate import (ContextualEntity, DataEntity, DefaultEntity,
                              ROCrate, ROCrateMetadata, RootDataEntity)
 from nii_dg.schema.base import File, Organization, Person
-
-
-def test_from_jsonld() -> None:
-    # from ro-crate-metadata.json to ROCrate instance
-    pass
 
 
 def test_add() -> None:
@@ -170,3 +165,64 @@ def test_validate() -> None:
 
     with pytest.raises(GovernanceError):
         crate.validate()
+
+
+def test_from_jsonld() -> None:
+    test_jsonld: Dict[str, Any] = {"context": "test"}
+    # error with no @context property
+    with pytest.raises(CrateError):
+        ROCrate(jsonld=test_jsonld)
+
+    # error with value of @context property
+    test_jsonld = {"@context": "test"}
+    with pytest.raises(CrateError):
+        ROCrate(jsonld=test_jsonld)
+
+    # error with no @graph property
+    test_jsonld["@context"] = ROCrate.BASE_CONTEXT
+    with pytest.raises(CrateError):
+        ROCrate(jsonld=test_jsonld)
+
+    # error with no RootDataEntity
+    test_jsonld["@graph"] = []
+    with pytest.raises(CrateError):
+        ROCrate(jsonld=test_jsonld)
+
+    # error with no ROCrateMetadata
+    test_jsonld["@graph"].append({"@id": "./", "@type": "Dataset"})
+    with pytest.raises(CrateError):
+        ROCrate(jsonld=test_jsonld)
+
+    # successfully generating ro-crate instance
+    test_jsonld["@graph"].append({"@id": "ro-crate-metadata.json", "@type": "CreativeWork"})
+
+    crate_1 = ROCrate(jsonld=test_jsonld)
+    isinstance(crate_1, ROCrate)
+    assert len(crate_1.get_all_entities()) == 2
+    assert len(crate_1.get_by_entity_type(RootDataEntity)) == 1
+    assert len(crate_1.get_by_entity_type(ROCrateMetadata)) == 1
+
+    # error with entity having no @id property
+    test_jsonld = crate_1.as_jsonld()
+    test_jsonld["@graph"].append({"id": "path/to/file"})
+    print(test_jsonld)
+    with pytest.raises(CrateError):
+        ROCrate(jsonld=test_jsonld)
+
+    # error with entity having no @type property
+    del test_jsonld["@graph"][2]
+    test_jsonld["@graph"].append({"@id": "path/to/file"})
+    with pytest.raises(CrateError):
+        ROCrate(jsonld=test_jsonld)
+
+    # error with entity having no @context property
+    test_jsonld["@graph"][2]["@type"] = "File"
+    with pytest.raises(CrateError):
+        ROCrate(jsonld=test_jsonld)
+
+    # successfully generating ro-crate instance
+    test_jsonld["@graph"][2]["@context"] = "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/base.jsonld"
+    crate_2 = ROCrate(jsonld=test_jsonld)
+    isinstance(crate_2, ROCrate)
+    assert len(crate_2.get_all_entities()) == 3
+    assert len(crate_2.get_by_entity_type(File)) == 1
