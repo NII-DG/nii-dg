@@ -17,7 +17,7 @@ from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
                            ROCrateMetadata, RootDataEntity)
 from nii_dg.error import (CheckPropsError, CrateError, EntityError,
                           GovernanceError, UnexpectedImplementationError)
-from nii_dg.utils import import_entity_class
+from nii_dg.utils import import_entity_class, verify_idlink_is_correct_type
 
 
 class ROCrate():
@@ -139,14 +139,31 @@ class ROCrate():
 
     def check_existence_of_entity(self) -> None:
         for ent in self.get_all_entities():
-            for val in ent.values():
+            if isinstance(ent, DefaultEntity):
+                continue
+            for prop, val in ent.items():
                 if isinstance(val, Entity) and val not in self.get_all_entities():
                     raise CrateError(f"The entity {val} is included in entity {ent}, but not included in the crate.")
+                if isinstance(val, dict) and "@id" in val:
+                    # expected: {"@id":"https://example.com"}
+                    if len(self.get_by_id(val["@id"])) == 0:
+                        raise CrateError(
+                            f"The link of @id {val['@id']} is included in the property {prop} of entity {ent}, but entity with @id {val['@id']} is not found in the crate.")
+                    if verify_idlink_is_correct_type(ent, prop, self.get_by_id(val["@id"])) is False:
+                        raise CrateError(
+                            f"The link of @id {val['@id']} is included in the property {prop} of entity {ent}, but the type of entity with @id {val['@id']} is wrong.")
                 if isinstance(val, list):
                     # expected: [Any], [Entity]
                     for ele in [v for v in val if isinstance(v, Entity)]:
                         if ele not in self.get_all_entities():
                             raise CrateError(f"The entity {ele} is included in entity {ent}, but not included in this crate.")
+                    for id_dict in [v for v in val if isinstance(v, dict) and "@id" in v]:
+                        if len(self.get_by_id(id_dict["@id"])) == 0:
+                            raise CrateError(
+                                f"The link of @id {id_dict['@id']} is included in the property {prop} of entity {ent}, but there is no entity found in the crate with @id {id_dict['@id']}.")
+                        if verify_idlink_is_correct_type(ent, prop, self.get_by_id(id_dict["@id"])) is False:
+                            raise CrateError(
+                                f"The link of @id {id_dict['@id']} is included in the property {prop} of entity {ent}, but the type of entity with @id {id_dict['@id']} is wrong.")
 
     def dump(self, path: str) -> None:
         """\

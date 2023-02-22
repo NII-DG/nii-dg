@@ -8,7 +8,7 @@ Definition of Entity base class and its subclasses.
 from collections.abc import MutableMapping
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from nii_dg.utils import github_branch, github_repo
+from nii_dg.config import github_branch, github_repo
 
 if TYPE_CHECKING:
     TypedMutableMapping = MutableMapping[str, Any]

@@ -9,15 +9,18 @@ from nii_dg.entity import RootDataEntity
 from nii_dg.error import PropsError
 from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.base import File as BaseFile
-from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
+from nii_dg.schema.base import Organization, Person
+from nii_dg.utils import (EntityDef, IdDict, access_url, check_all_prop_types,
                           check_content_size, check_email,
                           check_erad_researcher_number, check_isodate,
                           check_mime_type, check_orcid_id, check_phonenumber,
                           check_prop_type, check_required_props, check_sha256,
                           check_unexpected_props, check_url, classify_uri,
                           convert_string_type_to_python_type,
+                          extract_entity_type_list_from_string_type,
                           get_name_from_ror, import_entity_class,
-                          load_entity_def_from_schema_file, sum_file_size,
+                          load_entity_def_from_schema_file, split_type_str,
+                          sum_file_size, verify_idlink_is_correct_type,
                           verify_is_past_date)
 
 
@@ -64,10 +67,10 @@ def test_convert_string_type_to_python_type() -> None:
         assert convert_string_type_to_python_type("Tuple[str, int]")
 
     # Entity subclass in schema module
-    assert convert_string_type_to_python_type("RootDataEntity") is RootDataEntity
-    assert convert_string_type_to_python_type("File", "base") is BaseFile
-    assert convert_string_type_to_python_type("List[File]", "base") is List[BaseFile]
-    assert convert_string_type_to_python_type("File", "amed") is AmedFile
+    assert convert_string_type_to_python_type("RootDataEntity") is Union[RootDataEntity, IdDict]
+    assert convert_string_type_to_python_type("File", "base") is Union[BaseFile, IdDict]
+    assert convert_string_type_to_python_type("List[File]", "base") is List[Union[BaseFile, IdDict]]
+    assert convert_string_type_to_python_type("File", "amed") is Union[AmedFile, IdDict]
 
     # error
     with pytest.raises(PropsError):
@@ -116,7 +119,7 @@ def test_check_unexpected_props() -> None:
 
 
 def test_check_required_props() -> None:
-    ent = BaseFile()
+    ent = BaseFile("test")
     entity_def: EntityDef = {  # type:ignore
         "test_prop": {
             "expected_type": "str",
@@ -296,3 +299,22 @@ def test_sum_file_size() -> None:
 
     assert sum_file_size("GB", [file_1, file_2]) == 25
     assert sum_file_size("B", []) == 0
+
+
+def test_split_type_str() -> None:
+    assert split_type_str("str", ", ") == ["str"]
+    assert split_type_str("Union[int, str]"[6:-1], ", ") == ["int", "str"]
+    assert split_type_str("Union[str, List[int, float]]"[6:-1], ", ") == ["str", "List[int, float]"]
+
+
+def test_extract_entity_type_list_from_string_type() -> None:
+    assert extract_entity_type_list_from_string_type("List[Union[File, RootDataEntity]]", "base") == [BaseFile, RootDataEntity]
+
+
+def test_verify_idlink_is_correct_type() -> None:
+    person = Person("https://example.com/person")
+    org = Organization("https://example.com/organization")
+    file = BaseFile("test")
+
+    assert verify_idlink_is_correct_type(person, "affiliation", [org])
+    assert verify_idlink_is_correct_type(person, "affiliation", [file]) is False
