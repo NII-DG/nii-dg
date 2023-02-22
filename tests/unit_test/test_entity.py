@@ -4,6 +4,7 @@
 import pytest
 
 from nii_dg.entity import Entity, ROCrateMetadata, RootDataEntity
+from nii_dg.schema.base import Person
 
 
 def test_delitem() -> None:
@@ -17,14 +18,13 @@ def test_delitem() -> None:
 
 
 def test_as_jsonld() -> None:
-    root = RootDataEntity({"name": "test"})
-    meta = ROCrateMetadata(root)
+    person = RootDataEntity({"name": "test"})
+    meta = ROCrateMetadata(person)
 
-    assert root.as_jsonld() == {
+    assert person.as_jsonld() == {
         "@id": "./",
         "@type": "Dataset",
-        "name": "test",
-        "@context": "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/RootDataEntity.json"
+        "name": "test"
     }
     assert meta.as_jsonld() == {
         "@id": "ro-crate-metadata.json",
@@ -39,10 +39,13 @@ def test_as_jsonld() -> None:
 
 
 def test_properties() -> None:
-    root = RootDataEntity()
+    person = Person("https://example.com/person", {"name": "Ichiro Suzuki"})
 
+    assert person.id == "https://example.com/person"
+    assert person.type == "Person"
+    assert person.schema_name == "base"
+    assert person.entity_name == "Person"
+
+    root = RootDataEntity()
     assert root.id == "./"
     assert root.type == "Dataset"
-    assert root.context == "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/RootDataEntity.json"
-    assert root.schema_name == "base"
-    assert root.entity_name == "RootDataEntity"

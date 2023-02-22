@@ -176,7 +176,7 @@ class ROCrate():
         governance_error = GovernanceError()
 
         for ent in self.get_all_entities():
-            if isinstance(ent, ROCrateMetadata):
+            if isinstance(ent, DefaultEntity):
                 continue
             try:
                 ent.validate(self)

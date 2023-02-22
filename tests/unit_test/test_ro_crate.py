@@ -94,8 +94,7 @@ def test_as_json_ld() -> None:
             "@type": "Dataset",
             "name": "test",
             "hasPart": [],
-            "datePublished":test_dict["@graph"][0]["datePublished"],
-            "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/base.json"
+            "datePublished":test_dict["@graph"][0]["datePublished"]
         },
             {
             "@id": "ro-crate-metadata.json",
