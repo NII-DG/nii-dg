@@ -109,7 +109,7 @@ def convert_string_type_to_python_type(type_str: str, schema_name: Optional[str]
                     except PropsError:
                         pass
             if entity_class is None:
-                if type_str == "ROCrateMetadata" or type_str == "RootDataEntity":
+                if type_str in ["ROCrateMetadata", "RootDataEntity"]:
                     module = importlib.import_module("nii_dg.entity")
                     return Union[getattr(module, type_str), IdDict]
                 raise PropsError(f"Unexpected type: {type_str}")
@@ -152,7 +152,7 @@ def check_unexpected_props(entity: "Entity", entity_def: EntityDef) -> None:
     error_dict = {}
     for actual_prop in entity.keys():
         if actual_prop not in entity_def:
-            if type(actual_prop) is str and actual_prop.startswith("@"):
+            if isinstance(actual_prop, str) and actual_prop.startswith("@"):
                 continue
             error_dict[actual_prop] = "Unexpected property"
     if len(error_dict) > 0:
@@ -175,7 +175,6 @@ def check_required_props(entity: "Entity", entity_def: EntityDef) -> None:
 
 
 def check_content_formats(entity: "Entity", format_rules: Dict[str, Callable[[str], None]]) -> None:
-    # TODO 名前もイケてない
     """\
     expected as called after check_required_props(), check_all_prop_types(), check_unexpected_props()
     """
@@ -234,7 +233,7 @@ def check_content_size(value: str) -> None:
     Check file size value is in the defined format.
     If not, raise ValueError.
     """
-    if type(value) is not str:
+    if not isinstance(value, str):
         raise TypeError
 
     pattern = r"^\d+[KMGTP]?B$"
@@ -249,7 +248,7 @@ def check_mime_type(value: str) -> None:
     Check encoding format value is in MIME type format.
     """
     # TODO: mimetypeの辞書がOSによって差分があるのをどう吸収するか, 例えばtext/markdown
-    if type(value) is not str:
+    if not isinstance(value, str):
         raise TypeError
 
     if mimetypes.guess_extension(value) is None:
@@ -260,7 +259,7 @@ def check_sha256(value: str) -> None:
     """
     Check sha256 value is in SHA256 format.
     """
-    if type(value) is not str:
+    if not isinstance(value, str):
         raise TypeError
 
     pattern = r"(?:[^a-fA-F\d]|\b)([a-fA-F\d]{64})(?:[^a-fA-F\d]|\b)"
@@ -356,18 +355,17 @@ def verify_is_past_date(entity: "Entity", key: str) -> Optional[bool]:
     return True
 
 
-def access_url(url: str) -> None:
+def access_url(url: str) -> requests.Response:
     """
     Check the url is accessible.
     """
     try:
         res = requests.get(url, timeout=(10.0, 30.0))
         res.raise_for_status()
-    except requests.HTTPError as httperr:
-        msg = str(httperr)
-        raise ValueError(f"URL is not accessible. {msg}") from None
     except Exception as err:
-        raise UnexpectedImplementationError from err
+        raise ValueError(f"Unable to access {url} due to {err}") from None
+
+    return res
 
 
 def get_name_from_ror(ror_id: str) -> List[str]:
@@ -375,16 +373,7 @@ def get_name_from_ror(ror_id: str) -> List[str]:
     Get organization name from ror.
     """
     api_url = "https://api.ror.org/organizations/" + ror_id
-
-    try:
-        res = requests.get(api_url, timeout=(10.0, 30.0))
-        res.raise_for_status()
-    except requests.HTTPError as httperr:
-        if res.status_code == 404:
-            raise ValueError(f"ROR ID {ror_id} does not exist.") from None
-        raise UnexpectedImplementationError from httperr
-    except Exception as err:
-        raise UnexpectedImplementationError from err
+    res = access_url(api_url)
 
     body = res.json()
     name_list: List[str] = body["aliases"]
@@ -398,6 +387,7 @@ def sum_file_size(size_unit: str, entity_list: List["Entity"]) -> float:
     """
     units = ["B", "KB", "MB", "GB", "TB", "PB"]
     file_size_sum: float = 0
+    target_prop = "contentSize"
 
     try:
         unit = units.index(size_unit)
@@ -405,12 +395,12 @@ def sum_file_size(size_unit: str, entity_list: List["Entity"]) -> float:
         raise UnexpectedImplementationError from err
 
     for ent in entity_list:
-        if ent["contentSize"][-2:] in units:
-            file_unit = units.index(ent["contentSize"][-2:])
-            file_size = int(ent["contentSize"][:-2])
-        elif ent["contentSize"][-1:] in units:
+        if ent[target_prop][-2:] in units:
+            file_unit = units.index(ent[target_prop][-2:])
+            file_size = int(ent[target_prop][:-2])
+        elif ent[target_prop][-1:] in units:
             file_unit = 0
-            file_size = int(ent["contentSize"][:-1])
+            file_size = int(ent[target_prop][:-1])
         else:
             raise UnexpectedImplementationError
 
