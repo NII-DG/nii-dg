@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
-from nii_dg.error import CrateError, EntityError, PropsError
+from nii_dg.error import EntityError, PropsError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import Person as BasePerson
@@ -129,8 +129,14 @@ class DMP(ContextualEntity):
 
         dmp_metadata_ents = crate.get_by_entity_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
-            raise CrateError("Entity DMPMetadata MUST be required with DMP entity.")
-        dmp_metadata_ent = dmp_metadata_ents[0]
+            validation_failures.add("AnotherEntity", "Entity `DMPMetadata` MUST be required with DMP entity.")
+        else:
+            dmp_metadata_ent = dmp_metadata_ents[0]
+            if "repository" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
+                validation_failures.add("repository", "This property is required, but not found.")
+
+            if self["accessRights"] == "open access" and "distribution" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
+                validation_failures.add("distribution", "This property is required, but not found.")
 
         if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
             validation_failures.add("availabilityStarts", "This property is required, but not found.")
@@ -146,12 +152,6 @@ class DMP(ContextualEntity):
 
         if self["accessRights"] == "open access" and "license" not in self.keys():
             validation_failures.add("license", "This property is required, but not found.")
-
-        if "repository" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
-            validation_failures.add("repository", "This property is required, but not found.")
-
-        if self["accessRights"] == "open access" and "distribution" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
-            validation_failures.add("distribution", "This property is required, but not found.")
 
         if "contentSize" in self.keys():
             target_files = []

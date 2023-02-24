@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from nii_dg.entity import ContextualEntity
-from nii_dg.error import CrateError, EntityError, PropsError
+from nii_dg.error import EntityError, PropsError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
@@ -123,9 +123,14 @@ class DMP(ContextualEntity):
 
         dmp_metadata_ents = crate.get_by_entity_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
-            raise CrateError("Entity DMPMetadata MUST be required with DMP entity.")
+            validation_failures.add("AnotherEntity", "Entity `DMPMetadata` MUST be required with DMP entity.")
+        else:
+            dmp_metadata_ent = dmp_metadata_ents[0]
+            if "repository" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
+                validation_failures.add("repository", "This property is required, but not found.")
 
-        dmp_metadata_ent = dmp_metadata_ents[0]
+            if self["accessRights"] == "open access" and "distribution" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
+                validation_failures.add("distribution", "This property is required, but not found.")
 
         if self["accessRights"] != "open access" and "reasonForConcealment" not in self.keys():
             validation_failures.add("reasonForConcealment", "This property is required, but not found.")
@@ -152,12 +157,6 @@ class DMP(ContextualEntity):
 
         if self["accessRights"] in ["open access", "restricted access", "embargoed access"] and "contactPoint" not in self.keys():
             validation_failures.add("contactPoint", "This property is required, but not found.")
-
-        if "repository" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
-            validation_failures.add("repository", "This property is required, but not found.")
-
-        if self["accessRights"] == "open access" and "distribution" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
-            validation_failures.add("distribution", "This property is required, but not found.")
 
         if "contentSize" in self.keys():
             target_files = []

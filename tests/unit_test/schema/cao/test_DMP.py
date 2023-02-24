@@ -2,7 +2,8 @@
 # coding: utf-8
 
 import pytest
-from nii_dg.error import CrateError, EntityError
+
+from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import (DataDownload, HostingInstitution, License,
                                 RepositoryObject)
@@ -79,23 +80,20 @@ def test_validate() -> None:
     ent = DMP(1, {"accessRights": "embargoed access"})
     crate.add(ent)
 
-    # No DMPMetadata entity
-    with pytest.raises(CrateError):
+    # error: no DMPMetadata entity
+    # error: availabilityStarts is required
+    with pytest.raises(EntityError):
         ent.validate(crate)
 
     meta = DMPMetadata()
     crate.add(meta)
-    # error: availabilityStarts is required
+    ent["availabilityStarts"] = "2000-01-01"
+    # error: availabilityStarts MUST be the date of future
     # error: repository is required
     with pytest.raises(EntityError):
         ent.validate(crate)
 
-    ent["availabilityStarts"] = "2000-01-01"
     ent["repository"] = "https://example.com/repo"
-    # error: availabilityStarts MUST be the date of future
-    with pytest.raises(EntityError):
-        ent.validate(crate)
-
     ent["availabilityStarts"] = "2030-01-01"
     # no error
     ent.validate(crate)
