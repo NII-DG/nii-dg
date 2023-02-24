@@ -317,7 +317,7 @@ def test_split_type_str() -> None:
 
 
 def test_extract_entity_type_list_from_string_type() -> None:
-    assert extract_entity_type_list_from_string_type("List[Union[File, RootDataEntity]]", "base") == [BaseFile, RootDataEntity]
+    assert extract_entity_type_list_from_string_type("List[Union[File, RootDataEntity]]", "base") == [BaseFile, RootDataEntity]  # type: ignore
 
 
 def test_verify_idlink_is_correct_type() -> None:
