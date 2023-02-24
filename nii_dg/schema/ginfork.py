@@ -62,8 +62,8 @@ class GinMonitoring(ContextualEntity):
             validation_failures.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
 
         targets = [ent for ent in crate.get_by_entity_type(File) if ent["experimentPackageFlag"] is True]
-        sum = sum_file_size(self["contentSize"][-2:], targets)
-        if sum > int(self["contentSize"][:-2]):
+        sum_size = sum_file_size(self["contentSize"][-2:], targets)
+        if sum_size > int(self["contentSize"][:-2]):
             validation_failures.add("contentSize", "The total file size of ginfork.File labeled as an experimental package is larger than the defined size.")
 
         dir_paths = [dir.id for dir in crate.get_by_entity_type(Dataset)]
@@ -109,8 +109,11 @@ class File(BaseFile):
             except PropsError as e:
                 prop_errors.add_by_dict(str(e))
 
-        if classify_uri(self, "@id") == "abs_path":
-            prop_errors.add("@id", "The value MUST be URL or relative path to the file, not absolute path.")
+        try:
+            if classify_uri(self.id) == "abs_path":
+                prop_errors.add("@id", "The value MUST be URL or relative path to the file, not absolute path.")
+        except ValueError as error:
+            prop_errors.add("@id", str(error))
 
         try:
             check_content_formats(self, {
@@ -129,8 +132,8 @@ class File(BaseFile):
         try:
             if verify_is_past_date(self, "sdDatePublished") is False:
                 prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
-        except PropsError as e:
-            prop_errors.add("sdDatePublished", str(e))
+        except (TypeError, ValueError):
+            prop_errors.add("sdDatePublished", "The value is invalid date format. MUST be 'YYYY-MM-DD'.")
 
         if len(prop_errors.message_dict) > 0:
             raise prop_errors
@@ -138,10 +141,7 @@ class File(BaseFile):
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
 
-        if "contentSize" not in self.keys():
-            validation_failures.add("contentSize", "This property is required, but not found.")
-
-        if classify_uri(self, "@id") == "URL" and "sdDatePublished" not in self.keys():
+        if classify_uri(self.id) == "URL" and "sdDatePublished" not in self.keys():
             validation_failures.add("sdDatepublished", "This property is required, but not found.")
 
         if len(validation_failures.message_dict) > 0:

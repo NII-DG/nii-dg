@@ -188,7 +188,7 @@ ginfork_file = GinforkFile("path/to/file.txt", props={"name": "Example ginfork f
 }
 ```
 
-のように表現される。metadata の properties などは、`@context` により別の prop として扱われるため (e.g., `amed:name`, `ginfork:name`)、同一の `@id` が存在しても、それぞれ別の metadata が保持される。
+のように表現される。metadata の properties などは、`@context` により別の prop として扱われるため (e.g., `amed.File:name`, `ginfork.File:name`)、同一の `@id` が存在しても、それぞれ別の metadata が保持される。
 
 #### Entity 単位での型検査と property の検証
 
@@ -227,6 +227,25 @@ Packaging における型検査 (`entity.check_props()`) と、Validation にお
   - 複数の Entity 間の relation を用いてこれらの値の検証を行う
 
 #### Using REST API Server
+詳細はOpenAPI仕様(OAS) [open-api_spec.yml](./open-api_spec.yml)を参照
+
+ endpoint `/`:
+ - request bodyとしてNII-DGライブラリを利用してパッケージしたro-crateをPOST送信すると、validationが受付されrequestIdが返る
+ - 一部エンティティのみをValidationしたい時、クエリパラメータに`entityIds`として指定ができる。
+    - 指定がない場合はro-crate全体がvalidation対象となる。
+    - entityIdsを複数指定する場合のクエリパラメータの形式は `?entityIds=a&entityIds=b`とすること。
+
+例: python requestsモジュール利用
+```python
+import requests
+res = requests.post("https://example.com/?entityIds=a&entityIds=b", json=crate_json)
+```
+
+例: curl利用
+``` shell:example
+$ curl -X POST "https://example.com/?entityIds=a&entityIds=b" -H "Content-Type: application/json" -d @path/to/rocrate
+```
+
 
 [TODO: not written yet]
 

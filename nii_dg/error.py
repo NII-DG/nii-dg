@@ -93,10 +93,6 @@ class GovernanceError(Exception):
     Raised at Data Governance validation time at RO-Crate validate() method.
     This validation is performed by the validate() method of each subclass.
     For each subclass, EntityError is raised when the validation fails.
-
-    - Error として複数の entity から送出された error (Entity error) がまとめられる
-    - それぞれの元となる entity の情報も持っていてほしい (included in entity error)
-    - また、まとめられた error list を summarize するメソッドもほしい
     """
 
     def __init__(self, entity_errors: Optional[List[EntityError]] = None) -> None:

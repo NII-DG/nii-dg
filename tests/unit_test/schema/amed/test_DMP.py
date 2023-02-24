@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
+
 import pytest
-from nii_dg.error import CrateError, EntityError
+
+from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.amed import (DMP, ClinicalResearchRegistration, DMPMetadata,
                                 File)
@@ -72,20 +74,20 @@ def test_validate() -> None:
     ent = DMP(1, {"accessRights": "Unshared", "gotInformedConsent": "yes"})
     crate.add(ent)
 
-    # No DMPMetadata entity
-    with pytest.raises(CrateError):
+    # error: No DMPMetadata entity
+    # error: availabilityStarts is required
+    # error: informedConsentFormat is required
+    with pytest.raises(EntityError):
         ent.validate(crate)
 
     meta = DMPMetadata()
     crate.add(meta)
-    # error: availabilityStarts is required
-    # error: informedConsentFormat is required
+    ent["availabilityStarts"] = "2000-01-01"
+    ent["informedConsentFormat"] = "amed"
     # error: repository is required
     with pytest.raises(EntityError):
         ent.validate(crate)
 
-    ent["availabilityStarts"] = "2000-01-01"
-    ent["informedConsentFormat"] = "amed"
     ent["repository"] = "https://example.com/repo"
     # error: availabilityStarts MUST be the date of future
     with pytest.raises(EntityError):

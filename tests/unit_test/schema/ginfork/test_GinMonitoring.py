@@ -2,9 +2,11 @@
 # coding: utf-8
 
 import pytest
+
+from nii_dg.entity import RootDataEntity
 from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
-from nii_dg.schema.base import Dataset, RootDataEntity
+from nii_dg.schema.base import Dataset
 from nii_dg.schema.ginfork import File, GinMonitoring
 
 
