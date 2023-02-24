@@ -41,9 +41,20 @@ def crate_json() -> Dict[str, Any]:
 @pytest.fixture(scope="module")
 def invalid_crate_json() -> Dict[str, Any]:
     crate = ROCrate()
-    crate.root["name"] = "test"
     base_json = crate.as_jsonld()
-    base_json["unknown"] = "invalid property"
+    del base_json["@graph"][1]
+
+    return base_json
+
+
+@pytest.fixture(scope="module")
+def invalid_prop_crate_json() -> Dict[str, Any]:
+    crate = ROCrate()
+    crate.root["name"] = "test"
+    file = File("path/to/file", {"name": "test_file", "contentSize": "10B"})
+    crate.add(file)
+    base_json = crate.as_jsonld()
+    base_json["@graph"][2]["unknown_prop"] = "unknown_value"
 
     return base_json
 
@@ -77,7 +88,7 @@ def test_validation(client: Any, crate_json: Dict[str, Any]) -> None:
     result_response = client.get("/" + request_id).json
 
     assert result_response["request"]["entityIds"] == []
-    # assert result_response["request"]["roCrate"] == crate_json
+    assert result_response["request"]["roCrate"] == crate_json
     assert result_response["requestId"] == request_id
     assert result_response["status"] == "COMPLETE"
     assert result_response["results"] == []
@@ -91,7 +102,7 @@ def test_partial_valiadtion(client: Any, crate_json: Dict[str, Any]) -> None:
     - validation only some entities in RO-Crate
     - successfully validated and no GovernanceError occurred
     '''
-    req_response = client.post("/validate", json=crate_json, query_string={"entityId": ["./", "path/to/file"]})
+    req_response = client.post("/validate", json=crate_json, query_string={"entityIds": ["./", "path/to/file"]})
     result = req_response.json
 
     assert "request_id" in result
@@ -111,7 +122,7 @@ def test_partial_valiadtion(client: Any, crate_json: Dict[str, Any]) -> None:
     assert cancel_response.status_code == 400
 
 
-def test_vaidation_error(client: Any, crate_json_validation_error: Dict[str, Any]) -> None:
+def test_vaidation_failed(client: Any, crate_json_validation_error: Dict[str, Any]) -> None:
     '''\
     - RO-Crate whole validation
     - GovernanceError occurred
@@ -142,12 +153,12 @@ def test_vaidation_error(client: Any, crate_json_validation_error: Dict[str, Any
          "reason": "The value is not the same as the email contained in the value of @id property."}]
 
 
-def test_partial_vaidation_error(client: Any, crate_json_validation_error: Dict[str, Any]) -> None:
+def test_partial_vaidation_failed(client: Any, crate_json_validation_error: Dict[str, Any]) -> None:
     '''\
     - validation only some entities in RO-Crate
     - GovernanceError occurred
     '''
-    req_response = client.post("/validate", json=crate_json_validation_error, query_string={"entityId": ["#mailto:test@example.com"]})
+    req_response = client.post("/validate", json=crate_json_validation_error, query_string={"entityIds": ["#mailto:test@example.com"]})
     result = req_response.json
 
     assert "request_id" in result
@@ -157,7 +168,7 @@ def test_partial_vaidation_error(client: Any, crate_json_validation_error: Dict[
     request_id = result["request_id"]
     result_response = client.get("/" + request_id).json
 
-    assert result_response["request"]["entityIds"] == []
+    assert result_response["request"]["entityIds"] == ["#mailto:test@example.com"]
     assert result_response["request"]["roCrate"] == crate_json_validation_error
     assert result_response["requestId"] == request_id
     assert result_response["status"] == "FAILED"
@@ -179,12 +190,12 @@ def test_request_error_nocrate(client: Any) -> None:
     result = req_response.json
 
     assert req_response.status_code == 400
-    assert result["message"] == "To data governance, ro-crate-metadata.json is required as a request body."
+    assert result["message"] == "400 Bad Request: RO-Crate json file is not found in the request."
 
 
 def test_request_invalid_crate(client: Any, invalid_crate_json: Dict[str, Any]) -> None:
     '''\
-    - requests with invalid ro-crate (cannot make it into ROCrate instance)
+    - requests with invalid ro-crate (lack of ROMetadata entity so that cannot make it into ROCrate instance)
     - status code 400 is returned
     '''
 
@@ -192,7 +203,20 @@ def test_request_invalid_crate(client: Any, invalid_crate_json: Dict[str, Any]) 
     result = req_response.json
 
     assert req_response.status_code == 400
-    assert result["message"] == "Invalid ro-crate."
+    assert result["message"] == "400 Bad Request: The JSON-LD doesn't have metadata entity."
+
+
+def test_request_invalid_prop_crate(client: Any, invalid_prop_crate_json: Dict[str, Any]) -> None:
+    '''\
+    - requests with ro-crate having invalid prop (failed with check_props() method)
+    - status code 400 is returned
+    '''
+
+    req_response = client.post("/validate", json=invalid_prop_crate_json)
+    result = req_response.json
+
+    assert req_response.status_code == 400
+    assert result["message"] == "400 Bad Request: RO-Crate has invalid property."
 
 
 def test_invalid_entityids(client: Any, crate_json: Dict[str, Any]) -> None:
@@ -200,11 +224,11 @@ def test_invalid_entityids(client: Any, crate_json: Dict[str, Any]) -> None:
     - requests with invalid entityIds
     - status code 400 is returned
     '''
-    req_response = client.post("/validate", json=crate_json, query_string={"entityId": ["unknownId"]})
+    req_response = client.post("/validate", json=crate_json, query_string={"entityIds": ["unknownId"]})
     result = req_response.json
 
     assert req_response.status_code == 400
-    assert result["message"] == "Invalid entityId: unknownId is not found in the crate."
+    assert result["message"] == "400 Bad Request: Entity ID `unknownId` is not found in the crate."
 
 
 def test_invalid_requestid(client: Any) -> None:
@@ -217,7 +241,7 @@ def test_invalid_requestid(client: Any) -> None:
     result = req_response.json
 
     assert req_response.status_code == 400
-    assert result["message"] == f"request_id {invalid_uuid} is not found."
+    assert result["message"] == f"400 Bad Request: Request ID `{invalid_uuid}` is not found."
 
 
 def test_invalid_requestid_cancel(client: Any) -> None:
@@ -230,7 +254,7 @@ def test_invalid_requestid_cancel(client: Any) -> None:
     result = req_response.json
 
     assert req_response.status_code == 400
-    assert result["message"] == f"request_id {invalid_uuid} is not found."
+    assert result["message"] == f"400 Bad Request: Request ID `{invalid_uuid}` is not found."
 
 
 def test_in_queue(client: Any, crate_json: Dict[str, Any]) -> None:
@@ -239,12 +263,12 @@ def test_in_queue(client: Any, crate_json: Dict[str, Any]) -> None:
     '''
     # dummy tasks for filling workers
     for _ in range(3):
-        executor.submit(time.sleep, 60)
+        executor.submit(time.sleep, 30)
 
     enqueue_response = client.post("/validate", json=crate_json)
     request_id = enqueue_response.json["request_id"]
 
-    in_queue_response = client.post("/" + request_id)
+    in_queue_response = client.get("/" + request_id)
 
     assert in_queue_response.status_code == 200
     assert in_queue_response.json["status"] == "QUEUED"
@@ -257,3 +281,15 @@ def test_in_queue(client: Any, crate_json: Dict[str, Any]) -> None:
 
     assert canceled_response["requestId"] == request_id
     assert canceled_response["status"] == "CANCELED"
+
+
+def test_healthcheck(client: Any) -> None:
+    '''\
+    - server monitoring request
+    - get `OK`
+    '''
+
+    response = client.get("/healthcheck")
+
+    assert response.status_code == 200
+    assert response.json["message"] == "OK"

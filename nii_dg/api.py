@@ -3,6 +3,7 @@
 
 import os
 from concurrent.futures import Future, ThreadPoolExecutor
+from copy import deepcopy
 from typing import TYPE_CHECKING, Any, Dict, List
 from uuid import uuid4
 
@@ -10,7 +11,9 @@ from flask import (Blueprint, Flask, Response, abort, current_app, jsonify,
                    request)
 from waitress import serve
 
-from nii_dg.error import EntityError, GovernanceError
+from nii_dg.entity import DefaultEntity
+from nii_dg.error import (CheckPropsError, CrateError, EntityError,
+                          GovernanceError)
 from nii_dg.ro_crate import ROCrate
 
 if TYPE_CHECKING:
@@ -72,25 +75,26 @@ def internal_error(err: Exception) -> Response:
 @app_bp.route("/validate", methods=["POST"])
 def request_validation() -> Response:
     request_id = str(uuid4())
-    request_body = request.json or {}
+    try:
+        request_body = request.json
+    except Exception:
+        abort(400, "RO-Crate json file is not found in the request.")
     entity_ids: List[str] = request.args.getlist("entityIds", None)
 
-    if request_body == {}:
-        # TODO
-        return abort(400, "To data governance, ro-crate-metadata.json is required as a request body.")
-
     try:
-        crate = ROCrate(request_body)
-    except Exception:
-        # TODO: exceptionの種類確認
-        abort(400, "Invalid ro-crate.")
+        crate = ROCrate(deepcopy(request_body))
+        crate.as_jsonld()
+    except CrateError as crateerr:
+        abort(400, crateerr)
+    except CheckPropsError:
+        abort(400, "RO-Crate has invalid property.")
 
     target_entities: List[Entity] = []
     if entity_ids:
         for entity_id in entity_ids:
             target_entities.extend(crate.get_by_id(entity_id))
             if len(crate.get_by_id(entity_id)) == 0:
-                abort(400, f"Invalid entityId: {entity_id} is not found in the crate.")
+                abort(400, f"Entity ID `{entity_id}` is not found in the crate.")
 
     job = executor.submit(validate, crate, target_entities)
 
@@ -106,9 +110,9 @@ def request_validation() -> Response:
 
 
 @app_bp.route("/<string:request_id>", methods=["GET"])
-def get_results(request_id: str) -> None:
+def get_results(request_id: str) -> Response:
     if request_id not in job_map:
-        abort(400, f"Request_id {request_id} is not found.")
+        abort(400, f"Request ID `{request_id}` is not found.")
     job = job_map[request_id]
     req = request_map[request_id]
 
@@ -144,9 +148,9 @@ def get_results(request_id: str) -> None:
 
 
 @app_bp.route("/<string:request_id>/cancel", methods=["POST"])
-def cancel_validation(request_id: str) -> None:
+def cancel_validation(request_id: str) -> Response:
     if request_id not in job_map:
-        abort(400, f"Request_id {request_id} is not found.")
+        abort(400, f"Request ID `{request_id}` is not found.")
     job = job_map[request_id]
     try_cancel = job.cancel()
     if not try_cancel:
@@ -159,7 +163,7 @@ def cancel_validation(request_id: str) -> None:
 
 @app_bp.route('/healthcheck', methods=['GET'])
 def check_health() -> Response:
-    return Response(jsonify({"message": "OK"}), status=GET_STATUS_CODE)
+    return jsonify({"message": "OK"}), GET_STATUS_CODE
 
 
 # --- job ---
@@ -169,6 +173,8 @@ def validate(crate: ROCrate, entities: List["Entity"]) -> List[Any]:
     if len(entities) > 0:
         governance_error = GovernanceError()
         for entity in entities:
+            if isinstance(entity, DefaultEntity):
+                continue
             try:
                 entity.validate(crate)
             except EntityError as err:
