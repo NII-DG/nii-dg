@@ -167,7 +167,7 @@ def cancel_validation(request_id: str) -> Response:
 
 @app_bp.route('/healthcheck', methods=['GET'])
 def check_health() -> Response:
-    response: Response = jsonify({"message": "OK"}),
+    response: Response = jsonify({"message": "OK"})
     response.status_code = GET_STATUS_CODE
     return response
 
