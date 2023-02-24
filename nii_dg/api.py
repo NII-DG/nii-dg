@@ -37,7 +37,7 @@ JOB_STATUS = [
 # --- state ---
 
 executor = ThreadPoolExecutor(max_workers=3)
-job_map: Dict[str, Future] = {}
+job_map: Dict[str, Future] = {}  # type:ignore
 request_map: Dict[str, Dict[str, Any]] = {}
 
 # --- result wrapper ---
@@ -64,12 +64,16 @@ app_bp = Blueprint("app", __name__)
 
 @app_bp.errorhandler(400)
 def invalid_request(err: Exception) -> Response:
-    return jsonify(message=str(err)), 400
+    response: Response = jsonify(message=str(err))
+    response.status_code = 400
+    return response
 
 
 @app_bp.errorhandler(500)
 def internal_error(err: Exception) -> Response:
-    return jsonify(message='An internal error occurred.'), 500
+    response: Response = jsonify(message='An internal error occurred.')
+    response.status_code = 500
+    return response
 
 
 @app_bp.route("/validate", methods=["POST"])
@@ -163,7 +167,9 @@ def cancel_validation(request_id: str) -> Response:
 
 @app_bp.route('/healthcheck', methods=['GET'])
 def check_health() -> Response:
-    return jsonify({"message": "OK"}), GET_STATUS_CODE
+    response: Response = jsonify({"message": "OK"}),
+    response.status_code = GET_STATUS_CODE
+    return response
 
 
 # --- job ---

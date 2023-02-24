@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import pytest
+
 from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import Organization, Person
