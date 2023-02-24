@@ -89,11 +89,11 @@ class Dataset(DataEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @ property
+    @property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @ property
+    @property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -141,11 +141,11 @@ class Organization(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @ property
+    @property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @ property
+    @property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -201,11 +201,11 @@ class Person(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @ property
+    @property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @ property
+    @property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -260,11 +260,11 @@ class License(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @ property
+    @property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @ property
+    @property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -311,11 +311,11 @@ class RepositoryObject(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @ property
+    @property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @ property
+    @property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -352,11 +352,11 @@ class DataDownload(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @ property
+    @property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @ property
+    @property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -411,7 +411,7 @@ class HostingInstitution(Organization):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @ property
+    @property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -463,11 +463,11 @@ class ContactPoint(ContextualEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @ property
+    @property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @ property
+    @property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
