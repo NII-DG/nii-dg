@@ -7,8 +7,7 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Any, Dict, List
 from uuid import uuid4
 
-from flask import (Blueprint, Flask, Response, abort, current_app, jsonify,
-                   request)
+from flask import Blueprint, Flask, Response, abort, jsonify, request
 from waitress import serve
 
 from nii_dg.entity import DefaultEntity
@@ -102,11 +101,10 @@ def request_validation() -> Response:
 
     job = executor.submit(validate, crate, target_entities)
 
-    with current_app.app_context():
-        request_map[request_id] = {
-            "roCrate": request_body,
-            "entityIds": entity_ids}
-        job_map[request_id] = job
+    request_map[request_id] = {
+        "roCrate": request_body,
+        "entityIds": entity_ids}
+    job_map[request_id] = job
 
     response: Response = jsonify({"request_id": request_id})
     response.status_code = POST_STATUS_CODE

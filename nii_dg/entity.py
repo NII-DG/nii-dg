@@ -6,21 +6,16 @@ Definition of Entity base class and its subclasses.
 """
 
 from collections.abc import MutableMapping
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from nii_dg.config import github_branch, github_repo
+from nii_dg.error import EntityError
 
 if TYPE_CHECKING:
     TypedMutableMapping = MutableMapping[str, Any]
     from nii_dg.ro_crate import ROCrate
 else:
     TypedMutableMapping = MutableMapping
-
-LD_KEYWORDS: List[str] = [
-    "@base", "@container", "@context", "@direction", "@graph", "@id", "@import",
-    "@included", "@index", "@json", "@language", "@list", "@nest", "@none", "@prefix",
-    "@propagate", "@protected", "@reverse", "@set", "@type", "@value", "@version", "@vocab"]
 
 
 class Entity(TypedMutableMapping):
@@ -31,17 +26,17 @@ class Entity(TypedMutableMapping):
     `__contains__`, `__eq__`, `__ne__`, `get`, `pop`, `popitem`, `setdefault`, `update`, `clear`, `keys`, `values` and `items`.
     """
 
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None, schema_name: Optional[str] = None, _type: Optional[str] = None) -> None:
+        self.schema_name = schema_name
         self.data: Dict[str, Any] = {
-            "@id": id,
-            "@type": self.__class__.__name__,
+            "@id": id_,
+            "@type": _type or self.__class__.__name__,
+            "@context": self.context
         }
-        # TODO: check props include @ start
         self.update(props or {})
-        self.schema = Path(__file__).stem
 
     def __setitem__(self, key: str, value: Any) -> None:
-        if key.startswith("@") and key not in LD_KEYWORDS:
+        if key.startswith("@") and key != "@id":
             raise KeyError(f"Cannot set {key} as property; property with @ is limited.")
         self.data[key] = value
 
@@ -66,6 +61,7 @@ class Entity(TypedMutableMapping):
         return f"<{self.schema_name}.{self.type} {self.id}>"
 
     def __eq__(self) -> str:
+        # TODO
         return self.id + self.context
 
     @property
@@ -85,6 +81,7 @@ class Entity(TypedMutableMapping):
         # - Add context prop (not for ROCrateMetadata) TODO
         - Replace entities in props with their id
         """
+        self.check_props()
         ref_data: Dict[str, Any] = {}
         for key, val in self.items():
             if isinstance(val, dict):
@@ -122,12 +119,12 @@ class Entity(TypedMutableMapping):
             schema=self.schema_name,
         )
 
-    @property
-    def schema_name(self) -> str:
-        """\
-        Implementation of this method is required in each subclass using comment-outed code.
-        """
-        return self.schema
+    # @property
+    # def schema_name(self) -> str:
+    #     """\
+    #     Implementation of this method is required in each subclass using comment-outed code.
+    #     """
+    #     return self.schema
         # return Path(__file__).stem
         # raise NotImplementedError
 
@@ -174,6 +171,17 @@ class DefaultEntity(Entity):
     A entity that is always included in the RO-Crate. For example, ROCrateMetadata, RootDataEntity, etc.
     """
 
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None, _type: Optional[str] = None) -> None:
+        self.data: Dict[str, Any] = {
+            "@id": id_,
+            "@type": _type
+        }
+        self.update(props or {})
+
+    @property
+    def context(self) -> str:
+        return "https://w3id.org/ro/crate/1.1/context"
+
 
 class DataEntity(Entity):
     """\
@@ -196,14 +204,19 @@ class ROCrateMetadata(DefaultEntity):
     """
 
     def __init__(self, root: Entity) -> None:
-        super().__init__(id="ro-crate-metadata.json")
-        self["@type"] = "CreativeWork"
+        super().__init__(id_="ro-crate-metadata.json", _type="CreativeWork")
+        # self["@id"] = "ro-crate-metadata.json"
+        # self["@type"] = "CreativeWork"
         self["conformsTo"] = {"@id": "https://w3id.org/ro/crate/1.1"}
         self["about"] = root
 
-    @property
-    def context(self) -> str:
-        return "https://w3id.org/ro/crate/1.1/context"
+    def check_props(self) -> None:
+        # TODO
+        if self.id != "ro-crate-metadata.json":
+            raise EntityError(self)
+
+        if self["conformsTo"] != {"@id": "https://w3id.org/ro/crate/1.1"}:
+            raise EntityError(self)
 
 
 class RootDataEntity(DefaultEntity):
@@ -212,10 +225,10 @@ class RootDataEntity(DefaultEntity):
     """
 
     def __init__(self, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id="./", props=props)
-        self["@type"] = "Dataset"
+        super().__init__(id_="./", props=props, _type="Dataset")
         # `hasPart` and `datePublished` are added in `RO-Crate` class.
 
-    @property
-    def context(self) -> str:
-        return "https://w3id.org/ro/crate/1.1/context"
+    def check_props(self) -> None:
+        # TODO
+        if self.id != "./":
+            raise EntityError(self)

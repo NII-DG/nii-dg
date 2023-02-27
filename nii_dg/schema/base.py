@@ -24,12 +24,12 @@ SCHEMA_NAME = Path(__file__).stem
 
 class File(DataEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        # super().__init__(id=id, props=props, schema_name=SCHEMA_NAME)
-        super().__init__(id=id, props=props)
+        super().__init__(id=id, props=props, schema_name=SCHEMA_NAME)
+        # super().__init__(id=id, props=props)
 
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    # def as_jsonld(self) -> Dict[str, Any]:
+    #     self.check_props()
+    #     return super().as_jsonld()
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
