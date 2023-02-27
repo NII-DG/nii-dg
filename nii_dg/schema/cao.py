@@ -20,15 +20,17 @@ from nii_dg.utils import (access_url, check_all_prop_types,
 
 
 class DMPMetadata(ContextualEntity):
-    def __init__(self, id: Optional[str] = None, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id="#CAO-DMP", props=props)
-        self["name"] = "CAO-DMP"
+    def __init__(self, id: str = "#CAO-DMP", props: Dict[str, Any] = {}):
+        if "name" not in props:
+            props["name"] = "CAO-DMP"
+        super().__init__(id=id, props=props)
+        # self["name"] = "CAO-DMP"
 
-    @property
+    @ property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @property
+    @ property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -77,14 +79,15 @@ class DMPMetadata(ContextualEntity):
 
 class DMP(ContextualEntity):
     def __init__(self, id: int, props: Optional[Dict[str, Any]] = None):
+        # super().__init__(id=id, props=props, schema_name=SCHEMA_NAME)
         super().__init__(id="#dmp:" + str(id), props=props)
         self["dataNumber"] = id
 
-    @property
+    @ property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @property
+    @ property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -161,7 +164,7 @@ class DMP(ContextualEntity):
 
             sum_size = sum_file_size(self["contentSize"][-2:], target_files)
 
-            if self["contentSize"] != "over100GB" and sum_size > int(self["contentSize"][:-2]):
+            if self["contentSize"] != "over100GB" and sum_size > int(self["contentSize"][: -2]):
                 validation_failures.add("contentSize", "The total file size included in this DMP is larger than the defined size.")
 
             if self["contentSize"] == "over100GB" and sum_size < 100:
@@ -175,11 +178,11 @@ class Person(BasePerson):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @property
+    @ property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @property
+    @ property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
@@ -229,11 +232,11 @@ class File(BaseFile):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @property
+    @ property
     def schema_name(self) -> str:
         return Path(__file__).stem
 
-    @property
+    @ property
     def entity_name(self) -> str:
         return self.__class__.__name__
 

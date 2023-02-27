@@ -6,6 +6,7 @@ Definition of Entity base class and its subclasses.
 """
 
 from collections.abc import MutableMapping
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from nii_dg.config import github_branch, github_repo
@@ -31,11 +32,13 @@ class Entity(TypedMutableMapping):
     """
 
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None) -> None:
-        self.data: Dict[str, Any] = {}
-
-        self["@id"] = id
-        self["@type"] = self.__class__.__name__
+        self.data: Dict[str, Any] = {
+            "@id": id,
+            "@type": self.__class__.__name__,
+        }
+        # TODO: check props include @ start
         self.update(props or {})
+        self.schema = Path(__file__).stem
 
     def __setitem__(self, key: str, value: Any) -> None:
         if key.startswith("@") and key not in LD_KEYWORDS:
@@ -62,6 +65,9 @@ class Entity(TypedMutableMapping):
 
         return f"<{self.schema_name}.{self.type} {self.id}>"
 
+    def __eq__(self) -> str:
+        return self.id + self.context
+
     @property
     def id(self) -> str:
         return self.data["@id"]  # type: ignore
@@ -76,7 +82,7 @@ class Entity(TypedMutableMapping):
         Basically, it is assumed that self.check_props method checks the existence of required props and the type of props.
         In addition, this method do the following:
 
-        - Add context prop (not for ROCrateMetadata)
+        # - Add context prop (not for ROCrateMetadata) TODO
         - Replace entities in props with their id
         """
         ref_data: Dict[str, Any] = {}
@@ -101,9 +107,10 @@ class Entity(TypedMutableMapping):
                 ref_data[key] = {"@id": val.id}
             else:
                 ref_data[key] = val
-        if isinstance(self, (DataEntity, ContextualEntity)):
+        # if isinstance(self, (DataEntity, ContextualEntity)):
             # DefaultEntity uses the original RO-Crate context.
-            ref_data["@context"] = self.context
+            # ref_data["@context"] = self.context
+            # ref_data.set_context(self.context)
         return ref_data
 
     @property
@@ -120,16 +127,16 @@ class Entity(TypedMutableMapping):
         """\
         Implementation of this method is required in each subclass using comment-outed code.
         """
+        return self.schema
         # return Path(__file__).stem
-        raise NotImplementedError
+        # raise NotImplementedError
 
     @property
     def entity_name(self) -> str:
         """\
         Implementation of this method is required in each subclass using comment-outed code.
         """
-        # return self.__class__.__name__
-        raise NotImplementedError
+        return self.__class__.__name__
 
     def check_props(self) -> None:
         """\
@@ -155,8 +162,11 @@ class Entity(TypedMutableMapping):
         Generate entity instance from json-ld.
         This method is called in from_jsonld() of ROCrate.
         """
-        id_ = jsonld.pop("@id")
-        return cls(id_, jsonld)
+        if "@id" not in jsonld:
+            raise ValueError(f"Entity must have @id: {jsonld}")
+        id_ = jsonld["@id"]
+        props = {k: v for k, v in jsonld.items() if not k.startswith("@")}
+        return cls(id_, props)
 
 
 class DefaultEntity(Entity):

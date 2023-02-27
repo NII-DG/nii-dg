@@ -144,14 +144,19 @@ class ROCrate():
             for prop, val in ent.items():
                 if isinstance(val, Entity) and val not in self.get_all_entities():
                     raise CrateError(f"The entity {val} is included in entity {ent}, but not included in the crate.")
-                if isinstance(val, dict) and "@id" in val:
-                    # expected: {"@id":"https://example.com"}
-                    if len(self.get_by_id(val["@id"])) == 0:
-                        raise CrateError(
-                            f"The link of @id {val['@id']} is included in the property {prop} of entity {ent}, but entity with @id {val['@id']} is not found in the crate.")
-                    if verify_idlink_is_correct_type(ent, prop, self.get_by_id(val["@id"])) is False:
-                        raise CrateError(
-                            f"The link of @id {val['@id']} is included in the property {prop} of entity {ent}, but the type of entity with @id {val['@id']} is wrong.")
+                # if isinstance(val, dict) and "@id" in val:
+                #     # expected: {"@id":"https://example.com"}
+
+                #     e = Entity.from_jsonld(val)
+                #     if e not in self.get_all_entities():
+                #         error()
+
+                #     if len(self.get_by_id(val["@id"])) == 0:
+                #         raise CrateError(
+                #             f"The link of @id {val['@id']} is included in the property {prop} of entity {ent}, but entity with @id {val['@id']} is not found in the crate.")
+                #     if verify_idlink_is_correct_type(ent, prop, self.get_by_id(val["@id"])) is False:
+                #         raise CrateError(
+                #             f"The link of @id {val['@id']} is included in the property {prop} of entity {ent}, but the type of entity with @id {val['@id']} is wrong.")
                 if isinstance(val, list):
                     # expected: [Any], [Entity]
                     for ele in [v for v in val if isinstance(v, Entity)]:

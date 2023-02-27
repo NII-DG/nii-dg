@@ -19,17 +19,13 @@ if TYPE_CHECKING:
     from nii_dg.ro_crate import ROCrate
 
 
+SCHEMA_NAME = Path(__file__).stem
+
+
 class File(DataEntity):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
+        # super().__init__(id=id, props=props, schema_name=SCHEMA_NAME)
         super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_props()

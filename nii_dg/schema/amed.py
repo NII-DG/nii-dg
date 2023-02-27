@@ -179,9 +179,9 @@ class File(BaseFile):
     def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id=id, props=props)
 
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
+    # @property
+    # def schema_name(self) -> str:
+    #     return Path(__file__).stem
 
     @property
     def entity_name(self) -> str:
