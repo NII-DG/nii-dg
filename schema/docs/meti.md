@@ -1,6 +1,6 @@
 # NII-DG: Schema: meti
 
-See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg/blob/main/schema/README.md) for more information.
+See [GitHub - NII-DG/nii-dg - schema/README.md](https://github.com/NII-DG/nii-dg/blob/main/schema/README.md) for more information.
 
 ## DMPMetadata
 Metadata of research project that is the subject of this data management plan.

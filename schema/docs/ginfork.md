@@ -1,6 +1,6 @@
 # NII-DG: Schema: ginfork
 
-See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg/blob/main/schema/README.md) for more information.
+See [GitHub - NII-DG/nii-dg - schema/README.md](https://github.com/NII-DG/nii-dg/blob/main/schema/README.md) for more information.
 
 ## GinMonitoring
 Monitoring function for the GIN-fork platform.

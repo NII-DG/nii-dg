@@ -58,7 +58,7 @@ class GinMonitoring(ContextualEntity):
         # TODO: impl.
         validation_failures = EntityError(self)
 
-        if self["about"] != crate.root:
+        if self["about"] != crate.root and self["about"] != {"@id": "./"}:
             validation_failures.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
 
         targets = [ent for ent in crate.get_by_entity_type(File) if ent["experimentPackageFlag"] is True]

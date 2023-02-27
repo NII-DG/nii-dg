@@ -61,7 +61,7 @@ class DMPMetadata(ContextualEntity):
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
 
-        if self["about"] != crate.root:
+        if self["about"] != crate.root and self["about"] != {"@id": "./"}:
             validation_failures.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
 
         if len(self["hasPart"]) != len(crate.get_by_entity_type(DMP)):

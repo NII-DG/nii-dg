@@ -1,9 +1,8 @@
 # NII-DG: Schema: base
 
-See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg/blob/main/schema/README.md) for more information.
+See [GitHub - NII-DG/nii-dg - schema/README.md](https://github.com/NII-DG/nii-dg/blob/main/schema/README.md) for more information.
 
 ## File
-
 A file included in the research project, e.g. text file, script file and images.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -16,7 +15,6 @@ A file included in the research project, e.g. text file, script file and images.
 | `sdDatePublished` | `str` | Required when the file is from outside the RO-Crate Root. | Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format. | `2022-12-01` |
 
 ## Dataset
-
 A folder of the files included in the research project.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -25,7 +23,6 @@ A folder of the files included in the research project.
 | `url` | `str` | Optional. | MUST be a direct URL to the directory. | `https://github.com/username/repository/directory` |
 
 ## Organization
-
 An organization related to the research project, e.g. university, research institution and funding agency.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -35,7 +32,6 @@ An organization related to the research project, e.g. university, research insti
 | `description` | `str` | Optional. | Description of the organization. | `Japan's only general academic research institution seeking to create future value in the new discipline of informatics.` |
 
 ## Person
-
 A person who contributes to the research project, e.g. researcher.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -47,7 +43,6 @@ A person who contributes to the research project, e.g. researcher.
 | `telephone` | `str` | Optional. | Phone number of the person. Hyphen can be used as a separator. | `03-0000-0000` |
 
 ## License
-
 A license granted to the data.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -56,7 +51,6 @@ A license granted to the data.
 | `description` | `str` | Optional. | Description of the license. | `the licensed defined by Apache Software Foundation` |
 
 ## RepositoryObject
-
 A repository where the research data is managed in
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -65,7 +59,6 @@ A repository where the research data is managed in
 | `description` | `str` | Optional. | Indicates a description of the repository. | `Repository managed by NII.` |
 
 ## DataDownload
-
 Downloadable dataset from the research project.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -75,7 +68,6 @@ Downloadable dataset from the research project.
 | `uploadDate` | `str` | Optional. | MUST be a string in ISO 8601 date format. Indicates the date when this data set was uploaded to this site. | `2022-12-01` |
 
 ## HostingInstitution
-
 An organization that has responsibility of managing research data.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
@@ -85,7 +77,6 @@ An organization that has responsibility of managing research data.
 | `address` | `str` | Required. | Physical address of the organization. | `2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430` |
 
 ## ContactPoint
-
 A contact information.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |

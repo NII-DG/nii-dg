@@ -37,7 +37,7 @@ $ docker run -it --rm ghcr.io/NII-DG/nii-dg:latest bash
 
 ## Usage
 
-上記した通り、本ライブラリは 3 つの機能に分かれている。
+上記の通り、本ライブラリは 3つの機能に分かれている。
 
 1. Schema definition: Metadata Schema とその検証ルールの定義
 2. Packaging: パッケージング (RO-Crate 化)
@@ -233,9 +233,9 @@ Packaging における型検査 (`entity.check_props()`) と、Validation にお
 
  endpoint `/`:
  - request bodyとしてNII-DGライブラリを利用してパッケージしたro-crateをPOST送信すると、validationが受付されrequestIdが返る
- - 一部エンティティのみをValidationしたい時、クエリパラメータに`entityIds`として指定ができる。
-    - 指定がない場合はro-crate全体がvalidation対象となる。
-    - entityIdsを複数指定する場合のクエリパラメータの形式は `?entityIds=a&entityIds=b`とすること。
+ - 一部エンティティのみをValidationしたい時、クエリパラメータに`entityIds`として指定ができる
+    - 指定がない場合はro-crate全体がvalidation対象となる
+    - entityIdsを複数指定する場合のクエリパラメータの形式は `?entityIds=a&entityIds=b`とすること
 
 例: python requestsモジュール利用
 ```python

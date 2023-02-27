@@ -40,8 +40,8 @@ class DMPMetadata(ContextualEntity):
         for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
             try:
                 func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
+            except PropsError as err:
+                prop_errors.add_by_dict(str(err))
 
         if self.id != "#AMED-DMP":
             prop_errors.add("@id", "The value MUST be '#AMED-DMP'.")
@@ -58,7 +58,7 @@ class DMPMetadata(ContextualEntity):
     def validate(self, crate: ROCrate) -> None:
         validation_failures = EntityError(self)
 
-        if self["about"] != crate.root:
+        if self["about"] != crate.root and self["about"] != {"@id": "./"}:
             validation_failures.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
 
         if len(self["hasPart"]) > 0:
