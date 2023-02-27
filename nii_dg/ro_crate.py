@@ -107,8 +107,8 @@ class ROCrate():
         for e in self.get_all_entities():
             try:
                 graph.append(e.as_jsonld())
-            except EntityError as e:
-                check_error.add_error(e)
+            except EntityError as err:
+                check_error.add_error(err)
 
         if len(check_error.entity_errors) > 0:
             raise check_error

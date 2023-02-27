@@ -101,7 +101,7 @@ class Entity(TypedMutableMapping):
                 ref_data[key] = {"@id": val.id}
             else:
                 ref_data[key] = val
-        if isinstance(self, DataEntity) or isinstance(self, ContextualEntity):
+        if isinstance(self, (DataEntity, ContextualEntity)):
             # DefaultEntity uses the original RO-Crate context.
             ref_data["@context"] = self.context
         return ref_data
@@ -148,6 +148,15 @@ class Entity(TypedMutableMapping):
         """
         # Abstract method
         raise NotImplementedError
+
+    @classmethod
+    def from_jsonld(cls, jsonld: Dict[str, Any]) -> "Entity":
+        """\
+        Generate entity instance from json-ld.
+        This method is called in from_jsonld() of ROCrate.
+        """
+        id_ = jsonld.pop("@id")
+        return cls(id_, jsonld)
 
 
 class DefaultEntity(Entity):
