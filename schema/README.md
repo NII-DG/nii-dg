@@ -123,9 +123,6 @@ Schema 定義として、
 - `cao`
   - 内閣府「[公的資金による研究データの管理・利活用](https://www8.cao.go.jp/cstp/kenkyudx.html)に関する基本的な考え方」におけるメタデータの共通項目
   - [参考 docs](https://www8.cao.go.jp/cstp/common_metadata_elements.pdf)
-- `jst`
-  - 科学技術振興機構
-  - [参考 docs](https://www.jst.go.jp/pr/intro/openscience/guideline_openscience_r4.pdf)
 - `amed`
   - 日本医療研究開発機構
   - [参考 Web Page](https://www.amed.go.jp/koubo/datamanagement.html)
