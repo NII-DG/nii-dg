@@ -23,8 +23,8 @@ SCHEMA_NAME = Path(__file__).stem
 
 
 class File(DataEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props, schema_name=SCHEMA_NAME)
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
         # super().__init__(id=id, props=props)
 
     # def as_jsonld(self) -> Dict[str, Any]:

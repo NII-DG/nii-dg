@@ -26,11 +26,14 @@ class Entity(TypedMutableMapping):
     `__contains__`, `__eq__`, `__ne__`, `get`, `pop`, `popitem`, `setdefault`, `update`, `clear`, `keys`, `values` and `items`.
     """
 
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None, schema_name: Optional[str] = None, _type: Optional[str] = None) -> None:
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None, schema_name: Optional[str] = None) -> None:
+        if props and [key for key in props.keys() if key.startswith("@")] != []:
+            raise KeyError("Cannot set the property started with @.")
+
         self.schema_name = schema_name
         self.data: Dict[str, Any] = {
             "@id": id_,
-            "@type": _type or self.__class__.__name__,
+            "@type": self.__class__.__name__,
             "@context": self.context
         }
         self.update(props or {})
@@ -45,7 +48,7 @@ class Entity(TypedMutableMapping):
 
     def __delitem__(self, key: str) -> None:
         if key.startswith("@"):
-            raise KeyError(f"Cannot delete reserved key: {key}")
+            raise KeyError(f"Cannot delete protected key: {key}")
         del self.data[key]
 
     def __iter__(self) -> Any:
@@ -76,10 +79,7 @@ class Entity(TypedMutableMapping):
         """\
         Dump this entity as JSON-LD.
         Basically, it is assumed that self.check_props method checks the existence of required props and the type of props.
-        In addition, this method do the following:
-
-        # - Add context prop (not for ROCrateMetadata) TODO
-        - Replace entities in props with their id
+        In addition, this method replace entities in props with their id.
         """
         self.check_props()
         ref_data: Dict[str, Any] = {}
@@ -104,10 +104,6 @@ class Entity(TypedMutableMapping):
                 ref_data[key] = {"@id": val.id}
             else:
                 ref_data[key] = val
-        # if isinstance(self, (DataEntity, ContextualEntity)):
-            # DefaultEntity uses the original RO-Crate context.
-            # ref_data["@context"] = self.context
-            # ref_data.set_context(self.context)
         return ref_data
 
     @property
@@ -118,15 +114,6 @@ class Entity(TypedMutableMapping):
             gh_ref=github_branch(),
             schema=self.schema_name,
         )
-
-    # @property
-    # def schema_name(self) -> str:
-    #     """\
-    #     Implementation of this method is required in each subclass using comment-outed code.
-    #     """
-    #     return self.schema
-        # return Path(__file__).stem
-        # raise NotImplementedError
 
     @property
     def entity_name(self) -> str:
@@ -171,15 +158,21 @@ class DefaultEntity(Entity):
     A entity that is always included in the RO-Crate. For example, ROCrateMetadata, RootDataEntity, etc.
     """
 
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None, _type: Optional[str] = None) -> None:
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None, type_: Optional[str] = None) -> None:
+        if props and [key for key in props.keys() if key.startswith("@")] != []:
+            raise KeyError("Cannot set the property started with @.")
+
+        # DefaultEntity uses the defined type as @type, not the entity name.
+        # DefaultEntity uses the original RO-Crate context, so the @context property is not included.
         self.data: Dict[str, Any] = {
             "@id": id_,
-            "@type": _type
+            "@type": type_
         }
         self.update(props or {})
 
     @property
     def context(self) -> str:
+        # DefaultEntity uses the original RO-Crate context.
         return "https://w3id.org/ro/crate/1.1/context"
 
 
@@ -196,6 +189,31 @@ class ContextualEntity(Entity):
     """
 
 
+class RootDataEntity(DefaultEntity):
+    """\
+    A Dataset that represents the RO-Crate. For more information, see https://www.researchobject.org/ro-crate/1.1/root-data-entity.html .
+    """
+
+    def __init__(self, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_="./", props=props, type_="Dataset")
+        # `hasPart` and `datePublished` are added in `RO-Crate` class.
+
+    def check_props(self) -> None:
+        prop_errors = EntityError(self)
+
+        if self.id != "./":
+            prop_errors.add("@id", "The value MUST be `./`.")
+
+        if self.type != "Dataset":
+            prop_errors.add("@type", "The value MUST be `Dataset`.")
+
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
+
+    def validate(self, crate: "ROCrate") -> None:
+        pass
+
+
 class ROCrateMetadata(DefaultEntity):
     """\
     RO-Crate must contain a RO-Crate metadata file descriptor with the `@id` of `ro-crate-metadata.json`.
@@ -203,32 +221,34 @@ class ROCrateMetadata(DefaultEntity):
     See https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#ro-crate-metadata-file-descriptor.
     """
 
-    def __init__(self, root: Entity) -> None:
-        super().__init__(id_="ro-crate-metadata.json", _type="CreativeWork")
-        # self["@id"] = "ro-crate-metadata.json"
-        # self["@type"] = "CreativeWork"
+    def __init__(self, root: RootDataEntity) -> None:
+        super().__init__(id_="ro-crate-metadata.json", type_="CreativeWork")
         self["conformsTo"] = {"@id": "https://w3id.org/ro/crate/1.1"}
         self["about"] = root
 
     def check_props(self) -> None:
-        # TODO
+        prop_errors = EntityError(self)
+
         if self.id != "ro-crate-metadata.json":
-            raise EntityError(self)
+            prop_errors.add("@id", "The value MUST be `ro-crate-metadata.json`.")
 
-        if self["conformsTo"] != {"@id": "https://w3id.org/ro/crate/1.1"}:
-            raise EntityError(self)
+        if "conformsTo" not in self:
+            prop_errors.add("conformsTo", "This property is required and the value MUST be `{'@id': 'https: // w3id.org/ro/crate/1.1'}`.")
 
+        if "conformsTo" in self and self["conformsTo"] != {"@id": "https://w3id.org/ro/crate/1.1"}:
+            prop_errors.add("conformsTo", "The value MUST be `{'@id': 'https: // w3id.org/ro/crate/1.1'}`.")
 
-class RootDataEntity(DefaultEntity):
-    """\
-    A Dataset that represents the RO-Crate. For more information, see https://www.researchobject.org/ro-crate/1.1/root-data-entity.html .
-    """
+        if self.type != "CreativeWork":
+            prop_errors.add("@type", "The value MUST be `CreativeWork`.")
 
-    def __init__(self, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_="./", props=props, _type="Dataset")
-        # `hasPart` and `datePublished` are added in `RO-Crate` class.
+        if len(prop_errors.message_dict) > 0:
+            raise prop_errors
 
-    def check_props(self) -> None:
-        # TODO
-        if self.id != "./":
-            raise EntityError(self)
+    def validate(self, crate: "ROCrate") -> None:
+        validation_failures = EntityError(self)
+
+        if self["about"] != {"@id": "./"} and self["about"] != crate.root:
+            validation_failures.add("about", "The value of about property MUST be RootDataEntity of the crate.")
+
+        if len(validation_failures.message_dict) > 0:
+            raise validation_failures

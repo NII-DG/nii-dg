@@ -139,7 +139,7 @@ class ROCrate():
 
     def check_existence_of_entity(self) -> None:
         for ent in self.get_all_entities():
-            if isinstance(ent, DefaultEntity):
+            if isinstance(ent, ROCrateMetadata):
                 continue
             for prop, val in ent.items():
                 if isinstance(val, Entity) and val not in self.get_all_entities():
@@ -181,8 +181,6 @@ class ROCrate():
         governance_error = GovernanceError()
 
         for ent in self.get_all_entities():
-            if isinstance(ent, DefaultEntity):
-                continue
             try:
                 ent.validate(self)
             except EntityError as e:

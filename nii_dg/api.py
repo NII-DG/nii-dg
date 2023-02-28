@@ -177,8 +177,6 @@ def validate(crate: ROCrate, entities: List["Entity"]) -> List[Any]:
     if len(entities) > 0:
         governance_error = GovernanceError()
         for entity in entities:
-            if isinstance(entity, DefaultEntity):
-                continue
             try:
                 entity.validate(crate)
             except EntityError as err:
