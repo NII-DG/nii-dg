@@ -32,7 +32,6 @@ def main() -> None:
         "dataManager": creator})
 
     dmp_meta = DMPMetadata(props={
-        "name": "execution results",
         "about": ro_crate.root,
         "funder": org,
         "keyword": "Informatics",

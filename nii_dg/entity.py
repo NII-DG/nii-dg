@@ -6,16 +6,23 @@ Definition of Entity base class and its subclasses.
 """
 
 from collections.abc import MutableMapping
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict
+
+from typeguard import check_type as ori_check_type
 
 from nii_dg.config import github_branch, github_repo
-from nii_dg.error import EntityError
+from nii_dg.error import EntityError, PropsError
+from nii_dg.utils import (check_all_prop_types, check_instance_type_from_id,
+                          check_prop_type, get_entity_list_to_validate,
+                          load_entity_def_from_schema_file)
 
 if TYPE_CHECKING:
     TypedMutableMapping = MutableMapping[str, Any]
     from nii_dg.ro_crate import ROCrate
 else:
     TypedMutableMapping = MutableMapping
+
+IdDict = TypedDict("IdDict", {"@id": str})
 
 
 class Entity(TypedMutableMapping):
@@ -142,7 +149,67 @@ class Entity(TypedMutableMapping):
         Implementation of this method is required in each subclass.
         """
         # Abstract method
-        raise NotImplementedError
+        # raise NotImplementedError
+        validation_failures = EntityError(self)
+        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        instance_type_dict = get_entity_list_to_validate(self)
+
+        for prop, val in self.items():
+            if isinstance(val, Entity):
+                if val not in crate.get_all_entities():
+                    validation_failures.add(prop, f"The entity {val} is not included in the crate.")
+                if prop in instance_type_dict:
+                    try:
+                        check_prop_type(prop, val, instance_type_dict[prop])
+                    except PropsError as e:
+                        validation_failures.add(prop, str(e))
+
+            elif isinstance(val, dict) and prop in instance_type_dict:
+                # expected: {"@id":"https://example.com"}
+                try:
+                    ori_check_type(prop, val, IdDict)
+                except TypeError:
+                    validation_failures.add(prop, "Only property @id is required when using dict instead of entity subclass instance.")
+                if "@id" in val and len(crate.get_by_id(val["@id"])) == 0:
+                    validation_failures.add(prop, f"Entity with @id {val['@id']} is not found in the crate.")
+
+                if "@id" in val and prop in instance_type_dict:
+                    try:
+                        check_instance_type_from_id(prop, crate.get_by_id(val["@id"]), instance_type_dict[prop])
+                    except PropsError as e:
+                        validation_failures.add(prop, str(e))
+
+            elif isinstance(val, list):
+                # expected: [Any], [Entity]
+                for ele in [v for v in val if isinstance(v, Entity)]:
+                    if ele not in crate.get_all_entities():
+                        validation_failures.add(prop, f"The entity {ele} is not included in this crate.")
+                    if prop in instance_type_dict:
+                        try:
+                            check_prop_type(prop, [ele], instance_type_dict[prop])
+                        except PropsError as e:
+                            validation_failures.add(prop, str(e))
+
+                for id_dict in [v for v in val if isinstance(v, dict)]:
+                    try:
+                        ori_check_type(prop, id_dict, IdDict)
+                    except TypeError:
+                        validation_failures.add(prop, "Only property @id is required when using dict instead of entity subclass instance.")
+                    if "@id" in id_dict and len(crate.get_by_id(id_dict["@id"])) == 0:
+                        validation_failures.add(prop, f"Entity with @id {id_dict['@id']} is not found in the crate.")
+                    if "@id" in id_dict and prop in instance_type_dict:
+                        try:
+                            check_instance_type_from_id(prop, crate.get_by_id(id_dict["@id"]), instance_type_dict[prop], "list")
+                        except PropsError as e:
+                            validation_failures.add(prop, str(e))
+
+        try:
+            check_all_prop_types(self, entity_def, 1)
+        except PropsError as prop_err:
+            validation_failures.add_by_dict(str(prop_err))
+
+        if len(validation_failures.message_dict) > 0:
+            raise validation_failures
 
     @classmethod
     def from_jsonld(cls, id_: str, jsonld: Dict[str, Any]) -> "Entity":
@@ -215,6 +282,7 @@ class RootDataEntity(DefaultEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
+        # TODO: link check
         pass
 
 

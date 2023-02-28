@@ -49,7 +49,11 @@ class DMPMetadata(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         if self["about"] != crate.root and self["about"] != {"@id": "./"}:
             validation_failures.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
@@ -102,7 +106,11 @@ class DMP(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         dmp_metadata_ents = crate.get_by_entity_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
@@ -183,7 +191,11 @@ class Person(BasePerson):
             raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
-        validation_failures = EntityError(self)
+        try:
+            super(BasePerson, self).validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         try:
             access_url(self.id)
@@ -238,7 +250,11 @@ class File(BaseFile):
             raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
-        validation_failures = EntityError(self)
+        try:
+            super(BaseFile, self).validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         if classify_uri(self.id) == "URL" and "sdDatePublished" not in self.keys():
             validation_failures.add("sdDatePublished", "This property is required, but not found.")

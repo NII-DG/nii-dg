@@ -10,7 +10,7 @@ from nii_dg.error import PropsError
 from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import Organization, Person
-from nii_dg.utils import (EntityDef, IdDict, access_url, check_all_prop_types,
+from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_content_formats, check_content_size,
                           check_email, check_erad_researcher_number,
                           check_isodate, check_mime_type, check_orcid_id,
@@ -52,26 +52,29 @@ def test_import_entity_class() -> None:
 
 
 def test_convert_string_type_to_python_type() -> None:
-    assert convert_string_type_to_python_type("bool") is bool
-    assert convert_string_type_to_python_type("str") is str
-    assert convert_string_type_to_python_type("int") is int
-    assert convert_string_type_to_python_type("float") is float
-    assert convert_string_type_to_python_type("Any") is Any
-    assert convert_string_type_to_python_type("List[str]") is List[str]
-    assert convert_string_type_to_python_type("List[Any]") is List[Any]
-    assert convert_string_type_to_python_type("Union[str, int]") is Union[str, int]
-    assert convert_string_type_to_python_type("Union[List[str], int]") is Union[List[str], int]
-    assert convert_string_type_to_python_type('Literal["a", "b"]') is Literal["a", "b"]
+    assert convert_string_type_to_python_type("bool") == (bool, 0)
+    assert convert_string_type_to_python_type("str") == (str, 0)
+    assert convert_string_type_to_python_type("int") == (int, 0)
+    assert convert_string_type_to_python_type("float") == (float, 0)
+    assert convert_string_type_to_python_type("Any") == (Any, 0)
+    assert convert_string_type_to_python_type("List[str]") == (List[str], 0)
+    assert convert_string_type_to_python_type("List[Any]") == (List[Any], 0)
+    assert convert_string_type_to_python_type("Union[str, int]") == (Union[str, int], 0)
+    assert convert_string_type_to_python_type("Union[List[str], int, bool]") == (Union[List[str], int, bool], 0)
+    assert convert_string_type_to_python_type('Literal["a", "b"]') == (Literal["a", "b"], 0)
 
-    # error
+    # error: Tuple is not used in json
     with pytest.raises(PropsError):
-        assert convert_string_type_to_python_type("Tuple[str, int]")
+        convert_string_type_to_python_type("Tuple[str, int]")
+    # error: Too complex
+    with pytest.raises(PropsError):
+        convert_string_type_to_python_type("Union[List[Union[str, bool]], int]")
 
     # Entity subclass in schema module
-    assert convert_string_type_to_python_type("RootDataEntity") is Union[RootDataEntity, IdDict]
-    assert convert_string_type_to_python_type("File", "base") is Union[BaseFile, IdDict]
-    assert convert_string_type_to_python_type("List[File]", "base") is List[Union[BaseFile, IdDict]]
-    assert convert_string_type_to_python_type("File", "amed") is Union[AmedFile, IdDict]
+    assert convert_string_type_to_python_type("RootDataEntity") == (RootDataEntity, 1)
+    assert convert_string_type_to_python_type("File", "base") == (BaseFile, 1)
+    assert convert_string_type_to_python_type("List[File]", "base") == (List[BaseFile], 1)
+    assert convert_string_type_to_python_type("File", "amed") == (AmedFile, 1)
 
     # error
     with pytest.raises(PropsError):

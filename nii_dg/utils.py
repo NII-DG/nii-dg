@@ -6,24 +6,24 @@ import importlib
 import mimetypes
 import re
 from pathlib import Path, PurePosixPath, PureWindowsPath
-from typing import (Any, Callable, Dict, List, Literal, NewType, Optional,
-                    TypedDict, Union)
+from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
+                    Optional, Tuple, TypedDict, Union)
 from urllib.parse import quote, urlparse
 
 import requests
 import yaml
 from typeguard import check_type as ori_check_type
 
-from nii_dg.entity import Entity
 from nii_dg.error import PropsError, UnexpectedImplementationError
+
+if TYPE_CHECKING:
+    from nii_dg.entity import Entity
 
 
 class EntityDefDict(TypedDict):
     expected_type: str
     required: bool
 
-
-IdDict = TypedDict("IdDict", {"@id": str})
 
 EntityDef = NewType("EntityDef", Dict[str, EntityDefDict])
 
@@ -66,33 +66,37 @@ def import_entity_class(schema_name: str, entity_name: str) -> Any:
         raise PropsError(f"Tried to import {entity_name} from schema/{schema_name}.py, but this entity is not found.") from None
 
 
-def convert_string_type_to_python_type(type_str: str, schema_name: Optional[str] = None) -> Any:
+def convert_string_type_to_python_type(type_str: str, schema_name: Optional[str] = None) -> Tuple[Any, int]:
     """\
     Convert string type to python type.
-    When it is subclass of Entity, id dict format {"@id":"id"} is also allowed.
-    e.g. "List[Union[str, int]]" -> List[Union[str, int]]
-    e.g. "Optional[Entity]" -> Optional[Union[Entity, IdDict]]
+    At the same time, it determines whether entity subclasses are included in it and returns a flag.
+    e.g. "List[Union[str, int]]" -> List[Union[str, int]], 0
     """
     if type_str == "bool":
-        return bool
+        return bool, 0
     elif type_str == "str":
-        return str
+        return str, 0
     elif type_str == "int":
-        return int
+        return int, 0
     elif type_str == "float":
-        return float
+        return float, 0
     elif type_str == "Any":
-        return Any
+        return Any, 0
     elif type_str.startswith("List["):
-        return List[convert_string_type_to_python_type(type_str[5:-1], schema_name)]  # type: ignore
-    elif type_str.startswith("Union["):
-        child_types = tuple([convert_string_type_to_python_type(t, schema_name) for t in split_type_str(type_str[6:-1], ", ")])
-        return Union[child_types]  # type: ignore
+        type_, flg = convert_string_type_to_python_type(type_str[5:-1], schema_name)
+        return List[type_], flg  # type: ignore
     elif type_str.startswith("Optional["):
-        return Optional[convert_string_type_to_python_type(type_str[9:-1], schema_name)]
+        type_, flg = convert_string_type_to_python_type(type_str[9:-1], schema_name)
+        return Optional[type_], flg
+    elif type_str.startswith("Union["):
+        child_types = tuple([convert_string_type_to_python_type(t, schema_name)[0] for t in type_str[6:-1].split(", ")])
+        flg_list = [convert_string_type_to_python_type(t, schema_name)[1] for t in type_str[6:-1].split(", ")]
+        if flg_list.count(flg_list[0]) != len(flg_list):
+            raise PropsError(f"Unexpected type: {type_str}")
+        return Union[child_types], flg_list[0]  # type: ignore
     elif type_str.startswith("Literal["):
         child_list = [t.strip('"').strip("'") for t in type_str[8:-1].split(", ")]
-        return Literal[tuple(child_list)]  # type: ignore
+        return Literal[tuple(child_list)], 0  # type: ignore
     else:
         if "[" in type_str:
             raise PropsError(f"Unexpected type: {type_str}")
@@ -111,17 +115,20 @@ def convert_string_type_to_python_type(type_str: str, schema_name: Optional[str]
             if entity_class is None:
                 if type_str in ["ROCrateMetadata", "RootDataEntity"]:
                     module = importlib.import_module("nii_dg.entity")
-                    return Union[getattr(module, type_str), IdDict]
+                    return getattr(module, type_str), 1
                 raise PropsError(f"Unexpected type: {type_str}")
             else:
-                return Union[entity_class, IdDict]
+                return entity_class, 1
 
 
-def check_prop_type(entity: "Entity", prop: str, value: Any, expected_type: str) -> None:
+def check_prop_type(prop: str, value: Any, expected_python_type: Any) -> None:
     """
     Check the type of each property by referring schema.yml.
+    When the type includes entity subclass, the check is skipped.
     """
-    expected_python_type = convert_string_type_to_python_type(expected_type, entity.schema_name)
+    # expected_python_type, flg = convert_string_type_to_python_type(expected_type, entity.schema_name)
+    # if flg == 1:
+    #     return
     try:
         ori_check_type(prop, value, expected_python_type)
     except TypeError as e:
@@ -132,20 +139,38 @@ def check_prop_type(entity: "Entity", prop: str, value: Any, expected_type: str)
         raise UnexpectedImplementationError(e) from None
 
 
-def check_all_prop_types(entity: "Entity", entity_def: EntityDef) -> None:
+def check_all_prop_types(entity: "Entity", entity_def: EntityDef, subclass_flg: int = 0) -> None:
     """
     Check the type of all property in the entity by referring schema.yml.
+    When the type of property includes entity subclass, the check of the property is skipped.
     Called after check_unexpected_props().
     """
     error_dict = {}
     for prop, prop_def in entity_def.items():
         if prop in entity:
-            try:
-                check_prop_type(entity, prop, entity[prop], prop_def["expected_type"])
-            except PropsError as e:
-                error_dict[prop] = str(e)
+            expected_python_type, flg = convert_string_type_to_python_type(prop_def["expected_type"], entity.schema_name)
+            if flg == subclass_flg:
+                try:
+                    check_prop_type(prop, entity[prop], expected_python_type)
+                except PropsError as e:
+                    error_dict[prop] = str(e)
     if len(error_dict) > 0:
         raise PropsError(error_dict)
+
+
+def check_instance_type_from_id(prop: str, entity_list: List["Entity"], expected_python_type: Any, list_flg: Optional[str] = None) -> None:
+    correct_type_ents = []
+    for ent in entity_list:
+        try:
+            if list_flg == "list":
+                check_prop_type(prop, [ent], expected_python_type)
+            else:
+                check_prop_type(prop, ent, expected_python_type)
+            correct_type_ents.append(ent)
+        except PropsError:
+            pass
+    if len(correct_type_ents) == 0:
+        raise PropsError(f"The @id link in property {prop} is invalid type.")
 
 
 def check_unexpected_props(entity: "Entity", entity_def: EntityDef) -> None:
@@ -409,70 +434,13 @@ def sum_file_size(size_unit: str, entity_list: List["Entity"]) -> float:
     return file_size_sum
 
 
-def split_type_str(type_str: str, delimiter: str) -> List[str]:
-    """\
-    Split string type with square brackets into element.
-    e.g. "float, List[Union[int, str]]" -> ["float", "List[Union[int, str]]"]
-    """
-    split_list = type_str.split(delimiter)
-    for i, t in enumerate(split_list):
-        if t.count("[") > t.count("]"):
-            split_list[i + 1] = t + delimiter + split_list[i + 1]
-            split_list.remove(t)
-        if t.count("[") < t.count("]"):
-            raise PropsError(f"Unexpected type: {type_str}")
-    return split_list
-
-
-def extract_entity_type_list_from_string_type(type_str: str, schema_name: Optional[str] = None) -> List[Entity]:
-    """\
-    Extract Entity python type as a list from string type.
-    e.g. "Optional[Union[EntityA, EntityB]]" -> [EntityA, EntityB]
-    """
-    entity_list: List[Entity] = []
-    if type_str in ["bool", "str", "int", "float", "Any"] or type_str.startswith("Literal["):
-        pass
-    elif type_str.startswith("List["):
-        entity_list.extend(extract_entity_type_list_from_string_type(type_str[5:-1], schema_name))
-    elif type_str.startswith("Union["):
-        child_list = split_type_str(type_str[6:-1], ", ")
-        for t in child_list:
-            entity_list.extend(extract_entity_type_list_from_string_type(t, schema_name))
-    elif type_str.startswith("Optional["):
-        entity_list.extend(extract_entity_type_list_from_string_type(type_str[9:-1], schema_name))
-    else:
-        if "[" in type_str:
-            raise PropsError(f"Unexpected type: {type_str}")
-
-        # Entity subclass in schema module
-        schema_name = schema_name or "base"
-        entity_class = None
-        try:
-            entity_class = import_entity_class(schema_name, type_str)
-        except PropsError:
-            if schema_name != "base":
-                try:
-                    entity_class = import_entity_class("base", type_str)
-                except PropsError:
-                    pass
-
-        if entity_class is None:
-            if type_str not in ["ROCrateMetadata", "RootDataEntity"]:
-                raise PropsError(f"Unexpected type: {type_str}")
-            module = importlib.import_module("nii_dg.entity")
-            entity_list.append(getattr(module, type_str))
-        else:
-            entity_list.append(entity_class)
-
-    return entity_list
-
-
-def verify_idlink_is_correct_type(entity: Entity, prop: str, entity_list: List[Entity]) -> bool:
+def get_entity_list_to_validate(entity: "Entity") -> Dict[str, Any]:
     entity_def = load_entity_def_from_schema_file(entity.schema_name, entity.entity_name)
-    expected_entity_list = extract_entity_type_list_from_string_type(entity_def[prop]["expected_type"], entity.schema_name)
+    instance_type_dict = {}
+    for prop, prop_def in entity_def.items():
+        if prop in entity:
+            expected_python_type, flg = convert_string_type_to_python_type(prop_def["expected_type"], entity.schema_name)
+            if flg == 1:
+                instance_type_dict[prop] = expected_python_type
 
-    for ent in entity_list:
-        for ent_type in expected_entity_list:
-            if isinstance(ent, ent_type):  # type:ignore
-                return True
-    return False
+    return instance_type_dict

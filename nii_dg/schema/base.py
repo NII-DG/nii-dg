@@ -66,7 +66,11 @@ class File(DataEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         if classify_uri(self.id) == "URL":
             if "sdDatePublished" not in self.keys():
@@ -145,7 +149,11 @@ class Organization(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         if self.id.startswith("https://ror.org/"):
             try:
@@ -200,7 +208,11 @@ class Person(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         try:
             access_url(self.id)
@@ -239,7 +251,11 @@ class License(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         try:
             access_url(self.id)
@@ -315,7 +331,11 @@ class DataDownload(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         try:
             access_url(self.id)
@@ -355,7 +375,11 @@ class HostingInstitution(Organization):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super(Organization, self).validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         if self.id.startswith("https://ror.org/"):
             try:
@@ -406,7 +430,11 @@ class ContactPoint(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         if self.id.startswith("#mailto:"):
             if "email" not in self.keys():
