@@ -11,7 +11,7 @@ from nii_dg.schema.meti import DMP, DMPMetadata, File
 
 
 def test_init() -> None:
-    ent = DMP(1)
+    ent = DMP("#dmp:1")
     assert ent["@id"] == "#dmp:1"
     assert ent["@type"] == "DMP"
     assert ent.schema_name == "meti"
@@ -19,8 +19,9 @@ def test_init() -> None:
 
 
 def test_as_jsonld() -> None:
-    ent = DMP(1)
+    ent = DMP("#dmp:1")
 
+    ent["dataNumber"] = 1
     ent["name"] = "calculated data"
     ent["description"] = "Result data calculated by Newton's method"
     ent["hostingInstitution"] = HostingInstitution("https://ror.org/04ksd4g47")
@@ -48,12 +49,13 @@ def test_as_jsonld() -> None:
 
 
 def test_check_props() -> None:
-    ent = DMP(1, {"unknown_property": "unknown"})
+    ent = DMP("#dmp:1", {"unknown_property": "unknown"})
 
     # error: with unexpected property
     # error: lack of required properties
     # error: type error
     # error: availabilityStarts value is not future date
+    ent["dataNumber"] = 1
     ent["description"] = "Result data calculated by Newton's method"
     ent["hostingInstitution"] = HostingInstitution("https://ror.org/04ksd4g47")
     ent["wayOfManage"] = True
@@ -74,7 +76,7 @@ def test_check_props() -> None:
 
 def test_validate() -> None:
     crate = ROCrate()
-    ent = DMP(1, {"accessRights": "embargoed access"})
+    ent = DMP("#dmp:1", {"accessRights": "embargoed access"})
     crate.add(ent)
 
     # error: availabilityStarts is required

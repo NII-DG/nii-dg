@@ -11,7 +11,7 @@ from nii_dg.schema.cao import DMP, DMPMetadata, File, Person
 
 
 def test_init() -> None:
-    ent = DMP(1)
+    ent = DMP("#dmp:1")
     assert ent["@id"] == "#dmp:1"
     assert ent["@type"] == "DMP"
     assert ent.schema_name == "cao"
@@ -19,9 +19,10 @@ def test_init() -> None:
 
 
 def test_as_jsonld() -> None:
-    ent = DMP(1)
+    ent = DMP("#dmp:1")
     person = Person("https://orcid.org/0000-0001-2345-6789")
 
+    ent["dataNumber"] = 1
     ent["name"] = "calculated data"
     ent["description"] = "Result data calculated by Newton's method"
     ent["creator"] = [person]
@@ -47,7 +48,7 @@ def test_as_jsonld() -> None:
 
 
 def test_check_props() -> None:
-    ent = DMP(1, {"unknown_property": "unknown"})
+    ent = DMP("#dmp:1", {"unknown_property": "unknown"})
 
     # error: with unexpected property
     # error: lack of required properties
@@ -70,6 +71,7 @@ def test_check_props() -> None:
 
     # no error occurs
     del ent["unknown_property"]
+    ent["dataNumber"] = 1
     ent["keyword"] = "Informatics"
     ent["availabilityStarts"] = "9999-04-01"
     ent.check_props()
@@ -77,7 +79,7 @@ def test_check_props() -> None:
 
 def test_validate() -> None:
     crate = ROCrate()
-    ent = DMP(1, {"accessRights": "embargoed access"})
+    ent = DMP("#dmp:1", {"accessRights": "embargoed access"})
     crate.add(ent)
 
     # error: no DMPMetadata entity

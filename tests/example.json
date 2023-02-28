@@ -106,7 +106,7 @@
       "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/cao.jsonld"
     },
     {
-      "@id": "#ginmonitoring:1",
+      "@id": "#ginmonitoring",
       "@type": "GinMonitoring",
       "about": {
         "@id": "./"

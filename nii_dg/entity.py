@@ -63,9 +63,9 @@ class Entity(TypedMutableMapping):
 
         return f"<{self.schema_name}.{self.type} {self.id}>"
 
-    def __eq__(self) -> str:
-        # TODO
-        return self.id + self.context
+    # def __eq__(self) -> str:
+    #     # TODO
+    #     return self.id + self.context
 
     @property
     def id(self) -> str:

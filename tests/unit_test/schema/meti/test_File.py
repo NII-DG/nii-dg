@@ -20,7 +20,7 @@ def test_as_jsonld() -> None:
     ent = File("config/setting.txt")
 
     ent["name"] = "setting.txt"
-    ent["dmpDataNumber"] = DMP(1)
+    ent["dmpDataNumber"] = DMP("#dmp:1")
     ent["contentSize"] = "1560B"
     ent["encodingFormat"] = "text/plain"
     ent["sha256"] = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
@@ -44,7 +44,7 @@ def test_check_props() -> None:
     # error: type error
     # error: @id value is not relative path nor URL
     # error: sdDatePublished value is not past date
-    ent["dmpDataNumber"] = DMP(1)
+    ent["dmpDataNumber"] = DMP("#dmp:1")
     ent["contentSize"] = 1560
     ent["sdDatePublished"] = "9999-12-01"
     with pytest.raises(EntityError):

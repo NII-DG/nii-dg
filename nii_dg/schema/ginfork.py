@@ -25,7 +25,7 @@ SCHEMA_NAME = Path(__file__).stem
 
 
 class GinMonitoring(ContextualEntity):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+    def __init__(self, id_: str = "#ginmonitoring", props: Optional[Dict[str, Any]] = None):
         super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
@@ -124,7 +124,7 @@ class File(BaseFile):
         validation_failures = EntityError(self)
 
         if classify_uri(self.id) == "URL" and "sdDatePublished" not in self.keys():
-            validation_failures.add("sdDatepublished", "This property is required, but not found.")
+            validation_failures.add("sdDatePublished", "This property is required, but not found.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures

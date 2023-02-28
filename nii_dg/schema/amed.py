@@ -199,7 +199,7 @@ class File(BaseFile):
         validation_failures = EntityError(self)
 
         if classify_uri(self.id) == "URL" and "sdDatePublished" not in self.keys():
-            validation_failures.add("sdDatepublished", "This property is required, but not found.")
+            validation_failures.add("sdDatePublished", "This property is required, but not found.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures

@@ -6,7 +6,7 @@ See [GitHub - NII-DG/nii-dg - schema/README.md](https://github.com/NII-DG/nii-dg
 Monitoring function for the GIN-fork platform.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
-| `@id` | `str` | Required. | MUST be index number of monitoring rules with the prefix `#ginmonitoring:`. | `#ginmonitoring:1` |
+| `@id` | `str` | Required. | MUST be `#ginmonitoring`. | `#ginmonitoring` |
 | `about` | `RootDataEntity` | Required. | MUST be `{"@id": "./"}`. Indicates this rule applies to the research project stated in RootDataEntity. | `{"@id": "./"}` |
 | `contentSize` | `Literal["1GB", "10GB", "100GB", "1TB", "1PB"]` | Required. | MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in the experiment package. | `100GB` |
 | `workflowIdentifier` | `Literal["basic", "bio", "nuero"]` | Required. | MUST choose one from `basic`, `bio` and `neuro`. Indicates a kind of workflow used in the research workflow. | `bio` |
