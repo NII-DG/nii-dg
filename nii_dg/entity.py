@@ -30,10 +30,10 @@ class Entity(TypedMutableMapping):
         if props and [key for key in props.keys() if key.startswith("@")] != []:
             raise KeyError("Cannot set the property started with @.")
 
-        self.schema_name = schema_name
+        self.__schema_name = schema_name
         self.data: Dict[str, Any] = {
             "@id": id_,
-            "@type": self.__class__.__name__,
+            "@type": self.entity_name,
             "@context": self.context
         }
         self.update(props or {})
@@ -69,11 +69,31 @@ class Entity(TypedMutableMapping):
 
     @property
     def id(self) -> str:
-        return self.data["@id"]  # type: ignore
+        return self.data["@id"]
 
     @property
     def type(self) -> str:
-        return self.data["@type"]  # type: ignore
+        return self.data["@type"]
+
+    @property
+    def context(self) -> str:
+        template = "https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/schema/context/{schema}.jsonld"
+        return template.format(
+            gh_repo=github_repo(),
+            gh_ref=github_branch(),
+            schema=self.schema_name,
+        )
+
+    @property
+    def entity_name(self) -> str:
+        return self.__class__.__name__
+
+    @property
+    def schema_name(self) -> Optional[str]:
+        """\
+        This property is not set for DefaultEntity.
+        """
+        return self.__schema_name
 
     def as_jsonld(self) -> Dict[str, Any]:
         """\
@@ -106,22 +126,6 @@ class Entity(TypedMutableMapping):
                 ref_data[key] = val
         return ref_data
 
-    @property
-    def context(self) -> str:
-        template = "https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/schema/context/{schema}.jsonld"
-        return template.format(
-            gh_repo=github_repo(),
-            gh_ref=github_branch(),
-            schema=self.schema_name,
-        )
-
-    @property
-    def entity_name(self) -> str:
-        """\
-        Implementation of this method is required in each subclass using comment-outed code.
-        """
-        return self.__class__.__name__
-
     def check_props(self) -> None:
         """\
         Called at RO-Crate dump time.
@@ -141,14 +145,14 @@ class Entity(TypedMutableMapping):
         raise NotImplementedError
 
     @classmethod
-    def from_jsonld(cls, jsonld: Dict[str, Any]) -> "Entity":
+    def from_jsonld(cls, id_: str, jsonld: Dict[str, Any]) -> "Entity":
         """\
         Generate entity instance from json-ld.
         This method is called in from_jsonld() of ROCrate.
         """
-        if "@id" not in jsonld:
-            raise ValueError(f"Entity must have @id: {jsonld}")
-        id_ = jsonld["@id"]
+        # if "@id" not in jsonld:
+        #     raise ValueError(f"Entity must have @id: {jsonld}")
+        # id_ = jsonld["@id"]
         props = {k: v for k, v in jsonld.items() if not k.startswith("@")}
         return cls(id_, props)
 

@@ -28,7 +28,7 @@ IdDict = TypedDict("IdDict", {"@id": str})
 EntityDef = NewType("EntityDef", Dict[str, EntityDefDict])
 
 
-def load_entity_def_from_schema_file(schema_name: str, entity_name: str) -> EntityDef:
+def load_entity_def_from_schema_file(schema_name: Optional[str] = None, entity_name: str = "") -> EntityDef:
     schema_file = Path(__file__).resolve().parent.joinpath(f"schema/{schema_name}.yml")
     if not schema_file.exists():
         raise PropsError(f"Tried to load {entity_name} from schema/{schema_name}.yml, but this file is not found.")

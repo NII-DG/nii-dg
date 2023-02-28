@@ -25,11 +25,6 @@ SCHEMA_NAME = Path(__file__).stem
 class File(DataEntity):
     def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
         super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
-        # super().__init__(id=id, props=props)
-
-    # def as_jsonld(self) -> Dict[str, Any]:
-    #     self.check_props()
-    #     return super().as_jsonld()
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -82,20 +77,8 @@ class File(DataEntity):
 
 
 class Dataset(DataEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -134,20 +117,8 @@ class Dataset(DataEntity):
 
 
 class Organization(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -194,20 +165,8 @@ class Organization(ContextualEntity):
 
 
 class Person(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -229,7 +188,7 @@ class Person(ContextualEntity):
             prop_errors.add_by_dict(str(e))
 
         try:
-            if type(self.id) is str and self.id.startswith("https://orcid.org/"):
+            if isinstance(self.id, str) and self.id.startswith("https://orcid.org/"):
                 check_orcid_id(self.id[18:])
         except ValueError as e:
             prop_errors.add("@id", str(e))
@@ -253,20 +212,8 @@ class Person(ContextualEntity):
 
 
 class License(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -304,20 +251,8 @@ class License(ContextualEntity):
 
 
 class RepositoryObject(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -345,20 +280,8 @@ class RepositoryObject(ContextualEntity):
 
 
 class DataDownload(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -404,12 +327,8 @@ class DataDownload(ContextualEntity):
 
 
 class HostingInstitution(Organization):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -456,20 +375,8 @@ class HostingInstitution(Organization):
 
 
 class ContactPoint(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)

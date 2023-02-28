@@ -21,22 +21,12 @@ REQUIRED_DIRECTORIES = {
     "for_parameter": ["source", "input_data"]
 }
 
+SCHEMA_NAME = Path(__file__).stem
+
 
 class GinMonitoring(ContextualEntity):
-    def __init__(self, id: int, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id="#ginmonitoring:" + str(id), props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -55,7 +45,6 @@ class GinMonitoring(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
-        # TODO: impl.
         validation_failures = EntityError(self)
 
         if self["about"] != crate.root and self["about"] != {"@id": "./"}:
@@ -75,6 +64,7 @@ class GinMonitoring(ContextualEntity):
         if len(missing_dirs) > 0:
             validation_failures.add("datasetStructure", f"Couldn't find required directories: named {missing_dirs}.")
 
+        # TODO: update file name rules
         parent_dirs = {dir_name: [path[: -(len(dir_name) + 1)] for path in dir_paths if path.split('/')[-2] == dir_name]
                        for dir_name in ["source", "input_data", "output_data"]}
         if self["datasetStructure"] == "for_parameter" and len(set(parent_dirs["source"]) & set(parent_dirs["input_data"])) == 0:
@@ -88,16 +78,8 @@ class GinMonitoring(ContextualEntity):
 
 
 class File(BaseFile):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @ property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @ property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super(BaseFile, self).__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)

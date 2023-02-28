@@ -18,25 +18,13 @@ from nii_dg.utils import (access_url, check_all_prop_types,
                           load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
 
+SCHEMA_NAME = Path(__file__).stem
+
 
 class DMPMetadata(ContextualEntity):
-    def __init__(self, id: str = "#CAO-DMP", props: Dict[str, Any] = {}):
-        if "name" not in props:
-            props["name"] = "CAO-DMP"
-        super().__init__(id=id, props=props)
-        # self["name"] = "CAO-DMP"
-
-    @ property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @ property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str = "#CAO-DMP", props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+        self.data.setdefault("name", "CAO-DMP")
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -78,22 +66,8 @@ class DMPMetadata(ContextualEntity):
 
 
 class DMP(ContextualEntity):
-    def __init__(self, id: int, props: Optional[Dict[str, Any]] = None):
-        # super().__init__(id=id, props=props, schema_name=SCHEMA_NAME)
-        super().__init__(id="#dmp:" + str(id), props=props)
-        self["dataNumber"] = id
-
-    @ property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @ property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -112,7 +86,7 @@ class DMP(ContextualEntity):
         except PropsError as e:
             prop_errors.add_by_dict(str(e))
 
-        if self.id != "#dmp:" + str(self["dataNumber"]):
+        if "dataNumber" in self and self.id != "#dmp:" + str(self["dataNumber"]):
             prop_errors.add("@id", "The value MUST be started with '#dmp:'and then the value of dataNumber property MUST come after it.")
 
         if self.type != self.entity_name:
@@ -175,16 +149,8 @@ class DMP(ContextualEntity):
 
 
 class Person(BasePerson):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @ property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @ property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super(BasePerson, self).__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -205,7 +171,7 @@ class Person(BasePerson):
             prop_errors.add_by_dict(str(e))
 
         try:
-            if type(self.id) is str and self.id.startswith("https://orcid.org/"):
+            if isinstance(self.id, str) and self.id.startswith("https://orcid.org/"):
                 check_orcid_id(self.id[18:])
         except ValueError as e:
             prop_errors.add("@id", str(e))
@@ -229,16 +195,8 @@ class Person(BasePerson):
 
 
 class File(BaseFile):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @ property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @ property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super(BaseFile, self).__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
