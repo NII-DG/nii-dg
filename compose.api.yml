@@ -1,0 +1,15 @@
+version: '3.5'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile-api
+    image: nii-dg
+    container_name: nii-dg
+    volumes:
+      - ${PWD}:/app
+    restart: on-failure
+    working_dir: /app
+    ports:
+      - 5000:5000
+    command: ['python', '/app/nii_dg/api.py']

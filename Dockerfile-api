@@ -26,4 +26,4 @@ EXPOSE 5000
 ENV WSGI_SERVER "waitress"
 
 ENTRYPOINT ["tini", "--"]
-CMD ["sleep", "infinity"]
+CMD ['python', '/app/nii_dg/api.py']
