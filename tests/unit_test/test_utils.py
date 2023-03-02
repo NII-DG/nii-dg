@@ -5,7 +5,7 @@ from typing import Any, List, Literal, Union
 
 import pytest
 
-from nii_dg.entity import RootDataEntity
+from nii_dg.entity import Entity, RootDataEntity
 from nii_dg.error import PropsError
 from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.base import File as BaseFile
@@ -13,15 +13,14 @@ from nii_dg.schema.base import Organization, Person
 from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_content_formats, check_content_size,
                           check_email, check_erad_researcher_number,
-                          check_isodate, check_mime_type, check_orcid_id,
-                          check_phonenumber, check_prop_type,
-                          check_required_props, check_sha256,
+                          check_instance_type_from_id, check_isodate,
+                          check_mime_type, check_orcid_id, check_phonenumber,
+                          check_prop_type, check_required_props, check_sha256,
                           check_unexpected_props, check_url, classify_uri,
                           convert_string_type_to_python_type,
-                          extract_entity_type_list_from_string_type,
-                          get_name_from_ror, import_entity_class,
-                          load_entity_def_from_schema_file, split_type_str,
-                          sum_file_size, verify_idlink_is_correct_type,
+                          get_entity_list_to_validate, get_name_from_ror,
+                          import_entity_class,
+                          load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
 
 
@@ -84,14 +83,12 @@ def test_convert_string_type_to_python_type() -> None:
 
 
 def test_check_prop_type() -> None:
-    ent = BaseFile("text.txt")
-
     # no error occurs with correct format
-    check_prop_type(ent, "@id", "test.txt", "str")
+    check_prop_type("@id", "test.txt", str)
 
     # error
     with pytest.raises(PropsError):
-        check_prop_type(ent, "@id", "test.txt", "int")
+        check_prop_type("@id", "test.txt", int)
 
 
 def test_check_all_prop_types() -> None:
@@ -106,6 +103,22 @@ def test_check_all_prop_types() -> None:
     # error
     with pytest.raises(PropsError):
         check_all_prop_types(ent, entity_def)
+
+
+def test_check_instance_type_from_id() -> None:
+    ent_list: List[Entity] = []
+
+    # error
+    with pytest.raises(PropsError):
+        check_instance_type_from_id("affiliation", ent_list, Organization)
+    with pytest.raises(PropsError):
+        check_instance_type_from_id("affiliation", ent_list, List[Organization], "list")
+
+    # no error occurred
+    org = Organization("https://example.com/org")
+    ent_list.append(org)
+    check_instance_type_from_id("affiliation", ent_list, Organization)
+    check_instance_type_from_id("affiliation", ent_list, List[Organization], "list")
 
 
 def test_check_unexpected_props() -> None:
@@ -313,20 +326,11 @@ def test_sum_file_size() -> None:
     assert sum_file_size("B", []) == 0
 
 
-def test_split_type_str() -> None:
-    assert split_type_str("str", ", ") == ["str"]
-    assert split_type_str("Union[int, str]"[6:-1], ", ") == ["int", "str"]
-    assert split_type_str("Union[str, List[int, float]]"[6:-1], ", ") == ["str", "List[int, float]"]
+def test_get_entity_list_to_validate() -> None:
+    person = Person("test", {"affiliation": "Organization A"})
 
+    assert get_entity_list_to_validate(person) == {"affiliation": Organization}
 
-def test_extract_entity_type_list_from_string_type() -> None:
-    assert extract_entity_type_list_from_string_type("List[Union[File, RootDataEntity]]", "base") == [BaseFile, RootDataEntity]  # type: ignore
-
-
-def test_verify_idlink_is_correct_type() -> None:
-    person = Person("https://example.com/person")
-    org = Organization("https://example.com/organization")
-    file = BaseFile("test")
-
-    assert verify_idlink_is_correct_type(person, "affiliation", [org])
-    assert verify_idlink_is_correct_type(person, "affiliation", [file]) is False
+    file = BaseFile("sample")
+    assert len(get_entity_list_to_validate(file)) == 0
+    assert isinstance(get_entity_list_to_validate(file), dict)

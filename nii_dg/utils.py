@@ -170,7 +170,7 @@ def check_instance_type_from_id(prop: str, entity_list: List["Entity"], expected
         except PropsError:
             pass
     if len(correct_type_ents) == 0:
-        raise PropsError(f"The @id link in property {prop} is invalid type.")
+        raise PropsError("The entity liked by @id dict in this property is invalid type.")
 
 
 def check_unexpected_props(entity: "Entity", entity_def: EntityDef) -> None:
@@ -441,6 +441,7 @@ def get_entity_list_to_validate(entity: "Entity") -> Dict[str, Any]:
         if prop in entity:
             expected_python_type, flg = convert_string_type_to_python_type(prop_def["expected_type"], entity.schema_name)
             if flg == 1:
+                print("instance")
                 instance_type_dict[prop] = expected_python_type
 
     return instance_type_dict
