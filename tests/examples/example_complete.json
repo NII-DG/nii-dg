@@ -82,7 +82,7 @@
         "@id": "https://www.nii.ac.jp/"
       },
       "dataManager": {
-        "@id": "https://example.com/person"
+        "@id": "https://ja.wikipedia.org/wiki/%E3%82%A4%E3%83%81%E3%83%AD%E3%83%BC"
       },
       "dataNumber": 1,
       "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/cao.jsonld"
