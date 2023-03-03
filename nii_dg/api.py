@@ -10,7 +10,6 @@ from uuid import uuid4
 from flask import Blueprint, Flask, Response, abort, jsonify, request
 from waitress import serve
 
-from nii_dg.entity import DefaultEntity
 from nii_dg.error import (CheckPropsError, CrateError, EntityError,
                           GovernanceError)
 from nii_dg.ro_crate import ROCrate
@@ -47,7 +46,7 @@ def result_wrapper(error_dict: List[EntityError]) -> List[Dict[str, str]]:
     for entity_error in error_dict:
         entity_dict = {}
         entity_dict["entityId"] = entity_error.entity.id
-        entity_dict["props"] = entity_error.entity.schema_name + "." + entity_error.entity.type + ":"
+        entity_dict["props"] = entity_error.entity.schema_name + "." + entity_error.entity.type + ":"  # type:ignore
         for prop, reason in entity_error.message_dict.items():
             reason_dict = entity_dict.copy()
             reason_dict["props"] += prop

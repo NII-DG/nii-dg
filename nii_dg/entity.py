@@ -76,11 +76,11 @@ class Entity(TypedMutableMapping):
 
     @property
     def id(self) -> str:
-        return self.data["@id"]
+        return self.data["@id"]  # type:ignore
 
     @property
     def type(self) -> str:
-        return self.data["@type"]
+        return self.data["@type"]  # type:ignore
 
     @property
     def context(self) -> str:
@@ -151,7 +151,6 @@ class Entity(TypedMutableMapping):
         # Abstract method
         # raise NotImplementedError
         validation_failures = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
         instance_type_dict = get_entity_list_to_validate(self)
 
         for prop, val in self.items():
