@@ -97,7 +97,8 @@ def test_validate() -> None:
         ent.validate(crate)
 
     ent["availabilityStarts"] = "2030-01-01"
-    ent["repository"] = "https://example.com/repo"
+    ent["repository"] = {"@id":"https://example.com/repo"}
+    crate.add(RepositoryObject("https://example.com/repo"), ContactPoint("#mailto:test@example.com"))
     # no error
     ent.validate(crate)
 
@@ -115,7 +116,7 @@ def test_validate() -> None:
     ent["isAccessibleForFree"] = False
     ent["contentSize"] = "10GB"
     file = File("test", {"contentSize": "11GB", "dmpDataNumber": ent})
-    crate.add(file)
+    crate.add(file, DataDownload("https://zenodo.org/record/example"), License("https://example.com/license"))
     # error: file size is over.
     # error: isAccessibleForFree MUST be True
     with pytest.raises(EntityError):
