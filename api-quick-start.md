@@ -101,12 +101,12 @@ $ curl localhost:5000/bd453ed1-30b9-4873-b240-e459467ea9dc
 }
 ```
 
-## Cancel Governance Request
+## POST Cancel Governance Request
 Only when your request is in statue `QUEUED`, you can cancel it. If the request successfully canceled, its status id changed to `CANCELED`.
 
 When cancel request is successfully applied, you get your request ID.
 ```
-$ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc/cancel
+$ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc/cancel -X POST
 {"request_id": "a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc"}
 ```
 After a moment:
