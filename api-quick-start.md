@@ -1,37 +1,47 @@
 ## Deploy NII-DG API Server
-Clone this Github repository
+
+Clone this Github repository.
 
 Then run docker-compose up to launch the server:
 
-```
-$docker compose -f compose.api.yml up
+```bash
+$ docker compose -f compose.api.yml up
 Attaching to nii-dg
 nii-dg  | INFO:waitress:Serving on http://0.0.0.0:5000
 ```
+
 Server launched successfully and accessible at the address `localhost:5000`.
 
-To check if the server is working, use the endpoint `/healthcheck`. You get `OK` in the message from running server.
-```
+To check if the server is working, use the endpoint `/healthcheck`.
+You get `OK` in the message from running server.
+
+```bash
 $ curl localhost:5000/healthcheck
 {"message":"OK"}
 ```
 
 ## Request RO-Crate validation to the server
+
 ### Prepare ro-crate-metadata.json
+
 You need `ro-crate-metadata.json`, RO-Crate json file created by using NII-DG library. Data governance is performed based on the RO-Crate as an input.
 
+基本的なendpoint `/`:
+
 ### POST /validate
+
 Access the POST endpoint `/validate` with your RO-Crate as a request body to request governance.
 
-```
+```bash
 $ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @path/to/ro-crate-metadata
 {"request_id":"a84d2318-8b57-49c4-848d-b1935e4a1224"}
 ```
+
 You get `request_id` in uuid4 when your request is successfully applied to the server.
 
-
 In the case your ro-crate is in wrong format, governance request is denied.
-```
+
+```bash
 $ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @path/to/wrong-ro-crate
 {
   "message": "400 Bad Request: RO-Crate has invalid property."
@@ -39,20 +49,22 @@ $ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @p
 ```
 
 ### Governance with only specified entities
+
 If you want to limit the entities to be governed for reasons such as time-consuming verification, you can specify the target entities by sending entity ID as a query parameter `entityIds`.
 Please make sure that the entity id is percent-encoded format and the URI is enclosed with single/double quotes.
 
-```
+```bash
 $ curl -X POST "localhost:5000/validate?entityIds=file_1.txt&entityIds=https%3A%2F%2Fexample.com%2Fperson" -H "Content-Type: application/json" -d @path/to/ro-crate-metadata
 {"request_id":"bd453ed1-30b9-4873-b240-e459467ea9dc"}
 ```
 
 ## Get Governance Result
+
 You can get the status of the governance by using the request_id.
 The status `COMPLETE` means the governance check finished successfully and no problem is found. The `results` value is empty list.
 The status `FAILED` also means the governance check finished successfully, but found the problems. The `results` value is problem list of dictionaries consisting of entity ID, property and failed reason.
 
-```
+```bash
 $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
 {
   "request": {
@@ -79,6 +91,7 @@ $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
 ```
 
 When you specified entities, `request` property has target list.
+
 ```
 $ curl localhost:5000/bd453ed1-30b9-4873-b240-e459467ea9dc
 {
@@ -87,7 +100,7 @@ $ curl localhost:5000/bd453ed1-30b9-4873-b240-e459467ea9dc
       "file_1.txt",
       "https://example.com/person"
     ],
-(Omitted)
+  ...
   },
   "requestId": "bd453ed1-30b9-4873-b240-e459467ea9dc",
   "results": [
@@ -102,18 +115,22 @@ $ curl localhost:5000/bd453ed1-30b9-4873-b240-e459467ea9dc
 ```
 
 ## POST Cancel Governance Request
+
 Only when your request is in statue `QUEUED`, you can cancel it. If the request successfully canceled, its status id changed to `CANCELED`.
 
 When cancel request is successfully applied, you get your request ID.
-```
+
+```bash
 $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc/cancel -X POST
 {"request_id": "a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc"}
 ```
+
 After a moment:
-```
+
+```bash
 $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
 {
-  (Omitted),
+  ...,
   "request_id": "a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc",
   "results":[],
   "status":"CANCELED"}
