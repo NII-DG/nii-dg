@@ -7,7 +7,7 @@ import mimetypes
 import re
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
-                    Optional, TypedDict, Union)
+                    Optional, Tuple, TypedDict, Union)
 from urllib.parse import quote, urlparse
 
 import requests
@@ -20,16 +20,6 @@ if TYPE_CHECKING:
     from nii_dg.entity import Entity
 
 
-def github_repo() -> str:
-    # TODO use environment variable, git command, or const value (where?)
-    return "ascade/nii_dg"
-
-
-def github_branch() -> str:
-    # TODO use environment variable, git command, or const value (where?)
-    return "develop"
-
-
 class EntityDefDict(TypedDict):
     expected_type: str
     required: bool
@@ -38,7 +28,7 @@ class EntityDefDict(TypedDict):
 EntityDef = NewType("EntityDef", Dict[str, EntityDefDict])
 
 
-def load_entity_def_from_schema_file(schema_name: str, entity_name: str) -> EntityDef:
+def load_entity_def_from_schema_file(schema_name: Optional[str] = None, entity_name: str = "") -> EntityDef:
     schema_file = Path(__file__).resolve().parent.joinpath(f"schema/{schema_name}.yml")
     if not schema_file.exists():
         raise PropsError(f"Tried to load {entity_name} from schema/{schema_name}.yml, but this file is not found.")
@@ -60,10 +50,10 @@ def load_entity_def_from_schema_file(schema_name: str, entity_name: str) -> Enti
 def import_entity_class(schema_name: str, entity_name: str) -> Any:
     """\
     Import entity class from schema module.
-    e.g., import_entity_class("base", "RootDataEntity") ->
+    e.g., import_entity_class("base", "File") ->
 
-    from nii_dg.schema.base import RootDataEntity
-    return RootDataEntity
+    from nii_dg.schema.base import File
+    return File
     """
     schema_file = Path(__file__).resolve().parent.joinpath(f"schema/{schema_name}.py")
     if not schema_file.exists():
@@ -76,31 +66,37 @@ def import_entity_class(schema_name: str, entity_name: str) -> Any:
         raise PropsError(f"Tried to import {entity_name} from schema/{schema_name}.py, but this entity is not found.") from None
 
 
-def convert_string_type_to_python_type(type_str: str, schema_name: Optional[str] = None) -> Any:
+def convert_string_type_to_python_type(type_str: str, schema_name: Optional[str] = None) -> Tuple[Any, int]:
     """\
     Convert string type to python type.
-    e.g. "List[Union[str, int]]" -> List[Union[str, int]]
+    At the same time, it determines whether entity subclasses are included in it and returns a flag.
+    e.g. "List[Union[str, int]]" -> List[Union[str, int]], 0
     """
     if type_str == "bool":
-        return bool
+        return bool, 0
     elif type_str == "str":
-        return str
+        return str, 0
     elif type_str == "int":
-        return int
+        return int, 0
     elif type_str == "float":
-        return float
+        return float, 0
     elif type_str == "Any":
-        return Any
+        return Any, 0
     elif type_str.startswith("List["):
-        return List[convert_string_type_to_python_type(type_str[5:-1], schema_name)]  # type: ignore
-    elif type_str.startswith("Union["):
-        child_types = tuple([convert_string_type_to_python_type(t, schema_name) for t in type_str[6:-1].split(", ")])
-        return Union[child_types]  # type: ignore
+        type_, flg = convert_string_type_to_python_type(type_str[5:-1], schema_name)
+        return List[type_], flg  # type: ignore
     elif type_str.startswith("Optional["):
-        return Optional[convert_string_type_to_python_type(type_str[5:-1], schema_name)]
+        type_, flg = convert_string_type_to_python_type(type_str[9:-1], schema_name)
+        return Optional[type_], flg
+    elif type_str.startswith("Union["):
+        child_types = tuple([convert_string_type_to_python_type(t, schema_name)[0] for t in type_str[6:-1].split(", ")])
+        flg_list = [convert_string_type_to_python_type(t, schema_name)[1] for t in type_str[6:-1].split(", ")]
+        if flg_list.count(flg_list[0]) != len(flg_list):
+            raise PropsError(f"Unexpected type: {type_str}")
+        return Union[child_types], flg_list[0]  # type: ignore
     elif type_str.startswith("Literal["):
         child_list = [t.strip('"').strip("'") for t in type_str[8:-1].split(", ")]
-        return Literal[tuple(child_list)]  # type: ignore
+        return Literal[tuple(child_list)], 0  # type: ignore
     else:
         if "[" in type_str:
             raise PropsError(f"Unexpected type: {type_str}")
@@ -117,47 +113,71 @@ def convert_string_type_to_python_type(type_str: str, schema_name: Optional[str]
                     except PropsError:
                         pass
             if entity_class is None:
+                if type_str in ["ROCrateMetadata", "RootDataEntity"]:
+                    module = importlib.import_module("nii_dg.entity")
+                    return getattr(module, type_str), 1
                 raise PropsError(f"Unexpected type: {type_str}")
             else:
-                return entity_class
+                return entity_class, 1
 
 
-def check_prop_type(entity: "Entity", prop: str, value: Any, expected_type: str) -> None:
+def check_prop_type(prop: str, value: Any, expected_python_type: Any) -> None:
     """
     Check the type of each property by referring schema.yml.
+    When the type includes entity subclass, the check is skipped.
     """
-    excepted_python_type = convert_string_type_to_python_type(expected_type, entity.schema_name)
+    # expected_python_type, flg = convert_string_type_to_python_type(expected_type, entity.schema_name)
+    # if flg == 1:
+    #     return
     try:
-        ori_check_type(prop, value, excepted_python_type)
+        ori_check_type(prop, value, expected_python_type)
     except TypeError as e:
         ori_msg = str(e)
         type_msg = ori_msg[ori_msg.find("must be") + 8:]
         raise PropsError(f"The type of this property MUST be {type_msg}.") from None
     except Exception as e:
-        raise UnexpectedImplementationError(e)
+        raise UnexpectedImplementationError(e) from None
 
 
 def check_all_prop_types(entity: "Entity", entity_def: EntityDef) -> None:
     """
     Check the type of all property in the entity by referring schema.yml.
+    When the type of property includes entity subclass, the check of the property is skipped.
     Called after check_unexpected_props().
     """
     error_dict = {}
     for prop, prop_def in entity_def.items():
         if prop in entity:
-            try:
-                check_prop_type(entity, prop, entity[prop], prop_def["expected_type"])
-            except PropsError as e:
-                error_dict[prop] = str(e)
+            expected_python_type, flg = convert_string_type_to_python_type(prop_def["expected_type"], entity.schema_name)
+            if flg == 0:
+                try:
+                    check_prop_type(prop, entity[prop], expected_python_type)
+                except PropsError as e:
+                    error_dict[prop] = str(e)
     if len(error_dict) > 0:
         raise PropsError(error_dict)
+
+
+def check_instance_type_from_id(prop: str, entity_list: List["Entity"], expected_python_type: Any, list_flg: Optional[str] = None) -> None:
+    correct_type_ents = []
+    for ent in entity_list:
+        try:
+            if list_flg == "list":
+                check_prop_type(prop, [ent], expected_python_type)
+            else:
+                check_prop_type(prop, ent, expected_python_type)
+            correct_type_ents.append(ent)
+        except PropsError:
+            pass
+    if len(correct_type_ents) == 0:
+        raise PropsError("The entity liked by @id dict in this property is invalid type.")
 
 
 def check_unexpected_props(entity: "Entity", entity_def: EntityDef) -> None:
     error_dict = {}
     for actual_prop in entity.keys():
         if actual_prop not in entity_def:
-            if type(actual_prop) is str and actual_prop.startswith("@"):
+            if isinstance(actual_prop, str) and actual_prop.startswith("@"):
                 continue
             error_dict[actual_prop] = "Unexpected property"
     if len(error_dict) > 0:
@@ -180,7 +200,6 @@ def check_required_props(entity: "Entity", entity_def: EntityDef) -> None:
 
 
 def check_content_formats(entity: "Entity", format_rules: Dict[str, Callable[[str], None]]) -> None:
-    # TODO 名前もイケてない
     """\
     expected as called after check_required_props(), check_all_prop_types(), check_unexpected_props()
     """
@@ -198,17 +217,17 @@ def check_content_formats(entity: "Entity", format_rules: Dict[str, Callable[[st
         raise PropsError(error_dict)
 
 
-def classify_uri(entity: "Entity", key: str) -> str:
+def classify_uri(value: str) -> str:
     """
     Check the value is URI.
     Return 'URL' when the value starts with 'http' or 'https'
     When it is not URL, return 'abs_path' or 'rel_path.
     """
     try:
-        encoded_uri = quote(entity[key], safe="!#$&'()*+,/:;=?@[]\\")
+        encoded_uri = quote(value, safe="!#$&'()*+,/:;=?@[]\\")
         parsed = urlparse(encoded_uri)
     except (TypeError, ValueError):
-        raise PropsError(f"The value of {key} in {entity} is invalid URI.") from None
+        raise ValueError(f"The value {value} is invalid URI.") from None
 
     if parsed.scheme in ["http", "https"] and parsed.netloc != "":
         return "URL"
@@ -225,8 +244,8 @@ def check_url(value: str) -> None:
     try:
         encoded_url = quote(value, safe="!#$&'()*+,/:;=?@[]\\")
         parsed = urlparse(encoded_url)
-    except (TypeError, ValueError):
-        raise PropsError(f"The value {value} is invalid URI.") from None
+    except TypeError:
+        raise ValueError from None
 
     if parsed.scheme not in ["http", "https"]:
         raise ValueError
@@ -239,7 +258,7 @@ def check_content_size(value: str) -> None:
     Check file size value is in the defined format.
     If not, raise ValueError.
     """
-    if type(value) is not str:
+    if not isinstance(value, str):
         raise TypeError
 
     pattern = r"^\d+[KMGTP]?B$"
@@ -254,7 +273,7 @@ def check_mime_type(value: str) -> None:
     Check encoding format value is in MIME type format.
     """
     # TODO: mimetypeの辞書がOSによって差分があるのをどう吸収するか, 例えばtext/markdown
-    if type(value) is not str:
+    if not isinstance(value, str):
         raise TypeError
 
     if mimetypes.guess_extension(value) is None:
@@ -265,7 +284,7 @@ def check_sha256(value: str) -> None:
     """
     Check sha256 value is in SHA256 format.
     """
-    if type(value) is not str:
+    if not isinstance(value, str):
         raise TypeError
 
     pattern = r"(?:[^a-fA-F\d]|\b)([a-fA-F\d]{64})(?:[^a-fA-F\d]|\b)"
@@ -333,7 +352,7 @@ def check_orcid_id(value: str) -> None:
     orcidid_match = re.compile(pattern)
 
     if orcidid_match.fullmatch(value) is None:
-        raise PropsError(f"Orcid ID {value} is invalid.")
+        raise ValueError(f"Orcid ID {value} is invalid.")
 
     if value[-1] == "X":
         checksum = 10
@@ -343,38 +362,35 @@ def check_orcid_id(value: str) -> None:
     for num in value.replace("-", "")[:-1]:
         sum_val = (sum_val + int(num)) * 2
     if (12 - (sum_val % 11)) % 11 != checksum:
-        raise PropsError(f"Orcid ID {value} is invalid.")
+        raise ValueError(f"Orcid ID {value} is invalid.")
 
 
 def verify_is_past_date(entity: "Entity", key: str) -> Optional[bool]:
     """
     Check the date is past or not.
     """
-    try:
-        iso_date = datetime.date.fromisoformat(entity[key])
-    except (KeyError, TypeError):
+    if key not in entity.keys():
         return None
-    except ValueError:
-        raise PropsError(f"The value {entity[key]} is invalid date format. MUST be 'YYYY-MM-DD'.") from None
 
+    iso_date = datetime.date.fromisoformat(entity[key])
     today = datetime.date.today()
+
     if (today - iso_date).days < 0:
         return False
     return True
 
 
-def access_url(url: str) -> None:
+def access_url(url: str) -> requests.Response:
     """
     Check the url is accessible.
     """
     try:
         res = requests.get(url, timeout=(10.0, 30.0))
         res.raise_for_status()
-    except requests.HTTPError as httperr:
-        msg = str(httperr)
-        raise ValueError(f"URL is not accessible. {msg}") from None
     except Exception as err:
-        raise UnexpectedImplementationError from err
+        raise ValueError(f"Unable to access {url} due to {err}") from None
+
+    return res
 
 
 def get_name_from_ror(ror_id: str) -> List[str]:
@@ -382,16 +398,7 @@ def get_name_from_ror(ror_id: str) -> List[str]:
     Get organization name from ror.
     """
     api_url = "https://api.ror.org/organizations/" + ror_id
-
-    try:
-        res = requests.get(api_url, timeout=(10.0, 30.0))
-        res.raise_for_status()
-    except requests.HTTPError as httperr:
-        if res.status_code == 404:
-            raise ValueError(f"ROR ID {ror_id} does not exist.") from None
-        raise UnexpectedImplementationError from httperr
-    except Exception as err:
-        raise UnexpectedImplementationError from err
+    res = access_url(api_url)
 
     body = res.json()
     name_list: List[str] = body["aliases"]
@@ -405,6 +412,7 @@ def sum_file_size(size_unit: str, entity_list: List["Entity"]) -> float:
     """
     units = ["B", "KB", "MB", "GB", "TB", "PB"]
     file_size_sum: float = 0
+    target_prop = "contentSize"
 
     try:
         unit = units.index(size_unit)
@@ -412,15 +420,26 @@ def sum_file_size(size_unit: str, entity_list: List["Entity"]) -> float:
         raise UnexpectedImplementationError from err
 
     for ent in entity_list:
-        if ent["contentSize"][-2:] in units:
-            file_unit = units.index(ent["contentSize"][-2:])
-            file_size = int(ent["contentSize"][:-2])
-        elif ent["contentSize"][-1:] in units:
+        if ent[target_prop][-2:] in units:
+            file_unit = units.index(ent[target_prop][-2:])
+            file_size = int(ent[target_prop][:-2])
+        elif ent[target_prop][-1:] in units:
             file_unit = 0
-            file_size = int(ent["contentSize"][:-1])
+            file_size = int(ent[target_prop][:-1])
         else:
             raise UnexpectedImplementationError
 
         file_size_sum += round(file_size / 1024 ** (unit - file_unit), 3)
 
     return file_size_sum
+
+
+def get_entity_list_to_validate(entity: "Entity") -> Dict[str, Any]:
+    entity_def = load_entity_def_from_schema_file(entity.schema_name, entity.entity_name)
+    instance_type_dict = {}
+    for prop, prop_def in entity_def.items():
+        if prop in entity:
+            expected_python_type, flg = convert_string_type_to_python_type(prop_def["expected_type"], entity.schema_name)
+            if flg == 1:
+                instance_type_dict[prop] = expected_python_type
+    return instance_type_dict

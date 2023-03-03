@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import pytest  # noqa: F401
+import pytest
 
 from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
@@ -53,6 +53,7 @@ def test_check_props() -> None:
     del ent["unknown_property"]
     ent["@id"] = "config/setting/txt"
     ent["name"] = "setting.txt"
+    ent["contentSize"] = "150GB"
     ent["sdDatePublished"] = "2000-01-01"
     ent["experimentPackageFlag"] = True
     ent.check_props()
@@ -63,12 +64,10 @@ def test_validate() -> None:
     file = File("https://example.com/config/setting.txt")
 
     # error: when @id is URL, sdDatePublished is required
-    # error: contentSize is required
     with pytest.raises(EntityError):
         file.validate(crate)
 
     # no error occurs with sdDatePublished property
-    file["contentSize"] = "150GB"
     file["sdDatePublished"] = "2000-01-01"
     file.validate(crate)
 

@@ -1,17 +1,6 @@
 # NII-DG: Schema: base
 
-See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg/blob/main/schema/README.md) for more information.
-
-## RootDataEntity
-A Dataset that represents the RO-Crate. For more information, see https://www.researchobject.org/ro-crate/1.1/root-data-entity.html .
-| Property | Type | Required? | Description | Example |
-| --- | --- | --- | --- | --- |
-| `@id` | `str` | Required. | MUST be `./`. | `./` |
-| `name` | `str` | Required. | Title of the research project. | `Example Research Project` |
-| `description` | `str` | Optional. | Description of the research project. | `This research project aims to reveal the effect of xxx.` |
-| `funder` | `List[Organization]` | Optional. | Funding agencies of the research project. MUST be an array of @id dictionary of Organization entity. | `[{"@id": "https://ror.org/01b9y6c26"}]` |
-| `dateCreated` | `str` | Required. | Automatically added to the entity when you generate RO-Crate with as_jsonld() method. MUST be a string in ISO 8601 date format and a timestamp down to milliseconds. The time zone is UTC. Indicates timestamp the RO-Crate itself was created. | `2022-12-09T10:48:07.976+00:00` |
-| `hasPart` | `List[Union[Dataset, File]]` | Required. | MUST be an array of Dataset and File entities that indicate files and directories as subjects of data governance. If there is no file to include, MUST be empty list. | `[{"@id": "config/"}, {"@id": "config/config.txt"}]` |
+See [GitHub - NII-DG/nii-dg - schema/README.md](https://github.com/NII-DG/nii-dg/blob/main/schema/README.md) for more information.
 
 ## File
 A file included in the research project, e.g. text file, script file and images.

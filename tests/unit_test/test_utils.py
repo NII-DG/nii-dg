@@ -3,71 +3,77 @@
 import datetime
 from typing import Any, List, Literal, Union
 
-import pytest  # noqa: F401
+import pytest
 
+from nii_dg.entity import Entity, RootDataEntity
 from nii_dg.error import PropsError
 from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.base import File as BaseFile
-from nii_dg.schema.base import RootDataEntity
+from nii_dg.schema.base import Organization, Person
 from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
-                          check_content_size, check_email,
-                          check_erad_researcher_number, check_isodate,
+                          check_content_formats, check_content_size,
+                          check_email, check_erad_researcher_number,
+                          check_instance_type_from_id, check_isodate,
                           check_mime_type, check_orcid_id, check_phonenumber,
                           check_prop_type, check_required_props, check_sha256,
                           check_unexpected_props, check_url, classify_uri,
                           convert_string_type_to_python_type,
-                          get_name_from_ror, import_entity_class,
+                          get_entity_list_to_validate, get_name_from_ror,
+                          import_entity_class,
                           load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
 
 
 def test_load_entity_def_from_schema_file() -> None:
-    excepted_entity_def = load_entity_def_from_schema_file("base", "RootDataEntity")
+    excepted_entity_def = load_entity_def_from_schema_file("base", "Person")
     assert excepted_entity_def["@id"] == {"expected_type": "str", "required": True}
     assert excepted_entity_def["name"] == {"expected_type": "str", "required": True}
-    assert excepted_entity_def["description"] == {"expected_type": "str", "required": False}
-    assert excepted_entity_def["dateCreated"] == {"expected_type": "str", "required": True}
-    assert excepted_entity_def["hasPart"] == {"expected_type": "List[Union[Dataset, File]]", "required": True}
+    assert excepted_entity_def["alias"] == {"expected_type": "str", "required": False}
+    assert excepted_entity_def["affiliation"] == {"expected_type": "Organization", "required": True}
+    assert excepted_entity_def["email"] == {"expected_type": "str", "required": True}
+    assert excepted_entity_def["telephone"] == {"expected_type": "str", "required": False}
 
     # error
     with pytest.raises(PropsError):
         load_entity_def_from_schema_file("base", "FooBar")
     with pytest.raises(PropsError):
-        load_entity_def_from_schema_file("foobar", "RootDataEntity")
+        load_entity_def_from_schema_file("foobar", "Person")
 
 
 def test_import_entity_class() -> None:
-    assert import_entity_class("base", "RootDataEntity") is RootDataEntity
+    assert import_entity_class("base", "File") is BaseFile
 
     # error
     with pytest.raises(PropsError):
         import_entity_class("base", "FooBar")
     with pytest.raises(PropsError):
-        import_entity_class("foobar", "RootDataEntity")
+        import_entity_class("foobar", "File")
 
 
 def test_convert_string_type_to_python_type() -> None:
-    assert convert_string_type_to_python_type("bool") is bool
-    assert convert_string_type_to_python_type("str") is str
-    assert convert_string_type_to_python_type("int") is int
-    assert convert_string_type_to_python_type("float") is float
-    assert convert_string_type_to_python_type("Any") is Any
-    assert convert_string_type_to_python_type("List[str]") is List[str]
-    assert convert_string_type_to_python_type("List[Any]") is List[Any]
-    assert convert_string_type_to_python_type("Union[str, int]") is Union[str, int]
-    assert convert_string_type_to_python_type("Union[List[str], int]") is Union[List[str], int]
-    assert convert_string_type_to_python_type('Literal["a", "b"]') is Literal["a", "b"]
+    assert convert_string_type_to_python_type("bool") == (bool, 0)
+    assert convert_string_type_to_python_type("str") == (str, 0)
+    assert convert_string_type_to_python_type("int") == (int, 0)
+    assert convert_string_type_to_python_type("float") == (float, 0)
+    assert convert_string_type_to_python_type("Any") == (Any, 0)
+    assert convert_string_type_to_python_type("List[str]") == (List[str], 0)
+    assert convert_string_type_to_python_type("List[Any]") == (List[Any], 0)
+    assert convert_string_type_to_python_type("Union[str, int]") == (Union[str, int], 0)
+    assert convert_string_type_to_python_type("Union[List[str], int, bool]") == (Union[List[str], int, bool], 0)
+    assert convert_string_type_to_python_type('Literal["a", "b"]') == (Literal["a", "b"], 0)
 
-    # error
+    # error: Tuple is not used in json
     with pytest.raises(PropsError):
-        assert convert_string_type_to_python_type("Tuple[str, int]")
+        convert_string_type_to_python_type("Tuple[str, int]")
+    # error: Too complex
+    with pytest.raises(PropsError):
+        convert_string_type_to_python_type("Union[List[Union[str, bool]], int]")
 
     # Entity subclass in schema module
-    assert convert_string_type_to_python_type("RootDataEntity") is RootDataEntity
-    assert convert_string_type_to_python_type("RootDataEntity", "base") is RootDataEntity
-    assert convert_string_type_to_python_type("File", "base") is BaseFile
-    assert convert_string_type_to_python_type("List[File]", "base") is List[BaseFile]
-    assert convert_string_type_to_python_type("File", "amed") is AmedFile
+    assert convert_string_type_to_python_type("RootDataEntity") == (RootDataEntity, 1)
+    assert convert_string_type_to_python_type("File", "base") == (BaseFile, 1)
+    assert convert_string_type_to_python_type("List[File]", "base") == (List[BaseFile], 1)
+    assert convert_string_type_to_python_type("File", "amed") == (AmedFile, 1)
 
     # error
     with pytest.raises(PropsError):
@@ -77,14 +83,12 @@ def test_convert_string_type_to_python_type() -> None:
 
 
 def test_check_prop_type() -> None:
-    ent = BaseFile("text.txt")
-
     # no error occurs with correct format
-    check_prop_type(ent, "@id", "test.txt", "str")
+    check_prop_type("@id", "test.txt", str)
 
     # error
     with pytest.raises(PropsError):
-        check_prop_type(ent, "@id", "test.txt", "int")
+        check_prop_type("@id", "test.txt", int)
 
 
 def test_check_all_prop_types() -> None:
@@ -99,6 +103,22 @@ def test_check_all_prop_types() -> None:
     # error
     with pytest.raises(PropsError):
         check_all_prop_types(ent, entity_def)
+
+
+def test_check_instance_type_from_id() -> None:
+    ent_list: List[Entity] = []
+
+    # error
+    with pytest.raises(PropsError):
+        check_instance_type_from_id("affiliation", ent_list, Organization)
+    with pytest.raises(PropsError):
+        check_instance_type_from_id("affiliation", ent_list, List[Organization], "list")
+
+    # no error occurred
+    org = Organization("https://example.com/org")
+    ent_list.append(org)
+    check_instance_type_from_id("affiliation", ent_list, Organization)
+    check_instance_type_from_id("affiliation", ent_list, List[Organization], "list")
 
 
 def test_check_unexpected_props() -> None:
@@ -116,7 +136,7 @@ def test_check_unexpected_props() -> None:
 
 
 def test_check_required_props() -> None:
-    root = RootDataEntity()
+    ent = BaseFile("test")
     entity_def: EntityDef = {  # type:ignore
         "test_prop": {
             "expected_type": "str",
@@ -125,40 +145,47 @@ def test_check_required_props() -> None:
     }
 
     with pytest.raises(PropsError):
-        check_required_props(root, entity_def)
+        check_required_props(ent, entity_def)
 
-    # nothing is occurred with correct format
-    root["test_prop"] = "sample_value"
-    check_required_props(root, entity_def)
+    # no error occurred with correct format
+    ent["test_prop"] = "sample_value"
+    check_required_props(ent, entity_def)
 
 
 def test_check_content_formats() -> None:
-    # TODO impl. after impl. schema/base.py
-    pass
+    file = BaseFile("https://example.com/file")
+
+    # no error occurred with correct format
+    check_content_formats(file, {
+        "contentSize": check_content_size,
+        "url": check_url,
+        "sha256": check_sha256,
+        "encodingFormat": check_mime_type,
+        "sdDatePublished": check_isodate
+    })
+
+    file["contentSize"] = "15kb"
+    with pytest.raises(PropsError):
+        check_content_formats(file, {"contentSize": check_content_size})
 
 
 def test_classify_uri() -> None:
-    ent = BaseFile("https://example.com",
-                   {"path1": "file:///document/test",
-                    "path2": "/document/test",
-                    "path3": "document/test"})
-    assert classify_uri(ent, "@id") == "URL"
-    assert classify_uri(ent, "path1") == "abs_path"
-    assert classify_uri(ent, "path2") == "abs_path"
-    assert classify_uri(ent, "path3") == "rel_path"
+    assert classify_uri("https://example.com") == "URL"
+    assert classify_uri("file:///document/test") == "abs_path"
+    assert classify_uri("/document/test") == "abs_path"
+    assert classify_uri("document/test") == "rel_path"
 
 
 def test_check_url() -> None:
-    # nothing is occurred with correct format
+    # no error occurred with correct format
     check_url("https://example.com")
 
     with pytest.raises(ValueError):
         check_url("file:///documents/file")
-    # to be added
 
 
 def test_content_size() -> None:
-    # nothing is occurred with correct format
+    # no error is occurred with correct format
     check_content_size("156B")
     check_content_size("156KB")
     check_content_size("156MB")
@@ -167,100 +194,97 @@ def test_content_size() -> None:
 
     with pytest.raises(ValueError):
         check_content_size("150")
-    # to be added
 
 
 def test_check_mime_type() -> None:
-    # nothing is occurred with correct format
+    # no error is occurred with correct format
     check_mime_type("text/plain")
 
     with pytest.raises(ValueError):
         check_mime_type("text/unknown")
-    # to be added
 
 
 def test_check_sha256() -> None:
-    # nothing is occurred with correct format
+    # no error is occurred with correct format
     check_sha256("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
 
     with pytest.raises(ValueError):
         check_sha256("123929084207jiljgau09u0808")
-    # to be added
 
 
 def test_check_isodate() -> None:
-    # nothing is occurred with correct format
+    # no error is occurred with correct format
     check_isodate("2023-01-01")
 
 
-@pytest.mark.parametrize('wrong_date', [
-    "20230131", "2023Jan31", "2023-31-01", "2023/01/31", "2023131", "2023-02-31"])
-def test_check_isodate_error(wrong_date) -> None:
+@pytest.mark.parametrize("wrong_date",
+                         ["20230131", "2023Jan31", "2023-31-01", "2023/01/31", "2023131", "2023-02-31"])
+def test_check_isodate_error(wrong_date: str) -> None:
     # error
     with pytest.raises(ValueError):
         check_isodate(wrong_date)
 
 
-@pytest.mark.parametrize('correct_email', [
-    "test@example.com", "test1234@example.co.jp"])
-def test_check_email(correct_email) -> None:
-    # nothing is occurred with correct format
+@pytest.mark.parametrize("correct_email",
+                         ["test@example.com", "test1234@example.co.jp"])
+def test_check_email(correct_email: str) -> None:
+    # no error is occurred with correct format
     check_email(correct_email)
 
 
-@pytest.mark.parametrize('wrong_email', [
-    "test@", "@example.co.jp", "testatexample.co.jp", ".test@example.com", "test.@example.com", "sample..test@example.com"])
-def test_check_email_error(wrong_email) -> None:
+@pytest.mark.parametrize("wrong_email",
+                         ["test@", "@example.co.jp", "testatexample.co.jp", ".test@example.com", "test.@example.com", "sample..test@example.com"])
+def test_check_email_error(wrong_email: str) -> None:
     with pytest.raises(ValueError):
         check_email(wrong_email)
 
 
-@pytest.mark.parametrize('correct_phone_number', [
-    "01-2345-6789", "0123456789", "090-1234-5678", "09012345678"])
-def test_check_phone_number(correct_phone_number) -> None:
-    # nothing is occurred with correct format
+@pytest.mark.parametrize("correct_phone_number",
+                         ["01-2345-6789", "0123456789", "090-1234-5678", "09012345678"])
+def test_check_phone_number(correct_phone_number: str) -> None:
+    # no error is occurred with correct format
     check_phonenumber(correct_phone_number)
 
 
-@pytest.mark.parametrize('wrong_phone_number', [
-    "123-456", "090-12-345678", "01-2345-678a"])
-def test_check_phone_number_error(wrong_phone_number) -> None:
+@pytest.mark.parametrize("wrong_phone_number",
+                         ["123-456", "090-12-345678", "01-2345-678a"])
+def test_check_phone_number_error(wrong_phone_number: str) -> None:
     with pytest.raises(ValueError):
         check_phonenumber(wrong_phone_number)
 
 
-@pytest.mark.parametrize('correct_researcher_number', [
-    "01234567", "00123456"])
-def test_check_erad_researcher_number(correct_researcher_number) -> None:
-    # nothing is occurred with correct format
+@pytest.mark.parametrize("correct_researcher_number",
+                         ["01234567", "00123456"])
+def test_check_erad_researcher_number(correct_researcher_number: str) -> None:
+    # no error is occurred with correct format
     check_erad_researcher_number(correct_researcher_number)
 
 
-@pytest.mark.parametrize('wrong_researcher_number', [
-    "0123456", "0123456a", "0123-4567"])
-def test_check_erad_researcher_number_error(wrong_researcher_number) -> None:
+@pytest.mark.parametrize("wrong_researcher_number",
+                         ["0123456", "0123456a", "0123-4567"])
+def test_check_erad_researcher_number_error(wrong_researcher_number: str) -> None:
     # error
     with pytest.raises(ValueError):
         check_erad_researcher_number(wrong_researcher_number)
 
 
-@pytest.mark.parametrize('correct_orcid_id', [
-    "0000-0002-3849-163X", "1234-5678-9101-1128"])
-def test_check_orcid_id(correct_orcid_id) -> None:
-    # nothing is occurred with correct format
+@pytest.mark.parametrize("correct_orcid_id",
+                         ["0000-0002-3849-163X", "1234-5678-9101-1128"])
+def test_check_orcid_id(correct_orcid_id: str) -> None:
+    # no error is occurred with correct format
     check_orcid_id(correct_orcid_id)
 
 
-@pytest.mark.parametrize('wrong_orcid_id', [
-    "0000123456778900", "1234-5678-9101-1121", "0000-0002-3849-167X"])
-def test_check_orcid_id_error(wrong_orcid_id) -> None:
+@pytest.mark.parametrize("wrong_orcid_id",
+                         ["0000123456778900", "1234-5678-9101-1121", "0000-0002-3849-167X"])
+def test_check_orcid_id_error(wrong_orcid_id: str) -> None:
     # error
-    with pytest.raises(PropsError):
+    with pytest.raises(ValueError):
         check_orcid_id(wrong_orcid_id)
 
 
 def test_access_url() -> None:
-    # nothing is occurred with correct format
+    # no error is occurred with correct format
     access_url("https://example.com/")
 
     # error
@@ -269,7 +293,7 @@ def test_access_url() -> None:
 
 
 def test_verify_is_past_date() -> None:
-    ent = BaseFile("sample.txt")
+    ent = BaseFile("sample.txt", {"wrong_type": 1})
 
     assert verify_is_past_date(ent, "not_existing_prop") is None
 
@@ -281,6 +305,9 @@ def test_verify_is_past_date() -> None:
 
     ent["date"] = str(datetime.date.today())
     assert verify_is_past_date(ent, "date")
+
+    with pytest.raises(TypeError):
+        verify_is_past_date(ent, "wrong_type")
 
 
 def test_get_name_from_ror() -> None:
@@ -297,3 +324,13 @@ def test_sum_file_size() -> None:
 
     assert sum_file_size("GB", [file_1, file_2]) == 25
     assert sum_file_size("B", []) == 0
+
+
+def test_get_entity_list_to_validate() -> None:
+    person = Person("test", {"affiliation": "Organization A"})
+
+    assert get_entity_list_to_validate(person) == {"affiliation": Organization}
+
+    file = BaseFile("sample")
+    assert len(get_entity_list_to_validate(file)) == 0
+    assert isinstance(get_entity_list_to_validate(file), dict)

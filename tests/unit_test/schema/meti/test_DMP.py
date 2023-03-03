@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import pytest  # noqa: F401
+import pytest
 
-from nii_dg.error import CrateError, EntityError
+from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import (ContactPoint, DataDownload, HostingInstitution,
                                 License, Organization, RepositoryObject)
@@ -11,7 +11,7 @@ from nii_dg.schema.meti import DMP, DMPMetadata, File
 
 
 def test_init() -> None:
-    ent = DMP(1)
+    ent = DMP("#dmp:1")
     assert ent["@id"] == "#dmp:1"
     assert ent["@type"] == "DMP"
     assert ent.schema_name == "meti"
@@ -19,8 +19,9 @@ def test_init() -> None:
 
 
 def test_as_jsonld() -> None:
-    ent = DMP(1)
+    ent = DMP("#dmp:1")
 
+    ent["dataNumber"] = 1
     ent["name"] = "calculated data"
     ent["description"] = "Result data calculated by Newton's method"
     ent["hostingInstitution"] = HostingInstitution("https://ror.org/04ksd4g47")
@@ -48,12 +49,13 @@ def test_as_jsonld() -> None:
 
 
 def test_check_props() -> None:
-    ent = DMP(1, {"unknown_property": "unknown"})
+    ent = DMP("#dmp:1", {"unknown_property": "unknown"})
 
     # error: with unexpected property
     # error: lack of required properties
     # error: type error
     # error: availabilityStarts value is not future date
+    ent["dataNumber"] = 1
     ent["description"] = "Result data calculated by Newton's method"
     ent["hostingInstitution"] = HostingInstitution("https://ror.org/04ksd4g47")
     ent["wayOfManage"] = True
@@ -74,31 +76,29 @@ def test_check_props() -> None:
 
 def test_validate() -> None:
     crate = ROCrate()
-    ent = DMP(1, {"accessRights": "embargoed access"})
+    ent = DMP("#dmp:1", {"accessRights": "embargoed access"})
     crate.add(ent)
 
-    # No DMPMetadata entity
-    with pytest.raises(CrateError):
+    # error: availabilityStarts is required
+    # error: reasonForConcealment is required
+    # error: contactPoint is required
+    # error: no DMPMetadata entity
+    with pytest.raises(EntityError):
         ent.validate(crate)
 
     meta = DMPMetadata()
     crate.add(meta)
-    # error: availabilityStarts is required
-    # error: repository is required
-    # error: reasonForConcealment is required
-    # error: contactPoint is required
-    with pytest.raises(EntityError):
-        ent.validate(crate)
-
     ent["availabilityStarts"] = "2000-01-01"
     ent["reasonForConcealment"] = "Including personal info."
-    ent["repository"] = "https://example.com/repo"
     ent["contactPoint"] = ContactPoint("#mailto:test@example.com")
     # error: availabilityStarts MUST be the date of future
+    # error: repository is required
     with pytest.raises(EntityError):
         ent.validate(crate)
 
     ent["availabilityStarts"] = "2030-01-01"
+    ent["repository"] = {"@id": "https://example.com/repo"}
+    crate.add(RepositoryObject("https://example.com/repo"), ContactPoint("#mailto:test@example.com"))
     # no error
     ent.validate(crate)
 
@@ -116,7 +116,7 @@ def test_validate() -> None:
     ent["isAccessibleForFree"] = False
     ent["contentSize"] = "10GB"
     file = File("test", {"contentSize": "11GB", "dmpDataNumber": ent})
-    crate.add(file)
+    crate.add(file, DataDownload("https://zenodo.org/record/example"), License("https://example.com/license"))
     # error: file size is over.
     # error: isAccessibleForFree MUST be True
     with pytest.raises(EntityError):

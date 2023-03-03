@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import pytest  # noqa: F401
+import pytest
 
+from nii_dg.entity import RootDataEntity
 from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
-from nii_dg.schema.base import (DataDownload, Organization, RepositoryObject,
-                                RootDataEntity)
+from nii_dg.schema.base import DataDownload, Organization, RepositoryObject
 from nii_dg.schema.meti import DMP, DMPMetadata
 
 
@@ -25,7 +25,7 @@ def test_as_jsonld() -> None:
     ent["funder"] = Organization("https://ror.org/04ksd4g47")
     ent["repository"] = RepositoryObject("https://doi.org/xxxxxxxx")
     ent["distribution"] = DataDownload("https://zenodo.org/record/example")
-    ent["hasPart"] = [DMP(1), DMP(2)]
+    ent["hasPart"] = [DMP("#dmp:1"), DMP("#dmp:2")]
 
     jsonld = {'@type': 'DMPMetadata', '@id': '#METI-DMP', 'about': {'@id': './'}, 'name': 'METI-DMP', 'funder': {'@id': 'https://ror.org/04ksd4g47'}, 'repository': {
         '@id': 'https://doi.org/xxxxxxxx'}, 'distribution': {'@id': 'https://zenodo.org/record/example'}, 'hasPart': [{'@id': '#dmp:1'}, {'@id': '#dmp:2'}]}
@@ -43,7 +43,7 @@ def test_check_props() -> None:
     # error: lack of required properties
     # error: type error
     ent["funder"] = "NII"
-    ent["hasPart"] = [DMP(1), DMP(2)]
+    ent["hasPart"] = [DMP("#dmp:1"), DMP("#dmp:2")]
     with pytest.raises(EntityError):
         ent.check_props()
 
@@ -61,17 +61,15 @@ def test_validate() -> None:
     meta = DMPMetadata(props={"funder": org, "hasPart": [], "about": root})
     rocrate.add(org, meta)
 
-    # error: funder not included in the funder list of RootDataEntity
     # error: value of about is not the RootDataEntity of the crate
     with pytest.raises(EntityError):
         meta.validate(rocrate)
 
     meta["about"] = rocrate.root
-    rocrate.root["funder"] = [org]
     # no error
     meta.validate(rocrate)
 
-    dmp = DMP(2)
+    dmp = DMP("#dmp:2")
     rocrate.add(dmp)
     # error: not all DMP entity in the crate is included in hasPart
     with pytest.raises(EntityError):

@@ -3,4 +3,4 @@
 
 from nii_dg.schema.base import (DataDownload, Dataset, File,  # noqa: F401
                                 HostingInstitution, Organization, Person,
-                                RepositoryObject, RootDataEntity)
+                                RepositoryObject)

@@ -1,31 +1,32 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import pytest  # noqa: F401
+import pytest
 
-from nii_dg.entity import Entity, ROCrateMetadata
-from nii_dg.schema.base import RootDataEntity
+from nii_dg.entity import ROCrateMetadata, RootDataEntity
+from nii_dg.schema.base import Person
 
 
 def test_delitem() -> None:
-    ent = Entity("test", {"normal_prop": "removable", "@type": "unremovable"})
+    with pytest.raises(KeyError):
+        ent = Person("test", {"normal_prop": "removable", "@type": "not_settable"})
 
+    ent = Person("test", {"normal_prop": "removable"})
     del ent["normal_prop"]
-    assert list(ent.keys()) == ["@id", "@type"]
+    assert "normal_prop" not in ent.keys()
 
     with pytest.raises(KeyError):
         del ent["@type"]
 
 
 def test_as_jsonld() -> None:
-    root = RootDataEntity({"name": "test"})
-    meta = ROCrateMetadata(root)
+    person = RootDataEntity({"name": "test"})
+    meta = ROCrateMetadata(person)
 
-    assert root.as_jsonld() == {
+    assert person.as_jsonld() == {
         "@id": "./",
         "@type": "Dataset",
-        "name": "test",
-        "@context": "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/RootDataEntity.json"
+        "name": "test"
     }
     assert meta.as_jsonld() == {
         "@id": "ro-crate-metadata.json",
@@ -40,10 +41,13 @@ def test_as_jsonld() -> None:
 
 
 def test_properties() -> None:
-    root = RootDataEntity()
+    person = Person("https://example.com/person", {"name": "Ichiro Suzuki"})
 
+    assert person.id == "https://example.com/person"
+    assert person.type == "Person"
+    assert person.schema_name == "base"
+    assert person.entity_name == "Person"
+
+    root = RootDataEntity()
     assert root.id == "./"
     assert root.type == "Dataset"
-    assert root.context == "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/RootDataEntity.json"
-    assert root.schema_name == "base"
-    assert root.entity_name == "RootDataEntity"

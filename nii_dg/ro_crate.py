@@ -7,15 +7,17 @@ Definition of RO-Crate class.
 
 import json
 from collections import Counter
+from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Type
+from urllib.parse import urlparse
 
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
-                           ROCrateMetadata)
+                           ROCrateMetadata, RootDataEntity)
 from nii_dg.error import (CheckPropsError, CrateError, EntityError,
                           GovernanceError, UnexpectedImplementationError)
-from nii_dg.schema import RootDataEntity
+from nii_dg.utils import import_entity_class
 
 
 class ROCrate():
@@ -42,11 +44,15 @@ class ROCrate():
 
     BASE_CONTEXT: str = "https://w3id.org/ro/crate/1.1/context"
 
-    def __init__(self, from_jsonld: Optional[Dict[str, Any]] = None) -> None:
-        self.root = RootDataEntity()
-        self.default_entities = [self.root, ROCrateMetadata(root=self.root)]
-        self.data_entities = []
-        self.contextual_entities = []
+    def __init__(self, jsonld: Optional[Dict[str, Any]] = None) -> None:
+        if jsonld is not None:
+            self.from_jsonld(jsonld)
+        else:
+            self.root = RootDataEntity()
+            self.default_entities = [self.root, ROCrateMetadata(root=self.root)]
+            self.data_entities = []
+            self.contextual_entities = []
+
         self.root["hasPart"] = self.data_entities
 
     def add(self, *entities: Entity) -> None:
@@ -92,17 +98,16 @@ class ROCrate():
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_duplicate_entity()
-        self.check_existence_of_entity()
-        # add dateCreated to RootDataEntity
-        self.root["dateCreated"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+        # `datePublished` field is defined in the RO-Crate specification.
+        self.root["datePublished"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
         check_error = CheckPropsError()
         graph = []
         for e in self.get_all_entities():
             try:
                 graph.append(e.as_jsonld())
-            except EntityError as e:
-                check_error.add_error(e)
+            except EntityError as err:
+                check_error.add_error(err)
 
         if len(check_error.entity_errors) > 0:
             raise check_error
@@ -113,6 +118,15 @@ class ROCrate():
         }
 
     def check_duplicate_entity(self) -> None:
+        """\
+        Check for duplicate entities in the RO-Crate.
+
+        Duplicates, i.e. entities with the same `@id`, are allowed in the JSON-LD specification.
+        For example, a `File` entity in the `base` context and a `File` entity in the `amed` context can have the same `@id` and be included in the crate.
+        This is because the `name` property in each context is treated as different properties, even if they have the same `name` property.
+        However, if two entities with the same `@id` and `@context` exist, and both have a `name` property with different values, it becomes unclear which one is correct.
+        Therefore, this case is considered an error and an exception is raised.
+        """
         id_context_list = []
 
         for ent in self.get_all_entities():
@@ -121,17 +135,6 @@ class ROCrate():
         dup_ents = [ent for ent, count in Counter(id_context_list).items() if count > 1]
         if len(dup_ents) > 0:
             raise CrateError(f"Duplicate @id and @context value found: {dup_ents}.")
-
-    def check_existence_of_entity(self) -> None:
-        for ent in self.get_all_entities():
-            for val in ent.values():
-                if isinstance(val, Entity) and val not in self.get_all_entities():
-                    raise CrateError(f"The entity {val} is included in entity {ent}, but not included in the crate.")
-                if isinstance(val, list):
-                    # expected: [Any], [Entity]
-                    for ele in [v for v in val if isinstance(v, Entity)]:
-                        if ele not in self.get_all_entities():
-                            raise CrateError(f"The entity {ele} is included in entity {ent}, but not included in this crate.")
 
     def dump(self, path: str) -> None:
         """\
@@ -144,8 +147,6 @@ class ROCrate():
         governance_error = GovernanceError()
 
         for ent in self.get_all_entities():
-            if isinstance(ent, ROCrateMetadata):
-                continue
             try:
                 ent.validate(self)
             except EntityError as e:
@@ -153,3 +154,55 @@ class ROCrate():
 
         if len(governance_error.entity_errors) > 0:
             raise governance_error
+
+    def from_jsonld(self, jsonld: Dict[str, Any]) -> None:
+        if "@context" not in jsonld:
+            raise CrateError("The JSON-LD doesn't have `@context` property.")
+        if jsonld["@context"] != self.BASE_CONTEXT:
+            raise CrateError(f"The JSON-LD MUST have `{self.BASE_CONTEXT}` as a value of @context property.")
+        if "@graph" not in jsonld:
+            raise CrateError("The JSON-LD doesn't have `@graph` property.")
+
+        root_entity = None
+        metadata_entity = None
+        self.data_entities = []
+        self.contextual_entities = []
+        for entity in jsonld["@graph"]:
+            id_ = entity.get("@id", None)
+            if id_ is None:
+                raise CrateError("The JSON-LD includes an entity without `@id` property.")
+            type_ = entity.get("@type", None)
+            if type_ is None:
+                raise CrateError(f"The entity with @id `{id_}` doesn't have `@type` property.")
+
+            if id_ == "./" and type_ == "Dataset":
+                root_entity = entity
+            elif id_ == "ro-crate-metadata.json" and type_ == "CreativeWork":
+                metadata_entity = entity
+            else:
+                context = entity.get("@context", None)
+                if context is None:
+                    raise CrateError(f"The entity <{type_} {id_}> doesn't have `@context` property.")
+                schema_name = urlparse(context).path.split("/")[-1].split(".")[0]
+                entity_class = import_entity_class(schema_name, type_)
+                props = deepcopy(entity)
+                entity_instance = entity_class.from_jsonld(id_=id_, jsonld=props)
+
+                if isinstance(entity_instance, DataEntity):
+                    self.data_entities.append(entity_instance)
+                elif isinstance(entity_instance, ContextualEntity):
+                    self.contextual_entities.append(entity_instance)
+                else:
+                    raise CrateError(f"Unknown entity type: {type(entity_instance)}")
+
+        if root_entity is None:
+            raise CrateError("The JSON-LD doesn't have root entity.")
+        if metadata_entity is None:
+            raise CrateError("The JSON-LD doesn't have metadata entity.")
+
+        root_entity.pop("@id")
+        root_entity.pop("@type")
+        self.root = RootDataEntity(props=root_entity)
+        metadata_entity.pop("@id")
+        metadata_entity.pop("@type")
+        self.default_entities = [self.root, ROCrateMetadata(root=self.root)]

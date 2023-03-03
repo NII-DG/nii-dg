@@ -1,31 +1,32 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import pytest  # noqa: F401
+import pytest
 
+from nii_dg.entity import RootDataEntity
 from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
-from nii_dg.schema.base import Dataset, RootDataEntity
+from nii_dg.schema.base import Dataset
 from nii_dg.schema.ginfork import File, GinMonitoring
 
 
 def test_init() -> None:
-    ent = GinMonitoring(1)
-    assert ent["@id"] == "#ginmonitoring:1"
+    ent = GinMonitoring()
+    assert ent["@id"] == "#ginmonitoring"
     assert ent["@type"] == "GinMonitoring"
     assert ent.schema_name == "ginfork"
     assert ent.entity_name == "GinMonitoring"
 
 
 def test_as_jsonld() -> None:
-    ent = GinMonitoring(1)
+    ent = GinMonitoring()
 
     ent["about"] = RootDataEntity({})
     ent["contentSize"] = "100GB"
     ent["workflowIdentifier"] = "bio"
     ent["datasetStructure"] = "with_code"
 
-    jsonld = {'@type': 'GinMonitoring', '@id': '#ginmonitoring:1', 'about': {'@id': './'},
+    jsonld = {'@type': 'GinMonitoring', '@id': '#ginmonitoring', 'about': {'@id': './'},
               'contentSize': '100GB', 'workflowIdentifier': 'bio', 'datasetStructure': 'with_code'}
 
     ent_in_json = ent.as_jsonld()
@@ -35,7 +36,7 @@ def test_as_jsonld() -> None:
 
 
 def test_check_props() -> None:
-    ent = GinMonitoring(1, {"unknown_property": "unknown"})
+    ent = GinMonitoring("#ginmonitoring", {"unknown_property": "unknown"})
 
     # error: with unexpected property
     # error: lack of required properties
@@ -56,7 +57,7 @@ def test_check_props() -> None:
 def test_validate() -> None:
     crate = ROCrate()
 
-    ent = GinMonitoring(1)
+    ent = GinMonitoring()
     ent["about"] = RootDataEntity()
     ent["contentSize"] = "10GB"
     ent["workflowIdentifier"] = "basic"

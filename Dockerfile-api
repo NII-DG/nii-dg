@@ -22,5 +22,9 @@ COPY --from=builder /usr/local/lib/python3.8/site-packages /usr/local/lib/python
 WORKDIR /app
 COPY . .
 
+EXPOSE 5000
+ENV WSGI_SERVER "waitress"
+ENV PYTHONUNBUFFERED=1
+
 ENTRYPOINT ["tini", "--"]
-CMD ["sleep", "infinity"]
+CMD ["python", "/app/nii_dg/api.py"]

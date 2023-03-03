@@ -20,7 +20,7 @@ DMPMetadata:
       expected_type: Organization
       example: '{"@id": "https://ror.org/01b9y6c26"}'
       required: Required.
-      description: Funding agency of the research project (AMED in most cases). MUST be @id dictionary of Organization entity. When the funder property of RootDataEntity is also used, this Organization entity MUST be included in the funder list in RootDataEntity.
+      description: Funding agency of the research project (AMED in most cases). MUST be @id dictionary of Organization entity.
     funding:
       expected_type: str
       example: Acceleration Transformative Research for Medical Innovation
@@ -34,7 +34,7 @@ DMPMetadata:
     creator:
       expected_type: List[Person]
       example: '[{"@id": "https://orcid.org/0000-0001-2345-6789"}]'
-      required: Required.
+      required: Required when hasPart property has DMP entities.
       description: MUST be an array of @id dictionary of Person entity. Indicates all data creators involved in this research project.
     hostingInstitution:
       expected_type: HostingInstitution

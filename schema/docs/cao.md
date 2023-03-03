@@ -1,6 +1,6 @@
 # NII-DG: Schema: cao
 
-See [GitHub - ascade/nii-dg - schema/README.md](https://github.com/ascade/nii-dg/blob/main/schema/README.md) for more information.
+See [GitHub - NII-DG/nii-dg - schema/README.md](https://github.com/NII-DG/nii-dg/blob/main/schema/README.md) for more information.
 
 ## DMPMetadata
 Metadata of research project that is the subject of this data management plan.
@@ -9,7 +9,7 @@ Metadata of research project that is the subject of this data management plan.
 | `@id` | `str` | Required. | MUST be the name with prefix `#`. | `#CAO-DMP` |
 | `about` | `RootDataEntity` | Required. | MUST be `{"@id": "./"}`. Indicates this DMP is about research project that the data stated in RootDataEntity are generated. | `{"@id": "./"}` |
 | `name` | `str` | Required. | MUST be `CAO-DMP`. Indicates the DMP format used by your project. | `CAO-DMP` |
-| `funder` | `Organization` | Required. | Funding agency of the research project. MUST be @id dictionary of Organization entity. When the funder property of RootDataEntity is also used, this Organization entity MUST be included in the funder list in RootDataEntity. | `{"@id": "https://ror.org/01b9y6c26"}` |
+| `funder` | `Organization` | Required. | Funding agency of the research project. MUST be @id dictionary of Organization entity. | `{"@id": "https://ror.org/01b9y6c26"}` |
 | `repository` | `RepositoryObject` | Can be added when all data set is managed in a single repository. | MUST be @id dictionary of RepositoryObject entity. Indicates repository where the data is managed. | `{ "@id": "https://doi.org/xxxxxxxx" }` |
 | `distribution` | `DataDownload` | Can be added when accessRights in tied DMP entity has `open access` and all open-access data set is available from a single URL. | MUST be @id dictionary of DataDownload entity. Indicates where the download URL of the data set. | `{"@id": "https://zenodo.org/record/example"}` |
 | `keyword` | `str` | Required. | Indicates research field of the project. | `Informatics` |

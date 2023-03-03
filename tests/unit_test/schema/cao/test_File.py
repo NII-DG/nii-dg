@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import pytest  # noqa: F401
+import pytest
 
 from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
@@ -20,7 +20,7 @@ def test_as_jsonld() -> None:
     ent = File("config/setting.txt")
 
     ent["name"] = "setting.txt"
-    ent["dmpDataNumber"] = DMP(1)
+    ent["dmpDataNumber"] = DMP("#dmp:1")
     ent["contentSize"] = "1560B"
     ent["encodingFormat"] = "text/plain"
     ent["sha256"] = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
@@ -45,7 +45,7 @@ def test_check_props() -> None:
     # error: sdDatePublished value is not past date
     # error: type error (contentSize)
     ent["name"] = "setting.txt"
-    ent["dmpDataNumber"] = DMP(1)
+    ent["dmpDataNumber"] = DMP("#dmp:1")
     ent["contentSize"] = 1560
     ent["encodingFormat"] = "text/plain"
     ent["sha256"] = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"

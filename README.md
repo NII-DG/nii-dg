@@ -37,7 +37,7 @@ $ docker run -it --rm ghcr.io/NII-DG/nii-dg:latest bash
 
 ## Usage
 
-上記した通り、本ライブラリは 3 つの機能に分かれている。
+上記の通り、本ライブラリは 3つの機能に分かれている。
 
 1. Schema definition: Metadata Schema とその検証ルールの定義
 2. Packaging: パッケージング (RO-Crate 化)
@@ -77,8 +77,7 @@ ro_crate.dump("ro-crate-metadata.json")
       "@type": "Dataset",
       "hasPart": [],
       "name": "Sample RO-Crate",
-      "dateCreated": "2023-01-27T04:16:02.470+00:00",
-      "@context": "https://raw.githubusercontent.com/ascade/nii_dg/develop/schema/context/base/RootDataEntity.json"
+      "datePublished": "2023-01-27T04:16:02.470+00:00"
     },
     {
       "@id": "ro-crate-metadata.json",
@@ -98,21 +97,27 @@ ro_crate.dump("ro-crate-metadata.json")
 
 また、使用例として、以下が用意されている。
 
-- [./tests/example.py](./tests/example.py)
+- [./tests/examples/example.py](./tests/examples/example.py)
 
-#### RootDataEntity について
+#### RO-Crate Metadata File DescriptorとRoot Data Entity
 
-上述の Minimal example における 2 つの Entity は、RO-Crate における [RootDataEntity](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html) である。RootDataEntity は以下の 2 つからなる:
+上述の Minimal example における 2 つの Entity は、RO-Crate における [必須のエンティティ](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html) である。
+以下の2つが必須のエンティティである:
 
-- `@type`: `CreativeWork`
+- RO-Crate Metadata File Descriptor
+  - `@type`: `CreativeWork`
+  - > The RO-Crate JSON-LD MUST contain a self-describing RO-Crate Metadata File Descriptor with the @id value ro-crate-metadata.json (or ro-crate-metadata.jsonld in legacy crates) and @type CreativeWork.
+  - Called as `ROCrateMetadata` in this library.
   - RO-Crate metadata file に対する自己記述的な Entity
   - RO-Crate 自体の様々な metadata が記述される
-  - この metadata の schema は、[./schema/docs/base.md](./schema/docs/base.md) を参照
-- `@type`: `Dataset`
+- Root Data Entity
+  - `@type`: `Dataset`
+  - > This descriptor MUST have an about property referencing the Root Data Entity, which SHOULD have an @id of ./.
+  - Called as `RootDataEntity` in this library.
   - RO-Crate が持つ file を取りまとめる Entity
   - Data Entity (e.g., `File`, `Dataset`) が `hasPart` として自動的に追加される
 
-この 2 つの Entity は、`ROCrate` インスタンスの生成時に自動的に生成される。`ROCrate.root` により、`CreativeWork` に対応する Entity にアクセスできる。
+この 2 つの Entity は、`ROCrate` インスタンスの生成時に自動的に生成される。`ROCrate.root` により、`RootDataEntity` に対応する Entity にアクセスできる。
 
 #### 各 Entity の作成と RO-Crate への追加
 
@@ -185,7 +190,7 @@ ginfork_file = GinforkFile("path/to/file.txt", props={"name": "Example ginfork f
 }
 ```
 
-のように表現される。metadata の properties などは、`@context` により別の prop として扱われるため (e.g., `amed:name`, `ginfork:name`)、同一の `@id` が存在しても、それぞれ別の metadata が保持される。
+のように表現される。metadata の properties などは、`@context` により別の prop として扱われるため (e.g., `amed.File:name`, `ginfork.File:name`)、同一の `@id` が存在しても、それぞれ別の metadata が保持される。
 
 #### Entity 単位での型検査と property の検証
 
@@ -197,8 +202,12 @@ ginfork_file = GinforkFile("path/to/file.txt", props={"name": "Example ginfork f
 Validation として、`ROCrate.validate()` が用意されている。
 
 ```python
+import json
 from nii_dg.ro_crate import ROCrate
-crate = ROCrate(from_jsonld="path/to/ro-crate-matadata.json")
+
+with open("path/to/ro-crate-matadata.json") as f:
+    jsonld = json.load(f)
+crate = ROCrate(jsonld=jsonld)
 crate.validate()
 ```
 
@@ -212,8 +221,8 @@ Packaging における型検査 (`entity.check_props()`) と、Validation にお
 
 - `entity.check_props()`:
   - 各 prop の型検査を行う
-  - つまり、str に対して int を設定するなど、型の不一致を検出する
-  - また、required の prop が設定されているか、などの検査を行う
+     -  例: 型定義str に対して int が設定されているなど、型の不一致を検出する
+  - required の prop が設定されているか、などの検査を行う
 - `entity.validate()`:
   - より高度な検証を行う
   - 各 prop の「値」が正しいかを検証する
@@ -221,7 +230,9 @@ Packaging における型検査 (`entity.check_props()`) と、Validation にお
 
 #### Using REST API Server
 
-[TODO: not written yet]
+REST API の仕様として、[open-api_spec.yml](./open-api_spec.yml) を参照。
+
+また、API Server の起動・実行に関して、[api-quick-start.md](./api-quick-start.md) を参照。
 
 ## Development
 
