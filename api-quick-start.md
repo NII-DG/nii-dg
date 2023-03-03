@@ -40,8 +40,8 @@ $ curl -X POST "localhost:5000/validate?entityIds=file_1.txt&entityIds=https%3A%
 
 ## Get Governance Result
 You can get the status of the governance by using the request_id.
-The status `COMPLETE` means the governance check finished successfully and no problem is found.
-The status `FAILED` also means the governance check finished successfully, but found the problems.
+The status `COMPLETE` means the governance check finished successfully and no problem is found. The `result` value is empty list.
+The status `FAILED` also means the governance check finished successfully, but found the problems. The `result` value is problem list of dictionaries consisting of entity ID, property and failed reason.
 
 ```
 $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
@@ -183,4 +183,20 @@ $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
   "status": "FAILED"
 }
 
+```
+
+## Cancel Governance Request
+Only when your request is in statue `QUEUED`, you can cancel it. If the request successfully canceled, its status id changed to `CANCELED`.
+
+When cancel request is successfully applied, you get your request ID.
+```
+$ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc/cancel
+{"request_id": "a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc"}
+```
+After a moment:
+```
+$ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
+{"request_id": "a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc/cancel",
+(Omitted)
+"status":"CANCELED"}
 ```
