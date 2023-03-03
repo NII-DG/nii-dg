@@ -29,6 +29,15 @@ $ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @p
 ```
 You get `request_id` in uuid4 when your request is successfully applied to the server.
 
+
+In the case your ro-crate is in wrong format, governance request is denied.
+```
+$ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @path/to/wrong-ro-crate
+{
+  "message": "400 Bad Request: RO-Crate has invalid property."
+}
+```
+
 ### Governance with only specified entities
 If you want to limit the entities to be governed for reasons such as time-consuming verification, you can specify the target entities by sending entity ID as a query parameter `entityIds`.
 Please make sure that the entity id is percent-encoded format and the URI is enclosed with single/double quotes.
