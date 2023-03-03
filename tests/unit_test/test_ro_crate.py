@@ -10,7 +10,7 @@ from nii_dg.error import (CrateError, GovernanceError,
                           UnexpectedImplementationError)
 from nii_dg.ro_crate import (ContextualEntity, DataEntity, DefaultEntity,
                              ROCrate, ROCrateMetadata, RootDataEntity)
-from nii_dg.schema.base import File, Organization, Person
+from nii_dg.schema.base import File
 
 
 def test_add() -> None:

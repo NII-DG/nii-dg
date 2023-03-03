@@ -13,8 +13,7 @@ from typeguard import check_type as ori_check_type
 from nii_dg.config import github_branch, github_repo
 from nii_dg.error import EntityError, PropsError
 from nii_dg.utils import (check_instance_type_from_id, check_prop_type,
-                          get_entity_list_to_validate,
-                          load_entity_def_from_schema_file)
+                          get_entity_list_to_validate)
 
 if TYPE_CHECKING:
     TypedMutableMapping = MutableMapping[str, Any]

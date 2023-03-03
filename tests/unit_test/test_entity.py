@@ -3,7 +3,7 @@
 
 import pytest
 
-from nii_dg.entity import Entity, ROCrateMetadata, RootDataEntity
+from nii_dg.entity import ROCrateMetadata, RootDataEntity
 from nii_dg.schema.base import Person
 
 
