@@ -7,7 +7,7 @@ from pprint import pprint
 
 from nii_dg.ro_crate import ROCrate
 
-EXAMPLE_JSONLD_PATH = Path(__file__).parent.joinpath("example.json")
+EXAMPLE_JSONLD_PATH = Path(__file__).parent.joinpath("example_complete.json")
 
 
 def main() -> None:
