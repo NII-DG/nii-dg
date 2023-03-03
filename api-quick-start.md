@@ -31,7 +31,7 @@ You get `request_id` in uuid4 when your request is successfully applied to the s
 
 ### Governance with only specified entities
 If you want to limit the entities to be governed for reasons such as time-consuming verification, you can specify the target entities by sending entity ID as a query parameter `entityIds`.
-Please make sure that the entity id is percent-encoded format and the URI is enclosed with double quotes.
+Please make sure that the entity id is percent-encoded format and the URI is enclosed with single/double quotes.
 
 ```
 $ curl -X POST "localhost:5000/validate?entityIds=file_1.txt&entityIds=https%3A%2F%2Fexample.com%2Fperson" -H "Content-Type: application/json" -d @path/to/ro-crate-metadata
@@ -40,8 +40,8 @@ $ curl -X POST "localhost:5000/validate?entityIds=file_1.txt&entityIds=https%3A%
 
 ## Get Governance Result
 You can get the status of the governance by using the request_id.
-The status `COMPLETE` means the governance check finished successfully and no problem is found. The `result` value is empty list.
-The status `FAILED` also means the governance check finished successfully, but found the problems. The `result` value is problem list of dictionaries consisting of entity ID, property and failed reason.
+The status `COMPLETE` means the governance check finished successfully and no problem is found. The `results` value is empty list.
+The status `FAILED` also means the governance check finished successfully, but found the problems. The `results` value is problem list of dictionaries consisting of entity ID, property and failed reason.
 
 ```
 $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
@@ -220,7 +220,9 @@ $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc/cancel
 After a moment:
 ```
 $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
-{"request_id": "a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc/cancel",
-(Omitted)
-"status":"CANCELED"}
+{
+  (Omitted),
+  "request_id": "a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc",
+  "results":[],
+  "status":"CANCELED"}
 ```
