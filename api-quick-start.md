@@ -47,10 +47,7 @@ The status `FAILED` also means the governance check finished successfully, but f
 $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
 {
   "request": {
-    "entityIds": [
-      "file_1.txt",
-      "https://example.com/person"
-    ],
+    "entityIds": [],
     "roCrate": {
       "@context": "https://w3id.org/ro/crate/1.1/context",
       "@graph": [
@@ -182,11 +179,34 @@ $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
     {
       "entityId": "#ginmonitoring",
       "props": "ginfork.GinMonitoring:datasetStructure",
-      "reason": "Couldn't find required directories: named ['source', 'input_data', 'output_data']."}
+      "reason": "Couldn't find required directories: named ['source', 'input_data', 'output_data']."
+    }
   ],
   "status": "FAILED"
 }
+```
 
+When you specified entities, `request` property has target list.
+```
+$ curl localhost:5000/bd453ed1-30b9-4873-b240-e459467ea9dc
+{
+  "request": {
+    "entityIds": [
+      "file_1.txt",
+      "https://example.com/person"
+    ],
+(Omitted)
+  },
+  "requestId": "bd453ed1-30b9-4873-b240-e459467ea9dc",
+  "results": [
+    {
+      "entityId": "https://example.com/person",
+      "props": "cao.Person:@id",
+      "reason": "Unable to access https://example.com/person due to 404 Client Error: Not Found for url: https://example.com/person"
+    }
+  ],
+  "status": "FAILED"
+}
 ```
 
 ## Cancel Governance Request
