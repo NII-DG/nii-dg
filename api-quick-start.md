@@ -178,7 +178,11 @@ $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
       "entityId": "https://example.com/person",
       "props": "cao.Person:@id",
       "reason": "Unable to access https://example.com/person due to 404 Client Error: Not Found for url: https://example.com/person"
-    }
+    },
+    {
+      "entityId": "#ginmonitoring",
+      "props": "ginfork.GinMonitoring:datasetStructure",
+      "reason": "Couldn't find required directories: named ['source', 'input_data', 'output_data']."}
   ],
   "status": "FAILED"
 }

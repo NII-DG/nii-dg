@@ -139,7 +139,7 @@ def check_prop_type(prop: str, value: Any, expected_python_type: Any) -> None:
         raise UnexpectedImplementationError(e) from None
 
 
-def check_all_prop_types(entity: "Entity", entity_def: EntityDef, subclass_flg: int = 0) -> None:
+def check_all_prop_types(entity: "Entity", entity_def: EntityDef) -> None:
     """
     Check the type of all property in the entity by referring schema.yml.
     When the type of property includes entity subclass, the check of the property is skipped.
@@ -149,7 +149,7 @@ def check_all_prop_types(entity: "Entity", entity_def: EntityDef, subclass_flg: 
     for prop, prop_def in entity_def.items():
         if prop in entity:
             expected_python_type, flg = convert_string_type_to_python_type(prop_def["expected_type"], entity.schema_name)
-            if flg == subclass_flg:
+            if flg == 0:
                 try:
                     check_prop_type(prop, entity[prop], expected_python_type)
                 except PropsError as e:
@@ -441,7 +441,5 @@ def get_entity_list_to_validate(entity: "Entity") -> Dict[str, Any]:
         if prop in entity:
             expected_python_type, flg = convert_string_type_to_python_type(prop_def["expected_type"], entity.schema_name)
             if flg == 1:
-                print("instance")
                 instance_type_dict[prop] = expected_python_type
-
     return instance_type_dict

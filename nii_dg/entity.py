@@ -12,8 +12,8 @@ from typeguard import check_type as ori_check_type
 
 from nii_dg.config import github_branch, github_repo
 from nii_dg.error import EntityError, PropsError
-from nii_dg.utils import (check_all_prop_types, check_instance_type_from_id,
-                          check_prop_type, get_entity_list_to_validate,
+from nii_dg.utils import (check_instance_type_from_id, check_prop_type,
+                          get_entity_list_to_validate,
                           load_entity_def_from_schema_file)
 
 if TYPE_CHECKING:
@@ -202,11 +202,12 @@ class Entity(TypedMutableMapping):
                             check_instance_type_from_id(prop, crate.get_by_id(id_dict["@id"]), instance_type_dict[prop], "list")
                         except PropsError as e:
                             validation_failures.add(prop, str(e))
-
-        try:
-            check_all_prop_types(self, entity_def, 1)
-        except PropsError as prop_err:
-            validation_failures.add_by_dict(str(prop_err))
+            else:
+                if prop in instance_type_dict:
+                    try:
+                        check_prop_type(prop, val, instance_type_dict[prop])
+                    except PropsError as e:
+                        validation_failures.add(prop, str(e))
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures
