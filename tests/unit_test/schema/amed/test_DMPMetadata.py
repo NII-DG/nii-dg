@@ -98,5 +98,6 @@ def test_validate() -> None:
     person = Person("https://example.com/person")
     ent["creator"] = [person]
     ent["dataManager"] = person
+    crate.add(person)
     # no error
     ent.validate(crate)

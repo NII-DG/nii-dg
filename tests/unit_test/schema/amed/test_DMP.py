@@ -98,6 +98,8 @@ def test_validate() -> None:
         ent.validate(crate)
 
     ent["availabilityStarts"] = "2030-01-01"
+    ent["repository"] = {"@id": "https://example.com/repo"}
+    crate.add(RepositoryObject("https://example.com/repo"))
     # no error
     ent.validate(crate)
 
@@ -111,7 +113,7 @@ def test_validate() -> None:
     ent["distribution"] = DataDownload("https://zenodo.org/record/example")
     ent["contentSize"] = "10GB"
     file = File("test", {"contentSize": "11GB", "dmpDataNumber": ent})
-    crate.add(file)
+    crate.add(file, DataDownload("https://zenodo.org/record/example"))
     # error: file size is over.
     with pytest.raises(EntityError):
         ent.validate(crate)

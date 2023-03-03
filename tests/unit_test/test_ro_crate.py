@@ -120,22 +120,6 @@ def test_check_duplicate_entity() -> None:
     crate.check_duplicate_entity()
 
 
-def test_check_existence_of_entity() -> None:
-    crate = ROCrate()
-
-    # error
-    org = Organization("test_org")
-    person = Person("test_person", {"affiliation": org})
-    crate.add(person)
-
-    with pytest.raises(CrateError):
-        crate.check_existence_of_entity()
-
-    # no error
-    crate.add(org)
-    crate.check_duplicate_entity()
-
-
 @pytest.fixture
 def tmp_file() -> Any:
     with open("tmp.json", "x"):
