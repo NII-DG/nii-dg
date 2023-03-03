@@ -202,10 +202,10 @@ def main() -> None:
     app = create_app()
 
     if os.getenv("WSGI_SERVER") == "waitress":
-        serve(app, host='0.0.0.0', port=5000, threads=1)
         import logging
         waitress_logger = logging.getLogger("waitress")
         waitress_logger.setLevel(logging.INFO)
+        serve(app, host='0.0.0.0', port=5000, threads=1)
     else:
         # for debug
         app.config["DEBUG"] = True

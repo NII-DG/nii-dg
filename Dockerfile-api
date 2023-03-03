@@ -24,6 +24,7 @@ COPY . .
 
 EXPOSE 5000
 ENV WSGI_SERVER "waitress"
+ENV PYTHONUNBUFFERED=1
 
 ENTRYPOINT ["tini", "--"]
 CMD ['python', '/app/nii_dg/api.py']
