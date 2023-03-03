@@ -97,7 +97,7 @@ ro_crate.dump("ro-crate-metadata.json")
 
 また、使用例として、以下が用意されている。
 
-- [./tests/example.py](./tests/example.py)
+- [./tests/examples/example.py](./tests/examples/example.py)
 
 #### RO-Crate Metadata File DescriptorとRoot Data Entity
 
@@ -229,27 +229,10 @@ Packaging における型検査 (`entity.check_props()`) と、Validation にお
   - 複数の Entity 間の relation を用いてこれらの値の検証を行う
 
 #### Using REST API Server
-詳細はOpenAPI仕様(OAS) [open-api_spec.yml](./open-api_spec.yml)を参照
 
- endpoint `/`:
- - request bodyとしてNII-DGライブラリを利用してパッケージしたro-crateをPOST送信すると、validationが受付されrequestIdが返る
- - 一部エンティティのみをValidationしたい時、クエリパラメータに`entityIds`として指定ができる
-    - 指定がない場合はro-crate全体がvalidation対象となる
-    - entityIdsを複数指定する場合のクエリパラメータの形式は `?entityIds=a&entityIds=b`とすること
+REST API の仕様として、[open-api_spec.yml](./open-api_spec.yml) を参照。
 
-例: python requestsモジュール利用
-```python
-import requests
-res = requests.post("https://example.com/?entityIds=a&entityIds=b", json=crate_json)
-```
-
-例: curl利用
-``` shell:example
-$ curl -X POST "https://example.com/?entityIds=a&entityIds=b" -H "Content-Type: application/json" -d @path/to/rocrate
-```
-
-
-[TODO: not written yet]
+また、API Server の起動・実行に関して、[api-quick-start.md](./api-quick-start.md) を参照。
 
 ## Development
 
