@@ -32,7 +32,7 @@ def test_as_jsonld() -> None:
     ent["dataManager"] = Person("https://orcid.org/0000-0001-2345-6789")
     ent["repository"] = RepositoryObject("https://doi.org/xxxxxxxx")
     ent["distribution"] = DataDownload("https://zenodo.org/record/example")
-    ent["hasPart"] = [DMP(1), DMP(2)]
+    ent["hasPart"] = [DMP("#dmp:1"), DMP("#dmp:2")]
 
     jsonld = {'@type': 'DMPMetadata', '@id': '#AMED-DMP', 'about': {'@id': './'}, 'name': 'AMED-DMP', 'funding': 'Acceleration Transformative Research for Medical Innovation', 'chiefResearcher': {'@id': 'https://orcid.org/0000-0001-2345-6789'}, 'creator': [{'@id': 'https://orcid.org/0000-0001-2345-6789'}], 'hostingInstitution': {
         '@id': 'https://ror.org/04ksd4g47'}, 'dataManager': {'@id': 'https://orcid.org/0000-0001-2345-6789'}, 'repository': {'@id': 'https://doi.org/xxxxxxxx'}, 'distribution': {'@id': 'https://zenodo.org/record/example'}, 'hasPart': [{'@id': '#dmp:1'}, {'@id': '#dmp:2'}], "funder": {'@id': 'https://ror.org/04ksd4g47'}}
@@ -57,7 +57,7 @@ def test_check_props() -> None:
     ent["chiefResearcher"] = "Donald Duck"
     ent["creator"] = [Person("https://orcid.org/0000-0001-2345-6789")]
     ent["dataManager"] = Person("https://orcid.org/0000-0001-2345-6789")
-    ent["hasPart"] = [DMP(1), DMP(2)]
+    ent["hasPart"] = [DMP("#dmp:1"), DMP("#dmp:2")]
     with pytest.raises(EntityError):
         ent.check_props()
 
@@ -83,7 +83,7 @@ def test_validate() -> None:
     # no error
     ent.validate(crate)
 
-    dmp = DMP(1)
+    dmp = DMP("#dmp:1")
     crate.add(dmp)
     # error: not all DMP entity in the crate is included in hasPart
     with pytest.raises(EntityError):
@@ -98,5 +98,6 @@ def test_validate() -> None:
     person = Person("https://example.com/person")
     ent["creator"] = [person]
     ent["dataManager"] = person
+    crate.add(person)
     # no error
     ent.validate(crate)

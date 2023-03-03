@@ -25,7 +25,7 @@ def test_as_jsonld() -> None:
     ent["funder"] = Organization("https://ror.org/04ksd4g47")
     ent["repository"] = RepositoryObject("https://doi.org/xxxxxxxx")
     ent["distribution"] = DataDownload("https://zenodo.org/record/example")
-    ent["hasPart"] = [DMP(1), DMP(2)]
+    ent["hasPart"] = [DMP("#dmp:1"), DMP("#dmp:2")]
 
     jsonld = {'@type': 'DMPMetadata', '@id': '#METI-DMP', 'about': {'@id': './'}, 'name': 'METI-DMP', 'funder': {'@id': 'https://ror.org/04ksd4g47'}, 'repository': {
         '@id': 'https://doi.org/xxxxxxxx'}, 'distribution': {'@id': 'https://zenodo.org/record/example'}, 'hasPart': [{'@id': '#dmp:1'}, {'@id': '#dmp:2'}]}
@@ -43,7 +43,7 @@ def test_check_props() -> None:
     # error: lack of required properties
     # error: type error
     ent["funder"] = "NII"
-    ent["hasPart"] = [DMP(1), DMP(2)]
+    ent["hasPart"] = [DMP("#dmp:1"), DMP("#dmp:2")]
     with pytest.raises(EntityError):
         ent.check_props()
 
@@ -69,7 +69,7 @@ def test_validate() -> None:
     # no error
     meta.validate(rocrate)
 
-    dmp = DMP(2)
+    dmp = DMP("#dmp:2")
     rocrate.add(dmp)
     # error: not all DMP entity in the crate is included in hasPart
     with pytest.raises(EntityError):

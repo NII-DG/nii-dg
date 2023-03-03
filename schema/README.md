@@ -77,8 +77,8 @@ $ python3 validate_and_format_yml.py <source_yml> <dest_yml>
 
 ```python
 class File(DataEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         # Packaging で呼び出される各 props の型検査処理
@@ -123,9 +123,6 @@ Schema 定義として、
 - `cao`
   - 内閣府「[公的資金による研究データの管理・利活用](https://www8.cao.go.jp/cstp/kenkyudx.html)に関する基本的な考え方」におけるメタデータの共通項目
   - [参考 docs](https://www8.cao.go.jp/cstp/common_metadata_elements.pdf)
-- `jst`
-  - 科学技術振興機構
-  - [参考 docs](https://www.jst.go.jp/pr/intro/openscience/guideline_openscience_r4.pdf)
 - `amed`
   - 日本医療研究開発機構
   - [参考 Web Page](https://www.amed.go.jp/koubo/datamanagement.html)
@@ -141,7 +138,7 @@ Schema 定義として、
 ## Schema の追加と拡張
 
 - 基本的に共通 schema の追加と拡張は想定されていない
-  - 多くの `File` や `Person` といった基本的な Entity は、共通 Schema において定義されている。
+  - 多くの `File` や `Person` といった基本的な Entity は、共通 Schema において定義されている
   - そのため、`amed:DMPMetadata:creator` の値として、共通 schema の `base:Person` Entity を指定することが可能である
 - 拡張 schema において、Entity を定義する場合は、上述の Yaml/Python/Markdown schema file を作成し、それぞれ記述する
   - 共通 schema に定義されていない Entity の場合
@@ -150,4 +147,6 @@ Schema 定義として、
     - 想定としては、検証ルールを一部変更したり、新たな properties を追加することが考えられる
     - この場合、共通 schema の Entity を継承する
       - Yaml file: クリップボード的にコピペして、編集する
-      - Python module: `base.py` に定義されている Entity を継承し、`check_props()` と `validate()` を実装する
+      - Python module:
+       - `base.py` に定義されている Entity を継承し、`check_props()` と `validate()` を実装する
+       - `__init__()`において継承する Entity は親ではなく、親の親を指定

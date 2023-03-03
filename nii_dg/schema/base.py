@@ -19,21 +19,12 @@ if TYPE_CHECKING:
     from nii_dg.ro_crate import ROCrate
 
 
+SCHEMA_NAME = Path(__file__).stem
+
+
 class File(DataEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -75,31 +66,23 @@ class File(DataEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         if classify_uri(self.id) == "URL":
             if "sdDatePublished" not in self.keys():
-                validation_failures.add("sdDatepublished", "This property is required, but not found.")
+                validation_failures.add("sdDatePublished", "This property is required, but not found.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures
 
 
 class Dataset(DataEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -138,20 +121,8 @@ class Dataset(DataEntity):
 
 
 class Organization(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -178,7 +149,11 @@ class Organization(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         if self.id.startswith("https://ror.org/"):
             try:
@@ -198,20 +173,8 @@ class Organization(ContextualEntity):
 
 
 class Person(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -233,7 +196,7 @@ class Person(ContextualEntity):
             prop_errors.add_by_dict(str(e))
 
         try:
-            if type(self.id) is str and self.id.startswith("https://orcid.org/"):
+            if isinstance(self.id, str) and self.id.startswith("https://orcid.org/"):
                 check_orcid_id(self.id[18:])
         except ValueError as e:
             prop_errors.add("@id", str(e))
@@ -245,7 +208,11 @@ class Person(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         try:
             access_url(self.id)
@@ -257,20 +224,8 @@ class Person(ContextualEntity):
 
 
 class License(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -296,7 +251,11 @@ class License(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         try:
             access_url(self.id)
@@ -308,20 +267,8 @@ class License(ContextualEntity):
 
 
 class RepositoryObject(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -349,20 +296,8 @@ class RepositoryObject(ContextualEntity):
 
 
 class DataDownload(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -396,7 +331,11 @@ class DataDownload(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         try:
             access_url(self.id)
@@ -408,12 +347,8 @@ class DataDownload(ContextualEntity):
 
 
 class HostingInstitution(Organization):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -440,7 +375,11 @@ class HostingInstitution(Organization):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super(Organization, self).validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         if self.id.startswith("https://ror.org/"):
             try:
@@ -460,20 +399,8 @@ class HostingInstitution(Organization):
 
 
 class ContactPoint(ContextualEntity):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -503,7 +430,11 @@ class ContactPoint(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         if self.id.startswith("#mailto:"):
             if "email" not in self.keys():

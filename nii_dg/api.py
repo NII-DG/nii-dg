@@ -7,11 +7,9 @@ from copy import deepcopy
 from typing import TYPE_CHECKING, Any, Dict, List
 from uuid import uuid4
 
-from flask import (Blueprint, Flask, Response, abort, current_app, jsonify,
-                   request)
+from flask import Blueprint, Flask, Response, abort, jsonify, request
 from waitress import serve
 
-from nii_dg.entity import DefaultEntity
 from nii_dg.error import (CheckPropsError, CrateError, EntityError,
                           GovernanceError)
 from nii_dg.ro_crate import ROCrate
@@ -48,7 +46,7 @@ def result_wrapper(error_dict: List[EntityError]) -> List[Dict[str, str]]:
     for entity_error in error_dict:
         entity_dict = {}
         entity_dict["entityId"] = entity_error.entity.id
-        entity_dict["props"] = entity_error.entity.schema_name + "." + entity_error.entity.type + ":"
+        entity_dict["props"] = entity_error.entity.schema_name + "." + entity_error.entity.type + ":"  # type:ignore
         for prop, reason in entity_error.message_dict.items():
             reason_dict = entity_dict.copy()
             reason_dict["props"] += prop
@@ -102,11 +100,10 @@ def request_validation() -> Response:
 
     job = executor.submit(validate, crate, target_entities)
 
-    with current_app.app_context():
-        request_map[request_id] = {
-            "roCrate": request_body,
-            "entityIds": entity_ids}
-        job_map[request_id] = job
+    request_map[request_id] = {
+        "roCrate": request_body,
+        "entityIds": entity_ids}
+    job_map[request_id] = job
 
     response: Response = jsonify({"request_id": request_id})
     response.status_code = POST_STATUS_CODE
@@ -179,8 +176,6 @@ def validate(crate: ROCrate, entities: List["Entity"]) -> List[Any]:
     if len(entities) > 0:
         governance_error = GovernanceError()
         for entity in entities:
-            if isinstance(entity, DefaultEntity):
-                continue
             try:
                 entity.validate(crate)
             except EntityError as err:
@@ -206,10 +201,10 @@ def main() -> None:
     app = create_app()
 
     if os.getenv("WSGI_SERVER") == "waitress":
-        serve(app, host='0.0.0.0', port=5000, threads=1)
         import logging
         waitress_logger = logging.getLogger("waitress")
         waitress_logger.setLevel(logging.INFO)
+        serve(app, host='0.0.0.0', port=5000, threads=1)
     else:
         # for debug
         app.config["DEBUG"] = True

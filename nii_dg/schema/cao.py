@@ -18,23 +18,13 @@ from nii_dg.utils import (access_url, check_all_prop_types,
                           load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
 
+SCHEMA_NAME = Path(__file__).stem
+
 
 class DMPMetadata(ContextualEntity):
-    def __init__(self, id: Optional[str] = None, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id="#CAO-DMP", props=props)
-        self["name"] = "CAO-DMP"
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str = "#CAO-DMP", props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+        self.data.setdefault("name", "CAO-DMP")
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -59,9 +49,13 @@ class DMPMetadata(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
-        if self["about"] != crate.root:
+        if self["about"] != crate.root and self["about"] != {"@id": "./"}:
             validation_failures.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
 
         if len(self["hasPart"]) != len(crate.get_by_entity_type(DMP)):
@@ -76,21 +70,8 @@ class DMPMetadata(ContextualEntity):
 
 
 class DMP(ContextualEntity):
-    def __init__(self, id: int, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id="#dmp:" + str(id), props=props)
-        self["dataNumber"] = id
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
-
-    def as_jsonld(self) -> Dict[str, Any]:
-        self.check_props()
-        return super().as_jsonld()
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -109,7 +90,7 @@ class DMP(ContextualEntity):
         except PropsError as e:
             prop_errors.add_by_dict(str(e))
 
-        if self.id != "#dmp:" + str(self["dataNumber"]):
+        if "dataNumber" in self and self.id != "#dmp:" + str(self["dataNumber"]):
             prop_errors.add("@id", "The value MUST be started with '#dmp:'and then the value of dataNumber property MUST come after it.")
 
         if self.type != self.entity_name:
@@ -125,7 +106,11 @@ class DMP(ContextualEntity):
             raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
-        validation_failures = EntityError(self)
+        try:
+            super().validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         dmp_metadata_ents = crate.get_by_entity_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
@@ -161,7 +146,7 @@ class DMP(ContextualEntity):
 
             sum_size = sum_file_size(self["contentSize"][-2:], target_files)
 
-            if self["contentSize"] != "over100GB" and sum_size > int(self["contentSize"][:-2]):
+            if self["contentSize"] != "over100GB" and sum_size > int(self["contentSize"][: -2]):
                 validation_failures.add("contentSize", "The total file size included in this DMP is larger than the defined size.")
 
             if self["contentSize"] == "over100GB" and sum_size < 100:
@@ -172,16 +157,8 @@ class DMP(ContextualEntity):
 
 
 class Person(BasePerson):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super(BasePerson, self).__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -202,7 +179,7 @@ class Person(BasePerson):
             prop_errors.add_by_dict(str(e))
 
         try:
-            if type(self.id) is str and self.id.startswith("https://orcid.org/"):
+            if isinstance(self.id, str) and self.id.startswith("https://orcid.org/"):
                 check_orcid_id(self.id[18:])
         except ValueError as e:
             prop_errors.add("@id", str(e))
@@ -214,7 +191,11 @@ class Person(BasePerson):
             raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
-        validation_failures = EntityError(self)
+        try:
+            super(BasePerson, self).validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         try:
             access_url(self.id)
@@ -226,16 +207,8 @@ class Person(BasePerson):
 
 
 class File(BaseFile):
-    def __init__(self, id: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id=id, props=props)
-
-    @property
-    def schema_name(self) -> str:
-        return Path(__file__).stem
-
-    @property
-    def entity_name(self) -> str:
-        return self.__class__.__name__
+    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
+        super(BaseFile, self).__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
 
     def check_props(self) -> None:
         prop_errors = EntityError(self)
@@ -277,7 +250,11 @@ class File(BaseFile):
             raise prop_errors
 
     def validate(self, crate: ROCrate) -> None:
-        validation_failures = EntityError(self)
+        try:
+            super(BaseFile, self).validate(crate)
+            validation_failures = EntityError(self)
+        except EntityError as ent_err:
+            validation_failures = ent_err
 
         if classify_uri(self.id) == "URL" and "sdDatePublished" not in self.keys():
             validation_failures.add("sdDatePublished", "This property is required, but not found.")

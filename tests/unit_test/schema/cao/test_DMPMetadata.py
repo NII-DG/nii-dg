@@ -27,7 +27,7 @@ def test_as_jsonld() -> None:
     ent["distribution"] = DataDownload("https://zenodo.org/record/example")
     ent["keyword"] = "Informatics"
     ent["eradProjectId"] = "123456"
-    ent["hasPart"] = [DMP(1), DMP(2)]
+    ent["hasPart"] = [DMP("#dmp:1"), DMP("#dmp:2")]
 
     jsonld = {'@type': 'DMPMetadata', '@id': '#CAO-DMP', 'about': {'@id': './'}, 'name': 'CAO-DMP', 'funder': {'@id': 'https://ror.org/04ksd4g47'}, 'repository': {
         '@id': 'https://doi.org/xxxxxxxx'}, 'distribution': {'@id': 'https://zenodo.org/record/example'}, 'keyword': 'Informatics', 'eradProjectId': '123456', 'hasPart': [{'@id': '#dmp:1'}, {'@id': '#dmp:2'}]}
@@ -46,7 +46,7 @@ def test_check_props() -> None:
     # error: type error
     ent["funder"] = Organization("https://ror.org/04ksd4g47")
     ent["keyword"] = 13
-    ent["hasPart"] = [DMP(1), DMP(2)]
+    ent["hasPart"] = [DMP("#dmp:1"), DMP("#dmp:2")]
     with pytest.raises(EntityError):
         ent.check_props()
 
@@ -72,7 +72,7 @@ def test_validate() -> None:
     # no error
     ent.validate(crate)
 
-    dmp = DMP(1)
+    dmp = DMP("#dmp:1")
     crate.add(dmp)
     # error: not all DMP entity in the crate is included in hasPart
     with pytest.raises(EntityError):

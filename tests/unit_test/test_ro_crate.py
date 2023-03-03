@@ -10,7 +10,7 @@ from nii_dg.error import (CrateError, GovernanceError,
                           UnexpectedImplementationError)
 from nii_dg.ro_crate import (ContextualEntity, DataEntity, DefaultEntity,
                              ROCrate, ROCrateMetadata, RootDataEntity)
-from nii_dg.schema.base import File, Organization, Person
+from nii_dg.schema.base import File
 
 
 def test_add() -> None:
@@ -117,22 +117,6 @@ def test_check_duplicate_entity() -> None:
 
     # no error
     crate.delete(file_2)
-    crate.check_duplicate_entity()
-
-
-def test_check_existence_of_entity() -> None:
-    crate = ROCrate()
-
-    # error
-    org = Organization("test_org")
-    person = Person("test_person", {"affiliation": org})
-    crate.add(person)
-
-    with pytest.raises(CrateError):
-        crate.check_existence_of_entity()
-
-    # no error
-    crate.add(org)
     crate.check_duplicate_entity()
 
 

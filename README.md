@@ -37,7 +37,7 @@ $ docker run -it --rm ghcr.io/NII-DG/nii-dg:latest bash
 
 ## Usage
 
-上記した通り、本ライブラリは 3 つの機能に分かれている。
+上記の通り、本ライブラリは 3つの機能に分かれている。
 
 1. Schema definition: Metadata Schema とその検証ルールの定義
 2. Packaging: パッケージング (RO-Crate 化)
@@ -99,17 +99,19 @@ ro_crate.dump("ro-crate-metadata.json")
 
 - [./tests/example.py](./tests/example.py)
 
-#### RootDataEntity について
+#### RO-Crate Metadata File DescriptorとRoot Data Entity
 
-上述の Minimal example における 2 つの Entity は、RO-Crate における [RootDataEntity](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html) である。
-RootDataEntity は以下の 2 つからなる:
+上述の Minimal example における 2 つの Entity は、RO-Crate における [必須のエンティティ](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html) である。
+以下の2つが必須のエンティティである:
 
-- `@type`: `CreativeWork`
+- RO-Crate Metadata File Descriptor
+  - `@type`: `CreativeWork`
   - > The RO-Crate JSON-LD MUST contain a self-describing RO-Crate Metadata File Descriptor with the @id value ro-crate-metadata.json (or ro-crate-metadata.jsonld in legacy crates) and @type CreativeWork.
   - Called as `ROCrateMetadata` in this library.
   - RO-Crate metadata file に対する自己記述的な Entity
   - RO-Crate 自体の様々な metadata が記述される
-- `@type`: `Dataset`
+- Root Data Entity
+  - `@type`: `Dataset`
   - > This descriptor MUST have an about property referencing the Root Data Entity, which SHOULD have an @id of ./.
   - Called as `RootDataEntity` in this library.
   - RO-Crate が持つ file を取りまとめる Entity
@@ -219,8 +221,8 @@ Packaging における型検査 (`entity.check_props()`) と、Validation にお
 
 - `entity.check_props()`:
   - 各 prop の型検査を行う
-  - つまり、str に対して int を設定するなど、型の不一致を検出する
-  - また、required の prop が設定されているか、などの検査を行う
+     -  例: 型定義str に対して int が設定されているなど、型の不一致を検出する
+  - required の prop が設定されているか、などの検査を行う
 - `entity.validate()`:
   - より高度な検証を行う
   - 各 prop の「値」が正しいかを検証する
@@ -231,9 +233,9 @@ Packaging における型検査 (`entity.check_props()`) と、Validation にお
 
  endpoint `/`:
  - request bodyとしてNII-DGライブラリを利用してパッケージしたro-crateをPOST送信すると、validationが受付されrequestIdが返る
- - 一部エンティティのみをValidationしたい時、クエリパラメータに`entityIds`として指定ができる。
-    - 指定がない場合はro-crate全体がvalidation対象となる。
-    - entityIdsを複数指定する場合のクエリパラメータの形式は `?entityIds=a&entityIds=b`とすること。
+ - 一部エンティティのみをValidationしたい時、クエリパラメータに`entityIds`として指定ができる
+    - 指定がない場合はro-crate全体がvalidation対象となる
+    - entityIdsを複数指定する場合のクエリパラメータの形式は `?entityIds=a&entityIds=b`とすること
 
 例: python requestsモジュール利用
 ```python

@@ -3,15 +3,17 @@
 
 import pytest
 
-from nii_dg.entity import Entity, ROCrateMetadata, RootDataEntity
+from nii_dg.entity import ROCrateMetadata, RootDataEntity
 from nii_dg.schema.base import Person
 
 
 def test_delitem() -> None:
-    ent = Entity("test", {"normal_prop": "removable", "@type": "unremovable"})
+    with pytest.raises(KeyError):
+        ent = Person("test", {"normal_prop": "removable", "@type": "not_settable"})
 
+    ent = Person("test", {"normal_prop": "removable"})
     del ent["normal_prop"]
-    assert list(ent.keys()) == ["@id", "@type"]
+    assert "normal_prop" not in ent.keys()
 
     with pytest.raises(KeyError):
         del ent["@type"]

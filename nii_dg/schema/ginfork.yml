@@ -2,8 +2,8 @@ GinMonitoring:
   description: Monitoring function for the GIN-fork platform.
   props:
     '@id':
-      description: MUST be index number of monitoring rules with the prefix `#ginmonitoring:`.
-      example: '#ginmonitoring:1'
+      description: MUST be `#ginmonitoring`.
+      example: '#ginmonitoring'
       required: Required.
       expected_type: str
     about:

@@ -17,7 +17,7 @@ from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
                            ROCrateMetadata, RootDataEntity)
 from nii_dg.error import (CheckPropsError, CrateError, EntityError,
                           GovernanceError, UnexpectedImplementationError)
-from nii_dg.utils import import_entity_class, verify_idlink_is_correct_type
+from nii_dg.utils import import_entity_class
 
 
 class ROCrate():
@@ -98,7 +98,6 @@ class ROCrate():
 
     def as_jsonld(self) -> Dict[str, Any]:
         self.check_duplicate_entity()
-        self.check_existence_of_entity()
         # `datePublished` field is defined in the RO-Crate specification.
         self.root["datePublished"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
@@ -107,8 +106,8 @@ class ROCrate():
         for e in self.get_all_entities():
             try:
                 graph.append(e.as_jsonld())
-            except EntityError as e:
-                check_error.add_error(e)
+            except EntityError as err:
+                check_error.add_error(err)
 
         if len(check_error.entity_errors) > 0:
             raise check_error
@@ -137,34 +136,6 @@ class ROCrate():
         if len(dup_ents) > 0:
             raise CrateError(f"Duplicate @id and @context value found: {dup_ents}.")
 
-    def check_existence_of_entity(self) -> None:
-        for ent in self.get_all_entities():
-            if isinstance(ent, DefaultEntity):
-                continue
-            for prop, val in ent.items():
-                if isinstance(val, Entity) and val not in self.get_all_entities():
-                    raise CrateError(f"The entity {val} is included in entity {ent}, but not included in the crate.")
-                if isinstance(val, dict) and "@id" in val:
-                    # expected: {"@id":"https://example.com"}
-                    if len(self.get_by_id(val["@id"])) == 0:
-                        raise CrateError(
-                            f"The link of @id {val['@id']} is included in the property {prop} of entity {ent}, but entity with @id {val['@id']} is not found in the crate.")
-                    if verify_idlink_is_correct_type(ent, prop, self.get_by_id(val["@id"])) is False:
-                        raise CrateError(
-                            f"The link of @id {val['@id']} is included in the property {prop} of entity {ent}, but the type of entity with @id {val['@id']} is wrong.")
-                if isinstance(val, list):
-                    # expected: [Any], [Entity]
-                    for ele in [v for v in val if isinstance(v, Entity)]:
-                        if ele not in self.get_all_entities():
-                            raise CrateError(f"The entity {ele} is included in entity {ent}, but not included in this crate.")
-                    for id_dict in [v for v in val if isinstance(v, dict) and "@id" in v]:
-                        if len(self.get_by_id(id_dict["@id"])) == 0:
-                            raise CrateError(
-                                f"The link of @id {id_dict['@id']} is included in the property {prop} of entity {ent}, but there is no entity found in the crate with @id {id_dict['@id']}.")
-                        if verify_idlink_is_correct_type(ent, prop, self.get_by_id(id_dict["@id"])) is False:
-                            raise CrateError(
-                                f"The link of @id {id_dict['@id']} is included in the property {prop} of entity {ent}, but the type of entity with @id {id_dict['@id']} is wrong.")
-
     def dump(self, path: str) -> None:
         """\
         Dump the RO-Crate to the specified path.
@@ -176,8 +147,6 @@ class ROCrate():
         governance_error = GovernanceError()
 
         for ent in self.get_all_entities():
-            if isinstance(ent, DefaultEntity):
-                continue
             try:
                 ent.validate(self)
             except EntityError as e:
@@ -216,12 +185,9 @@ class ROCrate():
                     raise CrateError(f"The entity <{type_} {id_}> doesn't have `@context` property.")
                 schema_name = urlparse(context).path.split("/")[-1].split(".")[0]
                 entity_class = import_entity_class(schema_name, type_)
-                # TODO: 何かしらの抽象化層が必要
                 props = deepcopy(entity)
-                props.pop("@id")
-                props.pop("@type")
-                props.pop("@context")
-                entity_instance = entity_class(id=id_, props=props)
+                entity_instance = entity_class.from_jsonld(id_=id_, jsonld=props)
+
                 if isinstance(entity_instance, DataEntity):
                     self.data_entities.append(entity_instance)
                 elif isinstance(entity_instance, ContextualEntity):
