@@ -24,9 +24,8 @@ $ curl localhost:5000/healthcheck
 
 ### Prepare ro-crate-metadata.json
 
-You need `ro-crate-metadata.json`, RO-Crate json file created by using NII-DG library. Data governance is performed based on the RO-Crate as an input.
-
-基本的なendpoint `/`:
+You need `ro-crate-metadata.json`, RO-Crate json file created by using NII-DG library.
+Data governance is performed based on the RO-Crate as an input.
 
 ### POST /validate
 
@@ -35,6 +34,13 @@ Access the POST endpoint `/validate` with your RO-Crate as a request body to req
 ```bash
 $ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @path/to/ro-crate-metadata
 {"request_id":"a84d2318-8b57-49c4-848d-b1935e4a1224"}
+```
+
+Several RO-Crates are prepared for testing under [./tests/examples](./tests/examples); so use `example_complete.json` as follows:
+
+```bash
+$ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @./tests/examples/example_complete.json
+{"request_id":"e502a052-d261-4795-8fef-22ee66cf07cd"}
 ```
 
 You get `request_id` in uuid4 when your request is successfully applied to the server.
