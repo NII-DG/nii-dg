@@ -1,0 +1,46 @@
+File:
+  description: A file included in the research project, e.g. text file, script file and images.
+  props:
+    "@id":
+      expected_type: str
+      example: config/setting.txt
+      required: Required.
+      description: MUST be either a URI Path relative to RO-Crate root or an absolute URI from which is downloadable. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+    sha256:
+      expected_type: str
+      example: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      required: Optional.
+      description: Optional. MUST be the SHA-2 SHA256 hash of the file.
+    contents:
+      expected_type: str
+      example: This is a text file.
+      required: Optional.
+      description: Optional. MUST be the contents of the file. This is useful for small files that can be included in the metadata file.
+SapporoRun:
+  description: A run of a Sapporo.
+  props:
+    "@id":
+      expected_type: str
+      example: "#sapporo-run"
+      required: Required.
+      description: "#sapporo-run"
+    run_request:
+      expected_type: File
+      example: "run_request.json"
+      required: Required.
+      description: "run_request.json"
+    sapporo_config:
+      expected_type: File
+      example: "sapporo_config.json"
+      required: Required.
+      description: "sapporo_config.json"
+    state:
+      expected_type: str
+      example: "COMPLETED"
+      required: Required.
+      description: Run state.
+    outputs:
+      expected_type: Dataset
+      example: "outputs"
+      required: Required.
+      description: "outputs"
