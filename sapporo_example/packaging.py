@@ -2,7 +2,6 @@
 # coding: utf-8
 
 import json
-import os
 import subprocess
 import time
 from pathlib import Path
@@ -14,7 +13,7 @@ ATTRIBUTE = 'filename='
 
 
 def get_initial_run_id() -> str:
-    path = Path(__file__).with_name("base.sh")
+    path = Path(__file__).with_name("initial_run.sh")
     proc = subprocess.run(["sh", path], text=True, capture_output=True, check=True)
     req_dict = json.loads(proc.stdout)
     return req_dict["run_id"]
@@ -45,20 +44,30 @@ def get_output_file(url: str, run_dir: Path) -> None:
         save_file.write(output_file.content)
 
 
-def save_run_request(run_result: Dict[str, Any]) -> None:
-    SAVE_DIR = os.getcwd() + "/sapporo_example/test"
-    save_run_request_path = Path.joinpath(SAVE_DIR + "/run_request.json")
+def save_run_request(run_request: Dict[str, Any], run_dir: Path) -> None:
+    save_run_request_path = run_dir.joinpath("run_request.json")
     with open(save_run_request_path, 'w') as f:
-        json.dump(run_result["request"], f, indent=4)
+        json.dump(run_request, f, indent=4)
 
 
-def main() -> None:
-    run_id = get_initial_run_id()
+def save_run_results(run_id: str) -> None:
     if get_run_status(run_id) != "COMPLETE":
         return
     run_dir = Path(__file__).with_name(run_id)
     run_dir.mkdir(exist_ok=True)
+    run_results = get_run_results(run_id)
+    for file in run_results["outputs"]:
+        get_output_file(file["file_url"], run_dir)
+    save_run_request(run_results["request"], run_dir)
+
+
+def re_execute(run_dir: Path) -> None:
+    save_run_request_path = run_dir.joinpath("run_request.json")
+    with open(save_run_request_path, 'r') as f:
+        run_req = json.load(f)
+    re_exec_run_id = requests.post("http://localhost:1122/runs", data=run_req)
+    print(re_exec_run_id.text)
 
 
 if __name__ == "__main__":
-    main()
+    save_run_results("56f5481c-982f-4f79-87e5-0f0884c30205")
