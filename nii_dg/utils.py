@@ -5,6 +5,7 @@ import datetime
 import importlib
 import mimetypes
 import re
+import time
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
                     Optional, Tuple, TypedDict, Union)
@@ -443,3 +444,12 @@ def get_entity_list_to_validate(entity: "Entity") -> Dict[str, Any]:
             if flg == 1:
                 instance_type_dict[prop] = expected_python_type
     return instance_type_dict
+
+
+def get_sapporo_run_status(run_id: str, endpoint: str) -> str:
+    while True:
+        run_status = requests.get(endpoint + "/runs/" + run_id + "/status")
+        if run_status.json()["state"] not in ["QUEUED", "INITIALIZING", "RUNNING"]:
+            break
+        time.sleep(30)
+    return run_status.json()["state"]

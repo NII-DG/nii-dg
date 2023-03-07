@@ -19,7 +19,7 @@ from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_unexpected_props, check_url, classify_uri,
                           convert_string_type_to_python_type,
                           get_entity_list_to_validate, get_name_from_ror,
-                          import_entity_class,
+                          get_sapporo_run_status, import_entity_class,
                           load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
 
@@ -334,3 +334,9 @@ def test_get_entity_list_to_validate() -> None:
     file = BaseFile("sample")
     assert len(get_entity_list_to_validate(file)) == 0
     assert isinstance(get_entity_list_to_validate(file), dict)
+
+
+def test_get_sapporo_run_status() -> None:
+    run_id = "test"
+    get_sapporo_run_status(run_id)
+    pass
