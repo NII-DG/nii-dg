@@ -6,24 +6,29 @@ File:
       example: config/setting.txt
       required: Required.
       description: MUST be either a URI Path relative to RO-Crate root or an absolute URI from which is downloadable. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+    contentSize:
+      expected_type: str
+      example: 1560B
+      required: Optional.
+      description: MUST be an integer of the file size with the suffix `B` as a unit, bytes. If necessary, you can also use "KB", "MB", "GB", "TB" and "PB" as a unit.
     sha256:
       expected_type: str
       example: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       required: Optional.
-      description: Optional. MUST be the SHA-2 SHA256 hash of the file.
+      description: MUST be the SHA-2 SHA256 hash of the file.
     contents:
       expected_type: str
       example: This is a text file.
       required: Optional.
-      description: Optional. MUST be the contents of the file. This is useful for small files that can be included in the metadata file.
+      description: MUST be the contents of the file. This is useful for small files that can be included in the metadata file.
 SapporoRun:
-  description: A run of a Sapporo.
+  description: A run information of a Sapporo. The value in this entity is used to re-execute the workflow and check the result.
   props:
     "@id":
       expected_type: str
       example: "#sapporo-run"
       required: Required.
-      description: "#sapporo-run"
+      description: MUST be "#sapporo-run"
     run_request:
       expected_type: File
       example: "run_request.json"
@@ -41,6 +46,6 @@ SapporoRun:
       description: Run state.
     outputs:
       expected_type: Dataset
-      example: "outputs"
+      example: "outputs/"
       required: Required.
-      description: "outputs"
+      description: Directory with output files. The files under this directory are compared with the result of the re-execution.

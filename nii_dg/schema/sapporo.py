@@ -4,7 +4,7 @@
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from nii_dg.entity import ContextualEntity, DataEntity
+from nii_dg.entity import ContextualEntity
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 

@@ -44,10 +44,11 @@ def get_output_file(url: str, run_dir: Path) -> None:
         save_file.write(output_file.content)
 
 
-def save_run_request(run_request: Dict[str, Any], run_dir: Path) -> None:
+def get_run_request(run_id: str, run_dir: Path) -> None:
+    run_request = requests.get("http://localhost:1122/runs/" + run_id + "/data/run_request.json")
     save_run_request_path = run_dir.joinpath("run_request.json")
     with open(save_run_request_path, 'w') as f:
-        json.dump(run_request, f, indent=4)
+        json.dump(run_request.json(), f, indent=4)
 
 
 def save_run_results(run_id: str) -> None:
@@ -58,7 +59,7 @@ def save_run_results(run_id: str) -> None:
     run_results = get_run_results(run_id)
     for file in run_results["outputs"]:
         get_output_file(file["file_url"], run_dir)
-    save_run_request(run_results["request"], run_dir)
+    get_run_request(run_results["request"], run_dir)
 
 
 def re_execute(run_dir: Path) -> None:
@@ -70,4 +71,4 @@ def re_execute(run_dir: Path) -> None:
 
 
 if __name__ == "__main__":
-    save_run_results("56f5481c-982f-4f79-87e5-0f0884c30205")
+    pass
