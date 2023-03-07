@@ -3,7 +3,7 @@
 See [GitHub - NII-DG/nii-dg - schema/README.md](https://github.com/NII-DG/nii-dg/blob/main/schema/README.md) for more information.
 
 ## File
-A file included in the research project, e.g. text file, script file and images.
+A file included in the research project and obtained from the execution of the workflow on Sapporo-service, e.g. run_request.json.
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be either a URI Path relative to RO-Crate root or an absolute URI from which is downloadable. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded. | `config/setting.txt` |
@@ -16,7 +16,7 @@ A run information of a Sapporo. The value in this entity is used to re-execute t
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be "#sapporo-run" | `#sapporo-run` |
-| `run_request` | `File` | Required. | run_request.json | `run_request.json` |
-| `sapporo_config` | `File` | Required. | sapporo_config.json | `sapporo_config.json` |
+| `run_request` | `File` | Required. | run_request.json | `{"@id":"run_request.json"}` |
+| `sapporo_config` | `File` | Required. | sapporo_config.json | `{"@id":"sapporo_config.json"}` |
 | `state` | `str` | Required. | Run state. | `COMPLETED` |
-| `outputs` | `Dataset` | Required. | Directory with output files. The files under this directory are compared with the result of the re-execution. | `outputs/` |
+| `outputs` | `Dataset` | Required. | Directory with output files. The files under this directory are compared with the result of the re-execution. | `{"@id":"outputs/"}` |

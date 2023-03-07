@@ -1,5 +1,5 @@
 File:
-  description: A file included in the research project, e.g. text file, script file and images.
+  description: A file included in the research project and obtained from the execution of the workflow on Sapporo-service, e.g. run_request.json.
   props:
     "@id":
       expected_type: str
@@ -31,12 +31,12 @@ SapporoRun:
       description: MUST be "#sapporo-run"
     run_request:
       expected_type: File
-      example: "run_request.json"
+      example: '{"@id":"run_request.json"}'
       required: Required.
       description: "run_request.json"
     sapporo_config:
       expected_type: File
-      example: "sapporo_config.json"
+      example: '{"@id":"sapporo_config.json"}'
       required: Required.
       description: "sapporo_config.json"
     state:
@@ -46,6 +46,6 @@ SapporoRun:
       description: Run state.
     outputs:
       expected_type: Dataset
-      example: "outputs/"
+      example: '{"@id":"outputs/"}'
       required: Required.
       description: Directory with output files. The files under this directory are compared with the result of the re-execution.

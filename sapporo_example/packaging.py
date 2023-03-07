@@ -39,16 +39,16 @@ def get_output_file(url: str, run_dir: Path) -> None:
     contentDisposition = output_file.headers['Content-Disposition']
     filename = contentDisposition[contentDisposition.find(ATTRIBUTE) + len(ATTRIBUTE):]
 
-    save_file_path = Path.joinpath(run_dir, filename)
+    save_file_path = run_dir.joinpath(filename)
     with open(save_file_path, 'wb') as save_file:
         save_file.write(output_file.content)
 
 
-def get_run_request(run_id: str, run_dir: Path) -> None:
-    run_request = requests.get("http://localhost:1122/runs/" + run_id + "/data/run_request.json")
-    save_run_request_path = run_dir.joinpath("run_request.json")
+def get_json_files(run_id: str, run_dir: Path, file_name: str) -> None:
+    run_request = requests.get("http://localhost:1122/runs/" + run_id + "/data/" + file_name)
+    save_run_request_path = run_dir.joinpath(file_name)
     with open(save_run_request_path, 'w') as f:
-        json.dump(run_request.json(), f, indent=4)
+        f.write(run_request.text)
 
 
 def save_run_results(run_id: str) -> None:
@@ -59,7 +59,8 @@ def save_run_results(run_id: str) -> None:
     run_results = get_run_results(run_id)
     for file in run_results["outputs"]:
         get_output_file(file["file_url"], run_dir)
-    get_run_request(run_results["request"], run_dir)
+    get_json_files(run_id, run_dir, "run_request.json")
+    get_json_files(run_id, run_dir, "sapporo_config.json")
 
 
 def re_execute(run_dir: Path) -> None:
@@ -71,4 +72,6 @@ def re_execute(run_dir: Path) -> None:
 
 
 if __name__ == "__main__":
-    pass
+    run_id = "56f5481c-982f-4f79-87e5-0f0884c30205"
+    run_dir = Path(__file__).with_name(run_id)
+    get_json_files(run_id, run_dir, "sapporo_config.json")
