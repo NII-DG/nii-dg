@@ -1,0 +1,65 @@
+{
+  "@context": "https://w3id.org/ro/crate/1.1/context",
+  "@graph": [
+    {
+      "@id": "./",
+      "@type": "Dataset",
+      "hasPart": [
+        {
+          "@id": "run_request.json"
+        },
+        {
+          "@id": "sapporo_config.json"
+        },
+        {
+          "@id": "outputs/"
+        }
+      ],
+      "name": "example research project",
+      "datePublished": "2023-03-08T05:45:38.361+00:00"
+    },
+    {
+      "@id": "ro-crate-metadata.json",
+      "@type": "CreativeWork",
+      "conformsTo": {
+        "@id": "https://w3id.org/ro/crate/1.1"
+      },
+      "about": {
+        "@id": "./"
+      }
+    },
+    {
+      "@id": "run_request.json",
+      "@type": "File",
+      "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld",
+      "contents": "{\n    \"workflow_params\": \"{\\\"fastq_1\\\":{\\\"location\\\":\\\"ERR034597_1.small.fq.gz\\\",\\\"class\\\":\\\"File\\\"},\\\"fastq_2\\\":{\\\"location\\\":\\\"ERR034597_2.small.fq.gz\\\",\\\"class\\\":\\\"File\\\"},\\\"nthreads\\\":2}\",\n    \"workflow_type\": \"CWL\",\n    \"workflow_type_version\": \"v1.0\",\n    \"tags\": null,\n    \"workflow_engine_name\": \"cwltool\",\n    \"workflow_engine_parameters\": null,\n    \"workflow_url\": \"https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/trimming_and_qc.cwl\",\n    \"workflow_name\": null,\n    \"workflow_attachment\": \"[{\\\"file_name\\\": \\\"ERR034597_2.small.fq.gz\\\", \\\"file_url\\\": \\\"https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/ERR034597_2.small.fq.gz\\\"}, {\\\"file_name\\\": \\\"ERR034597_1.small.fq.gz\\\", \\\"file_url\\\": \\\"https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/ERR034597_1.small.fq.gz\\\"}]\"\n}"
+    },
+    {
+      "@id": "sapporo_config.json",
+      "@type": "File",
+      "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld",
+      "contents": "{\n  \"sapporo_version\": \"1.4.9\",\n  \"get_runs\": true,\n  \"workflow_attachment\": true,\n  \"registered_only_mode\": false,\n  \"service_info\": \"/app/sapporo/service-info.json\",\n  \"executable_workflows\": \"/app/sapporo/executable_workflows.json\",\n  \"run_sh\": \"/app/sapporo/run.sh\",\n  \"url_prefix\": \"/\",\n  \"sapporo_endpoint\": \"http://sapporo-service:1122\"\n}\n"
+    },
+    {
+      "@id": "outputs/",
+      "@type": "Dataset",
+      "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/base.jsonld",
+      "name": "outputs"
+    },
+    {
+      "@id": "#sapporo-run",
+      "@type": "SapporoRun",
+      "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld",
+      "run_request": {
+        "@id": "run_request.json"
+      },
+      "sapporo_config": {
+        "@id": "sapporo_config.json"
+      },
+      "state": "COMPLETE",
+      "outputs": {
+        "@id": "outputs/"
+      }
+    }
+  ]
+}

@@ -86,12 +86,18 @@ class ROCrate():
                 entity_list.append(ent)
         return entity_list
 
-    def get_by_entity_type(self, entity: Type[Entity]) -> List[Entity]:
+    def get_by_entity_type(self, entity_type: Type[Entity]) -> List[Entity]:
         entity_list: List[Entity] = []
         for ent in self.get_all_entities():
-            if type(ent) is entity:
+            if type(ent) is entity_type:
                 entity_list.append(ent)
         return entity_list
+
+    def get_by_id_and_entity_type(self, entity_id: str, entity_type: Type[Entity]) -> Optional[Entity]:
+        ent_list = [ent for ent in self.get_by_id(entity_id) if ent in self.get_by_entity_type(entity_type)]
+        if len(ent_list) == 0:
+            return None
+        return ent_list[0]
 
     def get_all_entities(self) -> List[Entity]:
         return self.default_entities + self.data_entities + self.contextual_entities  # type:ignore

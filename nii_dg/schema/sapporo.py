@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+'''
+This schema is for validation of workflow execution using sapporo-service.
+For more information about sapporo-service, please see:
+https://github.com/sapporo-wes/sapporo-service
+'''
+
 import json
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -95,15 +101,29 @@ class SapporoRun(ContextualEntity):
         if (len(validation_failures.message_dict.keys() & {"run_request""sapporo_config"}) > 0):
             raise validation_failures
 
+        if isinstance(self["run_request"], dict):
+            self["run_request"] = crate.get_by_id_and_entity_type(self["run_request"]["@id"], File)
+        if isinstance(self["sapporo_config"], dict):
+            self["sapporo_config"] = crate.get_by_id_and_entity_type(self["sapporo_config"]["@id"], File)
+
+        if "contents" not in self["sapporo_config"]:
+            validation_failures.add("sapporo_config", f"""The property `contents` and its value are required in the entity {self["sapporo_config"]}.""")
+            raise validation_failures
         config = json.loads(self["sapporo_config"]["contents"])
+
         if "sapporo_endpoint" not in config:
             validation_failures.add("sapporo_config", "The property `sapporo_endpoint` and its value are required in the contents.")
             raise validation_failures
-
         endpoint = config["sapporo_endpoint"]
+
+        if "contents" not in self["run_request"]:
+            validation_failures.add("run_request", f"""The property `contents` and its value are required in the entity {self["run_request"]}.""")
+            raise validation_failures
         run_request = json.loads(self["run_request"]["contents"])
+
         try:
-            re_exec = requests.post(endpoint, data=run_request, timeout=(10.0, 30.0))
+            print("request run")
+            re_exec = requests.post(endpoint + "/runs", data=run_request, timeout=(10.0, 30.0))
             re_exec.raise_for_status()
         except Exception as err:
             validation_failures.add("run_request", f"Failed to re-execute workflow: {err}.")

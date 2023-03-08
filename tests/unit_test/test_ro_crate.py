@@ -63,6 +63,12 @@ def test_get_by_entity_type() -> None:
     assert crate.get_by_entity_type(RootDataEntity) == [crate.root]
 
 
+def test_get_by_id_and_entity_type() -> None:
+    crate = ROCrate()
+    # TODO
+    pass
+
+
 def test_get_all_entities() -> None:
     crate = ROCrate()
     meta = crate.get_by_id("ro-crate-metadata.json")
