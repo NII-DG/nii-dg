@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import hashlib
 import json
+import os
 import subprocess
 import time
 from pathlib import Path
@@ -55,7 +57,7 @@ def execute_initial_run() -> str:
         raise ValueError("Initial execution didn't run successfully.")
     run_results = get_run_results(run_id)
 
-    DIR_PATH.with_name("outputs").mkdir(exist_ok=True)
+    DIR_PATH.joinpath("outputs").mkdir(exist_ok=True)
 
     file_list = ["outputs/" + file_dict["file_name"] for file_dict in run_results["outputs"]]
     file_list += ["run_request.json", "sapporo_config.json"]
@@ -85,6 +87,14 @@ def package() -> None:
         "sapporo_config": config,
         "state": run_state,
         "outputs": outputs_dir})
+
+    outputs_iter = DIR_PATH.joinpath("outputs").iterdir()
+    for file_path in outputs_iter:
+        file = File(str(file_path.relative_to(DIR_PATH)))
+        file["contentSize"] = str(os.path.getsize(file_path)) + "B"
+        with open(file_path, "rb") as f:
+            file["sha256"] = hashlib.sha256(f.read()).hexdigest()
+        ro_crate.add(file)
 
     ro_crate.add(run_req, config, outputs_dir, sapporo_run)
     ro_crate.dump(str(DIR_PATH.joinpath("ro-crate-metadata.json")))
