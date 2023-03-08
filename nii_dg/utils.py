@@ -453,3 +453,9 @@ def get_sapporo_run_status(run_id: str, endpoint: str) -> str:
             break
         time.sleep(30)
     return run_status.json()["state"]
+
+
+def download_file_from_url(url: str, file_path: str) -> None:
+    request = requests.get(url, timeout=(10, 120))
+    with open(file_path, 'w', encoding="utf_8") as f:
+        f.write(request.text)

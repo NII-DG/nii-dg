@@ -45,7 +45,7 @@ def get_run_results(run_id: str) -> Dict[str, Any]:
 def download_file(run_id: str, run_dir: Path, file_path: str) -> None:
     run_request = requests.get(SAPPORO_ENDPOINT + "/runs/" + run_id + "/data/" + file_path, timeout=(10, 120))
     save_run_request_path = run_dir.joinpath(file_path)
-    with open(save_run_request_path, 'w') as f:
+    with open(save_run_request_path, 'w', encoding="utf_8") as f:
         f.write(run_request.text)
 
 

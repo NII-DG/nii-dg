@@ -20,7 +20,7 @@ from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           check_content_size, check_required_props,
                           check_sha256, check_unexpected_props, classify_uri,
-                          get_sapporo_run_status,
+                          download_file_from_url, get_sapporo_run_status,
                           load_entity_def_from_schema_file)
 
 SCHEMA_NAME = Path(__file__).stem
@@ -137,10 +137,17 @@ class SapporoRun(ContextualEntity):
             validation_failures.add("state", f"""The status of the workflow execution MUST be {self["state"]}; got {re_exec_status} instead.""")
             raise validation_failures
 
-        # if re_exec_status != "COMPLETE" and len(validation_failures.message_dict) > 0:
-        #     raise validation_failures
+        if re_exec_status != "COMPLETE":
+            if len(validation_failures.message_dict) > 0:
+                raise validation_failures
+            return
 
-        # re_exec_results = requests.get(endpoint + "/runs/" + run_id)
+        re_exec_results = requests.get(endpoint + "/runs/" + run_id, timeout=(10, 30)).json()
+        dir_path = Path.cwd().joinpath("tmp_sapporo", run_id)
+        dir_path.mkdir(parents=True)
+        file_list = [file_dict["file_name"] for file_dict in re_exec_results["outputs"]]
+        for file_name in file_list:
+            download_file_from_url(endpoint + "/runs/" + run_id + "/data/outputs/" + file_name, str(dir_path.joinpath(file_name)))
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures
