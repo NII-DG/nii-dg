@@ -16,7 +16,6 @@ from nii_dg.schema.sapporo import File, SapporoRun
 ATTRIBUTE = 'filename='
 DIR_PATH = Path(__file__).with_name("initial_run")
 SAPPORO_ENDPOINT = "http://sapporo-service:1122"
-STATUS: str
 
 
 def get_initial_run_id() -> str:
@@ -48,11 +47,11 @@ def download_file(run_id: str, run_dir: Path, file_path: str) -> None:
         f.write(run_request.text)
 
 
-def do_initial_run() -> str:
+def execute_initial_run() -> str:
     run_id = get_initial_run_id()
     run_state = get_run_status(run_id)
 
-    if run_state != "COMPLETE":
+    if run_state not in ["COMPLETE", "EXECUTOR_ERROR"]:
         raise ValueError("Initial execution didn't run successfully.")
     run_results = get_run_results(run_id)
 
@@ -68,7 +67,7 @@ def do_initial_run() -> str:
 
 
 def package() -> None:
-    run_state = do_initial_run()
+    run_state = execute_initial_run()
 
     ro_crate = ROCrate()
     ro_crate.root["name"] = "example research project"

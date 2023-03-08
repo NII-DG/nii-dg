@@ -449,7 +449,7 @@ def get_entity_list_to_validate(entity: "Entity") -> Dict[str, Any]:
 def get_sapporo_run_status(run_id: str, endpoint: str) -> str:
     while True:
         run_status = requests.get(endpoint + "/runs/" + run_id + "/status")
-        if run_status.json()["state"] not in ["QUEUED", "INITIALIZING", "RUNNING"]:
+        if run_status.json()["state"] not in ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]:
             break
         time.sleep(30)
     return run_status.json()["state"]
