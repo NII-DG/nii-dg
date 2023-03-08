@@ -65,21 +65,22 @@ def test_get_by_entity_type() -> None:
 
 def test_get_by_id_and_entity_type() -> None:
     crate = ROCrate()
-    # TODO
-    pass
+    root = crate.get_by_id_and_entity_type("./", RootDataEntity)
+
+    assert root == crate.root
 
 
 def test_get_all_entities() -> None:
     crate = ROCrate()
-    meta = crate.get_by_id("ro-crate-metadata.json")
+    meta = crate.get_by_id_and_entity_type("ro-crate-metadata.json", ROCrateMetadata)
 
-    assert crate.get_all_entities() == [crate.root, meta[0]]
+    assert crate.get_all_entities() == [crate.root, meta]
 
     data_ent = DataEntity("data")
     con_ent = ContextualEntity("context")
     crate.add(data_ent, con_ent)
 
-    assert crate.get_all_entities() == [crate.root, meta[0], data_ent, con_ent]
+    assert crate.get_all_entities() == [crate.root, meta, data_ent, con_ent]
 
 
 def test_as_json_ld() -> None:
