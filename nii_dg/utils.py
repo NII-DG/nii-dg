@@ -430,7 +430,7 @@ def sum_file_size(size_unit: str, entity_list: List["Entity"]) -> float:
         else:
             raise UnexpectedImplementationError
 
-        file_size_sum += round(file_size / 1024 ** (unit - file_unit), 3)
+        file_size_sum += round(file_size / 1000 ** (unit - file_unit), 3)
 
     return file_size_sum
 

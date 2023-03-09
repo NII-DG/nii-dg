@@ -7,7 +7,10 @@ For more information about sapporo-service, please see:
 https://github.com/sapporo-wes/sapporo-service
 '''
 
+import hashlib
 import json
+import os
+import shutil
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -21,7 +24,7 @@ from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           check_content_size, check_required_props,
                           check_sha256, check_unexpected_props, classify_uri,
                           download_file_from_url, get_sapporo_run_status,
-                          load_entity_def_from_schema_file)
+                          load_entity_def_from_schema_file, sum_file_size)
 
 SCHEMA_NAME = Path(__file__).stem
 
@@ -66,6 +69,10 @@ class File(BaseFile):
             validation_failures = EntityError(self)
         except EntityError as ent_err:
             validation_failures = ent_err
+
+        sapporo_run_ents = crate.get_by_entity_type(SapporoRun)
+        if len(sapporo_run_ents) == 0:
+            validation_failures.add("AnotherEntity", "Entity `SapporoRun` MUST be required with sapporo.File entity.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures
@@ -122,7 +129,7 @@ class SapporoRun(ContextualEntity):
         run_request = json.loads(self["run_request"]["contents"])
 
         try:
-            print("request run")
+            print("re-exec")
             re_exec = requests.post(endpoint + "/runs", data=run_request, timeout=(10.0, 30.0))
             re_exec.raise_for_status()
         except Exception as err:
@@ -141,13 +148,38 @@ class SapporoRun(ContextualEntity):
             if len(validation_failures.message_dict) > 0:
                 raise validation_failures
             return
+        print("end re-exec")
+        print(re_exec_status)
+        output_entities = [ent for ent in crate.get_by_entity_type(File) if "outputs/" in ent.id]
 
         re_exec_results = requests.get(endpoint + "/runs/" + run_id, timeout=(10, 30)).json()
         dir_path = Path.cwd().joinpath("tmp_sapporo", run_id)
         dir_path.mkdir(parents=True)
         file_list = [file_dict["file_name"] for file_dict in re_exec_results["outputs"]]
-        for file_name in file_list:
-            download_file_from_url(endpoint + "/runs/" + run_id + "/data/outputs/" + file_name, str(dir_path.joinpath(file_name)))
 
+        for file_name in file_list:
+            print(file_name)
+            file_path = dir_path.joinpath(file_name)
+            download_file_from_url(endpoint + "/runs/" + run_id + "/data/outputs/" + file_name, str(file_path))
+            file_ent = [ent for ent in output_entities if "outputs/" + file_name in ent.id]
+
+            if len(file_ent) == 0:
+                validation_failures.add(f"outputs, {file_name}",
+                                        f"The file {file_name} is included in the result of re-execution, but not included in this crate.")
+                continue
+
+            if "contentSize" in file_ent[0] and os.path.getsize(file_path) != sum_file_size("B", file_ent):
+                validation_failures.add(
+                    f"outputs, {file_name}:contentSize", f"""The file size of {file_name}, {os.path.getsize(file_path)}B, does not match the `contentSize` value {file_ent[0]["contentSize"]} in {file_ent[0]}.""")
+
+            if "sha256" in file_ent[0]:
+                with open(file_path, "rb") as f:
+                    hash_value = hashlib.sha256(f.read()).hexdigest()
+                if hash_value != file_ent[0]["sha256"]:
+                    validation_failures.add(
+                        f"outputs, {file_name}:sha256", f"""The hash of {file_name} does not match the `sha256` value {file_ent[0]["sha256"]} in {file_ent[0]}""")
+
+        shutil.rmtree(dir_path)
+        print("temp dir deleted")
         if len(validation_failures.message_dict) > 0:
             raise validation_failures

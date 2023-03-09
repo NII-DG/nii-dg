@@ -45,6 +45,7 @@ def get_run_results(run_id: str) -> Dict[str, Any]:
 def download_file(run_id: str, run_dir: Path, file_path: str) -> None:
     run_request = requests.get(SAPPORO_ENDPOINT + "/runs/" + run_id + "/data/" + file_path, timeout=(10, 120))
     save_run_request_path = run_dir.joinpath(file_path)
+    save_run_request_path.mkdir(parents=True, exist_ok=True)
     with open(save_run_request_path, 'w', encoding="utf_8") as f:
         f.write(run_request.text)
 
@@ -92,8 +93,9 @@ def package() -> None:
     for file_path in outputs_iter:
         file = File(str(file_path.relative_to(DIR_PATH)))
         file["contentSize"] = str(os.path.getsize(file_path)) + "B"
-        with open(file_path, "rb") as f:
-            file["sha256"] = hashlib.sha256(f.read()).hexdigest()
+        if not str(file_path).endswith("html"):
+            with open(file_path, "rb") as f:
+                file["sha256"] = hashlib.sha256(f.read()).hexdigest()
         ro_crate.add(file)
 
     ro_crate.add(run_req, config, outputs_dir, sapporo_run)

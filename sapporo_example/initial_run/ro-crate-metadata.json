@@ -50,8 +50,7 @@
       "@id": "outputs/ERR034597_1.small_fastqc.html",
       "@type": "File",
       "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld",
-      "contentSize": "592393B",
-      "sha256": "e8b481c75d81f97080d8d61b9a21558c91e94488cc89dd20d09de4f7171df32d"
+      "contentSize": "592393B"
     },
     {
       "@id": "outputs/ERR034597_1.small.fq.trimmed.1U.fq",
@@ -78,8 +77,7 @@
       "@id": "outputs/ERR034597_2.small_fastqc.html",
       "@type": "File",
       "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld",
-      "contentSize": "592565B",
-      "sha256": "0f977665918cfebd9be552bb670c7c78cb70df83f1eb6af3303381062f9ff8d4"
+      "contentSize": "592565B"
     },
     {
       "@id": "outputs/ERR034597_1.small.fq.trimmed.1P.fq",
