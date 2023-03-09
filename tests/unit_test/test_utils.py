@@ -19,8 +19,8 @@ from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_unexpected_props, check_url, classify_uri,
                           convert_string_type_to_python_type,
                           download_file_from_url, get_entity_list_to_validate,
-                          get_name_from_ror, get_sapporo_run_status,
-                          import_entity_class,
+                          get_file_sha256, get_name_from_ror,
+                          get_sapporo_run_status, import_entity_class,
                           load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
 
@@ -347,4 +347,10 @@ def test_get_sapporo_run_status() -> None:
 def test_download_file_from_url() -> None:
     # TODO
     download_file_from_url("url", "filepath")
+    pass
+
+
+def test_get_file_sha256() -> None:
+    # TODO
+    get_file_sha256()
     pass

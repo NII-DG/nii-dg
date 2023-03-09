@@ -14,6 +14,7 @@ import requests
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import Dataset
 from nii_dg.schema.sapporo import File, SapporoRun
+from nii_dg.utils import download_file_from_url, get_sapporo_run_status
 
 ATTRIBUTE = 'filename='
 DIR_PATH = Path(__file__).with_name("initial_run")
@@ -27,44 +28,25 @@ def get_initial_run_id() -> str:
     return req_dict["run_id"]
 
 
-def get_run_status(run_id: str) -> str:
-    while True:
-        run_status = requests.get(SAPPORO_ENDPOINT + "/runs/" + run_id + "/status", timeout=(10, 30))
-        if run_status.json()["state"] not in ["QUEUED", "INITIALIZING", "RUNNING"]:
-            break
-        time.sleep(30)
-    return run_status.json()["state"]
-
-
 def get_run_results(run_id: str) -> Dict[str, Any]:
     run_result = requests.get(SAPPORO_ENDPOINT + "/runs/" + run_id, timeout=(10, 30))
 
     return run_result.json()
 
 
-def download_file(run_id: str, run_dir: Path, file_path: str) -> None:
-    run_request = requests.get(SAPPORO_ENDPOINT + "/runs/" + run_id + "/data/" + file_path, timeout=(10, 120))
-    save_run_request_path = run_dir.joinpath(file_path)
-    save_run_request_path.mkdir(parents=True, exist_ok=True)
-    with open(save_run_request_path, 'w', encoding="utf_8") as f:
-        f.write(run_request.text)
-
-
 def execute_initial_run() -> str:
     run_id = get_initial_run_id()
-    run_state = get_run_status(run_id)
+    run_state = get_sapporo_run_status(run_id, SAPPORO_ENDPOINT)
 
     if run_state not in ["COMPLETE", "EXECUTOR_ERROR"]:
         raise ValueError("Initial execution didn't run successfully.")
     run_results = get_run_results(run_id)
 
-    DIR_PATH.joinpath("outputs").mkdir(exist_ok=True)
-
     file_list = ["outputs/" + file_dict["file_name"] for file_dict in run_results["outputs"]]
     file_list += ["run_request.json", "sapporo_config.json"]
 
     for file_name in file_list:
-        download_file(run_id, DIR_PATH, file_name)
+        download_file_from_url(SAPPORO_ENDPOINT + "/runs/" + run_id + "/data/" + file_name, DIR_PATH.joinpath(file_name))
 
     return run_state
 

@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import datetime
+import hashlib
 import importlib
 import mimetypes
 import re
@@ -455,7 +456,12 @@ def get_sapporo_run_status(run_id: str, endpoint: str) -> str:
     return run_status.json()["state"]
 
 
-def download_file_from_url(url: str, file_path: str) -> None:
+def download_file_from_url(url: str, file_path: Path) -> None:
     request = requests.get(url, timeout=(10, 120))
     with open(file_path, 'w', encoding="utf_8") as f:
         f.write(request.text)
+
+
+def get_file_sha256(file_path: Path) -> str:
+    with open(file_path, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()

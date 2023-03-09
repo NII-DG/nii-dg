@@ -7,7 +7,6 @@ For more information about sapporo-service, please see:
 https://github.com/sapporo-wes/sapporo-service
 '''
 
-import hashlib
 import json
 import os
 import shutil
@@ -23,10 +22,12 @@ from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           check_content_size, check_required_props,
                           check_sha256, check_unexpected_props, classify_uri,
-                          download_file_from_url, get_sapporo_run_status,
+                          download_file_from_url, get_file_sha256,
+                          get_sapporo_run_status,
                           load_entity_def_from_schema_file, sum_file_size)
 
 SCHEMA_NAME = Path(__file__).stem
+SAPPORO_ENDPOINT = "http://sapporo-service:1122"
 
 
 class File(BaseFile):
@@ -105,7 +106,7 @@ class SapporoRun(ContextualEntity):
         except EntityError as ent_err:
             validation_failures = ent_err
 
-        if (len(validation_failures.message_dict.keys() & {"run_request""sapporo_config"}) > 0):
+        if (len(validation_failures.message_dict.keys() & {"run_request", "sapporo_config"}) > 0):
             raise validation_failures
 
         if isinstance(self["run_request"], dict):
@@ -116,12 +117,8 @@ class SapporoRun(ContextualEntity):
         if "contents" not in self["sapporo_config"]:
             validation_failures.add("sapporo_config", f"""The property `contents` and its value are required in the entity {self["sapporo_config"]}.""")
             raise validation_failures
-        config = json.loads(self["sapporo_config"]["contents"])
 
-        if "sapporo_endpoint" not in config:
-            validation_failures.add("sapporo_config", "The property `sapporo_endpoint` and its value are required in the contents.")
-            raise validation_failures
-        endpoint = config["sapporo_endpoint"]
+        endpoint = SAPPORO_ENDPOINT
 
         if "contents" not in self["run_request"]:
             validation_failures.add("run_request", f"""The property `contents` and its value are required in the entity {self["run_request"]}.""")
@@ -160,7 +157,7 @@ class SapporoRun(ContextualEntity):
         for file_name in file_list:
             print(file_name)
             file_path = dir_path.joinpath(file_name)
-            download_file_from_url(endpoint + "/runs/" + run_id + "/data/outputs/" + file_name, str(file_path))
+            download_file_from_url(endpoint + "/runs/" + run_id + "/data/outputs/" + file_name, file_path)
             file_ent = [ent for ent in output_entities if "outputs/" + file_name in ent.id]
 
             if len(file_ent) == 0:
@@ -172,14 +169,11 @@ class SapporoRun(ContextualEntity):
                 validation_failures.add(
                     f"outputs, {file_name}:contentSize", f"""The file size of {file_name}, {os.path.getsize(file_path)}B, does not match the `contentSize` value {file_ent[0]["contentSize"]} in {file_ent[0]}.""")
 
-            if "sha256" in file_ent[0]:
-                with open(file_path, "rb") as f:
-                    hash_value = hashlib.sha256(f.read()).hexdigest()
-                if hash_value != file_ent[0]["sha256"]:
-                    validation_failures.add(
-                        f"outputs, {file_name}:sha256", f"""The hash of {file_name} does not match the `sha256` value {file_ent[0]["sha256"]} in {file_ent[0]}""")
+            if "sha256" in file_ent[0] and get_file_sha256(file_path) != file_ent[0]["sha256"]:
+                validation_failures.add(
+                    f"outputs, {file_name}:sha256", f"""The hash of {file_name} does not match the `sha256` value {file_ent[0]["sha256"]} in {file_ent[0]}""")
 
-        shutil.rmtree(dir_path)
+        shutil.rmtree(dir_path.parent)
         print("temp dir deleted")
         if len(validation_failures.message_dict) > 0:
             raise validation_failures
