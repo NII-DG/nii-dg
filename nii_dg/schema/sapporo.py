@@ -126,7 +126,6 @@ class SapporoRun(ContextualEntity):
         run_request = json.loads(self["run_request"]["contents"])
 
         try:
-            print("re-exec")
             re_exec = requests.post(endpoint + "/runs", data=run_request, timeout=(10.0, 30.0))
             re_exec.raise_for_status()
         except Exception as err:
@@ -145,8 +144,6 @@ class SapporoRun(ContextualEntity):
             if len(validation_failures.message_dict) > 0:
                 raise validation_failures
             return
-        print("end re-exec")
-        print(re_exec_status)
         output_entities = [ent for ent in crate.get_by_entity_type(File) if "outputs/" in ent.id]
 
         re_exec_results = requests.get(endpoint + "/runs/" + run_id, timeout=(10, 30)).json()
@@ -155,10 +152,9 @@ class SapporoRun(ContextualEntity):
         file_list = [file_dict["file_name"] for file_dict in re_exec_results["outputs"]]
 
         for file_name in file_list:
-            print(file_name)
             file_path = dir_path.joinpath(file_name)
             download_file_from_url(endpoint + "/runs/" + run_id + "/data/outputs/" + file_name, file_path)
-            file_ent = [ent for ent in output_entities if "outputs/" + file_name in ent.id]
+            file_ent = [ent for ent in output_entities if file_name in ent.id]
 
             if len(file_ent) == 0:
                 validation_failures.add(f"outputs, {file_name}",
@@ -174,6 +170,5 @@ class SapporoRun(ContextualEntity):
                     f"outputs, {file_name}:sha256", f"""The hash of {file_name} does not match the `sha256` value {file_ent[0]["sha256"]} in {file_ent[0]}""")
 
         shutil.rmtree(dir_path.parent)
-        print("temp dir deleted")
         if len(validation_failures.message_dict) > 0:
             raise validation_failures

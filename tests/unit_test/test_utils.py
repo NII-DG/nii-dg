@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
 import datetime
+from pathlib import Path
 from typing import Any, List, Literal, Union
+from unittest.mock import mock_open, patch
 
 import pytest
 
@@ -24,6 +26,23 @@ from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
 
+# --- mock ---
+
+
+def mocked_requests_get(*args, **kwargs) -> Any:
+    # mock of requests.get
+    class MockResponse:
+        def __init__(self, json_data, status_code):
+            self.json_data = json_data
+            self.status_code = status_code
+
+        def json(self):
+            return self.json_data
+
+    return MockResponse({"state": "COMPLETE"}, 200)
+
+
+# --- tests ---
 
 def test_load_entity_def_from_schema_file() -> None:
     excepted_entity_def = load_entity_def_from_schema_file("base", "Person")
@@ -337,20 +356,21 @@ def test_get_entity_list_to_validate() -> None:
     assert isinstance(get_entity_list_to_validate(file), dict)
 
 
-def test_get_sapporo_run_status() -> None:
-    run_id = "test"
-    get_sapporo_run_status(run_id, "endpoint")
-    # TODO
-    pass
+@patch("requests.get", side_effect=mocked_requests_get)
+def test_get_sapporo_run_status(get_mock: Any) -> None:
+    assert get_sapporo_run_status("run_id", "endpoint") == "COMPLETE"
+
+    get_mock.assert_called_once()
 
 
-def test_download_file_from_url() -> None:
-    # TODO
-    download_file_from_url("url", "filepath")
-    pass
+@patch("builtins.open", new_callable=mock_open)
+def test_download_file_from_url(open_mock: Any) -> None:
+    download_file_from_url("https://example.com", Path("path/to/file"))
+
+    open_mock.assert_called_once()
 
 
-def test_get_file_sha256() -> None:
-    # TODO
-    get_file_sha256()
-    pass
+@patch("builtins.open", new_callable=mock_open, read_data=b"test")
+def test_get_file_sha256(open_mock: Any) -> None:
+    assert get_file_sha256(Path("path/to/file")) == "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+    open_mock.assert_called_once()
