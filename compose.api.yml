@@ -17,7 +17,7 @@ services:
       - nii-dg
 
 
-# --- Fork section ---
+# --- sapporo section ---
 # This section is from sapporo-service, see https://github.com/sapporo-wes/sapporo-service/blob/main/docker-compose.yml
 # Original license: https://github.com/sapporo-wes/sapporo-service/blob/main/LICENSE
   sapporo:
@@ -55,7 +55,7 @@ services:
       ]
     networks:
       - sapporo
-# --- End fork section ---
+# --- End sapporo section ---
       - nii-dg
 
 networks:
