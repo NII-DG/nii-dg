@@ -21,13 +21,13 @@ from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           check_content_size, check_required_props,
-                          check_sha256, check_unexpected_props, classify_uri,
-                          download_file_from_url, get_file_sha256,
+                          check_sha256, check_unexpected_props, check_url,
+                          classify_uri, download_file_from_url,
+                          generate_run_request_json, get_file_sha256,
                           get_sapporo_run_status,
                           load_entity_def_from_schema_file, sum_file_size)
 
 SCHEMA_NAME = Path(__file__).stem
-SAPPORO_ENDPOINT = "http://sapporo-service:1122"
 
 
 class File(BaseFile):
@@ -93,6 +93,14 @@ class SapporoRun(ContextualEntity):
             except PropsError as e:
                 prop_errors.add_by_dict(str(e))
 
+        try:
+            check_content_formats(self, {
+                "workflow_url": check_url,
+                "sapporo_location": check_url,
+            })
+        except PropsError as e:
+            prop_errors.add_by_dict(str(e))
+
         if self.type != self.entity_name:
             prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
 
@@ -109,21 +117,8 @@ class SapporoRun(ContextualEntity):
         if (len(validation_failures.message_dict.keys() & {"run_request", "sapporo_config"}) > 0):
             raise validation_failures
 
-        if isinstance(self["run_request"], dict):
-            self["run_request"] = crate.get_by_id_and_entity_type(self["run_request"]["@id"], File)
-        if isinstance(self["sapporo_config"], dict):
-            self["sapporo_config"] = crate.get_by_id_and_entity_type(self["sapporo_config"]["@id"], File)
-
-        if "contents" not in self["sapporo_config"]:
-            validation_failures.add("sapporo_config", f"""The property `contents` and its value are required in the entity {self["sapporo_config"]}.""")
-            raise validation_failures
-
-        endpoint = SAPPORO_ENDPOINT
-
-        if "contents" not in self["run_request"]:
-            validation_failures.add("run_request", f"""The property `contents` and its value are required in the entity {self["run_request"]}.""")
-            raise validation_failures
-        run_request = json.loads(self["run_request"]["contents"])
+        endpoint = self["sapporo_location"]
+        run_request = generate_run_request_json(self)
 
         try:
             re_exec = requests.post(endpoint + "/runs", data=run_request, timeout=(10.0, 30.0))
@@ -134,7 +129,7 @@ class SapporoRun(ContextualEntity):
             raise validation_failures
 
         run_id = re_exec.json()["run_id"]
-        re_exec_status = get_sapporo_run_status(run_id, endpoint)
+        re_exec_status = json.dumps(get_sapporo_run_status(run_id, endpoint))
 
         if re_exec_status != self["state"]:
             validation_failures.add("state", f"""The status of the workflow execution MUST be {self["state"]}; got {re_exec_status} instead.""")

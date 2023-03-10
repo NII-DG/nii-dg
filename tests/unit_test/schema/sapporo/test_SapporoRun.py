@@ -65,13 +65,13 @@ def test_init() -> None:
 def test_as_jsonld() -> None:
     ent = SapporoRun()
 
-    ent["run_request"] = File("run_request.json")
-    ent["sapporo_config"] = File("sapporo_config.json")
+    ent["workflow_engine_name"] = "CWL"
+    ent["sapporo_location"] = "https://example.com/sapporo"
     ent["state"] = "COMPLETE"
     ent["outputs"] = Dataset("outputs/", {"name": "outputs"})
 
-    jsonld = {"@type": "SapporoRun", "@id": "#sapporo-run", "run_request": {"@id": "run_request.json"},
-              "sapporo_config": {"@id": "sapporo_config.json"}, "state": "COMPLETE", "outputs": {"@id": "outputs/"}}
+    jsonld = {"@type": "SapporoRun", "@id": "#sapporo-run", "workflow_engine_name": "CWL",
+              "sapporo_location": "https://example.com/sapporo", "state": "COMPLETE", "outputs": {"@id": "outputs/"}}
 
     ent_in_json = ent.as_jsonld()
     del ent_in_json["@context"]
@@ -91,8 +91,8 @@ def test_check_props() -> None:
 
     # no error occurs
     del ent["unknown_property"]
-    ent["run_request"] = File("run_request.json")
-    ent["sapporo_config"] = File("sapporo_config.json")
+    ent["workflow_engine_name"] = "CWL"
+    ent["sapporo_location"] = "https://example.com/sapporo"
     ent["state"] = "COMPLETE"
     ent["outputs"] = Dataset("outputs/", {"name": "outputs"})
     ent.check_props()
@@ -106,25 +106,16 @@ def test_check_props() -> None:
 @patch("nii_dg.schema.sapporo.get_file_sha256", return_value="9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08")
 @patch("shutil.rmtree", side_effect=mocked_ignore_func)
 def test_validate(rmtree_mock: Any, sha256_mock: Any, getsize_mock: Any, open_mock: Any, post_mock: Any, get_mock: Any, mkdir_mock: Any) -> None:
-    # to test this method, sapporo-service server is required
+    # TODO
     crate = ROCrate()
-    run_req = File("run_request.json")
-    config = File("sapporo_config.json")
     output = Dataset("outputs/", {"name": "outputs"})
 
-    ent = SapporoRun(props={"state": "COMPLETE"})
-    ent["run_request"] = run_req
-    ent["sapporo_config"] = config
+    ent = SapporoRun(props={
+        "state": "COMPLETE", "sapporo_location": "https://example.com/sapporo", "workflow_engine_name": "CWL"})
     ent["outputs"] = output
 
-    crate.add(ent, run_req, config, output)
+    crate.add(ent, output)
 
-    # "contents" is required in File entity of run_request
-    with pytest.raises(EntityError):
-        ent.validate(crate)
-
-    run_req["contents"] = """{"prop": "value"}"""
-    config["contents"] = """{"prop": "value"}"""
     # output file MUST be inclued in crate
     with pytest.raises(EntityError):
         ent.validate(crate)

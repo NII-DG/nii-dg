@@ -4,6 +4,7 @@
 import datetime
 import hashlib
 import importlib
+import json
 import mimetypes
 import re
 import time
@@ -20,6 +21,7 @@ from nii_dg.error import PropsError, UnexpectedImplementationError
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
+    from nii_dg.schema.sapporo import SapporoRun
 
 
 class EntityDefDict(TypedDict):
@@ -465,3 +467,16 @@ def download_file_from_url(url: str, file_path: Path) -> None:
 def get_file_sha256(file_path: Path) -> str:
     with open(file_path, "rb") as f:
         return hashlib.sha256(f.read()).hexdigest()
+
+
+def generate_run_request_json(sapporo_run: "SapporoRun") -> Dict[str, Optional[str]]:
+    key_list = ["workflow_params", "workflow_type", "workflow_type_version", "tags", "workflow_engine_name", "workflow_engine_parameters",
+                "workflow_url", "workflow_name", "workflow_attachment"]
+    value_list = [None] * len(key_list)
+    run_request = dict(zip(key_list, value_list))
+
+    for key in key_list:
+        if key in sapporo_run:
+            run_request[key] = sapporo_run[key]
+
+    return run_request

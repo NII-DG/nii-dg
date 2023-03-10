@@ -16,7 +16,15 @@ A run information of a Sapporo. The value in this entity is used to re-execute t
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be "#sapporo-run" | `#sapporo-run` |
-| `run_request` | `File` | Required. | run_request.json | `{"@id":"run_request.json"}` |
-| `sapporo_config` | `File` | Required. | sapporo_config.json | `{"@id":"sapporo_config.json"}` |
+| `workflow_params` | `str` | Optional. | Parameters for workflow execution. | `{"fastq_1":{"location":"ERR034597_1.small.fq.gz","class":"File"},"fastq_2":{"location":"ERR034597_2.small.fq.gz","class":"File"},"nthreads":2}"` |
+| `workflow_type` | `str` | Optional. | The type of workflow language. | `CWL` |
+| `workflow_type_version` | `str` | Optional. | The version of the workflow language. | `v1.0` |
+| `tags` | `str` | Optional. | A key-value map of arbitrary metadata outside the scope of workflow_params. | `{"workflow_name": "dockstore-tool-bamstats-cwl"}` |
+| `workflow_engine_name` | `str` | Required. | Specify the name of the workflow engine to run a workflow. | `cwltool` |
+| `workflow_engine_parameters` | `str` | Optional. | Additional parameters can be sent to the workflow engine. | `None` |
+| `workflow_url` | `str` | Optional. | The workflow CWL or WDL document. | `https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/trimming_and_qc.cwl` |
+| `workflow_name` | `str` | Optional. | Name used to execute the workflow registered in the sapporo-service. | `Example workflow` |
+| `workflow_attachment` | `str` | Optional. | The array of file used to upload files required to execute the workflow. | `[{"file_name": "ERR034597_2.small.fq.gz", "file_url": "https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/ERR034597_2.small.fq.gz"}, {"file_name": "ERR034597_1.small.fq.gz", "file_url": "https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/ERR034597_1.small.fq.gz"}]` |
+| `sapporo_location` | `str` | Required. | The location where sapporo-service is. This MUST be accessible URL. | `https://example.com/sapporo-service` |
 | `state` | `str` | Required. | Run state. | `COMPLETED` |
 | `outputs` | `Dataset` | Required. | Directory with output files. The files under this directory are compared with the result of the re-execution. | `{"@id":"outputs/"}` |

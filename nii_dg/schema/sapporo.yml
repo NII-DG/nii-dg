@@ -29,16 +29,56 @@ SapporoRun:
       example: "#sapporo-run"
       required: Required.
       description: MUST be "#sapporo-run"
-    run_request:
-      expected_type: File
-      example: '{"@id":"run_request.json"}'
+    workflow_params:
+      expected_type: str
+      example: '{"fastq_1":{"location":"ERR034597_1.small.fq.gz","class":"File"},"fastq_2":{"location":"ERR034597_2.small.fq.gz","class":"File"},"nthreads":2}"'
+      required: Optional.
+      description: Parameters for workflow execution.
+    workflow_type:
+      expected_type: str
+      example: CWL
+      required: Optional.
+      description: The type of workflow language.
+    workflow_type_version:
+      expected_type: str
+      example: "v1.0"
+      required: Optional.
+      description: The version of the workflow language.
+    tags:
+      expected_type: str
+      example: '{"workflow_name": "dockstore-tool-bamstats-cwl"}'
+      required: Optional.
+      description: A key-value map of arbitrary metadata outside the scope of workflow_params.
+    workflow_engine_name:
+      expected_type: str
+      example: cwltool
       required: Required.
-      description: "run_request.json"
-    sapporo_config:
-      expected_type: File
-      example: '{"@id":"sapporo_config.json"}'
+      description: Specify the name of the workflow engine to run a workflow.
+    workflow_engine_parameters:
+      expected_type: str
+      example: null
+      required: Optional.
+      description: Additional parameters can be sent to the workflow engine.
+    workflow_url:
+      expected_type: str
+      example: "https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/trimming_and_qc.cwl"
+      required: Optional.
+      description: The workflow CWL or WDL document.
+    workflow_name:
+      expected_type: str
+      example: Example workflow
+      required: Optional.
+      description: Name used to execute the workflow registered in the sapporo-service.
+    workflow_attachment:
+      expected_type: str
+      example: '[{"file_name": "ERR034597_2.small.fq.gz", "file_url": "https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/ERR034597_2.small.fq.gz"}, {"file_name": "ERR034597_1.small.fq.gz", "file_url": "https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/ERR034597_1.small.fq.gz"}]'
+      required: Optional.
+      description: The array of file used to upload files required to execute the workflow.
+    sapporo_location:
+      expected_type: str
+      example: "https://example.com/sapporo-service"
       required: Required.
-      description: "sapporo_config.json"
+      description: The location where sapporo-service is. This MUST be accessible URL.
     state:
       expected_type: str
       example: "COMPLETED"
