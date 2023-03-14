@@ -62,18 +62,18 @@ class GinMonitoring(ContextualEntity):
         dir_paths = [dir.id for dir in crate.get_by_entity_type(Dataset)]
         missing_dirs = []
         for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]:
-            if dir_name not in [path.split('/')[-2] for path in dir_paths]:
+            if dir_name not in [Path(path).name for path in dir_paths]:
                 missing_dirs.append(dir_name)
 
         if len(missing_dirs) > 0:
             validation_failures.add("datasetStructure", f"Couldn't find required directories: named {missing_dirs}.")
 
         # TODO: update file name rules
-        parent_dirs = {dir_name: [path[: -(len(dir_name) + 1)] for path in dir_paths if path.split('/')[-2] == dir_name]
-                       for dir_name in ["source", "input_data", "output_data"]}
+        parent_dirs = {dir_name: [Path(path).parent for path in dir_paths if Path(path).name == dir_name]
+                       for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]}
         if self["datasetStructure"] == "for_parameter" and len(set(parent_dirs["source"]) & set(parent_dirs["input_data"])) == 0:
             validation_failures.add("datasetStructure", "The parent directories of source dir and input dir are not the same.")
-        if self["datasetStructure"] == "with_code" and\
+        if self["datasetStructure"] == "with_code" and \
                 len(set(parent_dirs["source"]) & set(parent_dirs["input_data"]) & set(parent_dirs["output_data"])) == 0:
             validation_failures.add("datasetStructure", "The parent directories of source dir, input dir and output dir are not the same.")
 
