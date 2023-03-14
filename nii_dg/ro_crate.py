@@ -87,8 +87,6 @@ class ROCrate():
         return entity_list
 
     def get_by_entity_type(self, entity_type: Type[Entity]) -> List[Entity]:
-
-    def get_by_entity_type(self, entity_type: Type[Entity]) -> List[Entity]:
         entity_list: List[Entity] = []
         for ent in self.get_all_entities():
             if type(ent) is entity_type:
