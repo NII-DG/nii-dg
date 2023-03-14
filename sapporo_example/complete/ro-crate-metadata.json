@@ -28,7 +28,7 @@
         }
       ],
       "name": "example research project",
-      "datePublished": "2023-03-13T09:19:46.002+00:00"
+      "datePublished": "2023-03-14T04:20:36.202+00:00"
     },
     {
       "@id": "ro-crate-metadata.json",
@@ -43,12 +43,14 @@
     {
       "@id": "outputs/ERR034597_1.small_fastqc.html",
       "@type": "File",
-      "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld"
+      "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld",
+      "name": "ERR034597_1.small_fastqc.html"
     },
     {
       "@id": "outputs/ERR034597_1.small.fq.trimmed.1U.fq",
       "@type": "File",
       "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld",
+      "name": "ERR034597_1.small.fq.trimmed.1U.fq",
       "contentSize": "187289B",
       "sha256": "f4ca88b95062fe9335b80826929aa2760571d5c6bd1be5c6c00000dc006af852"
     },
@@ -56,6 +58,7 @@
       "@id": "outputs/ERR034597_1.small.fq.trimmed.2P.fq",
       "@type": "File",
       "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld",
+      "name": "ERR034597_1.small.fq.trimmed.2P.fq",
       "contentSize": "5560582B",
       "sha256": "f551bf14128f5035fe3c87e37b3260c7804b0d9716e181020dbcc5f4a4e32af2"
     },
@@ -63,26 +66,49 @@
       "@id": "outputs/ERR034597_1.small.fq.trimmed.2U.fq",
       "@type": "File",
       "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld",
+      "name": "ERR034597_1.small.fq.trimmed.2U.fq",
       "contentSize": "80131B",
       "sha256": "2725ebbb861b73b563839e5fc9d576bf359c0a9f69cb59514077c2222db00c45"
     },
     {
       "@id": "outputs/ERR034597_2.small_fastqc.html",
       "@type": "File",
-      "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld"
+      "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld",
+      "name": "ERR034597_2.small_fastqc.html"
     },
     {
       "@id": "outputs/ERR034597_1.small.fq.trimmed.1P.fq",
       "@type": "File",
       "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld",
+      "name": "ERR034597_1.small.fq.trimmed.1P.fq",
       "contentSize": "5566650B",
       "sha256": "1c1ce97df2ce1199dc57a15963e5e3bfcc128dd635c5870b60daa512ec8ccdaa"
     },
     {
       "@id": "outputs/",
       "@type": "Dataset",
-      "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/base.jsonld",
-      "name": "outputs"
+      "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/main/schema/context/sapporo.jsonld",
+      "name": "outputs",
+      "hasPart": [
+        {
+          "@id": "outputs/ERR034597_1.small_fastqc.html"
+        },
+        {
+          "@id": "outputs/ERR034597_1.small.fq.trimmed.1U.fq"
+        },
+        {
+          "@id": "outputs/ERR034597_1.small.fq.trimmed.2P.fq"
+        },
+        {
+          "@id": "outputs/ERR034597_1.small.fq.trimmed.2U.fq"
+        },
+        {
+          "@id": "outputs/ERR034597_2.small_fastqc.html"
+        },
+        {
+          "@id": "outputs/ERR034597_1.small.fq.trimmed.1P.fq"
+        }
+      ]
     },
     {
       "@id": "#sapporo-run",

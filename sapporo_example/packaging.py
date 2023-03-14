@@ -7,15 +7,14 @@ import sys
 from pathlib import Path
 
 from nii_dg.ro_crate import ROCrate
-from nii_dg.schema.base import Dataset
-from nii_dg.schema.sapporo import File, SapporoRun
-from nii_dg.utils import (get_file_sha256)
+from nii_dg.schema.sapporo import Dataset, File, SapporoRun
+from nii_dg.utils import get_file_sha256
 
 
 def package(state: str, run_dir: Path, endpoint: str, validate_pattern: str = "complete") -> None:
     ro_crate = ROCrate()
     ro_crate.root["name"] = "example research project"
-    outputs_dir = Dataset("outputs/", {"name": "outputs"})
+    outputs_dir = Dataset("outputs/", {"name": "outputs", "hasPart": []})
 
     with open(run_dir.joinpath("run_request.json"), "r", encoding="utf_8") as f:
         run_req = json.load(f)
@@ -29,7 +28,8 @@ def package(state: str, run_dir: Path, endpoint: str, validate_pattern: str = "c
 
     outputs_iter = run_dir.joinpath("outputs").iterdir()
     for file_path in outputs_iter:
-        file = File(str(file_path.relative_to(run_dir)))
+        file = File(str(file_path.relative_to(run_dir)), {"name": file_path.name})
+        outputs_dir["hasPart"].append(file)
 
         if validate_pattern == "complete" and str(file_path).endswith("html"):
             pass
