@@ -450,10 +450,15 @@ def get_entity_list_to_validate(entity: "Entity") -> Dict[str, Any]:
 
 
 def get_sapporo_run_status(run_id: str, endpoint: str) -> str:
+    unknown_count = 0
     while True:
         run_status = requests.get(endpoint + "/runs/" + run_id + "/status", timeout=(10, 30))
         if run_status.json()["state"] not in ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]:
+            if run_status.json()["state"] == "UNKNOWN":
+                unknown_count += 1
             break
+        if unknown_count > 5:
+            raise TimeoutError("Aborted as the status remains `UNKNOWN` for a while")
         time.sleep(30)
     return run_status.json()["state"]
 

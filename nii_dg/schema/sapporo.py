@@ -7,6 +7,7 @@ For more information about sapporo-service, please see:
 https://github.com/sapporo-wes/sapporo-service
 '''
 
+import logging
 import os
 import shutil
 from pathlib import Path
@@ -28,6 +29,7 @@ from nii_dg.utils import (check_all_prop_types, check_content_formats,
                           load_entity_def_from_schema_file, sum_file_size)
 
 SCHEMA_NAME = Path(__file__).stem
+flask_log = logging.getLogger("flask.app")
 
 
 class File(BaseFile):
@@ -166,10 +168,16 @@ class SapporoRun(ContextualEntity):
             re_exec.raise_for_status()
         except Exception as err:
             validation_failures.add("sapporo_location", f"Failed to re-execute workflow: {err}.")
-            raise validation_failures
+            raise validation_failures from None
 
+        flask_log.info("Re-execute request to sapporo is accepted successfully in SapporoRun.validate().")
         run_id = re_exec.json()["run_id"]
-        re_exec_status = get_sapporo_run_status(run_id, endpoint)
+
+        try:
+            re_exec_status = get_sapporo_run_status(run_id, endpoint)
+        except TimeoutError as err:
+            validation_failures.add("sapporo_location", f"Failed to get status of re-execution: {err}.")
+            raise validation_failures from None
 
         if re_exec_status != self["state"]:
             validation_failures.add("state", f"""The status of the workflow execution MUST be {self["state"]}; got {re_exec_status} instead.""")

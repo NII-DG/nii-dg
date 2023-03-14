@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import logging
 import os
 from concurrent.futures import Future, ThreadPoolExecutor
 from copy import deepcopy
@@ -193,7 +194,7 @@ def validate(crate: ROCrate, entities: List["Entity"]) -> List[Any]:
 def create_app() -> Flask:
     app = Flask(__name__)
     app.register_blueprint(app_bp)
-
+    logging.basicConfig(level=logging.INFO)
     return app
 
 
