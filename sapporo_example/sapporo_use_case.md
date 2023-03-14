@@ -1,9 +1,9 @@
 # nii-dgを利用したガバナンス事例
-以下では、nii-dg機能を利用する事例の一つとして、 `sapporo-service` を使ったワークフロー実行結果の検証を行う流れを示す。 sapporo-serviceについてはこの[githubリポジトリ](https://github.com/sapporo-wes/sapporo-service)を参照のこと。
+以下では、nii-dg機能を利用する研究データガバナンスの一例として、 `sapporo-service` によるワークフロー実行結果の検証を行う流れを示す。 sapporo-serviceについてはこの[githubリポジトリ](https://github.com/sapporo-wes/sapporo-service)を参照のこと。
 
 ### 前提
-- sapporoを用いたワークフローの実行結果を、研究データとしてパッケージングしro-crateを生成する。この時、新たに定義した`sapporo` スキーマを利用している。
-- sapporoは remote REST API server として扱う。ただし本事例においては、sapporoはnii-dgコンテナから `http://sapporo-service:1122` を介してアクセス可能なローカルサーバーである。
+- sapporoを用いたワークフロー実行の結果を、研究データとしてパッケージングしro-crateを生成する。この時、新たに定義した`sapporo` スキーマを利用している。
+- sapporoは remote REST API server として扱う。ただし本事例においては、sapporoはnii-dgコンテナから `http://sapporo-service:1122` を介してアクセス可能なローカルサーバーを remote REST API server と見立てている。
 - 検証として、以下の三点を確認している。
   1. ro-crate内の値に基づいて、ワークフローが再実行可能である
   2. 再実行のステータスが、ro-crateに記載されているステータスと同一である
@@ -11,7 +11,7 @@
 
 
 ## sapporoサーバーの準備
-[sapporo](https://github.com/sapporo-wes/sapporo-service)サーバーを docker container として立てる。
+[sapporo](https://github.com/sapporo-wes/sapporo-service)サーバーを docker container として起動する。
 ```bash
 $ git clone https://github.com/sapporo-wes/sapporo-service.git
 Cloning into 'sapporo-service'...
@@ -67,15 +67,17 @@ $ python3 sapporo_example/packaging.py failed
 
 
 ## 検証実施
-NII-DGのAPIサーバーを確認する。サーバーの起動方法は[api-quick-start.md](../api-quick-start.md)を参照のこと。
+NII-DGのAPIサーバーの起動方法は[api-quick-start.md](../api-quick-start.md)を参照のこと。本事例では `localhost:5000` でAPIサーバーにアクセスできるものとする。
+また、NII-DG サーバーから sapporo へ通信できるよう、本事例では nii-dg のネットワークに sapporo を追加している。
 ```bash
 $ curl localhost:5000/healthcheck
 {
   "message": "OK"
 }
+$ dockcer network connect nii-dg-network sapporo-service
 ```
 
-エンドポイント`/validate`に生成したro-crate-metadata.jsonをPOSTすると、request_idが返ってくる。次にそのrequest_idをエンドポイントとしてGET通信をすると、検証が終わっていれば結果が返ってくる。
+エンドポイント`/validate`に生成したro-crate-metadata.jsonをリクエストボディとしてPOST通信を行うと、request_idが返ってくる。次にそのrequest_idをエンドポイントとしてGET通信を行い、検証が終わっていれば結果が返ってくる。
 
 以下では検証が無事終了し、結果も問題がなかったため、statusが `COMPLETE`, resultsは空のリストになっている。
 ```bash
@@ -92,7 +94,7 @@ $ curl localhost:5000/8d107027-2d80-4b8e-bd6c-4783286a0dd8
 
 以下では検証が無事終了したが、スキーマのルールに対して不適合な箇所が見つかっている。statusは `FAILED`で, resultsに修正のためのメッセージが `エンティティ・プロパティ・不適合理由` の組み合わせでリストになっている。
 
-今回の例では、outputsに含まれる2つのhtmlファイルが実行日を含んでいるため、初回実行時と検証実施時で差分が生まれてしまい、ファイルサイズ・チェックサムがずれることにより検証を通っていない。
+今回の例では、outputs/に含まれる2つのhtmlファイルが、ワークフローの実行日を内容として含んでいるため、初回実行時と検証実施時で差分が生まれてしまう。よってファイルサイズ・チェックサムがro-crateに記述された値と異なるため、検証の結果は失敗となっている。
 ```bash
 $ curl -X POST localhost:5000/validate -d @sapporo_example/failed/ro-crate-metadata.json -H "Content-Type: application/json"
 {"request_id": "8c28f892-a669-481e-9fa2-e119e5a146bb"}
