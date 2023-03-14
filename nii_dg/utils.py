@@ -473,7 +473,7 @@ def generate_run_request_json(sapporo_run: "SapporoRun") -> Dict[str, Optional[s
     key_list = ["workflow_params", "workflow_type", "workflow_type_version", "tags", "workflow_engine_name", "workflow_engine_parameters",
                 "workflow_url", "workflow_name", "workflow_attachment"]
     value_list = [None] * len(key_list)
-    run_request = dict(zip(key_list, value_list))
+    run_request: Dict[str, Optional[str]] = dict(zip(key_list, value_list))
 
     for key in key_list:
         if key in sapporo_run:

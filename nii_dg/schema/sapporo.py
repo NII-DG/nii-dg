@@ -7,7 +7,6 @@ For more information about sapporo-service, please see:
 https://github.com/sapporo-wes/sapporo-service
 '''
 
-import json
 import os
 import shutil
 from pathlib import Path
@@ -114,9 +113,6 @@ class SapporoRun(ContextualEntity):
         except EntityError as ent_err:
             validation_failures = ent_err
 
-        if (len(validation_failures.message_dict.keys() & {"run_request", "sapporo_config"}) > 0):
-            raise validation_failures
-
         endpoint = self["sapporo_location"]
         run_request = generate_run_request_json(self)
 
@@ -124,12 +120,11 @@ class SapporoRun(ContextualEntity):
             re_exec = requests.post(endpoint + "/runs", data=run_request, timeout=(10.0, 30.0))
             re_exec.raise_for_status()
         except Exception as err:
-            validation_failures.add("run_request", f"Failed to re-execute workflow: {err}.")
-            validation_failures.add("sapporo_config", f"Failed to re-execute workflow: {err}.")
+            validation_failures.add("sapporo_location", f"Failed to re-execute workflow: {err}.")
             raise validation_failures
 
         run_id = re_exec.json()["run_id"]
-        re_exec_status = json.dumps(get_sapporo_run_status(run_id, endpoint))
+        re_exec_status = get_sapporo_run_status(run_id, endpoint)
 
         if re_exec_status != self["state"]:
             validation_failures.add("state", f"""The status of the workflow execution MUST be {self["state"]}; got {re_exec_status} instead.""")
