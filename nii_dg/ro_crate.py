@@ -87,6 +87,8 @@ class ROCrate():
         return entity_list
 
     def get_by_entity_type(self, entity_type: Type[Entity]) -> List[Entity]:
+
+    def get_by_entity_type(self, entity_type: Type[Entity]) -> List[Entity]:
         entity_list: List[Entity] = []
         for ent in self.get_all_entities():
             if type(ent) is entity_type:
@@ -97,7 +99,9 @@ class ROCrate():
         ent_list = [ent for ent in self.get_by_id(entity_id) if ent in self.get_by_entity_type(entity_type)]
         if len(ent_list) == 0:
             return None
-        return ent_list[0]
+        if len(ent_list) == 1:
+            return ent_list[0]
+        raise CrateError(f"Duplicate @id and @context value found: {ent_list}.")
 
     def get_all_entities(self) -> List[Entity]:
         return self.default_entities + self.data_entities + self.contextual_entities  # type:ignore

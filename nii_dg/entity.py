@@ -147,8 +147,6 @@ class Entity(TypedMutableMapping):
         Comprehensive validation including the value of props.
         Implementation of this method is required in each subclass.
         """
-        # Abstract method
-        # raise NotImplementedError
         validation_failures = EntityError(self)
         instance_type_dict = get_entity_list_to_validate(self)
 
@@ -281,7 +279,6 @@ class RootDataEntity(DefaultEntity):
             raise prop_errors
 
     def validate(self, crate: "ROCrate") -> None:
-        # TODO: link check
         pass
 
 
