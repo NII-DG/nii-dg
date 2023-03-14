@@ -8,8 +8,7 @@ import pytest
 
 from nii_dg.error import EntityError
 from nii_dg.ro_crate import ROCrate
-from nii_dg.schema.base import Dataset
-from nii_dg.schema.sapporo import File, SapporoRun
+from nii_dg.schema.sapporo import Dataset, File, SapporoRun
 
 # --- mock ---
 
@@ -33,7 +32,7 @@ def mocked_requests_get(*args, **kwargs) -> Any:
             return str(self.json_data)
 
     return MockResponse({"state": "COMPLETE", "outputs":
-                         [{'file_name': 'outputs/test_file', 'file_url': 'dummy_url'}]},
+                         [{'file_name': 'test_file', 'file_url': 'dummy_url'}]},
                         200)
 
 
@@ -108,7 +107,7 @@ def test_check_props() -> None:
 def test_validate(rmtree_mock: Any, sha256_mock: Any, getsize_mock: Any, open_mock: Any, post_mock: Any, get_mock: Any, mkdir_mock: Any) -> None:
     # TODO
     crate = ROCrate()
-    output = Dataset("outputs/", {"name": "outputs"})
+    output = Dataset("outputs/", {"name": "outputs", "hasPart": []})
 
     ent = SapporoRun(props={
         "state": "COMPLETE", "sapporo_location": "https://example.com/sapporo", "workflow_engine_name": "CWL"})
@@ -116,7 +115,7 @@ def test_validate(rmtree_mock: Any, sha256_mock: Any, getsize_mock: Any, open_mo
 
     crate.add(ent, output)
 
-    # output file MUST be inclued in crate
+    # output file MUST be included in crate
     with pytest.raises(EntityError):
         ent.validate(crate)
 
@@ -128,7 +127,8 @@ def test_validate(rmtree_mock: Any, sha256_mock: Any, getsize_mock: Any, open_mo
     assert mkdir_mock.call_count == 1
 
     # no error
-    file = File("outputs/test_file", {"contentSize": "10B", "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"})
+    file = File("outputs/test_file", {"name": "test_file", "contentSize": "10B", "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"})
+    output["hasPart"].append(file)
     crate.add(file)
     ent.validate(crate)
 

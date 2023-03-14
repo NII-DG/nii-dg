@@ -3,12 +3,12 @@ File:
   props:
     "@id":
       expected_type: str
-      example: config/setting.txt
+      example: outputs/file_1.txt
       required: Required.
       description: MUST be either a URI Path relative to RO-Crate root or an absolute URI from which is downloadable. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
     name:
       expected_type: str
-      example: setting.txt
+      example: file_1.txt
       required: Required.
       description: Indicates the file name.
     contentSize:
@@ -41,7 +41,7 @@ Dataset:
       description: Indicates directory name. In most cases, the value is "outputs".
     hasPart:
       expected_type: List[File]
-      example: [{"@id": "outputs/file_1.txt"}]
+      example: '[{"@id": "outputs/file_1.txt"}]'
       required: Required.
       description: The list of File entity that is the output file of the workflow. These files listed in this property are compared to the result of the re-execution.
 SapporoRun:
