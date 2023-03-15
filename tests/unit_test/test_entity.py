@@ -4,7 +4,9 @@
 import pytest
 
 from nii_dg.entity import ROCrateMetadata, RootDataEntity
-from nii_dg.schema.base import Person
+from nii_dg.error import EntityError
+from nii_dg.ro_crate import ROCrate
+from nii_dg.schema.base import Organization, Person
 
 
 def test_delitem() -> None:
@@ -41,7 +43,28 @@ def test_as_jsonld() -> None:
 
 
 def test_validate() -> None:
-    pass
+    crate = ROCrate()
+    ent = Person("https://example.com", {"name": "Ichiro Suzuki", "affiliation": "Mariners"})
+
+    crate.add(ent)
+    # error: the value of affiliation is wrong type
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    ent["affiliation"] = {"name": "Mariners"}
+    # error: the value of affiliation is wrong dict
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    ent["affiliation"] = {"@id": "https://example.com/org"}
+    # error: the entity linked by affiliation is not in crate
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    org = Organization("https://example.com/org")
+    crate.add(org)
+    # no error
+    ent.validate(crate)
 
 
 def test_properties() -> None:
