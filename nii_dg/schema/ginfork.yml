@@ -20,12 +20,17 @@ GinMonitoring:
       description: MUST choose one from `basic`, `bio` and `neuro`. Indicates a kind of workflow used in the research workflow.
       example: bio
       required: Required.
-      expected_type: Literal["basic", "bio", "nuero"]
+      expected_type: Literal["basic", "bio", "neuro"]
     datasetStructure:
       description: MUST choose either `with_code` or `for_parameter`. Indicates a kind of dataset structure used in the research workflow.
       example: with_code
       required: Required.
       expected_type: Literal["with_code", "for_parameter"]
+    experimentPackageList:
+      description: MUST be an array of directory path of experiment package.
+      example: '["experiment/exp1/"]'
+      required: Required.
+      expected_type: List[str]
 File:
   description: A file monitored in the GIN-fork platform.
   props:
