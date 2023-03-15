@@ -18,9 +18,9 @@ from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_email, check_erad_researcher_number,
                           check_instance_type_from_id, check_isodate,
                           check_mime_type, check_orcid_id, check_phonenumber,
-                          check_prop_type, check_required_props, check_sha256,
-                          check_unexpected_props, check_url, classify_uri,
-                          convert_string_type_to_python_type,
+                          check_required_props, check_sha256,
+                          check_unexpected_props, check_url, check_value_type,
+                          classify_uri, convert_string_type_to_python_type,
                           download_file_from_url, generate_run_request_json,
                           get_entity_list_to_validate, get_file_sha256,
                           get_name_from_ror, get_sapporo_run_status,
@@ -104,13 +104,13 @@ def test_convert_string_type_to_python_type() -> None:
         convert_string_type_to_python_type("DMPMetadata", "foobar")
 
 
-def test_check_prop_type() -> None:
+def test_check_value_type() -> None:
     # no error occurs with correct format
-    check_prop_type("@id", "test.txt", str)
+    check_value_type("test.txt", str)
 
     # error
     with pytest.raises(PropsError):
-        check_prop_type("@id", "test.txt", int)
+        check_value_type("test.txt", int)
 
 
 def test_check_all_prop_types() -> None:
@@ -132,15 +132,15 @@ def test_check_instance_type_from_id() -> None:
 
     # error
     with pytest.raises(PropsError):
-        check_instance_type_from_id("affiliation", ent_list, Organization)
+        check_instance_type_from_id(ent_list, Organization)
     with pytest.raises(PropsError):
-        check_instance_type_from_id("affiliation", ent_list, List[Organization], "list")
+        check_instance_type_from_id(ent_list, List[Organization], "list")
 
     # no error occurred
     org = Organization("https://example.com/org")
     ent_list.append(org)
-    check_instance_type_from_id("affiliation", ent_list, Organization)
-    check_instance_type_from_id("affiliation", ent_list, List[Organization], "list")
+    check_instance_type_from_id(ent_list, Organization)
+    check_instance_type_from_id(ent_list, List[Organization], "list")
 
 
 def test_check_unexpected_props() -> None:

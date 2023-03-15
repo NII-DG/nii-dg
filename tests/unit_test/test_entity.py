@@ -40,6 +40,10 @@ def test_as_jsonld() -> None:
     }
 
 
+def test_validate() -> None:
+    pass
+
+
 def test_properties() -> None:
     person = Person("https://example.com/person", {"name": "Ichiro Suzuki"})
 

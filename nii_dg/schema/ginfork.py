@@ -64,8 +64,8 @@ class GinMonitoring(ContextualEntity):
         dir_list = [Path(experiment_dir).joinpath(dir_name) for experiment_dir in self["experimentPackageList"]
                     for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]]
         for dir_path in dir_list:
-            if dir_path not in dir_paths:
-                validation_failures.add("experimentPackageList", f"The directory {dir_path} is required.")
+            if str(dir_path) + "/" not in dir_paths:
+                validation_failures.add(f"experimentPackageList.{dir_path}", f"Dataset entity with @id `{dir_path}` is required.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures

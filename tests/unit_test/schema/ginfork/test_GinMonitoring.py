@@ -25,9 +25,10 @@ def test_as_jsonld() -> None:
     ent["contentSize"] = "100GB"
     ent["workflowIdentifier"] = "bio"
     ent["datasetStructure"] = "with_code"
+    ent["experimentPackageList"] = ["experiment/exp1/"]
 
-    jsonld = {'@type': 'GinMonitoring', '@id': '#ginmonitoring', 'about': {'@id': './'},
-              'contentSize': '100GB', 'workflowIdentifier': 'bio', 'datasetStructure': 'with_code'}
+    jsonld = {"@type": "GinMonitoring", "@id": "#ginmonitoring", "about": {"@id": "./"}, "contentSize": "100GB",
+              "workflowIdentifier": "bio", "datasetStructure": "with_code", "experimentPackageList": ["experiment/exp1/"]}
 
     ent_in_json = ent.as_jsonld()
     del ent_in_json["@context"]
@@ -44,6 +45,7 @@ def test_check_props() -> None:
     ent["contentSize"] = "10GB"
     ent["workflowIdentifier"] = "basic"
     ent["datasetStructure"] = "basic"
+    ent["experimentPackageList"] = ["experiment/exp1/"]
     with pytest.raises(EntityError):
         ent.check_props()
 
@@ -62,29 +64,25 @@ def test_validate() -> None:
     ent["contentSize"] = "10GB"
     ent["workflowIdentifier"] = "basic"
     ent["datasetStructure"] = "with_code"
+    ent["experimentPackageList"] = ["experiment/exp1/"]
 
-    file = File("test/file")
+    file = File("experiment/exp1/source/test.txt")
     file["contentSize"] = "15GB"
     file["experimentPackageFlag"] = True
-    crate.add(file, ent)
+    dir_1 = Dataset("experiment/exp1/source/", {"name": "source"})
+    crate.add(file, ent, dir_1)
 
     # error: over filesize
     # error: about property is unrelated
-    # error: specific named directories are missing; source, input_data and output_data
+    # error: specific named directories are missing; experiment/exp1/input_data and experiment/exp1/output_data
     with pytest.raises(EntityError):
         ent.validate(crate)
 
-    ent["about"] = crate.root
+    ent["about"] = {"@id": "./"}
     file["contentSize"] = "9GB"
-    dir_1 = Dataset("source/", {"name": "source"})
-    dir_2 = Dataset("input_data/", {"name": "input_data"})
-    dir_3 = Dataset("root/output_data/", {"name": "output_data"})
-    crate.add(dir_1, dir_2, dir_3)
+    dir_2 = Dataset("experiment/exp1/input_data/", {"name": "input_data"})
+    dir_3 = Dataset("experiment/exp1/output_data/", {"name": "output_data"})
+    crate.add(dir_2, dir_3)
 
-    # error: specific named directories are not in the same level
-    with pytest.raises(EntityError):
-        ent.validate(crate)
-
-    dir_3["@id"] = "output_data/"
     # no error occurred
     ent.validate(crate)
