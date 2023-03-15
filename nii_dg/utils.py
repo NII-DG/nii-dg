@@ -12,7 +12,7 @@ from urllib.parse import quote, urlparse
 
 import requests
 import yaml
-from typeguard import check_type as ori_check_type
+from typeguard import TypeCheckError, check_type
 
 from nii_dg.error import PropsError, UnexpectedImplementationError
 
@@ -121,20 +121,20 @@ def convert_string_type_to_python_type(type_str: str, schema_name: Optional[str]
                 return entity_class, 1
 
 
-def check_prop_type(prop: str, value: Any, expected_python_type: Any) -> None:
+def check_value_type(value: Any, expected_python_type: Any) -> None:
     """
     Check the type of each property by referring schema.yml.
     When the type includes entity subclass, the check is skipped.
     """
-    # expected_python_type, flg = convert_string_type_to_python_type(expected_type, entity.schema_name)
-    # if flg == 1:
-    #     return
     try:
-        ori_check_type(prop, value, expected_python_type)
-    except TypeError as e:
+        check_type(value, expected_python_type)
+    except TypeCheckError as e:
         ori_msg = str(e)
-        type_msg = ori_msg[ori_msg.find("must be") + 8:]
-        raise PropsError(f"The type of this property MUST be {type_msg}.") from None
+        if "is not an instance of" in ori_msg:
+            msg = "got " + ori_msg[:ori_msg.find("is not an instance of") - 1] + " instead"
+        else:
+            msg = ori_msg
+        raise PropsError(f"The type of this property MUST be {expected_python_type}; {msg}.") from None
     except Exception as e:
         raise UnexpectedImplementationError(e) from None
 
@@ -151,21 +151,21 @@ def check_all_prop_types(entity: "Entity", entity_def: EntityDef) -> None:
             expected_python_type, flg = convert_string_type_to_python_type(prop_def["expected_type"], entity.schema_name)
             if flg == 0:
                 try:
-                    check_prop_type(prop, entity[prop], expected_python_type)
+                    check_value_type(entity[prop], expected_python_type)
                 except PropsError as e:
                     error_dict[prop] = str(e)
     if len(error_dict) > 0:
         raise PropsError(error_dict)
 
 
-def check_instance_type_from_id(prop: str, entity_list: List["Entity"], expected_python_type: Any, list_flg: Optional[str] = None) -> None:
+def check_instance_type_from_id(entity_list: List["Entity"], expected_python_type: Any, list_flg: Optional[str] = None) -> None:
     correct_type_ents = []
     for ent in entity_list:
         try:
             if list_flg == "list":
-                check_prop_type(prop, [ent], expected_python_type)
+                check_value_type([ent], expected_python_type)
             else:
-                check_prop_type(prop, ent, expected_python_type)
+                check_value_type(ent, expected_python_type)
             correct_type_ents.append(ent)
         except PropsError:
             pass
