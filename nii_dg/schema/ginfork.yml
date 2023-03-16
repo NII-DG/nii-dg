@@ -31,6 +31,11 @@ GinMonitoring:
       example: '["experiment/exp1/"]'
       required: Required.
       expected_type: List[str]
+    experimentParameterName:
+      description: MUST be an array of directory path of experiment parameter.
+      example: '["parameter", "temp"]'
+      required: Required when datasetStructure is "for_parameter".
+      expected_type: List[str]
 File:
   description: A file monitored in the GIN-fork platform.
   props:

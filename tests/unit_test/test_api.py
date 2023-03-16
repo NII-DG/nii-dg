@@ -144,13 +144,13 @@ def test_vaidation_failed(client: Any, crate_json_validation_error: Dict[str, An
     assert result_response["results"] == [
         {"entityId": "https://ror.org/04ksd4g47",
          "props": "base.Organization:name",
-         "reason": ["The value MUST be same as the registered name in ROR. See https://ror.org/04ksd4g47."]},
+         "reason": "The value MUST be same as the registered name in ROR. See https://ror.org/04ksd4g47."},
         {"entityId": "#mailto:test@example.com",
          "props": "base.ContactPoint:@id",
-         "reason": ["The contained email is not the same as the value of email property."]},
+         "reason": "The contained email is not the same as the value of email property."},
         {"entityId": "#mailto:test@example.com",
          "props": "base.ContactPoint:email",
-         "reason": ["The value is not the same as the email contained in the value of @id property."]}]
+         "reason": "The value is not the same as the email contained in the value of @id property."}]
 
 
 def test_partial_vaidation_failed(client: Any, crate_json_validation_error: Dict[str, Any]) -> None:
@@ -175,10 +175,10 @@ def test_partial_vaidation_failed(client: Any, crate_json_validation_error: Dict
     assert result_response["results"] == [
         {"entityId": "#mailto:test@example.com",
          "props": "base.ContactPoint:@id",
-         "reason": ["The contained email is not the same as the value of email property."]},
+         "reason": "The contained email is not the same as the value of email property."},
         {"entityId": "#mailto:test@example.com",
          "props": "base.ContactPoint:email",
-         "reason": ["The value is not the same as the email contained in the value of @id property."]}]
+         "reason": "The value is not the same as the email contained in the value of @id property."}]
 
 
 def test_request_error_nocrate(client: Any) -> None:
