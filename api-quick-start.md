@@ -76,7 +76,7 @@ $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
   "request": {
     "entityIds": [],
     "roCrate": {
-      (Omitted)
+      ...,
     }
   },
   "requestId": "a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc",
@@ -106,7 +106,7 @@ $ curl localhost:5000/bd453ed1-30b9-4873-b240-e459467ea9dc
       "file_1.txt",
       "https://example.com/person"
     ],
-  ...
+  ...,
   },
   "requestId": "bd453ed1-30b9-4873-b240-e459467ea9dc",
   "results": [

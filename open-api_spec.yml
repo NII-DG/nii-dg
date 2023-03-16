@@ -138,8 +138,10 @@ components:
           type: string
           example: "amed.File:remoteLocation"
         reason:
-          type: string
-          example: Unable to fetch remote URL.
+          type: array
+          items:
+            type: string
+            example: Unable to fetch remote URL.
     ResultResponse:
       description: Result of the validation process. The schema for result is dependent on nii-dg library.
       type: object
