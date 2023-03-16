@@ -42,7 +42,7 @@ def main() -> None:
     file_gin = GinFile("file_1.txt",
                        {"name": "Sample File", "contentSize": "156GB", "experimentPackageFlag": True})
     gin = GinMonitoring("#ginmonitoring",
-                        {"about": ro_crate.root, "contentSize": "1TB", "workflowIdentifier": "basic", "datasetStructure": "with_code"})
+                        {"about": ro_crate.root, "contentSize": "1TB", "workflowIdentifier": "basic", "datasetStructure": "with_code", "experimentPackageList": ["experiment/exp1/"]})
 
     ro_crate.add(org, creator, repo, dmp_1, dmp_meta, file_cao, file_gin, gin)
 

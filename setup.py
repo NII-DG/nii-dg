@@ -21,7 +21,7 @@ setup(
     install_requires=[
         "flask",
         "pyyaml",
-        "typeguard",
+        "typeguard>=3",
         "requests",
         "waitress",
     ],
