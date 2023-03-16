@@ -196,7 +196,6 @@ def test_from_jsonld() -> None:
     # error with entity having no @id property
     test_jsonld = crate_1.as_jsonld()
     test_jsonld["@graph"].append({"id": "path/to/file"})
-    print(test_jsonld)
     with pytest.raises(CrateError):
         ROCrate(jsonld=test_jsonld)
 
