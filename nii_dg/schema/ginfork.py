@@ -18,7 +18,7 @@ from nii_dg.utils import (check_all_prop_types, check_content_formats,
 
 REQUIRED_DIRECTORIES = {
     "with_code": ["source", "input_data", "output_data"],
-    "for_parameter": ["source", "input_data", "parameters/output_data", "parameters/params", "temp/output_data", "temp_params"]
+    "for_parameter": ["source", "input_data"]
 }
 
 SCHEMA_NAME = Path(__file__).stem
@@ -66,6 +66,16 @@ class GinMonitoring(ContextualEntity):
         for dir_path in dir_list:
             if str(dir_path) + "/" not in dir_paths:
                 validation_failures.add_as_list("experimentPackageList", f"Dataset entity with @id `{dir_path}` is required.")
+
+        if self["datasetStructure"] == "for_parameter":
+            if "experimentParameterName" not in self:
+                validation_failures.add("experimentPackageName", "This property is required, but not found.")
+            else:
+                param_dir_list = [Path(experiment_dir).joinpath(param_dir_name, required_dir_name) for experiment_dir in self["experimentPackageList"]
+                                  for param_dir_name in self["experimentPackageName"] for required_dir_name in ["output_data", "params"]]
+                for param_dir_path in param_dir_list:
+                    if str(param_dir_path) + "/" not in dir_paths:
+                        validation_failures.add_as_list("experimentPackageName", f"Dataset entity with @id `{param_dir_path}` is required.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures
