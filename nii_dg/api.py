@@ -5,7 +5,7 @@ import logging
 import os
 from concurrent.futures import Future, ThreadPoolExecutor
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Dict, List, Union
+from typing import TYPE_CHECKING, Any, Dict, List
 from uuid import uuid4
 
 from flask import Blueprint, Flask, Response, abort, jsonify, request

@@ -43,7 +43,7 @@ class EntityError(Exception):
         """\
         Add a message to the message dictionary.
         """
-        self.message_dict.setdefault(prop, [message])
+        self.message_dict.setdefault(prop, message)
 
     def add_by_dict(self, messages: str) -> None:
         """\
@@ -52,7 +52,7 @@ class EntityError(Exception):
         # TODO: check this implementation (looks like a hack)
         message_dict = ast.literal_eval(messages)
         for key, value in zip(message_dict.keys(), message_dict.values()):
-            self.message_dict.setdefault(key, [value])
+            self.message_dict.setdefault(key, value)
 
 
 class CrateError(Exception):
