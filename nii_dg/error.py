@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 import ast
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
