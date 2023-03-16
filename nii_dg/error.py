@@ -45,15 +45,6 @@ class EntityError(Exception):
         """
         self.message_dict.setdefault(prop, [message])
 
-    def add_as_list(self, prop: str, message: str) -> None:
-        """\
-        Add a message to the message dictionary.
-        """
-        if prop not in self.message_dict:
-            self.message_dict[prop] = [message]
-            return
-        self.message_dict[prop].append(message)
-
     def add_by_dict(self, messages: str) -> None:
         """\
         Add messages from a dictionary to the message dictionary.

@@ -61,21 +61,21 @@ class GinMonitoring(ContextualEntity):
 
         dir_paths = [dir.id for dir in crate.get_by_entity_type(Dataset)]
         # TODO: update file name rules
-        dir_list = [Path(experiment_dir).joinpath(dir_name) for experiment_dir in self["experimentPackageList"]
-                    for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]]
-        for dir_path in dir_list:
-            if str(dir_path) + "/" not in dir_paths:
-                validation_failures.add_as_list("experimentPackageList", f"Dataset entity with @id `{dir_path}` is required.")
+        required_dir_list = [str(Path(experiment_dir).joinpath(dir_name)) + "/" for experiment_dir in self["experimentPackageList"]
+                             for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]]
+        missing_dirs = [dir_path for dir_path in required_dir_list if dir_path not in dir_paths]
+        if len(missing_dirs) > 0:
+            validation_failures.add("experimentPackageList", f"Required Dataset entity is missing; @id `{missing_dirs}`.")
 
         if self["datasetStructure"] == "for_parameter":
             if "experimentParameterName" not in self:
-                validation_failures.add("experimentPackageName", "This property is required, but not found.")
+                validation_failures.add("experimentParameterName", "This property is required, but not found.")
             else:
-                param_dir_list = [Path(experiment_dir).joinpath(param_dir_name, required_dir_name) for experiment_dir in self["experimentPackageList"]
-                                  for param_dir_name in self["experimentPackageName"] for required_dir_name in ["output_data", "params"]]
-                for param_dir_path in param_dir_list:
-                    if str(param_dir_path) + "/" not in dir_paths:
-                        validation_failures.add_as_list("experimentPackageName", f"Dataset entity with @id `{param_dir_path}` is required.")
+                param_dir_list = [str(Path(experiment_dir).joinpath(param_dir_name, required_dir_name)) + "/" for experiment_dir in self["experimentPackageList"]
+                                  for param_dir_name in self["experimentPameterName"] for required_dir_name in ["output_data", "params"]]
+                missing_param_dirs = [param_dir_path for param_dir_path in param_dir_list if param_dir_path not in dir_paths]
+                if len(missing_param_dirs) > 0:
+                    validation_failures.add("experimentParameterName", f"Required Dataset entity is missing; @id `{missing_param_dirs}`.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures

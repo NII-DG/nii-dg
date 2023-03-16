@@ -46,8 +46,7 @@ def main() -> None:
 
     ro_crate.add(org, creator, repo, dmp_1, dmp_meta, file_cao, file_gin, gin)
 
-    # print(json.dumps(ro_crate.as_jsonld(), indent=2))
-    ro_crate.validate()
+    print(json.dumps(ro_crate.as_jsonld(), indent=2))
 
 
 if __name__ == "__main__":
