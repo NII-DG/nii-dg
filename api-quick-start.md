@@ -68,7 +68,7 @@ $ curl -X POST "localhost:5000/validate?entityIds=file_1.txt&entityIds=https%3A%
 
 You can get the status of the governance by using the request_id.
 The status `COMPLETE` means the governance check finished successfully and no problem is found. The `results` value is empty list.
-The status `FAILED` also means the governance check finished successfully, but found the problems. The `results` value is problem list of dictionaries consisting of entity ID, property and list of failed reasons.
+The status `FAILED` also means the governance check finished successfully, but found the problems. The `results` value is problem list of dictionaries consisting of entity ID, property and failed reasons.
 
 ```bash
 $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
@@ -84,12 +84,12 @@ $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
     {
       "entityId": "https://example.com/person",
       "props": "cao.Person:@id",
-      "reason": ["Unable to access https://example.com/person due to 404 Client Error: Not Found for url: https://example.com/person"]
+      "reason": "Unable to access https://example.com/person due to 404 Client Error: Not Found for url: https://example.com/person"
     },
     {
       "entityId": "#ginmonitoring",
       "props": "ginfork.GinMonitoring:datasetStructure",
-      "reason": ["Couldn't find required directories: named ['source', 'input_data', 'output_data']."]
+      "reason": "Couldn't find required directories: named ['source', 'input_data', 'output_data']."
     }
   ],
   "status": "FAILED"
@@ -114,7 +114,7 @@ $ curl localhost:5000/bd453ed1-30b9-4873-b240-e459467ea9dc
     {
       "entityId": "https://example.com/person",
       "props": "cao.Person:@id",
-      "reason": ["Unable to access https://example.com/person due to 404 Client Error: Not Found for url: https://example.com/person"]
+      "reason": "Unable to access https://example.com/person due to 404 Client Error: Not Found for url: https://example.com/person"
     }
   ],
   "status": "FAILED"

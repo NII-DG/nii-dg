@@ -18,7 +18,7 @@ from nii_dg.utils import (check_all_prop_types, check_content_formats,
 
 REQUIRED_DIRECTORIES = {
     "with_code": ["source", "input_data", "output_data"],
-    "for_parameter": ["source", "input_data", "parameters/output_data", "parameters/params", "temp/output_data", "temp_params"]
+    "for_parameter": ["source", "input_data"]
 }
 
 SCHEMA_NAME = Path(__file__).stem
