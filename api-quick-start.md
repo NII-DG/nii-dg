@@ -68,7 +68,7 @@ $ curl -X POST "localhost:5000/validate?entityIds=file_1.txt&entityIds=https%3A%
 
 You can get the status of the governance by using the request_id.
 The status `COMPLETE` means the governance check finished successfully and no problem is found. The `results` value is empty list.
-The status `FAILED` also means the governance check finished successfully, but found the problems. The `results` value is problem list of dictionaries consisting of entity ID, property and failed reasons.
+The status `FAILED` also means the governance check finished successfully, but found the problems. The `results` value is problem list of dictionaries consisting of entity ID, property and failed reason.
 
 ```bash
 $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
