@@ -41,17 +41,27 @@ request_map: Dict[str, Dict[str, Any]] = {}
 # --- result wrapper ---
 
 
-def result_wrapper(error_dict: List[EntityError]) -> List[Dict[str, Union[str, List[str]]]]:
+def convert_dict(entity_dict: Dict[str, str], prop: str, reason: str) -> Dict[str, str]:
+    reason_dict = entity_dict.copy()
+    reason_dict["props"] += prop
+    reason_dict["reason"] = reason
+    return reason_dict
+
+
+def result_wrapper(error_list: List[EntityError]) -> List[Dict[str, str]]:
     result_array = []
-    for entity_error in error_dict:
-        entity_dict: Dict[str, Union[str, List[str]]] = {}
+    for entity_error in error_list:
+        entity_dict = {}
         entity_dict["entityId"] = entity_error.entity.id
         entity_dict["props"] = entity_error.entity.schema_name + "." + entity_error.entity.type + ":"  # type:ignore
-        for prop, reason in entity_error.message_dict.items():
-            reason_dict = entity_dict.copy()
-            reason_dict["props"] += prop  # type:ignore
-            reason_dict["reason"] = reason
-            result_array.append(reason_dict)
+        for prop, reasons in entity_error.message_dict.items():
+            if isinstance(reasons, str):
+                reason_dict = convert_dict(entity_dict, prop, reasons)
+                result_array.append(reason_dict)
+            elif isinstance(reasons, list):
+                for reason in reasons:
+                    reason_dict = convert_dict(entity_dict, prop, reason)
+                    result_array.append(reason_dict)
     return result_array
 
 # --- controller ---
