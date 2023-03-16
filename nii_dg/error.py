@@ -31,7 +31,7 @@ class EntityError(Exception):
 
     def __init__(self, entity: "Entity") -> None:
         self.entity = entity
-        self.message_dict: Dict[str, List[str]] = {}
+        self.message_dict: Dict[str, str] = {}
 
     def __str__(self) -> str:
         return str({repr(self.entity): self.message_dict})
