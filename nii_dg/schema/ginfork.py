@@ -18,7 +18,7 @@ from nii_dg.utils import (check_all_prop_types, check_content_formats,
 
 REQUIRED_DIRECTORIES = {
     "with_code": ["source", "input_data", "output_data"],
-    "for_parameter": ["source", "input_data"]
+    "for_parameter": ["source", "input_data", "parameters/output_data", "parameters/params", "temp/output_data", "temp_params"]
 }
 
 SCHEMA_NAME = Path(__file__).stem
@@ -60,22 +60,12 @@ class GinMonitoring(ContextualEntity):
             validation_failures.add("contentSize", "The total file size of ginfork.File labeled as an experimental package is larger than the defined size.")
 
         dir_paths = [dir.id for dir in crate.get_by_entity_type(Dataset)]
-        missing_dirs = []
-        for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]:
-            if dir_name not in [path.split('/')[-2] for path in dir_paths]:
-                missing_dirs.append(dir_name)
-
-        if len(missing_dirs) > 0:
-            validation_failures.add("datasetStructure", f"Couldn't find required directories: named {missing_dirs}.")
-
         # TODO: update file name rules
-        parent_dirs = {dir_name: [path[: -(len(dir_name) + 1)] for path in dir_paths if path.split('/')[-2] == dir_name]
-                       for dir_name in ["source", "input_data", "output_data"]}
-        if self["datasetStructure"] == "for_parameter" and len(set(parent_dirs["source"]) & set(parent_dirs["input_data"])) == 0:
-            validation_failures.add("datasetStructure", "The parent directories of source dir and input dir are not the same.")
-        if self["datasetStructure"] == "with_code" and\
-                len(set(parent_dirs["source"]) & set(parent_dirs["input_data"]) & set(parent_dirs["output_data"])) == 0:
-            validation_failures.add("datasetStructure", "The parent directories of source dir, input dir and output dir are not the same.")
+        dir_list = [Path(experiment_dir).joinpath(dir_name) for experiment_dir in self["experimentPackageList"]
+                    for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]]
+        for dir_path in dir_list:
+            if str(dir_path) + "/" not in dir_paths:
+                validation_failures.add_as_list("experimentPackageList", f"Dataset entity with @id `{dir_path}` is required.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures
