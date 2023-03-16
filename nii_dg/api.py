@@ -4,7 +4,7 @@
 import os
 from concurrent.futures import Future, ThreadPoolExecutor
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List, Union
 from uuid import uuid4
 
 from flask import Blueprint, Flask, Response, abort, jsonify, request
@@ -41,15 +41,15 @@ request_map: Dict[str, Dict[str, Any]] = {}
 # --- result wrapper ---
 
 
-def result_wrapper(error_dict: List[EntityError]) -> List[Dict[str, str]]:
+def result_wrapper(error_dict: List[EntityError]) -> List[Dict[str, Union[str, List[str]]]]:
     result_array = []
     for entity_error in error_dict:
-        entity_dict = {}
+        entity_dict: Dict[str, Union[str, List[str]]] = {}
         entity_dict["entityId"] = entity_error.entity.id
         entity_dict["props"] = entity_error.entity.schema_name + "." + entity_error.entity.type + ":"  # type:ignore
         for prop, reason in entity_error.message_dict.items():
             reason_dict = entity_dict.copy()
-            reason_dict["props"] += prop
+            reason_dict["props"] += prop  # type:ignore
             reason_dict["reason"] = reason
             result_array.append(reason_dict)
     return result_array
