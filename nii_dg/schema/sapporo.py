@@ -209,17 +209,17 @@ class SapporoRun(ContextualEntity):
             file_ent = [ent for ent in output_entities if file_name == ent["name"]]
 
             if len(file_ent) == 0:
-                validation_failures.add(f"outputs, {file_name}",
-                                        f"The file {file_name} is included in the result of re-execution, but not included in this crate.")
+                validation_failures.add_as_list("outputs",
+                                                f"The file {file_name} is included in the result of re-execution, but not included in this crate.")
                 continue
 
             if "contentSize" in file_ent[0] and os.path.getsize(file_path) != sum_file_size("B", file_ent):
-                validation_failures.add(
-                    f"outputs, {file_name}:contentSize", f"""The file size of {file_name}, {os.path.getsize(file_path)}B, does not match the `contentSize` value {file_ent[0]["contentSize"]} in {file_ent[0]}.""")
+                validation_failures.add_as_list(
+                    "outputs", f"""The file size of {file_name}, {os.path.getsize(file_path)}B, does not match the `contentSize` value {file_ent[0]["contentSize"]} in {file_ent[0]}.""")
 
             if "sha256" in file_ent[0] and get_file_sha256(file_path) != file_ent[0]["sha256"]:
-                validation_failures.add(
-                    f"outputs, {file_name}:sha256", f"""The hash of {file_name} does not match the `sha256` value {file_ent[0]["sha256"]} in {file_ent[0]}""")
+                validation_failures.add_as_list(
+                    "outputs", f"""The hash of {file_name} does not match the `sha256` value {file_ent[0]["sha256"]} in {file_ent[0]}""")
 
         shutil.rmtree(dir_path.parent)
         if len(validation_failures.message_dict) > 0:
