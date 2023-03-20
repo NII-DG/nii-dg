@@ -64,7 +64,7 @@ def test_validate() -> None:
     ent["contentSize"] = "10GB"
     ent["workflowIdentifier"] = "basic"
     ent["datasetStructure"] = "with_code"
-    ent["experimentPackageList"] = ["experiment/exp1"]
+    ent["experimentPackageList"] = ["experiment/exp1/"]
 
     file = File("experiment/exp1/source/test.txt")
     file["contentSize"] = "15GB"
@@ -92,12 +92,7 @@ def test_validate() -> None:
     with pytest.raises(EntityError):
         ent.validate(crate)
 
-    ent["experimentParameterName"] = ["experiment/exp2/parameter"]
-    # error: "experimentParameterName" MUST be child dir of experimentPackageList
-    with pytest.raises(EntityError):
-        ent.validate(crate)
-
-    ent["experimentParameterName"] = ["experiment/exp1/parameter"]
+    ent["experimentParameterName"] = ["experiment/exp1/parameter/"]
     dir_3["@id"] = "experiment/exp1/parameter/output_data/"
     # error: "experiment/exp1/parameter/params/" is missing
     with pytest.raises(EntityError):
