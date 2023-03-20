@@ -71,8 +71,8 @@ class GinMonitoring(ContextualEntity):
             if "experimentParameterName" not in self:
                 validation_failures.add("experimentParameterName", "This property is required, but not found.")
             else:
-                param_dir_list = [str(Path(experiment_dir).joinpath(param_dir_name, required_dir_name)) + "/" for experiment_dir in self["experimentPackageList"]
-                                  for param_dir_name in self["experimentPameterName"] for required_dir_name in ["output_data", "params"]]
+                param_dir_list = [str(Path(param_dir_name).joinpath(required_dir_name)) + "/" for param_dir_name in self["experimentParameterName"]
+                                  for required_dir_name in ["output_data", "params"]]
                 missing_param_dirs = [param_dir_path for param_dir_path in param_dir_list if param_dir_path not in dir_paths]
                 if len(missing_param_dirs) > 0:
                     validation_failures.add("experimentParameterName", f"Required Dataset entity is missing; @id `{missing_param_dirs}`.")
