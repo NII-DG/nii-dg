@@ -33,7 +33,7 @@ GinMonitoring:
       expected_type: List[str]
     experimentParameterName:
       description: MUST be an array of directory path of experiment parameter.
-      example: '["experiment/exp1/parameter", "temp"]'
+      example: '["experiment/exp1/parameter", "experiment/exp2/temp"]'
       required: Required when datasetStructure is "for_parameter".
       expected_type: List[str]
 File:
