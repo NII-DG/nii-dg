@@ -28,7 +28,7 @@ GinMonitoring:
       expected_type: Literal["with_code", "for_parameter"]
     experimentPackageList:
       description: MUST be an array of directory path of experiment package.
-      example: '["experiment/exp1/"]'
+      example: '["experiment/exp1"]'
       required: Required.
       expected_type: List[str]
     experimentParameterName:
