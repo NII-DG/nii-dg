@@ -11,7 +11,7 @@ Monitoring function for the GIN-fork platform.
 | `contentSize` | `Literal["1GB", "10GB", "100GB", "1TB", "1PB"]` | Required. | MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in the experiment package. | `100GB` |
 | `workflowIdentifier` | `Literal["basic", "bio", "neuro"]` | Required. | MUST choose one from `basic`, `bio` and `neuro`. Indicates a kind of workflow used in the research workflow. | `bio` |
 | `datasetStructure` | `Literal["with_code", "for_parameter"]` | Required. | MUST choose either `with_code` or `for_parameter`. Indicates a kind of dataset structure used in the research workflow. | `with_code` |
-| `experimentPackageList` | `List[str]` | Required. | MUST be an array of directory path of experiment package. | `["experiment/exp1/"]` |
+| `experimentPackageList` | `List[str]` | Required. | MUST be an array of directory path of experiment package. | `["experiment/exp1"]` |
 | `experimentParameterName` | `List[str]` | Required when datasetStructure is "for_parameter". | MUST be an array of directory path of experiment parameter. | `["experiment/exp1/parameter", "experiment/exp2/temp"]` |
 
 ## File

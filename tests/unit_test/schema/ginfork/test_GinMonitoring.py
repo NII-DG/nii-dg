@@ -64,7 +64,7 @@ def test_validate() -> None:
     ent["contentSize"] = "10GB"
     ent["workflowIdentifier"] = "basic"
     ent["datasetStructure"] = "with_code"
-    ent["experimentPackageList"] = ["experiment/exp1/"]
+    ent["experimentPackageList"] = ["experiment/exp1"]
 
     file = File("experiment/exp1/source/test.txt")
     file["contentSize"] = "15GB"
@@ -83,6 +83,28 @@ def test_validate() -> None:
     dir_2 = Dataset("experiment/exp1/input_data/", {"name": "input_data"})
     dir_3 = Dataset("experiment/exp1/output_data/", {"name": "output_data"})
     crate.add(dir_2, dir_3)
+
+    # no error occurred
+    ent.validate(crate)
+
+    ent["datasetStructure"] = "for_parameter"
+    # error: "experimentParameterName" is required
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    ent["experimentParameterName"] = ["experiment/exp2/parameter"]
+    # error: "experimentParameterName" MUST be child dir of experimentPackageList
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    ent["experimentParameterName"] = ["experiment/exp1/parameter"]
+    dir_3["@id"] = "experiment/exp1/parameter/output_data/"
+    # error: "experiment/exp1/parameter/params/" is missing
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    dir_4 = Dataset("experiment/exp1/parameter/params/", {"name": "params"})
+    crate.add(dir_4)
 
     # no error occurred
     ent.validate(crate)
