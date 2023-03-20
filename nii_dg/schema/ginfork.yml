@@ -28,12 +28,12 @@ GinMonitoring:
       expected_type: Literal["with_code", "for_parameter"]
     experimentPackageList:
       description: MUST be an array of directory path of experiment package.
-      example: '["experiment/exp1"]'
+      example: '["experiment/exp1/"]'
       required: Required.
       expected_type: List[str]
     experimentParameterName:
-      description: MUST be an array of directory path of experiment parameter.
-      example: '["experiment/exp1/parameter", "experiment/exp2/temp"]'
+      description: MUST be an array of directory path of experiment parameter. The path MUST be one of the child directories in the experimentPackageList.
+      example: '["experiment/exp1/parameter/", "experiment/exp2/temp/"]'
       required: Required when datasetStructure is "for_parameter".
       expected_type: List[str]
 File:
