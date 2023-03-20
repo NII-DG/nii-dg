@@ -86,3 +86,20 @@ def test_validate() -> None:
 
     # no error occurred
     ent.validate(crate)
+
+    ent["datasetStructure"] = "for_parameter"
+    # error: "experimentParameterName" is required
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    ent["experimentParameterName"] = ["experiment/exp1/parameter/"]
+    dir_3["@id"] = "experiment/exp1/parameter/output_data/"
+    # error: "experiment/exp1/parameter/params/" is missing
+    with pytest.raises(EntityError):
+        ent.validate(crate)
+
+    dir_4 = Dataset("experiment/exp1/parameter/params/", {"name": "params"})
+    crate.add(dir_4)
+
+    # no error occurred
+    ent.validate(crate)

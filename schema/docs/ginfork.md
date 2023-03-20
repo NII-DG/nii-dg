@@ -12,7 +12,7 @@ Monitoring function for the GIN-fork platform.
 | `workflowIdentifier` | `Literal["basic", "bio", "neuro"]` | Required. | MUST choose one from `basic`, `bio` and `neuro`. Indicates a kind of workflow used in the research workflow. | `bio` |
 | `datasetStructure` | `Literal["with_code", "for_parameter"]` | Required. | MUST choose either `with_code` or `for_parameter`. Indicates a kind of dataset structure used in the research workflow. | `with_code` |
 | `experimentPackageList` | `List[str]` | Required. | MUST be an array of directory path of experiment package. | `["experiment/exp1/"]` |
-| `experimentParameterName` | `List[str]` | Required when datasetStructure is "for_parameter". | MUST be an array of directory path of experiment parameter. | `["parameter", "temp"]` |
+| `experimentParameterName` | `List[str]` | Required when datasetStructure is "for_parameter". | MUST be an array of directory path of experiment parameter. The path MUST be one of the child directories in the experimentPackageList. | `["experiment/exp1/parameter/", "experiment/exp2/temp/"]` |
 
 ## File
 A file monitored in the GIN-fork platform.
