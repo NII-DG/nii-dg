@@ -115,7 +115,7 @@
       "contentSize": "1TB",
       "workflowIdentifier": "basic",
       "datasetStructure": "with_code",
-      "experimentPackageList": ["experiment/exp1/"]
+      "experimentPackageList": ["experiments/exp1/"]
     }
   ]
 }

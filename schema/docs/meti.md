@@ -4,6 +4,7 @@ See [GitHub - NII-DG/nii-dg - schema/README.md](https://github.com/NII-DG/nii-dg
 
 ## DMPMetadata
 Metadata of research project that is the subject of this data management plan.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be the name with prefix `#`. | `#METI-DMP` |
@@ -17,6 +18,7 @@ Metadata of research project that is the subject of this data management plan.
 
 ## DMP
 Contents from data management plan that is (will be) submitted to the funding agency.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be data No. with the prefix `#dmp:`. Indicates data number in the DMP list. | `#dmp:1` |
@@ -40,6 +42,7 @@ Contents from data management plan that is (will be) submitted to the funding ag
 
 ## File
 A file included in the research project, e.g. text file, script file and images.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be either a URI Path relative to the top directory of your repository (stated in DMP entity) or an absolute URI. When the file is from outside this research project, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded. | `config/setting.txt` |
