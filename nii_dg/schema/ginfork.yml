@@ -22,19 +22,19 @@ GinMonitoring:
       required: Required.
       expected_type: Literal["basic", "bio", "neuro"]
     datasetStructure:
-      description: MUST choose either `with_code` or `for_parameter`. Indicates a kind of dataset structure used in the research workflow.
+      description: MUST choose either `with_code` or `for_parameters`. Indicates a kind of dataset structure used in the research workflow.
       example: with_code
       required: Required.
-      expected_type: Literal["with_code", "for_parameter"]
+      expected_type: Literal["with_code", "for_parameters"]
     experimentPackageList:
-      description: MUST be an array of directory path of experiment package.
-      example: '["experiment/exp1/"]'
+      description: MUST be an array of directory path of experimental package.
+      example: '["experiment/exp1/", "experiment/exp2/"]'
       required: Required.
       expected_type: List[str]
-    experimentParameterName:
-      description: MUST be an array of directory path of experiment parameter. The path MUST be one of the child directories in the experimentPackageList.
-      example: '["experiment/exp1/parameter/", "experiment/exp2/temp/"]'
-      required: Required when datasetStructure is "for_parameter".
+    parameterExperimentList:
+      description: MUST be an array of directory path of the parameter folder under the experimental package. The path MUST be one of the child directories in the experimentPackageList.
+      example: '["experiment/exp1/ex_param1/", "experiment/exp1/ex_param2/", "experiment/exp2/paramX/"]'
+      required: Required when datasetStructure is "for_parameters".
       expected_type: List[str]
 File:
   description: A file monitored in the GIN-fork platform.
