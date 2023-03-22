@@ -4,6 +4,7 @@ See [GitHub - NII-DG/nii-dg - schema/README.md](https://github.com/NII-DG/nii-dg
 
 ## GinMonitoring
 Monitoring function for the GIN-fork platform.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be `#ginmonitoring`. | `#ginmonitoring` |
@@ -16,6 +17,7 @@ Monitoring function for the GIN-fork platform.
 
 ## File
 A file monitored in the GIN-fork platform.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be either a URI Path relative to the RO-Crate root or an absolute URI. When the file is from outside this research project, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded. | `config/setting.txt` |

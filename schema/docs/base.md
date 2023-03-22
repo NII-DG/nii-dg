@@ -4,6 +4,7 @@ See [GitHub - NII-DG/nii-dg - schema/README.md](https://github.com/NII-DG/nii-dg
 
 ## File
 A file included in the research project, e.g. text file, script file and images.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be either a URI Path relative to RO-Crate root or an absolute URI from which is downloadable. When the file is from outside the repository, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded. | `config/setting.txt` |
@@ -16,6 +17,7 @@ A file included in the research project, e.g. text file, script file and images.
 
 ## Dataset
 A folder of the files included in the research project.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be either a URI Path relative to the RO-Crate root (stated in the identifier property of RootDataEntity) or an absolute URI. MUST end with `/`. Indicates the path to the directory. | `config/` |
@@ -24,6 +26,7 @@ A folder of the files included in the research project.
 
 ## Organization
 An organization related to the research project, e.g. university, research institution and funding agency.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be the URL of the organization. ROR ID is recommended. | `https://ror.org/04ksd4g47` |
@@ -33,6 +36,7 @@ An organization related to the research project, e.g. university, research insti
 
 ## Person
 A person who contributes to the research project, e.g. researcher.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be URL of the person. ORCID ID is recommended. | `https://orcid.org/0000-0001-2345-6789` |
@@ -44,6 +48,7 @@ A person who contributes to the research project, e.g. researcher.
 
 ## License
 A license granted to the data.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be URL of the license. | `https://www.apache.org/licenses/LICENSE-2.0` |
@@ -52,6 +57,7 @@ A license granted to the data.
 
 ## RepositoryObject
 A repository where the research data is managed in
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be URI of the repository. If it is URL and free to access, DOI link is recommended. | `https://doi.org/xxxxxxxx` |
@@ -60,6 +66,7 @@ A repository where the research data is managed in
 
 ## DataDownload
 Downloadable dataset from the research project.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be a reachable URL. | `https://zenodo.org/record/example` |
@@ -69,6 +76,7 @@ Downloadable dataset from the research project.
 
 ## HostingInstitution
 An organization that has responsibility of managing research data.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be the URL of the organization. ROR ID is recommended. | `https://ror.org/04ksd4g47` |
@@ -78,6 +86,7 @@ An organization that has responsibility of managing research data.
 
 ## ContactPoint
 A contact information.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be email with the prefix `#mailto:` or be phone number with the prefix `#callto:`. | `#mailto:contact@example.com` |
