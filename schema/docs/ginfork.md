@@ -12,8 +12,8 @@ Monitoring function for the GIN-fork platform.
 | `contentSize` | `Literal["1GB", "10GB", "100GB", "1TB", "1PB"]` | Required. | MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in the experiment package. | `100GB` |
 | `workflowIdentifier` | `Literal["basic", "bio", "neuro"]` | Required. | MUST choose one from `basic`, `bio` and `neuro`. Indicates a kind of workflow used in the research workflow. | `bio` |
 | `datasetStructure` | `Literal["with_code", "for_parameters"]` | Required. | MUST choose either `with_code` or `for_parameters`. Indicates a kind of dataset structure used in the research workflow. | `with_code` |
-| `experimentPackageList` | `List[str]` | Required. | MUST be an array of directory path of experimental package. | `["experiment/exp1/", "experiment/exp2/"]` |
-| `parameterExperimentList` | `List[str]` | Required when datasetStructure is "for_parameters". | MUST be an array of directory path of the parameter folder under the experimental package. The path MUST be one of the child directories in the experimentPackageList. | `["experiment/exp1/ex_param1/", "experiment/exp1/ex_param2/", "experiment/exp2/paramX/"]` |
+| `experimentPackageList` | `List[str]` | Required. | MUST be an array of directory path of experimental package. | `["experiments/exp1/", "experiments/exp2/"]` |
+| `parameterExperimentList` | `List[str]` | Required when datasetStructure is "for_parameters". | MUST be an array of directory path of the parameter folder under the experimental package. The path MUST be one of the child directories in the experimentPackageList. | `["experiments/exp1/ex_param1/", "experiments/exp1/ex_param2/", "experiments/exp2/paramX/"]` |
 
 ## File
 A file monitored in the GIN-fork platform.

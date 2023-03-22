@@ -25,10 +25,10 @@ def test_as_jsonld() -> None:
     ent["contentSize"] = "100GB"
     ent["workflowIdentifier"] = "bio"
     ent["datasetStructure"] = "with_code"
-    ent["experimentPackageList"] = ["experiment/exp1/"]
+    ent["experimentPackageList"] = ["experiments/exp1/"]
 
     jsonld = {"@type": "GinMonitoring", "@id": "#ginmonitoring", "about": {"@id": "./"}, "contentSize": "100GB",
-              "workflowIdentifier": "bio", "datasetStructure": "with_code", "experimentPackageList": ["experiment/exp1/"]}
+              "workflowIdentifier": "bio", "datasetStructure": "with_code", "experimentPackageList": ["experiments/exp1/"]}
 
     ent_in_json = ent.as_jsonld()
     del ent_in_json["@context"]
@@ -45,7 +45,7 @@ def test_check_props() -> None:
     ent["contentSize"] = "10GB"
     ent["workflowIdentifier"] = "basic"
     ent["datasetStructure"] = "basic"
-    ent["experimentPackageList"] = ["experiment/exp1/"]
+    ent["experimentPackageList"] = ["experiments/exp1/"]
     with pytest.raises(EntityError):
         ent.check_props()
 
@@ -64,24 +64,24 @@ def test_validate() -> None:
     ent["contentSize"] = "10GB"
     ent["workflowIdentifier"] = "basic"
     ent["datasetStructure"] = "with_code"
-    ent["experimentPackageList"] = ["experiment/exp1/"]
+    ent["experimentPackageList"] = ["experiments/exp1/"]
 
-    file = File("experiment/exp1/source/test.txt")
+    file = File("experiments/exp1/source/test.txt")
     file["contentSize"] = "15GB"
     file["experimentPackageFlag"] = True
-    dir_1 = Dataset("experiment/exp1/source/", {"name": "source"})
+    dir_1 = Dataset("experiments/exp1/source/", {"name": "source"})
     crate.add(file, ent, dir_1)
 
     # error: over filesize
     # error: about property is unrelated
-    # error: specific named directories are missing; experiment/exp1/input_data and experiment/exp1/output_data
+    # error: specific named directories are missing; experiments/exp1/input_data and experiments/exp1/output_data
     with pytest.raises(EntityError):
         ent.validate(crate)
 
     ent["about"] = {"@id": "./"}
     file["contentSize"] = "9GB"
-    dir_2 = Dataset("experiment/exp1/input_data/", {"name": "input_data"})
-    dir_3 = Dataset("experiment/exp1/output_data/", {"name": "output_data"})
+    dir_2 = Dataset("experiments/exp1/input_data/", {"name": "input_data"})
+    dir_3 = Dataset("experiments/exp1/output_data/", {"name": "output_data"})
     crate.add(dir_2, dir_3)
 
     # no error occurred
@@ -92,13 +92,13 @@ def test_validate() -> None:
     with pytest.raises(EntityError):
         ent.validate(crate)
 
-    ent["parameterExperimentList"] = ["experiment/exp1/parameter/"]
-    dir_3["@id"] = "experiment/exp1/parameter/output_data/"
-    # error: "experiment/exp1/parameter/params/" is missing
+    ent["parameterExperimentList"] = ["experiments/exp1/parameter/"]
+    dir_3["@id"] = "experiments/exp1/parameter/output_data/"
+    # error: "experiments/exp1/parameter/params/" is missing
     with pytest.raises(EntityError):
         ent.validate(crate)
 
-    dir_4 = Dataset("experiment/exp1/parameter/params/", {"name": "params"})
+    dir_4 = Dataset("experiments/exp1/parameter/params/", {"name": "params"})
     crate.add(dir_4)
 
     # no error occurred
