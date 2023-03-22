@@ -4,6 +4,7 @@ See [GitHub - NII-DG/nii-dg - schema/README.md](https://github.com/NII-DG/nii-dg
 
 ## DMPMetadata
 Metadata of research project that is the subject of this data management plan.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be the name with prefix `#`. | `#AMED-DMP` |
@@ -21,6 +22,7 @@ Metadata of research project that is the subject of this data management plan.
 
 ## DMP
 Data management plan for each data collection, e.g. creators of the data collection, access rights, and how to cite the data collection.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be data number with the prefix `#dmp:`. Indicates data number in the DMP list. | `#dmp:1` |
@@ -40,6 +42,7 @@ Data management plan for each data collection, e.g. creators of the data collect
 
 ## File
 A file included in the research project, e.g. text file, script file and images.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be either a URI Path relative to the top directory of your repository (stated in DMP entity) or an absolute URI. When the file is from outside this research project, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. | `config/setting.txt` |
@@ -53,6 +56,7 @@ A file included in the research project, e.g. text file, script file and images.
 
 ## ClinicalResearchRegistration
 Identifier information that is registered to clinical research Registration service.
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 | `@id` | `str` | Required. | MUST be URL where your registered information is available. | `https://jrct.niph.go.jp/latest-detail/jRCT202211111111` |

@@ -18,7 +18,7 @@ from nii_dg.utils import (check_all_prop_types, check_content_formats,
 
 REQUIRED_DIRECTORIES = {
     "with_code": ["source", "input_data", "output_data"],
-    "for_parameter": ["source", "input_data"]
+    "for_parameters": ["source", "input_data"]
 }
 
 SCHEMA_NAME = Path(__file__).stem
@@ -67,15 +67,15 @@ class GinMonitoring(ContextualEntity):
         if len(missing_dirs) > 0:
             validation_failures.add("experimentPackageList", f"Required Dataset entity is missing; @id `{missing_dirs}`.")
 
-        if self["datasetStructure"] == "for_parameter":
-            if "experimentParameterName" not in self:
-                validation_failures.add("experimentParameterName", "This property is required, but not found.")
+        if self["datasetStructure"] == "for_parameters":
+            if "parameterExperimentList" not in self:
+                validation_failures.add("parameterExperimentList", "This property is required, but not found.")
             else:
-                param_dir_list = [str(Path(param_dir_name).joinpath(required_dir_name)) + "/" for param_dir_name in self["experimentParameterName"]
+                param_dir_list = [str(Path(param_dir_name).joinpath(required_dir_name)) + "/" for param_dir_name in self["parameterExperimentList"]
                                   for required_dir_name in ["output_data", "params"]]
                 missing_param_dirs = [param_dir_path for param_dir_path in param_dir_list if param_dir_path not in dir_paths]
                 if len(missing_param_dirs) > 0:
-                    validation_failures.add("experimentParameterName", f"Required Dataset entity is missing; @id `{missing_param_dirs}`.")
+                    validation_failures.add("parameterExperimentList", f"Required Dataset entity is missing; @id `{missing_param_dirs}`.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures

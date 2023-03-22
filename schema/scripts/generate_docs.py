@@ -27,6 +27,7 @@ See [GitHub - {repo} - schema/README.md](https://github.com/{repo}/blob/main/sch
 TEMPLATE_ENTITY = """\
 ## {entity_name}
 {description}
+
 | Property | Type | Required? | Description | Example |
 | --- | --- | --- | --- | --- |
 """
