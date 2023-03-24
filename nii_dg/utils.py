@@ -4,7 +4,6 @@
 import datetime
 import hashlib
 import importlib
-import json
 import mimetypes
 import re
 import time
@@ -449,7 +448,7 @@ def get_entity_list_to_validate(entity: "Entity") -> Dict[str, Any]:
     return instance_type_dict
 
 
-def get_sapporo_run_status(run_id: str, endpoint: str) -> str:
+def get_sapporo_run_status(run_id: str, endpoint: str) -> Any:
     unknown_count = 0
     while True:
         run_status = requests.get(endpoint + "/runs/" + run_id + "/status", timeout=(10, 30))
