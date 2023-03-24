@@ -2,16 +2,15 @@
 # coding: utf-8
 
 import json
+import sys
 from pathlib import Path
 from pprint import pprint
 
 from nii_dg.ro_crate import ROCrate
 
-EXAMPLE_JSONLD_PATH = Path(__file__).parent.joinpath("example_complete.json")
 
-
-def main() -> None:
-    with EXAMPLE_JSONLD_PATH.open("r", encoding="utf-8") as f:
+def main(jsonld_path: Path) -> None:
+    with jsonld_path.open("r", encoding="utf-8") as f:
         jsonld = json.load(f)
     crate = ROCrate(jsonld=jsonld)
     print("=== Root ===")
@@ -25,4 +24,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    jsonld_path = Path(__file__).parent.joinpath(sys.argv[1])
+    main(jsonld_path)

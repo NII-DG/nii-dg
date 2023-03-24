@@ -31,7 +31,7 @@ class EntityError(Exception):
 
     def __init__(self, entity: "Entity") -> None:
         self.entity = entity
-        self.message_dict: Dict[str, List[str]] = {}
+        self.message_dict: Dict[str, str] = {}
 
     def __str__(self) -> str:
         return str({repr(self.entity): self.message_dict})
@@ -43,16 +43,7 @@ class EntityError(Exception):
         """\
         Add a message to the message dictionary.
         """
-        self.message_dict.setdefault(prop, [message])
-
-    def add_as_list(self, prop: str, message: str) -> None:
-        """\
-        Add a message to the message dictionary.
-        """
-        if prop not in self.message_dict:
-            self.message_dict[prop] = [message]
-            return
-        self.message_dict[prop].append(message)
+        self.message_dict.setdefault(prop, message)
 
     def add_by_dict(self, messages: str) -> None:
         """\
@@ -61,7 +52,7 @@ class EntityError(Exception):
         # TODO: check this implementation (looks like a hack)
         message_dict = ast.literal_eval(messages)
         for key, value in zip(message_dict.keys(), message_dict.values()):
-            self.message_dict.setdefault(key, [value])
+            self.message_dict.setdefault(key, value)
 
 
 class CrateError(Exception):

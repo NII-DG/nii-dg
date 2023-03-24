@@ -18,7 +18,7 @@ from nii_dg.utils import (check_all_prop_types, check_content_formats,
 
 REQUIRED_DIRECTORIES = {
     "with_code": ["source", "input_data", "output_data"],
-    "for_parameter": ["source", "input_data", "parameters/output_data", "parameters/params", "temp/output_data", "temp_params"]
+    "for_parameters": ["source", "input_data"]
 }
 
 SCHEMA_NAME = Path(__file__).stem
@@ -60,12 +60,22 @@ class GinMonitoring(ContextualEntity):
             validation_failures.add("contentSize", "The total file size of ginfork.File labeled as an experimental package is larger than the defined size.")
 
         dir_paths = [dir.id for dir in crate.get_by_entity_type(Dataset)]
-        # TODO: update file name rules
-        dir_list = [Path(experiment_dir).joinpath(dir_name) for experiment_dir in self["experimentPackageList"]
-                    for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]]
-        for dir_path in dir_list:
-            if str(dir_path) + "/" not in dir_paths:
-                validation_failures.add_as_list("experimentPackageList", f"Dataset entity with @id `{dir_path}` is required.")
+
+        required_dir_list = [str(Path(experiment_dir).joinpath(dir_name)) + "/" for experiment_dir in self["experimentPackageList"]
+                             for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]]
+        missing_dirs = [dir_path for dir_path in required_dir_list if dir_path not in dir_paths]
+        if len(missing_dirs) > 0:
+            validation_failures.add("experimentPackageList", f"Required Dataset entity is missing; @id `{missing_dirs}`.")
+
+        if self["datasetStructure"] == "for_parameters":
+            if "parameterExperimentList" not in self:
+                validation_failures.add("parameterExperimentList", "This property is required, but not found.")
+            else:
+                param_dir_list = [str(Path(param_dir_name).joinpath(required_dir_name)) + "/" for param_dir_name in self["parameterExperimentList"]
+                                  for required_dir_name in ["output_data", "params"]]
+                missing_param_dirs = [param_dir_path for param_dir_path in param_dir_list if param_dir_path not in dir_paths]
+                if len(missing_param_dirs) > 0:
+                    validation_failures.add("parameterExperimentList", f"Required Dataset entity is missing; @id `{missing_param_dirs}`.")
 
         if len(validation_failures.message_dict) > 0:
             raise validation_failures
