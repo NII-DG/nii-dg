@@ -2,9 +2,11 @@
 # coding: utf-8
 
 import datetime
+import hashlib
 import importlib
 import mimetypes
 import re
+import time
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
                     Optional, Tuple, TypedDict, Union)
@@ -18,6 +20,7 @@ from nii_dg.error import PropsError, UnexpectedImplementationError
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
+    from nii_dg.schema.sapporo import SapporoRun
 
 
 class EntityDefDict(TypedDict):
@@ -429,7 +432,7 @@ def sum_file_size(size_unit: str, entity_list: List["Entity"]) -> float:
         else:
             raise UnexpectedImplementationError
 
-        file_size_sum += round(file_size / 1024 ** (unit - file_unit), 3)
+        file_size_sum += round(file_size / 1000 ** (unit - file_unit), 3)
 
     return file_size_sum
 
@@ -443,3 +446,41 @@ def get_entity_list_to_validate(entity: "Entity") -> Dict[str, Any]:
             if flg == 1:
                 instance_type_dict[prop] = expected_python_type
     return instance_type_dict
+
+
+def get_sapporo_run_status(run_id: str, endpoint: str) -> Any:
+    unknown_count = 0
+    while True:
+        run_status = requests.get(endpoint + "/runs/" + run_id + "/status", timeout=(10, 30))
+        if run_status.json()["state"] not in ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]:
+            if run_status.json()["state"] == "UNKNOWN":
+                unknown_count += 1
+            break
+        if unknown_count > 5:
+            raise TimeoutError("Aborted as the status remains `UNKNOWN` for a while")
+        time.sleep(30)
+    return run_status.json()["state"]
+
+
+def download_file_from_url(url: str, file_path: Path) -> None:
+    request = requests.get(url, timeout=(10, 120))
+    with open(file_path, 'w', encoding="utf_8") as f:
+        f.write(request.text)
+
+
+def get_file_sha256(file_path: Path) -> str:
+    with open(file_path, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()
+
+
+def generate_run_request_json(sapporo_run: "SapporoRun") -> Dict[str, Optional[str]]:
+    key_list = ["workflow_params", "workflow_type", "workflow_type_version", "tags", "workflow_engine_name", "workflow_engine_parameters",
+                "workflow_url", "workflow_name", "workflow_attachment"]
+    value_list = [None] * len(key_list)
+    run_request: Dict[str, Optional[str]] = dict(zip(key_list, value_list))
+
+    for key in key_list:
+        if key in sapporo_run:
+            run_request[key] = sapporo_run[key]
+
+    return run_request

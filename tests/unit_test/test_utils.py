@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
 import datetime
-from typing import Any, List, Literal, Union
+from pathlib import Path
+from typing import Any, Dict, List, Literal, Union
+from unittest.mock import mock_open, patch
 
 import pytest
 
@@ -10,6 +12,7 @@ from nii_dg.error import PropsError
 from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import Organization, Person
+from nii_dg.schema.sapporo import SapporoRun
 from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_content_formats, check_content_size,
                           check_email, check_erad_researcher_number,
@@ -18,11 +21,30 @@ from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
                           check_required_props, check_sha256,
                           check_unexpected_props, check_url, check_value_type,
                           classify_uri, convert_string_type_to_python_type,
-                          get_entity_list_to_validate, get_name_from_ror,
+                          download_file_from_url, generate_run_request_json,
+                          get_entity_list_to_validate, get_file_sha256,
+                          get_name_from_ror, get_sapporo_run_status,
                           import_entity_class,
                           load_entity_def_from_schema_file, sum_file_size,
                           verify_is_past_date)
 
+# --- mock ---
+
+
+def mocked_requests_get(*args: Any, **kwargs: Any) -> Any:
+    # mock of requests.get
+    class MockResponse:
+        def __init__(self, json_data: Dict[str, Any], status_code: int) -> None:
+            self.json_data = json_data
+            self.status_code = status_code
+
+        def json(self) -> Dict[str, Any]:
+            return self.json_data
+
+    return MockResponse({"state": "COMPLETE"}, 200)
+
+
+# --- tests ---
 
 def test_load_entity_def_from_schema_file() -> None:
     excepted_entity_def = load_entity_def_from_schema_file("base", "Person")
@@ -334,3 +356,34 @@ def test_get_entity_list_to_validate() -> None:
     file = BaseFile("sample")
     assert len(get_entity_list_to_validate(file)) == 0
     assert isinstance(get_entity_list_to_validate(file), dict)
+
+
+@patch("requests.get", side_effect=mocked_requests_get)
+def test_get_sapporo_run_status(get_mock: Any) -> None:
+    assert get_sapporo_run_status("run_id", "endpoint") == "COMPLETE"
+
+    get_mock.assert_called_once()
+
+
+@patch("builtins.open", new_callable=mock_open)
+def test_download_file_from_url(open_mock: Any) -> None:
+    download_file_from_url("https://example.com", Path("path/to/file"))
+
+    open_mock.assert_called_once()
+
+
+@patch("builtins.open", new_callable=mock_open, read_data=b"test")
+def test_get_file_sha256(open_mock: Any) -> None:
+    assert get_file_sha256(Path("path/to/file")) == "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+    open_mock.assert_called_once()
+
+
+def test_generate_run_request_json() -> None:
+    sapporo_run = SapporoRun(props={
+        "sapporo_location": "https://example.com/sapporo",
+        "workflow_engine_name": "CWL",
+        "workflow_params": """{"fastq_1":{"location":"ERR034597_1.small.fq.gz","class":"File"},"fastq_2":{"location":"ERR034597_2.small.fq.gz","class":"File"},"nthreads":2}"""
+    })
+    assert generate_run_request_json(sapporo_run) == {
+        "workflow_params": """{"fastq_1":{"location":"ERR034597_1.small.fq.gz","class":"File"},"fastq_2":{"location":"ERR034597_2.small.fq.gz","class":"File"},"nthreads":2}""",
+        "workflow_type": None, "workflow_type_version": None, "tags": None, "workflow_engine_name": "CWL", "workflow_engine_parameters": None, "workflow_url": None, "workflow_name": None, "workflow_attachment": None}
