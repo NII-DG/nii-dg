@@ -34,11 +34,11 @@ from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
 def mocked_requests_get(*args: Any, **kwargs: Any) -> Any:
     # mock of requests.get
     class MockResponse:
-        def __init__(self, json_data: Dict[str, str], status_code: int) -> None:
+        def __init__(self, json_data: Dict[str, Any], status_code: int) -> None:
             self.json_data = json_data
             self.status_code = status_code
 
-        def json(self) -> Dict[str, str]:
+        def json(self) -> Dict[str, Any]:
             return self.json_data
 
     return MockResponse({"state": "COMPLETE"}, 200)
