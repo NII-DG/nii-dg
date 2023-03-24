@@ -34,7 +34,6 @@ setup(
         "types-requests",
         "types-Flask",
         "types-waitress",
-        "types-mock",
     ],
     extras_require={
         "tests": [
@@ -46,7 +45,6 @@ setup(
             "types-requests",
             "types-Flask",
             "types-waitress",
-            "types-mock",
         ],
     },
     classifiers=[

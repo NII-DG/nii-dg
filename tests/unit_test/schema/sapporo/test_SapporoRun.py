@@ -13,15 +13,15 @@ from nii_dg.schema.sapporo import Dataset, File, SapporoRun
 # --- mock ---
 
 
-def mocked_ignore_func(*args, **kwargs) -> None:
+def mocked_ignore_func(*args: Any, **kwargs: Any) -> None:
     # do nothing
     pass
 
 
-def mocked_requests_get(*args, **kwargs) -> Any:
+def mocked_requests_get(*args: Any, **kwargs: Any) -> Any:
     # mock of get to sapporo_server
     class MockResponse:
-        def __init__(self, json_data, status_code) -> None:
+        def __init__(self, json_data: Dict[str, str], status_code: int) -> None:
             self.json_data = json_data
             self.status_code = status_code
 
@@ -36,10 +36,10 @@ def mocked_requests_get(*args, **kwargs) -> Any:
                         200)
 
 
-def mocked_requests_post(*args, **kwargs) -> Any:
+def mocked_requests_post(*args: Any, **kwargs: Any) -> Any:
     # mock of post to sapporo_server
     class MockResponse:
-        def __init__(self, json_data, status_code) -> None:
+        def __init__(self, json_data: Dict[str, str], status_code: int) -> None:
             self.json_data = json_data
             self.status_code = status_code
 

@@ -31,10 +31,10 @@ from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
 # --- mock ---
 
 
-def mocked_requests_get(*args, **kwargs) -> Any:
+def mocked_requests_get(*args: Any, **kwargs: Any) -> Any:
     # mock of requests.get
     class MockResponse:
-        def __init__(self, json_data, status_code) -> None:
+        def __init__(self, json_data: Dict[str, str], status_code: int) -> None:
             self.json_data = json_data
             self.status_code = status_code
 
