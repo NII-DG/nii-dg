@@ -2,7 +2,7 @@
 # coding: utf-8
 import datetime
 from pathlib import Path
-from typing import Any, List, Literal, Union
+from typing import Any, Dict, List, Literal, Union
 from unittest.mock import mock_open, patch
 
 import pytest
@@ -34,11 +34,11 @@ from nii_dg.utils import (EntityDef, access_url, check_all_prop_types,
 def mocked_requests_get(*args, **kwargs) -> Any:
     # mock of requests.get
     class MockResponse:
-        def __init__(self, json_data, status_code):
+        def __init__(self, json_data, status_code) -> None:
             self.json_data = json_data
             self.status_code = status_code
 
-        def json(self):
+        def json(self) -> Dict[str, str]:
             return self.json_data
 
     return MockResponse({"state": "COMPLETE"}, 200)

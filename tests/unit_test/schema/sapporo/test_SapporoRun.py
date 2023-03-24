@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-from typing import Any
+from typing import Any, Dict
 from unittest.mock import mock_open, patch
 
 import pytest
@@ -13,7 +13,7 @@ from nii_dg.schema.sapporo import Dataset, File, SapporoRun
 # --- mock ---
 
 
-def mocked_ignore_func(*args, **kwargs) -> Any:
+def mocked_ignore_func(*args, **kwargs) -> None:
     # do nothing
     pass
 
@@ -21,14 +21,14 @@ def mocked_ignore_func(*args, **kwargs) -> Any:
 def mocked_requests_get(*args, **kwargs) -> Any:
     # mock of get to sapporo_server
     class MockResponse:
-        def __init__(self, json_data, status_code):
+        def __init__(self, json_data, status_code) -> None:
             self.json_data = json_data
             self.status_code = status_code
 
-        def json(self):
+        def json(self) -> Dict[str, str]:
             return self.json_data
 
-        def text(self):
+        def text(self) -> str:
             return str(self.json_data)
 
     return MockResponse({"state": "COMPLETE", "outputs":
@@ -39,14 +39,14 @@ def mocked_requests_get(*args, **kwargs) -> Any:
 def mocked_requests_post(*args, **kwargs) -> Any:
     # mock of post to sapporo_server
     class MockResponse:
-        def __init__(self, json_data, status_code):
+        def __init__(self, json_data, status_code) -> None:
             self.json_data = json_data
             self.status_code = status_code
 
-        def json(self):
+        def json(self) -> Dict[str, str]:
             return self.json_data
 
-        def raise_for_status(self):
+        def raise_for_status(self) -> None:
             pass
 
     return MockResponse({"run_id": "test"}, 200)
