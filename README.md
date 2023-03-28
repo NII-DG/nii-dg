@@ -37,7 +37,7 @@ $ docker run -it --rm ghcr.io/NII-DG/nii-dg:latest bash
 
 ## Usage
 
-上記の通り、本ライブラリは 3つの機能に分かれている。
+上記の通り、本ライブラリは 3 つの機能に分かれている。
 
 1. Schema definition: Metadata Schema とその検証ルールの定義
 2. Packaging: パッケージング (RO-Crate 化)
@@ -99,10 +99,10 @@ ro_crate.dump("ro-crate-metadata.json")
 
 - [./tests/examples/example.py](./tests/examples/example.py)
 
-#### RO-Crate Metadata File DescriptorとRoot Data Entity
+#### RO-Crate Metadata File Descriptor と Root Data Entity
 
 上述の Minimal example における 2 つの Entity は、RO-Crate における [必須のエンティティ](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html) である。
-以下の2つが必須のエンティティである:
+以下の 2 つが必須のエンティティである:
 
 - RO-Crate Metadata File Descriptor
   - `@type`: `CreativeWork`
@@ -221,7 +221,7 @@ Packaging における型検査 (`entity.check_props()`) と、Validation にお
 
 - `entity.check_props()`:
   - 各 prop の型検査を行う
-     -  例: 型定義str に対して int が設定されているなど、型の不一致を検出する
+    - 例: 型定義 str に対して int が設定されているなど、型の不一致を検出する
   - required の prop が設定されているか、などの検査を行う
 - `entity.validate()`:
   - より高度な検証を行う
@@ -295,4 +295,5 @@ Release 用の GitHub actions として、以下のように設定されてい�
 
 ## License
 
-[TODO: not set yet]
+[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
+See the [LICENSE](https://github.com/sapporo-wes/yevis-cli/blob/main/LICENSE).
