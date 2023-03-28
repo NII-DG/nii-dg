@@ -10,13 +10,16 @@ import importlib
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import (Any, Dict, Literal, NewType, Optional, Tuple, TypedDict,
-                    Union, get_args, get_origin)
+from typing import (TYPE_CHECKING, Any, Dict, List, Literal, NewType, Optional,
+                    Tuple, TypedDict, Union, get_args, get_origin)
 
 import yaml
 
 from nii_dg.const import RO_CRATE_CONTEXT
 from nii_dg.module_info import GH_REF, GH_REPO
+
+if TYPE_CHECKING:
+    from nii_dg.entity import Entity
 
 NOW = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
@@ -158,7 +161,8 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
             "List[int]" ->
                 Subscript(value=Name(id='List', ctx=Load()), slice=Index(value=Name(id='int', ctx=Load())), ctx=Load())
             "Dict[str, int]" ->
-                Subscript(value=Name(id='Dict', ctx=Load()), slice=Index(value=Tuple(elts=[Name(id='str', ctx=Load()), Name(id='int', ctx=Load())], ctx=Load())), ctx=Load())
+                Subscript(value=Name(id='Dict', ctx=Load()), slice=Index(value=Tuple(
+                    elts=[Name(id='str', ctx=Load()), Name(id='int', ctx=Load())], ctx=Load())), ctx=Load())
             "str" -> Name(id='str', ctx=Load())
             "List" -> Name(id='List', ctx=Load())
             "Entity" -> Name(id='Entity', ctx=Load())
@@ -262,3 +266,41 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
     # parsed_expected_type: e.g., typing.List[int], typing.Dict[str, int], int, etc.
 
     return check_type(value, parsed_expected_type)
+
+
+# TODO: update
+def sum_file_size(size_unit: str, entities: List["Entity"]) -> float:
+    """\
+    Sum the file sizes of the given entities and convert the result to the specified unit.
+
+    Args:
+        size_unit (str): The unit of the file size to be summed. e.g., "B", "KB", "MB", "GB", "TB", "PB"
+        entities (List[Entity]): The entities whose file sizes are to be summed.
+
+    Returns:
+        float: The sum of the file sizes of the given entities in the specified unit.
+    """
+    unit_conversion_table = {
+        "B": 1,
+        "KB": 1024,
+        "MB": 1024 ** 2,
+        "GB": 1024 ** 3,
+        "TB": 1024 ** 4,
+        "PB": 1024 ** 5,
+    }
+    if size_unit not in unit_conversion_table:
+        raise ValueError(f"Invalid size unit: {size_unit}")
+
+    total_size = 0
+    for entity in entities:
+        if "contentSize" not in entity:
+            raise ValueError(f"contentSize is not defined for {entity}")
+        match = re.match(r"^(?P<size>\d+)(?P<unit>[KMGTP]?B)$", entity["contentSize"])
+        if match is None:
+            raise ValueError(f"Invalid content size: {entity['contentSize']}")
+        size = int(match.group("size"))
+        unit = match.group("unit")
+        total_size += size * unit_conversion_table[unit]
+
+    # round to 2 decimal places
+    return round(total_size / unit_conversion_table[size_unit], 3)

@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict
 
 from nii_dg.check_functions import (check_entity_values, is_absolute_path,
-                                    is_iso8601, is_url, is_url_accessible)
+                                    is_iso8601, is_url)
 from nii_dg.entity import ContextualEntity, EntityDef
 from nii_dg.error import EntityError
 from nii_dg.schema.base import File as BaseFile
@@ -21,7 +21,7 @@ SCHEMA_DEF = load_schema_file(SCHEMA_FILE_PATH)
 
 
 class DMPMetadata(ContextualEntity):
-    def __init__(self, id_: str = "#AMED-DMP", props: Dict[str, Any] = {"name": "AMED-DMP"},
+    def __init__(self, id_: str = "#METI-DMP", props: Dict[str, Any] = {"name": "METI-DMP"},
                  schema_name: str = SCHEMA_NAME,
                  entity_def: EntityDef = SCHEMA_DEF["DMPMetadata"]):
         super().__init__(id_, props, schema_name, entity_def)
@@ -29,13 +29,11 @@ class DMPMetadata(ContextualEntity):
     def check_props(self) -> None:
         super().check_props()
 
-        error = check_entity_values(self, {
-            "sdDatePublished": is_iso8601,
-        })
-        if self.id != "#AMED-DMP":
-            error.add("id", "The id MUST be '#AMED-DMP'.")
-        if self["name"] != "AMED-DMP":
-            error.add("name", "The name MUST be 'AMED-DMP'.")
+        error = EntityError(self)
+        if self.id != "#METI-DMP":
+            error.add("id", "The id MUST be '#METI-DMP'.")
+        if self["name"] != "METI-DMP":
+            error.add("name", "The name MUST be 'METI-DMP'.")
 
         if error.has_error():
             raise error
@@ -43,16 +41,13 @@ class DMPMetadata(ContextualEntity):
     def validate(self, crate: "ROCrate") -> None:
         error = EntityError(self)
         if self["about"] != crate.root and self["about"] != {"@id": "./"}:
-            error.add("about", "The value of the about property MUST be the RootDataEntity of this crate.")
-        if len(self["hasPart"]) > 0:
-            if self.get("creator") is None:
-                error.add("creator", "The creator property is required when the hasPart property is not empty.")
-            if self.get("hostingInstitution") is None:
-                error.add("hostingInstitution", "The hostingInstitution property is required when the hasPart property is not empty.")
-            if self.get("dataManager") is None:
-                error.add("dataManager", "The dataManager property is required when the hasPart property is not empty.")
-        if len(self["hasPart"]) > len(crate.get_by_type("DMP")):
-            error.add("hasPart", "The number of the hasPart property MUST be equal to the number of DMP entities.")
+            error.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
+        if len(self["hasPart"]) != len(crate.get_by_type("DMP")):
+            diff = []
+            for dmp in crate.get_by_type("DMP"):
+                if dmp not in self["hasPart"]:
+                    diff.append(dmp)
+            error.add("hasPart", f"There is an omission of DMP entity in the list: {diff}.")
 
         if error.has_error():
             raise error
@@ -72,35 +67,47 @@ class DMP(ContextualEntity):
         })
         if "dataNumber" in self:
             if self.id != f"#dmp:{self['dataNumber']}":
-                error.add("id", "The id MUST be '#dmp:<dataNumber>'.")
+                error.add("id", "The id MUST be '#dmp:{dataNumber}'.")
 
         if error.has_error():
             raise error
 
-    def validate(self, crate: ROCrate) -> None:
+    def validate(self, crate: "ROCrate") -> None:
         error = EntityError(self)
 
         dmp_metadata_ents = crate.get_by_type("DMPMetadata")
         if len(dmp_metadata_ents) == 0:
-            error.add("AnotherEntity", "Entity `DMPMetadata` MUST be required with DMP entity.")
+            error.add("AnotherEntity", "Entity 'DMPMetadata' MUST be required with DMP entity.")
         else:
             dmp_metadata_ent = dmp_metadata_ents[0]
             if "repository" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
                 error.add("repository", "This property is required, but not found.")
 
-            if self["accessRights"] == "Unrestricted Open Sharing" and "distribution" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
+            if self["accessRights"] == "open access" and "distribution" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
                 error.add("distribution", "This property is required, but not found.")
 
-        if self["accessRights"] in ["Unshared", "Restricted Closed Sharing"] and\
-                not any(map(self.keys().__contains__, ("availabilityStarts", "reasonForConcealment"))):
-            error.add("availabilityStarts",
-                      "This property is required, but not found. If the dataset remains unshared, add reasonForConcealment property instead.")
+        if self["accessRights"] != "open access" and "reasonForConcealment" not in self.keys():
+            error.add("reasonForConcealment", "This property is required, but not found.")
 
-        if "availabilityStarts" in self.keys() and self["accessRights"] in ["Restricted Open Sharing", "Unrestricted Open Sharing"]:
-            error.add("availabilityStarts", "This property is not required because the data is accessible at this time.")
+        if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
+            error.add("availabilityStarts", "This property is required, but not found.")
 
-        if self["gotInformedConsent"] == "yes" and "informedConsentFormat" not in self.keys():
-            error.add("informedConsentFormat", "This property is required, but not found.")
+        if self["accessRights"] != "embargoed access" and "availabilityStarts" in self.keys():
+            error.add("availabilityStarts", "This property is not required.")
+
+        if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self.keys():
+            error.add("isAccessibleForFree", "This property is required, but not found.")
+
+        if self["accessRights"] == "open access":
+            if "isAccessibleForFree" in self.keys() and self["isAccessibleForFree"] is False:
+                error.add("isAccessibleForFree", "The value MUST be True.")
+            if "license" not in self.keys():
+                error.add("license", "This property is required, but not found.")
+            if "contentSize" not in self.keys():
+                error.add("contentSize", "This property is required, but not found.")
+
+        if self["accessRights"] in ["open access", "restricted access", "embargoed access"] and "contactPoint" not in self.keys():
+            error.add("contactPoint", "This property is required, but not found.")
 
         if "contentSize" in self.keys():
             target_files = []
@@ -136,38 +143,12 @@ class File(BaseFile):
         if error.has_error():
             raise error
 
-    def validate(self, crate: ROCrate) -> None:
+    def validate(self, crate: "ROCrate") -> None:
         error = EntityError(self)
 
         if is_url(self.id):
             if "sdDatePublished" not in self:
                 error.add("sdDatePublished", "This property is required, but not found.")
-
-        if error.has_error():
-            raise error
-
-
-class ClinicalResearchRegistration(ContextualEntity):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["ClinicalResearchRegistration"]):
-        super().__init__(id_, props, schema_name, entity_def)
-
-    def check_props(self) -> None:
-        super().check_props()
-
-        error = check_entity_values(self, {
-            "@id": is_url,
-        })
-
-        if error.has_error():
-            raise error
-
-    def validate(self, crate: ROCrate) -> None:
-        error = EntityError(self)
-
-        if not is_url_accessible(self.id):
-            error.add("id", "The URL is not accessible.")
 
         if error.has_error():
             raise error
