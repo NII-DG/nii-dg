@@ -21,8 +21,6 @@ setup(
     install_requires=[
         "flask",
         "pyyaml",
-        "typeguard",
-        "requests",
         "waitress",
     ],
     tests_require=[
@@ -31,7 +29,6 @@ setup(
         "mypy",
         "pytest",
         "types-PyYAML",
-        "types-requests",
         "types-Flask",
         "types-waitress",
     ],
@@ -42,7 +39,6 @@ setup(
             "mypy",
             "pytest",
             "types-PyYAML",
-            "types-requests",
             "types-Flask",
             "types-waitress",
         ],
