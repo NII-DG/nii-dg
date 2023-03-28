@@ -201,6 +201,7 @@ class ROCrate():
                 if gh_ref != GH_REF:
                     # TODO: check gh_ref is semver or not? using is_semantic_version()
                     # TODO: check newer version is available or not? using is_newer_version()
+                    # TODO: download context file, them download schema file or not?
                     download_schema(gh_repo, gh_ref, schema)
                     entity_class = import_custom_class(f".{DOWNLOADED_SCHEMA_DIR_NAME}.{gh_repo}.{gh_ref}.{schema}", type_)
                 else:
