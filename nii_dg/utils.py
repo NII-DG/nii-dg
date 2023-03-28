@@ -12,10 +12,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import (TYPE_CHECKING, Any, Dict, List, Literal, NewType, Optional,
                     Tuple, TypedDict, Union, get_args, get_origin)
+from urllib.error import HTTPError
+from urllib.request import urlopen
 
 import yaml
 
-from nii_dg.const import RO_CRATE_CONTEXT
+from nii_dg.const import DOWNLOADED_SCHEMA_DIR_NAME, RO_CRATE_CONTEXT
 from nii_dg.module_info import GH_REF, GH_REPO
 
 if TYPE_CHECKING:
@@ -266,6 +268,84 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
     # parsed_expected_type: e.g., typing.List[int], typing.Dict[str, int], int, etc.
 
     return check_type(value, parsed_expected_type)
+
+
+def is_semantic_version(version: str) -> bool:
+    """
+    Check if a given string is a semantic version.
+
+    Args:
+        version (str): The string to be checked.
+
+    Returns:
+        bool: True if the given string is a semantic version, False otherwise.
+    """
+    return re.fullmatch(r"\d+\.\d+\.\d+", version) is not None
+
+
+def is_version_newer(ver1: str, ver2: str) -> bool:
+    """
+    Compare two version strings in semantic versioning format.
+
+    Args:
+        ver1 (str): The first version.
+        ver2 (str): The second version.
+
+    Returns:
+        bool: True if the first version is newer than the second version, False otherwise.
+    """
+    ver1_split = ver1.split(".")
+    ver2_split = ver2.split(".")
+
+    while len(ver1_split) < len(ver2_split):
+        ver1_split.append("0")
+    while len(ver2_split) < len(ver1_split):
+        ver2_split.append("0")
+
+    for i in range(len(ver1_split)):
+        if int(ver1_split[i]) > int(ver2_split[i]):
+            return True
+        elif int(ver1_split[i]) < int(ver2_split[i]):
+            return False
+
+    return False
+
+
+def download_schema(gh_repo: str, gh_ref: str, schema_module_name: str) -> None:
+    """\
+    Download a schema module from a GitHub repository.
+
+    Args:
+        gh_repo (str): The GitHub repository from which the schema module is to be downloaded.
+        gh_ref (str): The reference (branch, tag, or commit) of the GitHub repository.
+        schema_module_name (str): The name of the schema module to be downloaded.
+
+    Note:
+        Downloaded schema modules are stored in the 'nii_dg/downloaded_schema' directory.
+    """
+    schema_module_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.py"
+    schema_file_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.yml"
+
+    schema_dir = Path(f"./{DOWNLOADED_SCHEMA_DIR_NAME}/{gh_repo}/{gh_ref}")
+    schema_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        schema_module_path = schema_dir.joinpath(f"{schema_module_name}.py")
+        if not schema_module_path.exists():
+            with urlopen(schema_module_url) as res:
+                schema_module = res.read().decode("utf-8")
+            with schema_module_path.open("w") as f:
+                f.write(schema_module)
+        schema_file_path = schema_dir.joinpath(f"{schema_module_name}.yml")
+        if not schema_file_path.exists():
+            with urlopen(schema_file_url) as res:
+                schema_file = res.read().decode("utf-8")
+            with schema_file_path.open("w") as f:
+                f.write(schema_file)
+    except HTTPError as e:
+        if e.code == 404:
+            raise ValueError(f"Schema module '{schema_module_name}' does not exist in the given GitHub repository.")
+        else:
+            raise e
 
 
 # TODO: update
