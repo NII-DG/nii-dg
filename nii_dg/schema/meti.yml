@@ -1,9 +1,9 @@
 DMPMetadata:
   description: Metadata of research project that is the subject of this data management plan.
   props:
-    '@id':
+    "@id":
       expected_type: str
-      example: '#METI-DMP'
+      example: "#METI-DMP"
       required: Required.
       description: MUST be the name with prefix `#`.
     about:
@@ -44,9 +44,9 @@ DMPMetadata:
 DMP:
   description: Contents from data management plan that is (will be) submitted to the funding agency.
   props:
-    '@id':
+    "@id":
       expected_type: str
-      example: '#dmp:1'
+      example: "#dmp:1"
       required: Required.
       description: MUST be data No. with the prefix `#dmp:`. Indicates data number in the DMP list.
     dataNumber:
@@ -86,7 +86,7 @@ DMP:
       description: Indicates why access to the data set is restricted or embargoed.
     availabilityStarts:
       expected_type: str
-      example: '2030-04-01'
+      example: "2030-04-01"
       required: Required when accessRights has `embargoed access`.
       description: MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
     creator:
@@ -101,7 +101,7 @@ DMP:
       description: An explanation of the technique for collecting data.
     isAccessibleForFree:
       expected_type: bool
-      example: 'True'
+      example: "True"
       required: Required when accessRights has `open access` or `restricted access`.
       description: MUST be a boolean. `True` means the data set is free to access, while `False` means consideration. When accessRights has `open access`, MUST be `True`.
     license:
@@ -137,7 +137,7 @@ DMP:
 File:
   description: A file included in the research project, e.g. text file, script file and images.
   props:
-    '@id':
+    "@id":
       expected_type: str
       example: config/setting.txt
       required: Required.
@@ -174,6 +174,6 @@ File:
       description: MUST be a direct URL to the file.
     sdDatePublished:
       expected_type: str
-      example: '2022-12-01'
+      example: "2022-12-01"
       required: Required when the file is from outside this research project.
       description: Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.

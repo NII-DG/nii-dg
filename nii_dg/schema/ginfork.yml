@@ -1,9 +1,9 @@
 GinMonitoring:
   description: Monitoring function for the GIN-fork platform.
   props:
-    '@id':
+    "@id":
       description: MUST be `#ginmonitoring`.
-      example: '#ginmonitoring'
+      example: "#ginmonitoring"
       required: Required.
       expected_type: str
     about:
@@ -29,7 +29,7 @@ GinMonitoring:
 File:
   description: A file monitored in the GIN-fork platform.
   props:
-    '@id':
+    "@id":
       description: MUST be either a URI Path relative to the RO-Crate root or an absolute URI. When the file is from outside this research project, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
       example: config/setting.txt
       required: Required.
@@ -61,11 +61,11 @@ File:
       expected_type: str
     sdDatePublished:
       description: Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
-      example: '2022-12-01'
+      example: "2022-12-01"
       required: Required when the file is from outside this research project.
       expected_type: str
     experimentPackageFlag:
       description: Indicates whether the file is included in an experiment package.  MUST be a boolean.
-      example: 'True'
+      example: "True"
       required: Required.
       expected_type: bool

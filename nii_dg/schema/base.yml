@@ -1,7 +1,7 @@
 File:
   description: A file included in the research project, e.g. text file, script file and images.
   props:
-    '@id':
+    "@id":
       expected_type: str
       example: config/setting.txt
       required: Required.
@@ -33,13 +33,13 @@ File:
       description: MUST be a direct URL to the file.
     sdDatePublished:
       expected_type: str
-      example: '2022-12-01'
+      example: "2022-12-01"
       required: Required when the file is from outside the RO-Crate Root.
       description: Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
 Dataset:
   description: A folder of the files included in the research project.
   props:
-    '@id':
+    "@id":
       expected_type: str
       example: config/
       required: Required.
@@ -57,7 +57,7 @@ Dataset:
 Organization:
   description: An organization related to the research project, e.g. university, research institution and funding agency.
   props:
-    '@id':
+    "@id":
       expected_type: str
       example: https://ror.org/04ksd4g47
       required: Required.
@@ -80,7 +80,7 @@ Organization:
 Person:
   description: A person who contributes to the research project, e.g. researcher.
   props:
-    '@id':
+    "@id":
       expected_type: str
       example: https://orcid.org/0000-0001-2345-6789
       required: Required.
@@ -107,15 +107,15 @@ Person:
       description: Email address of the person.
     telephone:
       expected_type: str
-      example: '03-0000-0000'
+      example: "03-0000-0000"
       required: Optional.
       description: Phone number of the person. Hyphen can be used as a separator.
 License:
   description: A license granted to the data.
   props:
-    '@id':
+    "@id":
       expected_type: str
-      example: 'https://www.apache.org/licenses/LICENSE-2.0'
+      example: "https://www.apache.org/licenses/LICENSE-2.0"
       required: Required.
       description: MUST be URL of the license.
     name:
@@ -131,9 +131,9 @@ License:
 RepositoryObject:
   description: A repository where the research data is managed in
   props:
-    '@id':
+    "@id":
       expected_type: str
-      example: 'https://doi.org/xxxxxxxx'
+      example: "https://doi.org/xxxxxxxx"
       required: Required.
       description: MUST be URI of the repository. If it is URL and free to access, DOI link is recommended.
     name:
@@ -149,7 +149,7 @@ RepositoryObject:
 DataDownload:
   description: Downloadable dataset from the research project.
   props:
-    '@id':
+    "@id":
       expected_type: str
       example: https://zenodo.org/record/example
       required: Required.
@@ -166,14 +166,14 @@ DataDownload:
       description: MUST be the SHA-2 SHA256 hash of the download file.
     uploadDate:
       expected_type: str
-      example: '2022-12-01'
+      example: "2022-12-01"
       required: Optional.
       description: MUST be a string in ISO 8601 date format. Indicates the date when this data set was uploaded to this site.
 HostingInstitution:
   # based on Organization entity
   description: An organization that has responsibility of managing research data.
   props:
-    '@id':
+    "@id":
       expected_type: str
       example: https://ror.org/04ksd4g47
       required: Required.
@@ -190,15 +190,15 @@ HostingInstitution:
       description: Description of the organization.
     address:
       expected_type: str
-      example: '2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430'
+      example: "2-1-2 Hitotsubashi, Chiyoda-ku, Tokyo, Japan, 101-8430"
       required: Required.
       description: Physical address of the organization.
 ContactPoint:
   description: A contact information.
   props:
-    '@id':
+    "@id":
       expected_type: str
-      example: '#mailto:contact@example.com'
+      example: "#mailto:contact@example.com"
       required: Required.
       description: MUST be email with the prefix `#mailto:` or be phone number with the prefix `#callto:`.
     name:
@@ -213,6 +213,6 @@ ContactPoint:
       description: Email address as contact information.
     telephone:
       expected_type: str
-      example: '03-0000-0000'
+      example: "03-0000-0000"
       required: Required either email (described in the previous section) or telephone.
       description: Phone number as contact information.

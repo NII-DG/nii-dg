@@ -1,9 +1,9 @@
 DMPMetadata:
   description: Metadata of research project that is the subject of this data management plan.
   props:
-    '@id':
+    "@id":
       expected_type: str
-      example: '#AMED-DMP'
+      example: "#AMED-DMP"
       required: Required.
       description: MUST be the name with prefix `#`.
     about:
@@ -64,9 +64,9 @@ DMPMetadata:
 DMP:
   description: Data management plan for each data collection, e.g. creators of the data collection, access rights, and how to cite the data collection.
   props:
-    '@id':
+    "@id":
       expected_type: str
-      example: '#dmp:1'
+      example: "#dmp:1"
       required: Required.
       description: MUST be data number with the prefix `#dmp:`. Indicates data number in the DMP list.
     dataNumber:
@@ -96,7 +96,7 @@ DMP:
       description: MUST choose one from `Unshared`, `Restricted Closed Sharing`, `Restricted Open Sharing` and `Unrestricted Open Sharing`. Indicates the availability of the data set.
     availabilityStarts:
       expected_type: str
-      example: '2030-04-01'
+      example: "2030-04-01"
       required: Required when accessRights has `Unshared` or `Restricted Closed Sharing`. If the dataset will not be open sharing because it contains personal information or for some other reason, this value is not required, but instead the reason of unshared or closed sharing MUST be described in the following property, reasonForConcealment.
       description: MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification. Indicates when the data will be open sharing status.
     reasonForConcealment:
@@ -121,7 +121,7 @@ DMP:
       description: MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition.
     gotInformedConsent:
       expected_type: Literal["yes", "no", "unknown"]
-      example: 'yes'
+      example: "yes"
       required: Required.
       description: MUST choose one from `yes`, `no` or `unknown`. Indicates whether you got informed consent from subjects.
     informedConsentFormat:
@@ -137,7 +137,7 @@ DMP:
 File:
   description: A file included in the research project, e.g. text file, script file and images.
   props:
-    '@id':
+    "@id":
       expected_type: str
       example: config/setting.txt
       required: Required.
@@ -174,13 +174,13 @@ File:
       description: MUST be a direct URL to the file.
     sdDatePublished:
       expected_type: str
-      example: '2022-12-01'
+      example: "2022-12-01"
       required: Required when the file is from outside this research project.
       description: Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
 ClinicalResearchRegistration:
   description: Identifier information that is registered to clinical research Registration service.
   props:
-    '@id':
+    "@id":
       expected_type: str
       example: https://jrct.niph.go.jp/latest-detail/jRCT202211111111
       required: Required.
@@ -192,6 +192,6 @@ ClinicalResearchRegistration:
       description: Name of the registry service.
     value:
       expected_type: str
-      example: '1234567'
+      example: "1234567"
       required: Required.
       description: Indicates ID you got from the registry service.

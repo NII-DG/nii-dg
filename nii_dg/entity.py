@@ -1,52 +1,50 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-"""\
-Definition of Entity base class and its subclasses.
-"""
-
 from collections.abc import MutableMapping
-from typing import TYPE_CHECKING, Any, Dict, Optional, TypedDict
+from typing import TYPE_CHECKING, Any, Dict, Type
 
-from typeguard import check_type as ori_check_type
+import yaml
 
-from nii_dg.config import github_branch, github_repo
-from nii_dg.error import EntityError, PropsError
-from nii_dg.utils import (check_instance_type_from_id, check_prop_type,
-                          get_entity_list_to_validate)
+from nii_dg.const import RO_CRATE_SPEC
+from nii_dg.error import EntityError
+from nii_dg.utils import (NOW, EntityDef, generate_ctx,
+                          is_instance_of_expected_type)
 
 if TYPE_CHECKING:
-    TypedMutableMapping = MutableMapping[str, Any]
     from nii_dg.ro_crate import ROCrate
+    TypedMutableMapping = MutableMapping[str, Any]
 else:
     TypedMutableMapping = MutableMapping
 
-IdDict = TypedDict("IdDict", {"@id": str})
-
 
 class Entity(TypedMutableMapping):
-    """\
-    Base class for all entities.
+    data: Dict[str, Any]
+    schema_name: str
+    entity_def: EntityDef
 
-    By inheriting MutableMapping, this class implements the following methods:
-    `__contains__`, `__eq__`, `__ne__`, `get`, `pop`, `popitem`, `setdefault`, `update`, `clear`, `keys`, `values` and `items`.
-    """
-
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None, schema_name: Optional[str] = None) -> None:
-        if props and [key for key in props.keys() if key.startswith("@")] != []:
-            raise KeyError("Cannot set the property started with @.")
-
-        self.__schema_name = schema_name
-        self.data: Dict[str, Any] = {
+    def __init__(self, id_: str, props: Dict[str, Any], schema_name: str, entity_def: EntityDef) -> None:
+        self.data = {
             "@id": id_,
             "@type": self.entity_name,
-            "@context": self.context
+            "@context": generate_ctx(schema_name=schema_name),
         }
-        self.update(props or {})
+        self.schema_name = schema_name
+        self.entity_def = entity_def
+
+        # If props include keys starting with '@', raise an error.
+        # Use _set_special_item() instead for these special keys in subclasses.
+        self.update(props)
 
     def __setitem__(self, key: str, value: Any) -> None:
-        if key.startswith("@") and key != "@id":
-            raise KeyError(f"Cannot set {key} as property; property with @ is limited.")
+        if key.startswith("@"):
+            raise KeyError("The key must not start with '@'.")
+        self.data[key] = value
+
+    def _set_special_item(self, key: str, value: Any) -> None:
+        """\
+        Set a special item, which key starts with '@' (e.g. "@id", "@type", "@context").
+        """
         self.data[key] = value
 
     def __getitem__(self, key: str) -> Any:
@@ -54,7 +52,7 @@ class Entity(TypedMutableMapping):
 
     def __delitem__(self, key: str) -> None:
         if key.startswith("@"):
-            raise KeyError(f"Cannot delete protected key: {key}")
+            raise KeyError("The key must not start with '@'.")
         del self.data[key]
 
     def __iter__(self) -> Any:
@@ -69,257 +67,202 @@ class Entity(TypedMutableMapping):
 
         return f"<{self.schema_name}.{self.type} {self.id}>"
 
-    # def __eq__(self) -> str:
-    #     # TODO
-    #     return self.id + self.context
-
     @property
     def id(self) -> str:
-        return self.data["@id"]  # type:ignore
+        return self["@id"]  # type: ignore
 
     @property
     def type(self) -> str:
-        return self.data["@type"]  # type:ignore
+        return self["@type"]  # type: ignore
 
     @property
     def context(self) -> str:
-        template = "https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/schema/context/{schema}.jsonld"
-        return template.format(
-            gh_repo=github_repo(),
-            gh_ref=github_branch(),
-            schema=self.schema_name,
-        )
+        return self["@context"]  # type: ignore
 
     @property
     def entity_name(self) -> str:
         return self.__class__.__name__
 
-    @property
-    def schema_name(self) -> Optional[str]:
+    @classmethod
+    def from_jsonld(cls: Type["Entity"], jsonld: Dict[str, Any]) -> "Entity":
         """\
-        This property is not set for DefaultEntity.
+        Create an instance of the subclass of Entity from a JSON-LD object.
+
+        Args:
+            cls: The subclass of Entity to create.
+            jsonld (Dict[str, Any]): A JSON-LD object.
         """
-        return self.__schema_name
+        if cls.__name__ == "Entity":
+            raise NotImplementedError("This method is not implemented for Entity class, but for its subclasses.")
+
+        if not isinstance(jsonld, dict):
+            raise ValueError("The JSON-LD object must be a dictionary.")
+        if "@id" not in jsonld:
+            raise ValueError("The JSON-LD object must have an @id property.")
+
+        props = {k: v for k, v in jsonld.items() if not k.startswith("@")}
+        special_props = {k: v for k, v in jsonld.items() if k.startswith("@")}
+        entity = cls(id_=jsonld["@id"], props=props)  # type: ignore
+        for key, val in special_props.items():
+            entity._set_special_item(key, val)
+
+        return entity
 
     def as_jsonld(self) -> Dict[str, Any]:
-        """\
-        Dump this entity as JSON-LD.
-        Basically, it is assumed that self.check_props method checks the existence of required props and the type of props.
-        In addition, this method replace entities in props with their id.
-        """
-        self.check_props()
         ref_data: Dict[str, Any] = {}
         for key, val in self.items():
             if isinstance(val, dict):
-                # expected: {"@id": str}, {"@value": Any}
-                # These cannot be supported at this stage, should be supported in self.check_props.
+                # expect: {"@id": "xxx"}, {"@value": "xxx"}
                 ref_data[key] = val
             elif isinstance(val, list):
-                # expected: [Any], [Entity], [Entity, Any]
-                fixed_val = []
-                id_set = set()
+                # expect: [Any, Entity, ...]
+                ref_val = []
                 for v in val:
                     if isinstance(v, Entity):
-                        if v.id not in id_set:
-                            fixed_val.append({"@id": v.id})
-                            id_set.add(v.id)
-                    else:  # case: Any (not Entity)
-                        fixed_val.append(v)
-                ref_data[key] = fixed_val
+                        ref_val.append({"@id": v.id})
+                    else:
+                        ref_val.append(v)
+                ref_data[key] = ref_val
             elif isinstance(val, Entity):
                 ref_data[key] = {"@id": val.id}
             else:
                 ref_data[key] = val
+
         return ref_data
 
+    def _check_unexpected_props(self) -> None:
+        entity_error = EntityError(self)
+        for key in self.keys():
+            if key.startswith("@"):
+                continue
+            if key not in self.entity_def["props"]:
+                entity_error.add(key, "Unexpected property.")
+
+        if entity_error.has_error():
+            raise entity_error
+
+    def _check_required_props(self) -> None:
+        entity_error = EntityError(self)
+        required_keys = [k for k, v in self.entity_def["props"].items() if v.get("required") == "Required."]
+        for key in required_keys:
+            if key not in self:
+                entity_error.add(key, "This property is required; however, it is not found.")
+
+        if entity_error.has_error():
+            raise entity_error
+
+    def _check_prop_types(self) -> None:
+        entity_error = EntityError(self)
+        for key, val in self.items():
+            if key.startswith("@"):
+                continue
+            if key not in self.entity_def["props"]:
+                continue
+            expected_type = self.entity_def["props"][key]["expected_type"]
+            if not is_instance_of_expected_type(val, expected_type):
+                entity_error.add(key, f"The type of this property MUST be {expected_type}.")
+
+        if entity_error.has_error():
+            raise entity_error
+
     def check_props(self) -> None:
-        """\
-        Called at RO-Crate dump time.
-        Check if all required props are set and if prop types are correct.
-        Implementation of this method is required in each subclass.
-        """
-        # Abstract method
-        raise NotImplementedError
+        if self.entity_name == "Entity":
+            raise NotImplementedError("This method must be implemented in subclasses of Entity in schema modules.")
+
+        self._check_unexpected_props()
+        self._check_required_props()
+        self._check_prop_types()
 
     def validate(self, crate: "ROCrate") -> None:
-        """\
-        Called at Data Governance validation time.
-        Comprehensive validation including the value of props.
-        Implementation of this method is required in each subclass.
-        """
-        # Abstract method
-        # raise NotImplementedError
-        validation_failures = EntityError(self)
-        instance_type_dict = get_entity_list_to_validate(self)
-
-        for prop, val in self.items():
-            if isinstance(val, Entity):
-                if val not in crate.get_all_entities():
-                    validation_failures.add(prop, f"The entity {val} is not included in the crate.")
-                if prop in instance_type_dict:
-                    try:
-                        check_prop_type(prop, val, instance_type_dict[prop])
-                    except PropsError as e:
-                        validation_failures.add(prop, str(e))
-
-            elif isinstance(val, dict) and prop in instance_type_dict:
-                # expected: {"@id":"https://example.com"}
-                try:
-                    ori_check_type(prop, val, IdDict)
-                except TypeError:
-                    validation_failures.add(prop, "Only property @id is required when using dict instead of entity subclass instance.")
-                if "@id" in val and len(crate.get_by_id(val["@id"])) == 0:
-                    validation_failures.add(prop, f"Entity with @id {val['@id']} is not found in the crate.")
-
-                if "@id" in val and prop in instance_type_dict:
-                    try:
-                        check_instance_type_from_id(prop, crate.get_by_id(val["@id"]), instance_type_dict[prop])
-                    except PropsError as e:
-                        validation_failures.add(prop, str(e))
-
-            elif isinstance(val, list):
-                # expected: [Any], [Entity]
-                for ele in [v for v in val if isinstance(v, Entity)]:
-                    if ele not in crate.get_all_entities():
-                        validation_failures.add(prop, f"The entity {ele} is not included in this crate.")
-                    if prop in instance_type_dict:
-                        try:
-                            check_prop_type(prop, [ele], instance_type_dict[prop])
-                        except PropsError as e:
-                            validation_failures.add(prop, str(e))
-
-                for id_dict in [v for v in val if isinstance(v, dict)]:
-                    try:
-                        ori_check_type(prop, id_dict, IdDict)
-                    except TypeError:
-                        validation_failures.add(prop, "Only property @id is required when using dict instead of entity subclass instance.")
-                    if "@id" in id_dict and len(crate.get_by_id(id_dict["@id"])) == 0:
-                        validation_failures.add(prop, f"Entity with @id {id_dict['@id']} is not found in the crate.")
-                    if "@id" in id_dict and prop in instance_type_dict:
-                        try:
-                            check_instance_type_from_id(prop, crate.get_by_id(id_dict["@id"]), instance_type_dict[prop], "list")
-                        except PropsError as e:
-                            validation_failures.add(prop, str(e))
-            else:
-                if prop in instance_type_dict:
-                    try:
-                        check_prop_type(prop, val, instance_type_dict[prop])
-                    except PropsError as e:
-                        validation_failures.add(prop, str(e))
-
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
-
-    @classmethod
-    def from_jsonld(cls, id_: str, jsonld: Dict[str, Any]) -> "Entity":
-        """\
-        Generate entity instance from json-ld.
-        This method is called in from_jsonld() of ROCrate.
-        """
-        # if "@id" not in jsonld:
-        #     raise ValueError(f"Entity must have @id: {jsonld}")
-        # id_ = jsonld["@id"]
-        props = {k: v for k, v in jsonld.items() if not k.startswith("@")}
-        return cls(id_, props)
+        if self.entity_name == "Entity":
+            raise NotImplementedError("This method must be implemented in subclasses of Entity in schema modules.")
 
 
 class DefaultEntity(Entity):
-    """\
-    A entity that is always included in the RO-Crate. For example, ROCrateMetadata, RootDataEntity, etc.
-    """
-
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None, type_: Optional[str] = None) -> None:
-        if props and [key for key in props.keys() if key.startswith("@")] != []:
-            raise KeyError("Cannot set the property started with @.")
-
-        # DefaultEntity uses the defined type as @type, not the entity name.
-        # DefaultEntity uses the original RO-Crate context, so the @context property is not included.
-        self.data: Dict[str, Any] = {
-            "@id": id_,
-            "@type": type_
-        }
-        self.update(props or {})
-
-    @property
-    def context(self) -> str:
-        # DefaultEntity uses the original RO-Crate context.
-        return "https://w3id.org/ro/crate/1.1/context"
+    pass
 
 
 class DataEntity(Entity):
-    """\
-    A entity that represents a file or directory. For example, File, Dataset, etc.
-    This entity is always included in RootDataset entity.
-    """
+    pass
 
 
 class ContextualEntity(Entity):
-    """\
-    A entity that represents a metadata. For example, Person, License, etc.
-    """
+    pass
+
+
+# === DefaultEntities ===
+
+RootDataEntity_DEF: EntityDef = yaml.safe_load("""\
+description: A Dataset that represents the RO-Crate.
+props:
+  hasPart:
+    expected_type: List[DataEntity]
+    example: '[{ "@id": "file.txt" }]'
+    required: Required.
+    description: A list of DataEntities that are contained in the RO-Crate.
+  datePublished:
+    expected_type: str
+    example: 2023-01-01T00:00:00.000+00:00
+    required: Required.
+    description: The date when the RO-Crate was published. It should be in the format of ISO 8601.
+""")
 
 
 class RootDataEntity(DefaultEntity):
-    """\
-    A Dataset that represents the RO-Crate. For more information, see https://www.researchobject.org/ro-crate/1.1/root-data-entity.html .
-    """
+    def __init__(self, props: Dict[str, Any] = {},
+                 schema_name: str = "ro-crate",
+                 entity_def: EntityDef = RootDataEntity_DEF):
+        default_props = {
+            "hasPart": [],
+            "datePublished": NOW
+        }
+        default_props.update(props)
+        super().__init__(id_="./", props=default_props, schema_name=schema_name, entity_def=entity_def)
 
-    def __init__(self, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_="./", props=props, type_="Dataset")
-        # `hasPart` and `datePublished` are added in `RO-Crate` class.
+        self._set_special_item("@type", "Dataset")
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-
-        if self.id != "./":
-            prop_errors.add("@id", "The value MUST be `./`.")
-
-        if self.type != "Dataset":
-            prop_errors.add("@type", "The value MUST be `Dataset`.")
-
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
+        # do nothing
+        pass
 
     def validate(self, crate: "ROCrate") -> None:
-        # TODO: link check
+        # do nothing
         pass
 
 
+ROCrateMetadata_DEF: EntityDef = yaml.safe_load("""\
+description: The RO-Crate metadata file descriptor.
+props:
+  conformsTo:
+    expected_type: Dict[str, str]
+    example: '{ "@id": "https://w3id.org/ro/crate/1.1" }'
+    required: Required.
+    description: A versioned permanent link URI of the RO-Crate specification
+  about:
+    expected_type: RootDataEntity
+    example: '{ "@id": "./" }'
+    required: Required.
+    description: The RootDataEntity of the RO-Crate.
+""")
+
+
 class ROCrateMetadata(DefaultEntity):
-    """\
-    RO-Crate must contain a RO-Crate metadata file descriptor with the `@id` of `ro-crate-metadata.json`.
+    def __init__(self, props: Dict[str, Any] = {},
+                 schema_name: str = "ro-crate",
+                 entity_def: EntityDef = ROCrateMetadata_DEF):
+        default_props = {
+            "conformsTo": {"@id": RO_CRATE_SPEC},
+            "about": {"@id": "./"},
+        }
+        default_props.update(props)
+        super().__init__(id_="ro-crate-metadata.json", props=default_props, schema_name=schema_name, entity_def=entity_def)
 
-    See https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#ro-crate-metadata-file-descriptor.
-    """
-
-    def __init__(self, root: RootDataEntity) -> None:
-        super().__init__(id_="ro-crate-metadata.json", type_="CreativeWork")
-        self["conformsTo"] = {"@id": "https://w3id.org/ro/crate/1.1"}
-        self["about"] = root
+        self._set_special_item("@type", "CreativeWork")
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-
-        if self.id != "ro-crate-metadata.json":
-            prop_errors.add("@id", "The value MUST be `ro-crate-metadata.json`.")
-
-        if "conformsTo" not in self:
-            prop_errors.add("conformsTo", "This property is required and the value MUST be `{'@id': 'https: // w3id.org/ro/crate/1.1'}`.")
-
-        if "conformsTo" in self and self["conformsTo"] != {"@id": "https://w3id.org/ro/crate/1.1"}:
-            prop_errors.add("conformsTo", "The value MUST be `{'@id': 'https: // w3id.org/ro/crate/1.1'}`.")
-
-        if self.type != "CreativeWork":
-            prop_errors.add("@type", "The value MUST be `CreativeWork`.")
-
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
+        # do nothing
+        pass
 
     def validate(self, crate: "ROCrate") -> None:
-        validation_failures = EntityError(self)
-
-        if self["about"] != {"@id": "./"} and self["about"] != crate.root:
-            validation_failures.add("about", "The value of about property MUST be RootDataEntity of the crate.")
-
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
+        # do nothing
+        pass
