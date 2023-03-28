@@ -25,16 +25,9 @@ class EntityError(Exception):
     This error is raised during the Data Governance validation time, in the Entity 'check_props()' and 'validate()' methods.
     """
 
-    # entity: Entity  # commented for import error
-    errors: Dict[str, str]
-
-    def __init__(self, entity: "Entity"):
-        """\
-        Args:
-            entity (Entity): Entity instance that has errors.
-        """
+    def __init__(self, entity: "Entity") -> None:
         self.entity = entity
-        self.errors = {}
+        self.errors: Dict[str, str] = {}
 
     def __str__(self) -> str:
         return f"EntityError: Errors occurred in {self.entity}: {self.errors}"
@@ -68,14 +61,13 @@ class CrateError(Exception):
 
 
 class CrateCheckPropsError(CrateError):
-    """
+    """\
     Error class for 'check_props()' method in the RO-Crate.
 
     This error is raised during the Data Governance validation time, during the validation performed by the 'check_props()' method of the ROCrate class.
     """
-    errors: List[EntityError]
 
-    def __init__(self, errors: List[EntityError] = []):
+    def __init__(self, errors: List[EntityError] = []) -> None:
         self.errors = errors
 
     def __str__(self) -> str:
@@ -86,6 +78,11 @@ class CrateCheckPropsError(CrateError):
         self.errors.extend(errors)
 
     def has_error(self) -> bool:
+        """Return a boolean indicating whether there are errors.
+
+        Returns:
+            bool: True if there are errors, False otherwise.
+        """
         return len(self.errors) != 0
 
 

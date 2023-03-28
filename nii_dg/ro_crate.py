@@ -49,10 +49,10 @@ class ROCrate():
 
     def __init__(self, jsonld: Optional[Dict[str, Any]] = None) -> None:
         """\
-        Adds entities to the ROCrate.
+        Initialize a new instance of the RO-Crate class.
 
         Args:
-            *entities (Entity): The entities to be added to the ROCrate.
+            jsonld (Optional[Dict[str, Any]]): The JSON-LD data to use for initializing the RO-Crate.
 
         Raises:
             TypeError: If the entity type is not supported.
@@ -74,9 +74,8 @@ class ROCrate():
         Args:
             *entities (Entity): The entities to be added to the RO-Crate.
 
-        Note:
-            There are three types of entities that can be added: DefaultEntity, DataEntity, and ContextualEntity.
-            If an unsupported entity is given, a TypeError is raised.
+        Raises:
+            TypeError: If the entity type is not supported.
         """
         for entity in entities:
             if isinstance(entity, DefaultEntity):
@@ -90,13 +89,13 @@ class ROCrate():
 
     def remove(self, *entities: Entity) -> None:
         """\
-        Removes entities from the ROCrate.
+        Removes entities from the RO-Crate.
 
         Args:
-            *entities (Entity): The entities to be removed from the ROCrate.
+            *entities: The entities to be removed from the RO-Crate.
 
         Raises:
-            ValueError: If the entity is not included in the ROCrate or is a DefaultEntity.
+            ValueError: If the entity is not included in the RO-Crate or is a DefaultEntity.
             TypeError: If the entity type is not supported.
 
         Note:
@@ -117,13 +116,13 @@ class ROCrate():
             else:
                 raise TypeError("'Entity' class is not supported to be removed directly. Please use 'DefaultEntity', 'DataEntity', or 'ContextualEntity' instead.")
 
-    @ property
+    @property
     def all_entities(self) -> List[Entity]:
         """\
         Get all entities in the RO-Crate.
 
         Returns:
-            List[Entity]: A list of all entities in the RO-Crate.
+            A list of all entities in the RO-Crate.
         """
         return self.default_entities + self.data_entities + self.contextual_entities  # type: ignore
 
@@ -132,10 +131,10 @@ class ROCrate():
         Get entities by ID.
 
         Args:
-            id_ (str): The ID of the entity.
+            id_: The ID of the entity.
 
         Returns:
-            List[Entity]: A list of entities with the specified ID.
+            A list of entities with the specified ID.
         """
         return [entity for entity in self.all_entities if entity.id == id_]
 
@@ -144,14 +143,26 @@ class ROCrate():
         Get entities by type.
 
         Args:
-            type_ (str): The type of the entity.
+            type_: The type of the entity.
 
         Returns:
-            List[Entity]: A list of entities with the specified type.
+            A list of entities with the specified type.
         """
         return [entity for entity in self.all_entities if entity.type == type_]
 
     def from_jsonld(self, jsonld: Dict[str, Any]) -> None:
+        """\
+        Deserialize an RO-Crate from JSON-LD.
+
+        Args:
+            jsonld (Dict[str, Any]): The JSON-LD data to deserialize.
+
+        Raises:
+            TypeError: If the JSON-LD data is not a dictionary.
+            ValueError: If the JSON-LD data does not have the required keys or values.
+            ValueError: If a required RootDataEntity and ROCrateMetadata entity is not found.
+            ValueError: If an entity type is not found.
+        """
         if not isinstance(jsonld, dict):
             raise TypeError("The JSON-LD data must be a dictionary.")
         if "@context" not in jsonld:
@@ -166,6 +177,7 @@ class ROCrate():
         self.default_entities = []
         self.data_entities = []
         self.contextual_entities = []
+
         for entity in jsonld["@graph"]:
             id_ = entity.get("@id")
             if id_ is None:
@@ -175,13 +187,13 @@ class ROCrate():
                 raise ValueError("The JSON-LD data must have an '@type' key for each entity.")
 
             if id_ == "./" and type_ == "Dataset":
-                root_data_entity = RootDataEntity.from_jsonld(entity)  # type: ignore
+                root_data_entity = RootDataEntity.from_jsonld(entity)
             elif id_ == "ro-crate-metadata.json" and type_ == "CreativeWork":
                 metadata_entity = ROCrateMetadata.from_jsonld(entity)
             else:
                 ctx = entity.get("@context", RO_CRATE_CONTEXT)
                 gh_repo, gh_ref, schema = parse_ctx(ctx)
-                # TODO impl for other repo
+                # TODO support other schemas
                 entity_class = import_custom_class(f"nii_dg.schema.{schema}", type_)
                 if entity_class is None:
                     raise ValueError(f"Entity type {type_} is not found.")
@@ -194,14 +206,20 @@ class ROCrate():
                     raise ValueError(f"Entity type {type_} is not supported.")
 
         if root_data_entity is None:
-            raise ValueError("The JSON-LD data must have a root data entity.")
+            raise ValueError("The JSON-LD data must have a RootDataEntity.")
         if metadata_entity is None:
-            raise ValueError("The JSON-LD data must have a metadata entity.")
+            raise ValueError("The JSON-LD data must have a ROCrateMetadata entity.")
 
         self.root = root_data_entity  # type: ignore
         self.default_entities = [self.root, metadata_entity]  # type: ignore
 
     def as_jsonld(self) -> Dict[str, Any]:
+        """\
+        Serialize the RO-Crate as JSON-LD.
+
+        Returns:
+            Dict[str, Any]: The serialized RO-Crate as JSON-LD.
+        """
         self.check_duplicate_entity()
         self.check_props()
 
@@ -212,10 +230,10 @@ class ROCrate():
 
     def dump(self, path: str) -> None:
         """\
-        Dump the RO-Crate to the specified path.
+        Dump the RO-Crate to a file.
 
         Args:
-            path (str): The path to dump the RO-Crate.
+            path (str): The path to the file to dump the RO-Crate to.
         """
         with Path(path).resolve().open("w", encoding="utf-8") as f:
             json.dump(self.as_jsonld(), f, indent=2)
@@ -229,6 +247,9 @@ class ROCrate():
         This is because the 'name' property in each context is treated as a different property.
         However, if two entities have the same '@id' value and '@context' value, and both have 'name' property with different values, it becomes unclear which one is correct.
         Therefore, this case ('@id' and '@context' are same) is considered as an error and an exception is raised.
+
+        Raises:
+            CrateError: If there are duplicate entities in the RO-Crate.
         """
         id_ctx = [(entity.id, entity.context) for entity in self.all_entities]
         dup_id_ctx = [id_ctx[i] for i in range(len(id_ctx)) if id_ctx.count(id_ctx[i]) > 1]
@@ -236,6 +257,12 @@ class ROCrate():
             raise CrateError(f"Duplicate entities are found in the RO-Crate: {dup_id_ctx}")
 
     def check_props(self) -> None:
+        """\
+        Check the properties of all entities in the RO-Crate.
+
+        Raises:
+            CrateCheckPropsError: If there are errors in the properties of the entities.
+        """
         crate_error = CrateCheckPropsError()
         for entity in self.all_entities:
             try:
@@ -249,6 +276,12 @@ class ROCrate():
             raise crate_error
 
     def validate(self) -> None:
+        """\
+        Validate the RO-Crate.
+
+        Raises:
+            CrateValidationError: If there are errors in the entities in the RO-Crate.
+        """
         crate_error = CrateValidationError()
         for entity in self.all_entities:
             try:

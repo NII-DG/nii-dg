@@ -16,34 +16,9 @@ from typing import (Any, Dict, Literal, NewType, Optional, Tuple, TypedDict,
 import yaml
 
 from nii_dg.const import RO_CRATE_CONTEXT
+from nii_dg.module_info import GH_REF, GH_REPO
 
 NOW = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
-
-
-def gh_repo() -> str:
-    """\
-    Return the name of the GitHub repository.
-
-    Returns:
-        str: The name of the GitHub repository.
-    """
-    # TODO: Use environment variable
-    return "NII-DG/nii-dg"
-
-
-def gh_ref() -> str:
-    """\
-    Return the name of the GitHub reference.
-
-    Returns:
-        str: The name of the GitHub reference.
-    """
-    # TODO: Use environment variable
-    return "main"
-
-
-GH_REPO = gh_repo()
-GH_REF = gh_ref()
 
 
 def generate_ctx(gh_repo: str = GH_REPO, gh_ref: str = GH_REF, schema_name: str = "ro-crate") -> str:

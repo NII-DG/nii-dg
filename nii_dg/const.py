@@ -2,7 +2,7 @@
 # coding: utf-8
 
 """\
-This module defines constants for nii_dg library.
+Constants module for the nii_dg library.
 """
 
 RO_CRATE_SPEC: str = "https://w3id.org/ro/crate/1.1"
