@@ -234,6 +234,10 @@ REST API の仕様として、[open-api_spec.yml](./open-api_spec.yml) を参照
 
 また、API Server の起動・実行に関して、[api-quick-start.md](./api-quick-start.md) を参照。
 
+## JSON-LD Context を用いた schema の外部参照
+
+![System architecture extended](https://user-images.githubusercontent.com/26019402/228390256-5dcc5c81-3ba9-4be6-b0ab-1f6622c1fd2d.png)
+
 ## Development
 
 開発環境として Docker を利用する。
