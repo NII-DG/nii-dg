@@ -23,10 +23,14 @@ SCHEMA_DEF = load_schema_file(SCHEMA_FILE_PATH)
 
 
 class DMPMetadata(ContextualEntity):
-    def __init__(self, id_: str = "#CAO-DMP", props: Dict[str, Any] = {"name": "CAO-DMP"},
+    def __init__(self, id_: str = "#CAO-DMP", props: Dict[str, Any] = {},
                  schema_name: str = SCHEMA_NAME,
                  entity_def: EntityDef = SCHEMA_DEF["DMPMetadata"]):
-        super().__init__(id_, props, schema_name, entity_def)
+        default_props = {
+            "name": "CAO-DMP"
+        }
+        default_props.update(props)
+        super().__init__(id_, default_props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
@@ -52,7 +56,8 @@ class DMPMetadata(ContextualEntity):
 
 
 class DMP(ContextualEntity):
-    def __init__(self, id_: str, props: Dict[str, Any], schema_name: str = SCHEMA_NAME,
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
                  entity_def: EntityDef = SCHEMA_DEF["DMP"]):
         super().__init__(id_, props, schema_name, entity_def)
 
@@ -114,7 +119,8 @@ class DMP(ContextualEntity):
 
 
 class Person(BasePerson):
-    def __init__(self, id_: str, props: Dict[str, Any], schema_name: str = SCHEMA_NAME,
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
                  entity_def: EntityDef = SCHEMA_DEF["Person"]):
         super().__init__(id_, props, schema_name, entity_def)
 
@@ -142,7 +148,8 @@ class Person(BasePerson):
 
 
 class File(BaseFile):
-    def __init__(self, id_: str, props: Dict[str, Any], schema_name: str = SCHEMA_NAME,
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
                  entity_def: EntityDef = SCHEMA_DEF["File"]):
         super().__init__(id_, props, schema_name, entity_def)
 

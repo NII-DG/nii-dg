@@ -25,9 +25,11 @@ REQUIRED_DIRECTORIES = {
 
 
 class GinMonitoring(ContextualEntity):
-    def __init__(self, id_: str = "#ginmonitoring", props: Dict[str, Any] = {"name": "ginmonitoring"},
+    def __init__(self, id_: str = "#ginmonitoring", props: Dict[str, Any] = {},
                  schema_name: str = SCHEMA_NAME,
                  entity_def: EntityDef = SCHEMA_DEF["GinMonitoring"]):
+        # if "name" not in props:
+        #     props["name"] = "ginmonitoring"
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
@@ -67,10 +69,14 @@ class GinMonitoring(ContextualEntity):
 
 
 class File(BaseFile):
-    def __init__(self, id_: str = "#file", props: Dict[str, Any] = {"name": "file"},
+    def __init__(self, id_: str = "#file", props: Dict[str, Any] = {},
                  schema_name: str = SCHEMA_NAME,
                  entity_def: EntityDef = SCHEMA_DEF["File"]):
-        super().__init__(id_, props, schema_name, entity_def)
+        default_props = {
+            "name": "file"
+        }
+        default_props.update(props)
+        super().__init__(id_, default_props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()

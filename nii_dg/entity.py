@@ -309,7 +309,7 @@ class RootDataEntity(DefaultEntity):
     For more information, see https://www.researchobject.org/ro-crate/1.1/root-data-entity.html .
     """
 
-    def __init__(self, props: Dict[str, Any] = {},
+    def __init__(self, id_: str = "./", props: Dict[str, Any] = {},
                  schema_name: str = "ro-crate",
                  entity_def: EntityDef = RootDataEntity_DEF):
         default_props = {
@@ -317,7 +317,7 @@ class RootDataEntity(DefaultEntity):
             "datePublished": NOW
         }
         default_props.update(props)
-        super().__init__(id_="./", props=default_props, schema_name=schema_name, entity_def=entity_def)
+        super().__init__(id_, default_props, schema_name, entity_def)
 
         self._set_special_item("@type", "Dataset")
 
@@ -353,7 +353,7 @@ class ROCrateMetadata(DefaultEntity):
     See https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#ro-crate-metadata-file-descriptor.
     """
 
-    def __init__(self, props: Dict[str, Any] = {},
+    def __init__(self, id_: str = "ro-crate-metadata.json", props: Dict[str, Any] = {},
                  schema_name: str = "ro-crate",
                  entity_def: EntityDef = ROCrateMetadata_DEF):
         default_props = {
@@ -361,7 +361,7 @@ class ROCrateMetadata(DefaultEntity):
             "about": {"@id": "./"},
         }
         default_props.update(props)
-        super().__init__(id_="ro-crate-metadata.json", props=default_props, schema_name=schema_name, entity_def=entity_def)
+        super().__init__(id_, default_props, schema_name, entity_def)
 
         self._set_special_item("@type", "CreativeWork")
 

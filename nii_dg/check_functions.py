@@ -28,8 +28,6 @@ def check_entity_values(entity: "Entity", check_rules: Dict[str, Callable[[Any],
     Raises:
         TypeError: If entity is not an instance of Entity class.
     """
-    if not isinstance(entity, Entity):
-        raise TypeError("entity must be an instance of Entity class.")
     error = EntityError(entity)
     for key, check_func in check_rules.items():
         if key not in entity:

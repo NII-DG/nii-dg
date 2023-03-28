@@ -21,10 +21,14 @@ SCHEMA_DEF = load_schema_file(SCHEMA_FILE_PATH)
 
 
 class DMPMetadata(ContextualEntity):
-    def __init__(self, id_: str = "#AMED-DMP", props: Dict[str, Any] = {"name": "AMED-DMP"},
+    def __init__(self, id_: str = "#AMED-DMP", props: Dict[str, Any] = {},
                  schema_name: str = SCHEMA_NAME,
                  entity_def: EntityDef = SCHEMA_DEF["DMPMetadata"]):
-        super().__init__(id_, props, schema_name, entity_def)
+        default_props = {
+            "name": "AMED-DMP",
+        }
+        default_props.update(props)
+        super().__init__(id_, default_props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
