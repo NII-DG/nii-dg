@@ -7,8 +7,9 @@
 - Yaml file (e.g., [`../nii_dg/schema/base.yml`](../nii_dg/schema/base.yml))
 - Python module (e.g., [`../nii_dg/schema/base.py`](../nii_dg/schema/base.py))
 - Markdown file (e.g., [`./docs/base.md`](./docs/base.md))
+- JSON-LD file (e.g., [`../context/base.jsonld`](../context/base.jsonld))
 
-このうち、Markdown file は Yaml file から生成されるため、直接編集する必要はない。
+このうち、Markdown file、JSON-LD file は Yaml file から生成されるため、直接編集する必要はない。
 
 ### Yaml file
 
@@ -148,5 +149,13 @@ Schema 定義として、
     - この場合、共通 schema の Entity を継承する
       - Yaml file: クリップボード的にコピペして、編集する
       - Python module:
-       - `base.py` に定義されている Entity を継承し、`check_props()` と `validate()` を実装する
-       - `__init__()`において継承する Entity は親ではなく、親の親を指定
+      - `base.py` に定義されている Entity を継承し、`check_props()` と `validate()` を実装する
+      - `__init__()`において継承する Entity は親ではなく、親の親を指定
+
+## JSON-LD の生成
+
+[`./scripts/generate_jsonld.py`](./scripts/generate_jsonld.py) を用いて、Yaml schema file から JSON-LD の context file を生成する。
+
+```bash
+$ python3 generate_jsonld.py <source_yml> <dest_jsonld>
+```
