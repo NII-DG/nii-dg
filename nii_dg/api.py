@@ -10,8 +10,8 @@ from uuid import uuid4
 from flask import Blueprint, Flask, Response, abort, jsonify, request
 from waitress import serve
 
-from nii_dg.error import (CheckPropsError, CrateError, EntityError,
-                          GovernanceError)
+from nii_dg.error import (CrateCheckPropsError, CrateError,
+                          CrateValidationError, EntityError)
 from nii_dg.ro_crate import ROCrate
 
 if TYPE_CHECKING:
@@ -47,7 +47,7 @@ def result_wrapper(error_dict: List[EntityError]) -> List[Dict[str, str]]:
         entity_dict = {}
         entity_dict["entityId"] = entity_error.entity.id
         entity_dict["props"] = entity_error.entity.schema_name + "." + entity_error.entity.type + ":"  # type:ignore
-        for prop, reason in entity_error.message_dict.items():
+        for prop, reason in entity_error.errors.items():
             reason_dict = entity_dict.copy()
             reason_dict["props"] += prop
             reason_dict["reason"] = reason
@@ -88,7 +88,7 @@ def request_validation() -> Response:
         crate.as_jsonld()
     except CrateError as crateerr:
         abort(400, crateerr)
-    except CheckPropsError:
+    except CrateCheckPropsError:
         abort(400, "RO-Crate has invalid property.")
 
     target_entities: List[Entity] = []
@@ -130,7 +130,7 @@ def get_results(request_id: str) -> Response:
         if job.exception() is None:
             status = "COMPLETE"
             results = job.result()
-        elif isinstance(job.exception(), GovernanceError):
+        elif isinstance(job.exception(), CrateValidationError):
             status = "FAILED"
             results = result_wrapper(job.exception().entity_errors)  # type:ignore
         else:
@@ -174,14 +174,14 @@ def check_health() -> Response:
 
 def validate(crate: ROCrate, entities: List["Entity"]) -> List[Any]:
     if len(entities) > 0:
-        governance_error = GovernanceError()
+        governance_error = CrateValidationError()
         for entity in entities:
             try:
                 entity.validate(crate)
             except EntityError as err:
-                governance_error.add_error(err)
+                governance_error.add(err)
 
-        if len(governance_error.entity_errors) > 0:
+        if len(governance_error.errors) > 0:
             raise governance_error
     else:
         crate.validate()

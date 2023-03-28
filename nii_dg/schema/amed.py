@@ -81,7 +81,7 @@ class DMP(ContextualEntity):
         if error.has_error():
             raise error
 
-    def validate(self, crate: ROCrate) -> None:
+    def validate(self, crate: "ROCrate") -> None:
         error = EntityError(self)
 
         dmp_metadata_ents = crate.get_by_type("DMPMetadata")
@@ -140,7 +140,7 @@ class File(BaseFile):
         if error.has_error():
             raise error
 
-    def validate(self, crate: ROCrate) -> None:
+    def validate(self, crate: "ROCrate") -> None:
         error = EntityError(self)
 
         if is_url(self.id):
@@ -167,7 +167,7 @@ class ClinicalResearchRegistration(ContextualEntity):
         if error.has_error():
             raise error
 
-    def validate(self, crate: ROCrate) -> None:
+    def validate(self, crate: "ROCrate") -> None:
         error = EntityError(self)
 
         if not is_url_accessible(self.id):
