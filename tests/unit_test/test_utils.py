@@ -81,6 +81,39 @@ def test_convert_string_type_to_python_type() -> None:
     with pytest.raises(PropsError):
         convert_string_type_to_python_type("DMPMetadata", "foobar")
 
+    # TODO for new method
+
+    # print(is_instance_of_expected_type([1, 2, 3], "List[int]"))  # True
+    # print(is_instance_of_expected_type({"a": 1, "b": 2}, "Dict[str, int]"))  # True
+    # print(is_instance_of_expected_type((1, "a"), "Tuple[int, str]"))  # True
+    # print(is_instance_of_expected_type(None, "Optional[str]"))  # True
+    # print(is_instance_of_expected_type("hello", "Union[int, str]"))  # True
+    # print(is_instance_of_expected_type(1, "int"))  # True
+    # print(is_instance_of_expected_type(1, "Any"))  # True
+    # print(is_instance_of_expected_type("foo", "Literal['foo', 'bar']"))  # True
+    # print(is_instance_of_expected_type([1, "a"], "List[Union[int, str]]"))  # True
+    # print(is_instance_of_expected_type({"a": [1, 2], "b": [3, 4]}, "Dict[str, List[int]]"))  # True
+    # print(is_instance_of_expected_type((1, "a", [1, 2, 3]), "Tuple[int, str, List[int]]"))  # True
+    # print(is_instance_of_expected_type("foo", Literal["foo", "bar"]))  # True
+    # print(is_instance_of_expected_type(RootDataEntity(), "RootDataEntity"))  # True
+    # print(is_instance_of_expected_type({"@id": "id"}, "RootDataEntity"))  # True
+
+    # print("=====")
+
+    # # Negative test cases
+    # print(is_instance_of_expected_type(1, "str"))  # False
+    # print(is_instance_of_expected_type("baz", "Literal['foo', 'bar']"))  # False
+    # print(is_instance_of_expected_type([1, 2, 3], "List[str]"))  # False
+    # print(is_instance_of_expected_type({"a": 1, "b": 2}, "Dict[int, str]"))  # False
+    # print(is_instance_of_expected_type((1, "a"), "Tuple[str, int]"))  # False
+    # print(is_instance_of_expected_type(None, "str"))  # False
+    # print(is_instance_of_expected_type("hello", "Union[float, bool]"))  # False
+    # print(is_instance_of_expected_type([1, "a"], "List[int]"))  # False
+    # print(is_instance_of_expected_type({"a": [1, 2], "b": [3, "a"]}, "Dict[str, List[int]]"))  # False
+    # print(is_instance_of_expected_type((1, "a", [1, 2, "a"]), "Tuple[int, str, List[int]]"))  # False
+    # print(is_instance_of_expected_type("foo", Literal["bar", "baz"]))  # False
+    # print(is_instance_of_expected_type(RootDataEntity(), "str"))  # False
+
 
 def test_check_prop_type() -> None:
     # no error occurs with correct format
