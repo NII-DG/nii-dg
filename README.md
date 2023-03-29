@@ -236,7 +236,55 @@ REST API の仕様として、[open-api_spec.yml](./open-api_spec.yml) を参照
 
 ## JSON-LD Context を用いた schema の外部参照
 
+本ライブラリは、ライブラリに含まれる YAML schema (e.g., [`nii_dg/schema/base.yml`](./nii_dg/schema/base.yml))と Python module (e.g., [`nii_dg/schema/base.py`](./nii_dg/schema/base.yml)) を用いて、研究データのパッケージと検証が行われる。
+検証における入力は RO-Crate であるが、パッケージ時と検証時のライブラリバージョンが異なる場合、schema や検証ルールが異なる状態での検証が行われる可能性がある。
+この問題を解決するため、JSON-LD の `@context` property を用いて、schema (i.e., yaml schema and python module) の外部参照を行う。
+
+例として、[`nii_dg/schema/base.yml`](./nii_dg/schema/base.yml) と [`nii_dg/schema/base.py`](./nii_dg/schema/base.yml) を用いると、生成される `File` entity は以下のようになる。
+
+```json
+{
+  "@id": "file_1.txt",
+  "@type": "File",
+  "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/schema/context/base.jsonld",
+  "name": "Sample File",
+  "contentSize": "128GB",
+},
+```
+
+ここで、`@context` property により、`https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/schema/context/base.jsonld` にて、`File` entity の schema が定義されていることを示している。
+更に、参照先の JSON-LD Context においては、下記のように定義されている。
+
+```json
+"File": {
+  "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File",
+  "@context": {
+    "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:@id",
+    "name": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:name",
+    "contentSize": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:contentSize",
+    "encodingFormat": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:encodingFormat",
+    "sha256": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:sha256",
+    "url": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:url",
+    "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:sdDatePublished"
+  }
+},
+```
+
+これにより、`File` entity 自体、及びその各 property について、schema の外部参照が行われることになる。
+
 ![System architecture extended](https://user-images.githubusercontent.com/26019402/228390256-5dcc5c81-3ba9-4be6-b0ab-1f6622c1fd2d.png)
+
+実際の検証時には、RO-Crate 内の各 entity に記述されている `@context` を辿り、パッケージ時の Yaml schema と Python module を参照する。
+ライブラリ内で、それらの file を読み込み、entity の instance を生成する。
+その後、生成された entity の instance に含まれる schema や検証ルールを用いて、検証が行われる。
+
+---
+
+JSON-LD Context の生成については、[`./schema/REAMED.md`](./schema/REAMED.md) を参照。
+
+また、JSON-LD の公開性がこの実装においては、重要な要素である。
+そのため、本ライブラリでは、GitHub Actions により、JSON-LD Context の生成と公開を行っている。
+GitHub Actions として、[`./.github/workflows/release.yml`](./.github/workflows/release.yml) が用意されている。
 
 ## Development
 
@@ -279,6 +327,22 @@ $ pytest -s ./tests/unit_test
 また、GitHub actions として、以下のように設定されている。
 
 - [pytest](./.github/workflows/pytest.yml)
+
+### Documentation
+
+`sphinx` を用いて、ドキュメントを生成する。
+
+```bash
+# 初期設定
+$ sudo apt install python3-sphinx
+$ sphinx-apidoc -F -H nii-dg -A NII -V 1.0.0 -o docs nii_dg
+
+# ドキュメントの生成
+$ sphinx-build ./docs ./docs/_build
+
+# ドキュメントの確認
+$ npx http-server ./docs/_build -a 0.0.0.0 -p 3000
+```
 
 ## Branch and Release
 

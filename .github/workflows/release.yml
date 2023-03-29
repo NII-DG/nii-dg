@@ -7,8 +7,63 @@ on:
   workflow_dispatch: {}
 
 jobs:
+  load_release_version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - name: Load release version
+        id: load_release_version
+        run: |
+          echo "::set-output name=version::$(python3 ./nii_dg/module_info.py)"
+      - name: Print release version
+        run: |
+          echo ${{ steps.load_release_version.outputs.version }}
+
+  generate_and_push_context:
+    runs-on: ubuntu-latest
+    needs: load_release_version
+    steps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - name: Install nii_dg
+        run: |
+          python3 -m pip install --no-cache-dir --progress-bar off -U pip setuptools wheel
+          python3 -m pip install --no-cache-dir --progress-bar off -e .
+      - name: Generate context
+        run: |
+          for schema in ./nii_dg/schema/*.yml; do
+            schema_name=$(basename $schema .yml)
+            python3 ./schema/scripts/generate_context.py ./nii_dg/schema/${schema_name}.yml ./schema/context/${schema_name}.jsonld
+          done
+      - name: Generate docs
+        run: |
+          for schema in ./nii_dg/schema/*.yml; do
+            schema_name=$(basename $schema .yml)
+            python3 ./schema/scripts/generate_docs.py ./nii_dg/schema/${schema_name}.yml ./schema/docs/${schema_name}.md
+          done
+      - name: Commit and push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add ./schema/context/*.jsonld
+          git add ./schema/docs/*.md
+          git commit -m "Update context and docs"
+          git push
+
   build_wheel:
     runs-on: ubuntu-latest
+    needs: [load_release_version, generate_and_push_context]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -26,19 +81,23 @@ jobs:
       - name: Build distributions
         run: |
           python3 setup.py sdist bdist_wheel
+      - name: Tag name
+        run: |
+          echo "TAG_NAME=${{ needs.load_release_version.outputs.version }}" >> $GITHUB_ENV
       - name: Upload sdist to artifact
         uses: actions/upload-artifact@v3
         with:
           name: sdist
-          path: dist/nii_dg-1.0.0.tar.gz
+          path: dist/nii_dg-${{ env.TAG_NAME }}.tar.gz
       - name: Upload wheel to artifact
         uses: actions/upload-artifact@v3
         with:
           name: wheel
-          path: dist/nii_dg-1.0.0-py3-none-any.whl
+          path: dist/nii_dg-${{ env.TAG_NAME }}-py3-none-any.whl
 
   deploy_ghcr:
     runs-on: ubuntu-latest
+    needs: [load_release_version, generate_and_push_context]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -55,7 +114,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Tag name
         run: |
-          echo "TAG_NAME=$(date +%y%m%d)_$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "TAG_NAME=${{ needs.load_release_version.outputs.version }}" >> $GITHUB_ENV
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
@@ -68,7 +127,7 @@ jobs:
 
   crate_release:
     runs-on: ubuntu-latest
-    needs: build_wheel
+    needs: [load_release_version, generate_and_push_context]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -83,7 +142,7 @@ jobs:
           name: wheel
       - name: Tag name
         run: |
-          echo "TAG_NAME=$(date +%y%m%d)_$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "TAG_NAME=${{ needs.load_release_version.outputs.version }}" >> $GITHUB_ENV
       - name: Create release
         run: |
           gh release --repo ${{ github.repository }} create ${{ env.TAG_NAME }} --title ${{ env.TAG_NAME }} --generate-notes nii_dg-1.0.0.tar.gz nii_dg-1.0.0-py3-none-any.whl

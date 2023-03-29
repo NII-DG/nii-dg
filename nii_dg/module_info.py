@@ -10,3 +10,7 @@ GH_REPO: str = "NII-DG/nii_dg"
 
 GH_REF: str = "1.0.0"
 """str: The GitHub reference (tag or branch) for the nii_dg package."""
+
+
+if __name__ == "__main__":
+    print(GH_REF, end="")
