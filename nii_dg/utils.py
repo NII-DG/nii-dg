@@ -22,7 +22,6 @@ from nii_dg.module_info import GH_REF, GH_REPO
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
-    from nii_dg.schema.sapporo import SapporoRun
 
 NOW = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
