@@ -20,7 +20,7 @@ SCHEMA_DEF = load_schema_file(SCHEMA_FILE_PATH)
 
 REQUIRED_DIRECTORIES = {
     "with_code": ["source", "input_data", "output_data"],
-    "for_parameter": ["source", "input_data"]
+    "for_parameters": ["source", "input_data"]
 }
 
 
@@ -52,6 +52,9 @@ class GinMonitoring(ContextualEntity):
             if dir_name not in [path.split('/')[-2] for path in dir_paths]:
                 missing_dirs.append(dir_name)
 
+        required_dir_list = [str(Path(experiment_dir).joinpath(dir_name)) + "/" for experiment_dir in self["experimentPackageList"]
+                             for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]]
+        missing_dirs = [dir_path for dir_path in required_dir_list if dir_path not in dir_paths]
         if len(missing_dirs) > 0:
             error.add("datasetStructure", f"Couldn't find required directories: named {missing_dirs}.")
 

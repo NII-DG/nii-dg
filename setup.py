@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # coding: utf-8
-from .nii_dg.module_info import GH_REF
 from pathlib import Path
 
 from setuptools import setup
+
+from .nii_dg.module_info import GH_REF
 
 BASE_DIR: Path = Path(__file__).parent.resolve()
 LONG_DESCRIPTION: Path = BASE_DIR.joinpath("README.md")
