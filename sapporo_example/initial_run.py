@@ -42,4 +42,4 @@ if __name__ == "__main__":
     dir_path = Path(__file__).with_name("initial_run_dir")
     sapporo_endpoint = "http://sapporo-service:1122"
 
-    execute_initial_run(dir_path.joinpath("initial_run.sh"), dir_path, sapporo_endpoint)
+    execute_initial_run(Path(__file__).with_name("initial_run.sh"), dir_path, sapporo_endpoint)
