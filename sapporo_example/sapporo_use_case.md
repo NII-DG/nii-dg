@@ -229,7 +229,7 @@ $ curl localhost:5000/bd6f18a4-1599-41d2-bcbd-75f2cda2209d
 
 検証に問題がある例 (例えば、出力ファイルの名前が一致しないなど) として、`./ro-crate-metadata.json` を編集する。
 
-````bash
+```bash
 $ cp ./ro-crate-metadata.json ./ro-crate-metadata_failed.json
 $ sed -i 's/ERR034597_1.small_fastqc.html/ERR034597_1.small_fastqc_failed.html/' ./ro-crate-metadata_failed.json
 $ diff -u ./ro-crate-metadata.json ./ro-crate-metadata_failed.json
@@ -267,4 +267,3 @@ $ curl localhost:5000/32012249-d8f7-4f64-b20d-853ea5be67b5
 ```
 
 検証に問題があったため、`status` が `FAILED` 、`results` に問題があることが示されている。
-````
