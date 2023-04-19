@@ -74,7 +74,7 @@ $ curl localhost:5000/healthcheck
 {
   "message": "OK"
 }
-$ dockcer network connect nii-dg-network sapporo-service
+$ docker network connect nii-dg-network sapporo-service
 ```
 
 エンドポイント`/validate`に生成したro-crate-metadata.jsonをリクエストボディとしてPOST通信を行うと、request_idが返ってくる。次にそのrequest_idをエンドポイントとしてGET通信を行い、検証が終わっていれば結果が返ってくる。
