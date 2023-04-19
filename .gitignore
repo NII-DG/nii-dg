@@ -165,3 +165,7 @@ cython_debug/
 # ---
 
 **/ro-crate-metadata.json
+sapporo_example/run
+sapporo_example/results
+sapporo_example/ro-crate-metadata.json
+sapporo_example/ro-crate-metadata_failed.json
