@@ -78,7 +78,8 @@ class CrateCheckPropsError(CrateError):
         self.errors.extend(errors)
 
     def has_error(self) -> bool:
-        """Return a boolean indicating whether there are errors.
+        """\
+        Return a boolean indicating whether there are errors.
 
         Returns:
             bool: True if there are errors, False otherwise.
@@ -105,4 +106,10 @@ class CrateValidationError(CrateError):
         self.errors.extend(errors)
 
     def has_error(self) -> bool:
+        """\
+        Return a boolean indicating whether there are errors.
+
+        Returns:
+            bool: True if there are errors, False otherwise.
+        """
         return len(self.errors) != 0

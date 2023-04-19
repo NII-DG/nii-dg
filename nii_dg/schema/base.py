@@ -5,11 +5,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List
 from urllib.request import urlopen
 
-from nii_dg.check_functions import (check_entity_values, is_content_size,
-                                    is_email, is_encoding_format, is_iso8601,
-                                    is_orcid, is_phone_number,
-                                    is_relative_path, is_sha256, is_url,
-                                    is_url_accessible)
+from nii_dg.check_functions import (check_entity_values, is_absolute_path,
+                                    is_content_size, is_email,
+                                    is_encoding_format, is_iso8601, is_orcid,
+                                    is_phone_number, is_relative_path,
+                                    is_sha256, is_url, is_url_accessible)
 from nii_dg.entity import ContextualEntity, DataEntity, EntityDef
 from nii_dg.error import EntityError
 from nii_dg.utils import load_schema_file
@@ -39,6 +39,8 @@ class File(DataEntity):
             "url": is_url,
             "sdDatePublished": is_iso8601,
         })
+        if is_absolute_path(self.id):
+            error.add("@id", "The id MUST be a URL or a relative path.")
 
         if error.has_error():
             raise error
@@ -109,6 +111,8 @@ class Organization(ContextualEntity):
         return name_list
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         if self.id.startswith("https://ror.org/"):
@@ -140,12 +144,14 @@ class Person(ContextualEntity):
         })
         if str(self.id).startswith("https://orcid.org/"):
             if is_orcid(str(self.id).replace("https://orcid.org/", "")):
-                error.add("@id", "The id MUST be a valid ORCID ID.")
+                error.add("@id", "The id MUST be a valid ORCID.")
 
         if error.has_error():
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         if is_url_accessible(self.id):
@@ -172,6 +178,8 @@ class License(ContextualEntity):
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         if is_url_accessible(self.id):
@@ -216,7 +224,9 @@ class DataDownload(ContextualEntity):
         if error.has_error():
             raise error
 
-    def DataDownload(self) -> None:
+    def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         if is_url_accessible(self.id):
@@ -238,7 +248,7 @@ class HostingInstitution(Organization):
 
     def validate(self, crate: "ROCrate") -> None:
         # Checked ROR ID in Organization.validate()
-        super().check_props()
+        super().validate(crate)
 
 
 class ContactPoint(ContextualEntity):
@@ -261,6 +271,8 @@ class ContactPoint(ContextualEntity):
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         if self.id.startswith("#mailto:"):

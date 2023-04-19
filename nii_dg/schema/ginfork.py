@@ -15,87 +15,101 @@ if TYPE_CHECKING:
 
 
 SCHEMA_NAME = Path(__file__).stem
-SCHEMA_FILE_PATH = Path(__file__).resolve().parent.joinpath(f"{SCHEMA_NAME}.yml")
+SCHEMA_FILE_PATH = Path(__file__).resolve(
+).parent.joinpath(f"{SCHEMA_NAME}.yml")
 SCHEMA_DEF = load_schema_file(SCHEMA_FILE_PATH)
-
-REQUIRED_DIRECTORIES = {
-    "with_code": ["source", "input_data", "output_data"],
-    "for_parameters": ["source", "input_data"]
-}
 
 
 class GinMonitoring(ContextualEntity):
+    REQUIRED_DIRECTORIES = {
+        "with_code": ["source", "input_data", "output_data"],
+        "for_parameters": ["source", "input_data"]
+    }
+
     def __init__(self, id_: str = "#ginmonitoring", props: Dict[str, Any] = {},
                  schema_name: str = SCHEMA_NAME,
                  entity_def: EntityDef = SCHEMA_DEF["GinMonitoring"]):
-        # if "name" not in props:
-        #     props["name"] = "ginmonitoring"
+        default_props = {
+            "name": "ginmonitoring",
+        }
+        default_props.update(props)
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
 
-    def validate(self, crate: "ROCrate") -> None:
+    def validate(self, crate: ROCrate) -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         if self["about"] != crate.root and self["about"] != {"@id": "./"}:
-            error.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
+            error.add(
+                "about", "The value of this property MUST be the RootDataEntity of this crate.")
 
-        targets = [ent for ent in crate.get_by_type("File") if ent["experimentPackageFlag"] is True]
+        targets = [ent for ent in crate.get_by_type(
+            "File") if ent["experimentPackageFlag"] is True]
         sum_size = sum_file_size(self["contentSize"][-2:], targets)
         if sum_size > int(self["contentSize"][:-2]):
-            error.add("contentSize", "The total file size of ginfork.File labeled as an experimental package is larger than the defined size.")
+            error.add(
+                "contentSize", "The total file size of ginfork.File labeled as an experimental package is larger than the defined size.")
 
-        dir_paths = [dir.id for dir in crate.get_by_type("Dataset")]
-        missing_dirs = []
-        for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]:
-            if dir_name not in [path.split('/')[-2] for path in dir_paths]:
-                missing_dirs.append(dir_name)
-
-        required_dir_list = [str(Path(experiment_dir).joinpath(dir_name)) + "/" for experiment_dir in self["experimentPackageList"]
-                             for dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]]
-        missing_dirs = [dir_path for dir_path in required_dir_list if dir_path not in dir_paths]
+        dir_paths = [Path(dir_.id) for dir_ in crate.get_by_type("Dataset")]
+        required_dirs = [Path(experiment_dir).joinpath(required_dir_name)
+                         for experiment_dir in self["experimentPackageList"]
+                         for required_dir_name in self.REQUIRED_DIRECTORIES[self["datasetStructure"]]]
+        missing_dirs = [
+            dir_path for dir_path in required_dirs if dir_path not in dir_paths]
         if len(missing_dirs) > 0:
-            error.add("datasetStructure", f"Couldn't find required directories: named {missing_dirs}.")
+            error.add("experimentPackageList",
+                      f"Required Dataset entity is missing; @id '{missing_dirs}'.")
 
-        # TODO: update file name rules
-        parent_dirs = {dir_name: [path[: -(len(dir_name) + 1)] for path in dir_paths if path.split('/')[-2] == dir_name]
-                       for dir_name in ["source", "input_data", "output_data"]}
-        if self["datasetStructure"] == "for_parameter" and len(set(parent_dirs["source"]) & set(parent_dirs["input_data"])) == 0:
-            error.add("datasetStructure", "The parent directories of source dir and input dir are not the same.")
-        if self["datasetStructure"] == "with_code" and\
-                len(set(parent_dirs["source"]) & set(parent_dirs["input_data"]) & set(parent_dirs["output_data"])) == 0:
-            error.add("datasetStructure", "The parent directories of source dir, input dir and output dir are not the same.")
+        if self["datasetStructure"] == "for_parameters":
+            if "parameterExperimentList" not in self:
+                error.add("parameterExperimentList",
+                          "This property is required, but not found.")
+            else:
+                param_dirs = [Path(param_dir).joinpath(required_dir_name)
+                              for param_dir in self["parameterExperimentList"]
+                              for required_dir_name in ["output_data", "params"]]
+                missing_dirs = [
+                    param_dir for param_dir in param_dirs if param_dir not in dir_paths]
+                if len(missing_dirs) > 0:
+                    error.add("parameterExperimentList",
+                              f"Required Dataset entity is missing; @id '{missing_dirs}'.")
 
         if error.has_error():
             raise error
 
 
 class File(BaseFile):
-    def __init__(self, id_: str = "#file", props: Dict[str, Any] = {},
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
                  schema_name: str = SCHEMA_NAME,
                  entity_def: EntityDef = SCHEMA_DEF["File"]):
-        default_props = {
-            "name": "file"
-        }
-        default_props.update(props)
-        super().__init__(id_, default_props, schema_name, entity_def)
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
+        # "contentSize", "encodingFormat", "url", "sha256", "sdDatePublished" are checked in super().check_props()
         super().check_props()
 
         error = EntityError(self)
+
         if is_absolute_path(self.id):
-            error.add("@id", "The value MUST be a URL or a relative path.")
+            error.add(
+                "@id", "The value MUST be URL or relative path to the file, not absolute path.")
 
         if error.has_error():
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
+
         if is_url(self.id):
             if "sdDatePublished" not in self:
-                error.add("sdDatePublished", "This property is required, but not found.")
+                error.add("sdDatePublished",
+                          "This property is required, but not found.")
 
         if error.has_error():
             raise error

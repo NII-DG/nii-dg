@@ -37,7 +37,7 @@ class DMPMetadata(ContextualEntity):
             "sdDatePublished": is_iso8601,
         })
         if self.id != "#AMED-DMP":
-            error.add("id", "The id MUST be '#AMED-DMP'.")
+            error.add("@id", "The id MUST be '#AMED-DMP'.")
         if self["name"] != "AMED-DMP":
             error.add("name", "The name MUST be 'AMED-DMP'.")
 
@@ -45,15 +45,18 @@ class DMPMetadata(ContextualEntity):
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
+
         if self["about"] != crate.root and self["about"] != {"@id": "./"}:
             error.add("about", "The value of the about property MUST be the RootDataEntity of this crate.")
         if len(self["hasPart"]) > 0:
-            if self.get("creator") is None:
+            if "creator" not in self:
                 error.add("creator", "The creator property is required when the hasPart property is not empty.")
-            if self.get("hostingInstitution") is None:
+            if "hostingInstitution" not in self:
                 error.add("hostingInstitution", "The hostingInstitution property is required when the hasPart property is not empty.")
-            if self.get("dataManager") is None:
+            if "dataManager" not in self:
                 error.add("dataManager", "The dataManager property is required when the hasPart property is not empty.")
         if len(self["hasPart"]) > len(crate.get_by_type("DMP")):
             error.add("hasPart", "The number of the hasPart property MUST be equal to the number of DMP entities.")
@@ -76,12 +79,14 @@ class DMP(ContextualEntity):
         })
         if "dataNumber" in self:
             if self.id != f"#dmp:{self['dataNumber']}":
-                error.add("id", "The id MUST be '#dmp:<dataNumber>'.")
+                error.add("@id", "The id MUST be '#dmp:<dataNumber>'.")
 
         if error.has_error():
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         dmp_metadata_ents = crate.get_by_type("DMPMetadata")
@@ -89,10 +94,10 @@ class DMP(ContextualEntity):
             error.add("AnotherEntity", "Entity `DMPMetadata` MUST be required with DMP entity.")
         else:
             dmp_metadata_ent = dmp_metadata_ents[0]
-            if "repository" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
+            if "repository" not in [*self.keys(), *dmp_metadata_ent.keys()]:
                 error.add("repository", "This property is required, but not found.")
 
-            if self["accessRights"] == "Unrestricted Open Sharing" and "distribution" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
+            if self["accessRights"] == "Unrestricted Open Sharing" and "distribution" not in [*self.keys(), *dmp_metadata_ent.keys()]:
                 error.add("distribution", "This property is required, but not found.")
 
         if self["accessRights"] in ["Unshared", "Restricted Closed Sharing"] and\
@@ -100,13 +105,13 @@ class DMP(ContextualEntity):
             error.add("availabilityStarts",
                       "This property is required, but not found. If the dataset remains unshared, add reasonForConcealment property instead.")
 
-        if "availabilityStarts" in self.keys() and self["accessRights"] in ["Restricted Open Sharing", "Unrestricted Open Sharing"]:
+        if "availabilityStarts" in self and self["accessRights"] in ["Restricted Open Sharing", "Unrestricted Open Sharing"]:
             error.add("availabilityStarts", "This property is not required because the data is accessible at this time.")
 
-        if self["gotInformedConsent"] == "yes" and "informedConsentFormat" not in self.keys():
+        if self["gotInformedConsent"] == "yes" and "informedConsentFormat" not in self:
             error.add("informedConsentFormat", "This property is required, but not found.")
 
-        if "contentSize" in self.keys():
+        if "contentSize" in self:
             target_files = []
             for ent in crate.get_by_type("File"):
                 if ent["dmpDataNumber"] == self:
@@ -135,12 +140,14 @@ class File(BaseFile):
 
         error = EntityError(self)
         if is_absolute_path(self.id):
-            error.add("id", "The id MUST be a URL or a relative path.")
+            error.add("@id", "The id MUST be a URL or a relative path.")
 
         if error.has_error():
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         if is_url(self.id):
@@ -168,10 +175,12 @@ class ClinicalResearchRegistration(ContextualEntity):
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         if not is_url_accessible(self.id):
-            error.add("id", "The URL is not accessible.")
+            error.add("@id", "The URL is not accessible.")
 
         if error.has_error():
             raise error

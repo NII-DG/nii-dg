@@ -37,7 +37,7 @@ class DMPMetadata(ContextualEntity):
 
         error = EntityError(self)
         if self.id != "#CAO-DMP":
-            error.add("id", "The id MUST be '#CAO-DMP'.")
+            error.add("@id", "The id MUST be '#CAO-DMP'.")
         if self["name"] != "CAO-DMP":
             error.add("name", "The name MUST be 'CAO-DMP'.")
 
@@ -45,7 +45,10 @@ class DMPMetadata(ContextualEntity):
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
+
         if self["about"] != crate.root and self["about"] != {"@id": "./"}:
             error.add("about", "The value of the about property MUST be the RootDataEntity of this crate.")
         if len(self["hasPart"]) != len(crate.get_by_type("DMP")):
@@ -69,12 +72,14 @@ class DMP(ContextualEntity):
         })
         if "dataNumber" in self:
             if self.id != f"#dmp:{self['dataNumber']}":
-                error.add("id", "The value MUST be started with '#dmp:'and then the value of dataNumber property MUST come after it.")
+                error.add("@id", "The value MUST be started with '#dmp:'and then the value of dataNumber property MUST come after it.")
 
         if error.has_error():
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         dmp_metadata_ents = crate.get_by_type("DMPMetadata")
@@ -82,25 +87,25 @@ class DMP(ContextualEntity):
             error.add("AnotherEntity", "Entity `DMPMetadata` MUST be required with DMP entity.")
         else:
             dmp_metadata_ent = dmp_metadata_ents[0]
-            if "repository" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
+            if "repository" not in [*self.keys(), *dmp_metadata_ent.keys()]:
                 error.add("repository", "This property is required, but not found.")
 
-            if self["accessRights"] == "open access" and "distribution" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
+            if self["accessRights"] == "open access" and "distribution" not in [*self.keys(), *dmp_metadata_ent.keys()]:
                 error.add("distribution", "This property is required, but not found.")
 
-        if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
+        if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self:
             error.add("availabilityStarts", "This property is required, but not found.")
 
-        if self["accessRights"] != "embargoed access" and "availabilityStarts" in self.keys():
+        if self["accessRights"] != "embargoed access" and "availabilityStarts" in self:
             error.add("availabilityStarts", "This property is not required.")
 
-        if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self.keys():
+        if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self:
             error.add("isAccessibleForFree", "This property is required, but not found.")
 
-        if self["accessRights"] == "open access" and "license" not in self.keys():
+        if self["accessRights"] == "open access" and "license" not in self:
             error.add("license", "This property is required, but not found.")
 
-        if "contentSize" in self.keys():
+        if "contentSize" in self:
             target_files = []
             for ent in crate.get_by_type("File"):
                 if ent["dmpDataNumber"] == self:
@@ -132,16 +137,18 @@ class Person(BasePerson):
         })
         if self.id.startswith("https://orcid.org/"):
             if is_orcid(self.id) is False:
-                error.add("id", "The value MUST be a valid ORCID.")
+                error.add("@id", "The value MUST be a valid ORCID.")
 
         if error.has_error():
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         if is_url_accessible(self.id) is False:
-            error.add("id", "The value MUST be a valid URL.")
+            error.add("@id", "The value MUST be a valid URL.")
 
         if error.has_error():
             raise error
@@ -164,6 +171,8 @@ class File(BaseFile):
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         if is_url(self.id):

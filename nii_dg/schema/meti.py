@@ -90,30 +90,30 @@ class DMP(ContextualEntity):
             if self["accessRights"] == "open access" and "distribution" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
                 error.add("distribution", "This property is required, but not found.")
 
-        if self["accessRights"] != "open access" and "reasonForConcealment" not in self.keys():
+        if self["accessRights"] != "open access" and "reasonForConcealment" not in self:
             error.add("reasonForConcealment", "This property is required, but not found.")
 
-        if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
+        if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self:
             error.add("availabilityStarts", "This property is required, but not found.")
 
-        if self["accessRights"] != "embargoed access" and "availabilityStarts" in self.keys():
+        if self["accessRights"] != "embargoed access" and "availabilityStarts" in self:
             error.add("availabilityStarts", "This property is not required.")
 
-        if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self.keys():
+        if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self:
             error.add("isAccessibleForFree", "This property is required, but not found.")
 
         if self["accessRights"] == "open access":
-            if "isAccessibleForFree" in self.keys() and self["isAccessibleForFree"] is False:
+            if "isAccessibleForFree" in self and self["isAccessibleForFree"] is False:
                 error.add("isAccessibleForFree", "The value MUST be True.")
-            if "license" not in self.keys():
+            if "license" not in self:
                 error.add("license", "This property is required, but not found.")
-            if "contentSize" not in self.keys():
+            if "contentSize" not in self:
                 error.add("contentSize", "This property is required, but not found.")
 
-        if self["accessRights"] in ["open access", "restricted access", "embargoed access"] and "contactPoint" not in self.keys():
+        if self["accessRights"] in ["open access", "restricted access", "embargoed access"] and "contactPoint" not in self:
             error.add("contactPoint", "This property is required, but not found.")
 
-        if "contentSize" in self.keys():
+        if "contentSize" in self:
             target_files = []
             for ent in crate.get_by_type("File"):
                 if ent["dmpDataNumber"] == self:
