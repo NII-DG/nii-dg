@@ -1,0 +1,32 @@
+version: "3.5"
+services:
+  nii-dg:
+    build:
+      context: ..
+      dockerfile: Dockerfile-api
+    image: nii-dg
+    container_name: nii-dg
+    ports:
+      - 0.0.0.0:5000:5000
+    restart: on-failure
+    networks:
+      - nii-dg-network
+  sapporo-service:
+    image: ghcr.io/sapporo-wes/sapporo-service:1.4.9
+    container_name: sapporo-service
+    volumes:
+      - ${PWD}/run:${PWD}/run
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp:/tmp
+    environment:
+      - SAPPORO_DEBUG=False
+      - SAPPORO_RUN_DIR=${PWD}/run
+    ports:
+      - 0.0.0.0:1122:1122
+    restart: on-failure
+    networks:
+      - nii-dg-network
+
+networks:
+  nii-dg-network:
+    name: nii-dg-network
