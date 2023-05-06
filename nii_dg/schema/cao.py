@@ -36,6 +36,7 @@ class DMPMetadata(ContextualEntity):
         super().check_props()
 
         error = EntityError(self)
+
         if self.id != "#CAO-DMP":
             error.add("@id", "The id MUST be '#CAO-DMP'.")
         if self["name"] != "CAO-DMP":
@@ -164,6 +165,7 @@ class File(BaseFile):
         super().check_props()
 
         error = EntityError(self)
+
         if is_absolute_path(self.id):
             error.add("@id", "The value MUST be a URL or a relative path.")
 

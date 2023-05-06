@@ -49,6 +49,7 @@ class File(DataEntity):
         super().validate(crate)
 
         error = EntityError(self)
+
         if is_url(self.id):
             if "sdDataPublished" not in self:
                 error.add("sdDataPublished", "The property `sdDataPublished` is required when the id is a URL.")

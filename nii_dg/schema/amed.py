@@ -139,6 +139,7 @@ class File(BaseFile):
         super().check_props()
 
         error = EntityError(self)
+
         if is_absolute_path(self.id):
             error.add("@id", "The id MUST be a URL or a relative path.")
 

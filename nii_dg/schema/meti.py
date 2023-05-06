@@ -34,6 +34,7 @@ class DMPMetadata(ContextualEntity):
         super().check_props()
 
         error = EntityError(self)
+
         if self.id != "#METI-DMP":
             error.add("id", "The id MUST be '#METI-DMP'.")
         if self["name"] != "METI-DMP":
@@ -43,7 +44,10 @@ class DMPMetadata(ContextualEntity):
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
+
         if self["about"] != crate.root and self["about"] != {"@id": "./"}:
             error.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
         if len(self["hasPart"]) != len(crate.get_by_type("DMP")):
@@ -77,6 +81,8 @@ class DMP(ContextualEntity):
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         dmp_metadata_ents = crate.get_by_type("DMPMetadata")
@@ -148,6 +154,8 @@ class File(BaseFile):
             raise error
 
     def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
+
         error = EntityError(self)
 
         if is_url(self.id):
