@@ -2,453 +2,294 @@
 # coding: utf-8
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, List
+from urllib.request import urlopen
 
-from nii_dg.entity import ContextualEntity, DataEntity
-from nii_dg.error import EntityError, PropsError
-from nii_dg.utils import (access_url, check_all_prop_types,
-                          check_content_formats, check_content_size,
-                          check_email, check_isodate, check_mime_type,
-                          check_orcid_id, check_phonenumber,
-                          check_required_props, check_sha256,
-                          check_unexpected_props, check_url, classify_uri,
-                          get_name_from_ror, load_entity_def_from_schema_file,
-                          verify_is_past_date)
+from nii_dg.check_functions import (check_entity_values, is_absolute_path,
+                                    is_content_size, is_email,
+                                    is_encoding_format, is_iso8601, is_orcid,
+                                    is_phone_number, is_relative_path,
+                                    is_sha256, is_url, is_url_accessible)
+from nii_dg.entity import ContextualEntity, DataEntity, EntityDef
+from nii_dg.error import EntityError
+from nii_dg.utils import load_schema_file
 
 if TYPE_CHECKING:
     from nii_dg.ro_crate import ROCrate
 
 
 SCHEMA_NAME = Path(__file__).stem
+SCHEMA_FILE_PATH = Path(__file__).resolve().parent.joinpath(f"{SCHEMA_NAME}.yml")
+SCHEMA_DEF = load_schema_file(SCHEMA_FILE_PATH)
 
 
 class File(DataEntity):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["File"]):
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        super().check_props()
 
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
+        error = check_entity_values(self, {
+            "contentSize": is_content_size,
+            "encodingFormat": is_encoding_format,
+            "sha256": is_sha256,
+            "url": is_url,
+            "sdDatePublished": is_iso8601,
+        })
+        if is_absolute_path(self.id):
+            error.add("@id", "The id MUST be a URL or a relative path.")
 
-        try:
-            if classify_uri(self.id) == "abs_path":
-                prop_errors.add("@id", "The @id value MUST be URL or relative path to the file, not absolute path.")
-        except ValueError as error:
-            prop_errors.add("@id", str(error))
-
-        try:
-            check_content_formats(self, {
-                "contentSize": check_content_size,
-                "url": check_url,
-                "sha256": check_sha256,
-                "encodingFormat": check_mime_type,
-                "sdDatePublished": check_isodate
-            })
-        except PropsError as e:
-            prop_errors.add_by_dict(str(e))
-
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
-
-        try:
-            if verify_is_past_date(self, "sdDatePublished") is False:
-                prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
-        except (TypeError, ValueError):
-            prop_errors.add("sdDatePublished", "The value is invalid date format. MUST be 'YYYY-MM-DD'.")
-
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
+        if error.has_error():
+            raise error
 
     def validate(self, crate: "ROCrate") -> None:
-        try:
-            super().validate(crate)
-            validation_failures = EntityError(self)
-        except EntityError as ent_err:
-            validation_failures = ent_err
+        super().validate(crate)
 
-        if classify_uri(self.id) == "URL":
-            if "sdDatePublished" not in self.keys():
-                validation_failures.add("sdDatePublished", "This property is required, but not found.")
+        error = EntityError(self)
 
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
+        if is_url(self.id):
+            if "sdDataPublished" not in self:
+                error.add("sdDataPublished", "The property `sdDataPublished` is required when the id is a URL.")
+
+        if error.has_error():
+            raise error
 
 
 class Dataset(DataEntity):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["Dataset"]):
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        super().check_props()
 
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
-
-        try:
-            check_content_formats(self, {
-                "url": check_url
-            })
-        except PropsError as e:
-            prop_errors.add_by_dict(str(e))
-
+        error = check_entity_values(self, {
+            "url": is_url,
+        })
         if not self.id.endswith("/"):
-            prop_errors.add("@id", "The value MUST end with '/'.")
+            error.add("@id", "The id MUST end with `/`.")
+        if not is_relative_path(self.id):
+            error.add("@id", "The id MUST be a relative path.")
 
-        try:
-            if classify_uri(self.id) != "rel_path":
-                prop_errors.add("@id", "The value MUST be relative path to the directory, neither absolute path nor URL.")
-        except ValueError as error:
-            prop_errors.add("@id", str(error))
-
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
-
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
-
-    def validate(self, crate: "ROCrate") -> None:
-        pass
+        if error.has_error():
+            raise error
 
 
 class Organization(ContextualEntity):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["Organization"]):
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        super().check_props()
 
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
+        error = check_entity_values(self, {
+            "@id": is_url,
+            "url": is_url,
+        })
 
-        try:
-            check_content_formats(self, {
-                "@id": check_url,
-                "url": check_url
-            })
-        except PropsError as e:
-            prop_errors.add_by_dict(str(e))
+        if error.has_error():
+            raise error
 
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
+    @classmethod
+    def fetch_organization_names_from_ror_api(cls, ror_id: str) -> List[str]:
+        """\
+        Fetch organization names from ROR API.
 
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
+        Raises:
+            urllib.error.HTTPError: If the ROR API returns an error.
+        """
+        with urlopen(f"https://api.ror.org/organizations/{ror_id}") as res:
+            json = res.read().decode("utf-8")
+            name_list = [json["name"]]
+            name_list.extend(json["aliases"])
+
+        return name_list
 
     def validate(self, crate: "ROCrate") -> None:
-        try:
-            super().validate(crate)
-            validation_failures = EntityError(self)
-        except EntityError as ent_err:
-            validation_failures = ent_err
+        super().validate(crate)
+
+        error = EntityError(self)
 
         if self.id.startswith("https://ror.org/"):
-            try:
-                ror_namelist = get_name_from_ror(self.id[16:])
-                if self["name"] not in ror_namelist:
-                    validation_failures.add("name", f"The value MUST be same as the registered name in ROR. See {self.id}.")
-            except ValueError as e:
-                validation_failures.add("@id", str(e))
+            ror_id = self.id.replace("https://ror.org/", "")
+            name_list = self.fetch_organization_names_from_ror_api(ror_id)
+            if self["name"] not in name_list:
+                error.add("name", f"The name MUST be one of {name_list} registered in ROR.")
         else:
-            try:
-                access_url(self.id)
-            except ValueError as e:
-                validation_failures.add("@id", str(e))
+            if is_url_accessible(self.id):
+                error.add("@id", "Failed to access the URL.")
 
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
+        if error.has_error():
+            raise error
 
 
 class Person(ContextualEntity):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["Person"]):
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        super().check_props()
 
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
+        error = check_entity_values(self, {
+            "@id": is_url,
+            "email": is_email,
+            "telephone": is_phone_number,
+        })
+        if str(self.id).startswith("https://orcid.org/"):
+            if is_orcid(str(self.id).replace("https://orcid.org/", "")):
+                error.add("@id", "The id MUST be a valid ORCID.")
 
-        try:
-            check_content_formats(self, {
-                "@id": check_url,
-                "email": check_email,
-                "telephone": check_phonenumber
-            })
-        except PropsError as e:
-            prop_errors.add_by_dict(str(e))
-
-        try:
-            if isinstance(self.id, str) and self.id.startswith("https://orcid.org/"):
-                check_orcid_id(self.id[18:])
-        except ValueError as e:
-            prop_errors.add("@id", str(e))
-
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
-
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
+        if error.has_error():
+            raise error
 
     def validate(self, crate: "ROCrate") -> None:
-        try:
-            super().validate(crate)
-            validation_failures = EntityError(self)
-        except EntityError as ent_err:
-            validation_failures = ent_err
+        super().validate(crate)
 
-        try:
-            access_url(self.id)
-        except ValueError as e:
-            validation_failures.add("@id", str(e))
+        error = EntityError(self)
 
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
+        if is_url_accessible(self.id):
+            error.add("@id", "Failed to access the URL.")
+
+        if error.has_error():
+            raise error
 
 
 class License(ContextualEntity):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["License"]):
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        super().check_props()
 
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
+        error = check_entity_values(self, {
+            "@id": is_url,
+        })
 
-        try:
-            check_content_formats(self, {
-                "@id": check_url
-            })
-        except PropsError as e:
-            prop_errors.add_by_dict(str(e))
-
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
-
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
+        if error.has_error():
+            raise error
 
     def validate(self, crate: "ROCrate") -> None:
-        try:
-            super().validate(crate)
-            validation_failures = EntityError(self)
-        except EntityError as ent_err:
-            validation_failures = ent_err
+        super().validate(crate)
 
-        try:
-            access_url(self.id)
-        except ValueError as e:
-            validation_failures.add("@id", str(e))
+        error = EntityError(self)
 
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
+        if is_url_accessible(self.id):
+            error.add("@id", "Failed to access the URL.")
+
+        if error.has_error():
+            raise error
 
 
 class RepositoryObject(ContextualEntity):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["RepositoryObject"]):
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        super().check_props()
 
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
+        error = check_entity_values(self, {
+            "@id": is_url,
+        })
 
-        try:
-            classify_uri(self.id)
-        except ValueError as error:
-            prop_errors.add("@id", str(error))
-
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
-
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
-
-    def validate(self, crate: "ROCrate") -> None:
-        pass
+        if error.has_error():
+            raise error
 
 
 class DataDownload(ContextualEntity):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["DataDownload"]):
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        super().check_props()
 
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
+        error = check_entity_values(self, {
+            "@id": is_url,
+            "sha256": is_sha256,
+            "uploadDate": is_iso8601,
+        })
 
-        try:
-            check_content_formats(self, {
-                "@id": check_url,
-                "sha256": check_sha256,
-                "uploadDate": check_isodate
-            })
-        except PropsError as e:
-            prop_errors.add_by_dict(str(e))
-
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
-
-        try:
-            if verify_is_past_date(self, "uploadDate") is False:
-                prop_errors.add("uploadDate", "The value MUST be the date of past.")
-        except (TypeError, ValueError):
-            prop_errors.add("uploadDate", "The value is invalid date format. MUST be 'YYYY-MM-DD'.")
-
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
+        if error.has_error():
+            raise error
 
     def validate(self, crate: "ROCrate") -> None:
-        try:
-            super().validate(crate)
-            validation_failures = EntityError(self)
-        except EntityError as ent_err:
-            validation_failures = ent_err
+        super().validate(crate)
 
-        try:
-            access_url(self.id)
-        except ValueError as e:
-            validation_failures.add("@id", str(e))
+        error = EntityError(self)
 
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
+        if is_url_accessible(self.id):
+            error.add("@id", "Failed to access the URL.")
+
+        if error.has_error():
+            raise error
 
 
 class HostingInstitution(Organization):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_=id_, props=props)
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["HostingInstitution"]):
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
-
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
-
-        try:
-            check_content_formats(self, {
-                "@id": check_url,
-                "url": check_url
-            })
-        except PropsError as e:
-            prop_errors.add_by_dict(str(e))
-
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
-
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
+        # Checked @id and url in Organization.check_props()
+        super().check_props()
 
     def validate(self, crate: "ROCrate") -> None:
-        try:
-            super(Organization, self).validate(crate)
-            validation_failures = EntityError(self)
-        except EntityError as ent_err:
-            validation_failures = ent_err
-
-        if self.id.startswith("https://ror.org/"):
-            try:
-                ror_namelist = get_name_from_ror(self.id[16:])
-                if self["name"] not in ror_namelist:
-                    validation_failures.add("name", f"The value MUST be same as the registered name in ROR. See {self.id}.")
-            except ValueError as e:
-                validation_failures.add("@id", str(e))
-        else:
-            try:
-                access_url(self.id)
-            except ValueError as e:
-                validation_failures.add("@id", str(e))
-
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
+        # Checked ROR ID in Organization.validate()
+        super().validate(crate)
 
 
 class ContactPoint(ContextualEntity):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["ContactPoint"]):
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        super().check_props()
 
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
+        error = check_entity_values(self, {
+            "email": is_email,
+            "telephone": is_phone_number,
+        })
+        if not self.id.startswith("#mailto:") and not self.id.startswith("#callto:"):
+            error.add("@id", "The id MUST start with '#mailto:' or '#callto:'.")
 
-        try:
-            check_content_formats(self, {
-                "email": check_email,
-                "telephone": check_phonenumber
-            })
-        except PropsError as e:
-            prop_errors.add_by_dict(str(e))
-
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
-
-        if self.id[:8] not in ["#mailto:", "#callto:"]:
-            prop_errors.add("@id", "The value MUST be start with #mailto: or #callto:.")
-
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
+        if error.has_error():
+            raise error
 
     def validate(self, crate: "ROCrate") -> None:
-        try:
-            super().validate(crate)
-            validation_failures = EntityError(self)
-        except EntityError as ent_err:
-            validation_failures = ent_err
+        super().validate(crate)
+
+        error = EntityError(self)
 
         if self.id.startswith("#mailto:"):
-            if "email" not in self.keys():
-                validation_failures.add("email", "This property is required, but not found.")
-            elif self.id[8:] != self["email"]:
-                validation_failures.add("@id", "The contained email is not the same as the value of email property.")
-                validation_failures.add("email", "The value is not the same as the email contained in the value of @id property.")
-
+            email = self.id.replace("#mailto:", "")
+            if self.get("email") is None:
+                error.add("email", "This property is required.")
+            elif self.get("email") != email:
+                error.add("@id", "The email address MUST be the same as the value of the email property.")
+                error.add("email", "The email address MUST be the same as the value of the @id property.")
         elif self.id.startswith("#callto:"):
-            if "telephone" not in self.keys():
-                validation_failures.add("telephone", "This property is required, but not found.")
-            elif self.id[8:] != self["telephone"] or self.id[8:] != self["telephone"].replace("-", ""):
-                validation_failures.add("@id", "The contained phone number is not the same as the value of telephone property.")
-                validation_failures.add("telephone", "The value is not the same as the phone number contained in the value of @id property.")
+            phone_number = self.id.replace("#callto:", "")
+            if self.get("telephone") is None:
+                error.add("telephone", "This property is required.")
+            elif self.get("telephone") != phone_number:
+                error.add("@id", "The phone number MUST be the same as the value of the telephone property.")
+                error.add("telephone", "The phone number MUST be the same as the value of the @id property.")
 
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
+        if error.has_error():
+            raise error

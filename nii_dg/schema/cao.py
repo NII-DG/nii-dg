@@ -2,262 +2,184 @@
 # coding: utf-8
 
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict
 
-from nii_dg.entity import ContextualEntity
-from nii_dg.error import EntityError, PropsError
-from nii_dg.ro_crate import ROCrate
+from nii_dg.check_functions import (check_entity_values, is_absolute_path,
+                                    is_iso8601, is_orcid, is_url,
+                                    is_url_accessible)
+from nii_dg.entity import ContextualEntity, EntityDef
+from nii_dg.error import EntityError
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.schema.base import Person as BasePerson
-from nii_dg.utils import (access_url, check_all_prop_types,
-                          check_content_formats, check_content_size,
-                          check_erad_researcher_number, check_isodate,
-                          check_mime_type, check_orcid_id,
-                          check_required_props, check_sha256,
-                          check_unexpected_props, check_url, classify_uri,
-                          load_entity_def_from_schema_file, sum_file_size,
-                          verify_is_past_date)
+from nii_dg.utils import load_schema_file, sum_file_size
+
+if TYPE_CHECKING:
+    from nii_dg.ro_crate import ROCrate
+
 
 SCHEMA_NAME = Path(__file__).stem
+SCHEMA_FILE_PATH = Path(__file__).resolve().parent.joinpath(f"{SCHEMA_NAME}.yml")
+SCHEMA_DEF = load_schema_file(SCHEMA_FILE_PATH)
 
 
 class DMPMetadata(ContextualEntity):
-    def __init__(self, id_: str = "#CAO-DMP", props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
-        self.data.setdefault("name", "CAO-DMP")
+    def __init__(self, id_: str = "#CAO-DMP", props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["DMPMetadata"]):
+        default_props = {
+            "name": "CAO-DMP"
+        }
+        default_props.update(props)
+        super().__init__(id_, default_props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        super().check_props()
 
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
+        error = EntityError(self)
 
         if self.id != "#CAO-DMP":
-            prop_errors.add("@id", "The value MUST be '#CAO-DMP'.")
-
+            error.add("@id", "The id MUST be '#CAO-DMP'.")
         if self["name"] != "CAO-DMP":
-            prop_errors.add("name", "The value MUST be 'CAO-DMP'.")
+            error.add("name", "The name MUST be 'CAO-DMP'.")
 
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
+        if error.has_error():
+            raise error
 
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
+    def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
 
-    def validate(self, crate: ROCrate) -> None:
-        try:
-            super().validate(crate)
-            validation_failures = EntityError(self)
-        except EntityError as ent_err:
-            validation_failures = ent_err
+        error = EntityError(self)
 
         if self["about"] != crate.root and self["about"] != {"@id": "./"}:
-            validation_failures.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
+            error.add("about", "The value of the about property MUST be the RootDataEntity of this crate.")
+        if len(self["hasPart"]) != len(crate.get_by_type("DMP")):
+            error.add("hasPart", "The number of the hasPart property MUST be equal to the number of DMP entities.")
 
-        if len(self["hasPart"]) != len(crate.get_by_entity_type(DMP)):
-            diff = []
-            for dmp in crate.get_by_entity_type(DMP):
-                if dmp not in self["hasPart"]:
-                    diff.append(dmp)
-            validation_failures.add("hasPart", f"There is an omission of DMP entity in the list: {diff}.")
-
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
+        if error.has_error():
+            raise error
 
 
 class DMP(ContextualEntity):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
-        super().__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["DMP"]):
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        super().check_props()
 
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
+        error = check_entity_values(self, {
+            "availabilityStarts": is_iso8601,
+        })
+        if "dataNumber" in self:
+            if self.id != f"#dmp:{self['dataNumber']}":
+                error.add("@id", "The value MUST be started with '#dmp:'and then the value of dataNumber property MUST come after it.")
 
-        try:
-            check_content_formats(self, {
-                "availabilityStarts": check_isodate
-            })
-        except PropsError as e:
-            prop_errors.add_by_dict(str(e))
+        if error.has_error():
+            raise error
 
-        if "dataNumber" in self and self.id != "#dmp:" + str(self["dataNumber"]):
-            prop_errors.add("@id", "The value MUST be started with '#dmp:'and then the value of dataNumber property MUST come after it.")
+    def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
 
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
+        error = EntityError(self)
 
-        try:
-            if verify_is_past_date(self, "availabilityStarts"):
-                prop_errors.add("availabilityStarts", "The value MUST be the date of future.")
-        except (TypeError, ValueError):
-            prop_errors.add("availabilityStarts", "The value is invalid date format. MUST be 'YYYY-MM-DD'.")
-
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
-
-    def validate(self, crate: ROCrate) -> None:
-        try:
-            super().validate(crate)
-            validation_failures = EntityError(self)
-        except EntityError as ent_err:
-            validation_failures = ent_err
-
-        dmp_metadata_ents = crate.get_by_entity_type(DMPMetadata)
+        dmp_metadata_ents = crate.get_by_type("DMPMetadata")
         if len(dmp_metadata_ents) == 0:
-            validation_failures.add("AnotherEntity", "Entity `DMPMetadata` MUST be required with DMP entity.")
+            error.add("AnotherEntity", "Entity `DMPMetadata` MUST be required with DMP entity.")
         else:
             dmp_metadata_ent = dmp_metadata_ents[0]
-            if "repository" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
-                validation_failures.add("repository", "This property is required, but not found.")
+            if "repository" not in [*self.keys(), *dmp_metadata_ent.keys()]:
+                error.add("repository", "This property is required, but not found.")
 
-            if self["accessRights"] == "open access" and "distribution" not in list(self.keys()) + list(dmp_metadata_ent.keys()):
-                validation_failures.add("distribution", "This property is required, but not found.")
+            if self["accessRights"] == "open access" and "distribution" not in [*self.keys(), *dmp_metadata_ent.keys()]:
+                error.add("distribution", "This property is required, but not found.")
 
-        if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self.keys():
-            validation_failures.add("availabilityStarts", "This property is required, but not found.")
+        if self["accessRights"] == "embargoed access" and "availabilityStarts" not in self:
+            error.add("availabilityStarts", "This property is required, but not found.")
 
-        if self["accessRights"] != "embargoed access" and "availabilityStarts" in self.keys():
-            validation_failures.add("availabilityStarts", "This property is not required.")
+        if self["accessRights"] != "embargoed access" and "availabilityStarts" in self:
+            error.add("availabilityStarts", "This property is not required.")
 
-        if verify_is_past_date(self, "availabilityStarts"):
-            validation_failures.add("availabilityStarts", "The value MUST be the date of future.")
+        if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self:
+            error.add("isAccessibleForFree", "This property is required, but not found.")
 
-        if self["accessRights"] in ["open access", "restricted access"] and "isAccessibleForFree" not in self.keys():
-            validation_failures.add("isAccessibleForFree", "This property is required, but not found.")
+        if self["accessRights"] == "open access" and "license" not in self:
+            error.add("license", "This property is required, but not found.")
 
-        if self["accessRights"] == "open access" and "license" not in self.keys():
-            validation_failures.add("license", "This property is required, but not found.")
-
-        if "contentSize" in self.keys():
+        if "contentSize" in self:
             target_files = []
-            for ent in crate.get_by_entity_type(File):
+            for ent in crate.get_by_type("File"):
                 if ent["dmpDataNumber"] == self:
                     target_files.append(ent)
 
             sum_size = sum_file_size(self["contentSize"][-2:], target_files)
 
             if self["contentSize"] != "over100GB" and sum_size > int(self["contentSize"][: -2]):
-                validation_failures.add("contentSize", "The total file size included in this DMP is larger than the defined size.")
+                error.add("contentSize", "The total file size included in this DMP is larger than the defined size.")
 
             if self["contentSize"] == "over100GB" and sum_size < 100:
-                validation_failures.add("contentSize", "The total file size included in this DMP is smaller than 100GB.")
+                error.add("contentSize", "The total file size included in this DMP is smaller than 100GB.")
 
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
+        if error.has_error():
+            raise error
 
 
 class Person(BasePerson):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
-        super(BasePerson, self).__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["Person"]):
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        super().check_props()
 
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
+        error = check_entity_values(self, {
+            "@id": is_url,
+        })
+        if self.id.startswith("https://orcid.org/"):
+            if is_orcid(self.id) is False:
+                error.add("@id", "The value MUST be a valid ORCID.")
 
-        try:
-            check_content_formats(self, {
-                "@id": check_url,
-                "eradResearcherNumber": check_erad_researcher_number
-            })
-        except PropsError as e:
-            prop_errors.add_by_dict(str(e))
+        if error.has_error():
+            raise error
 
-        try:
-            if isinstance(self.id, str) and self.id.startswith("https://orcid.org/"):
-                check_orcid_id(self.id[18:])
-        except ValueError as e:
-            prop_errors.add("@id", str(e))
+    def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
 
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
+        error = EntityError(self)
 
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
+        if is_url_accessible(self.id) is False:
+            error.add("@id", "The value MUST be a valid URL.")
 
-    def validate(self, crate: ROCrate) -> None:
-        try:
-            super(BasePerson, self).validate(crate)
-            validation_failures = EntityError(self)
-        except EntityError as ent_err:
-            validation_failures = ent_err
-
-        try:
-            access_url(self.id)
-        except ValueError as e:
-            validation_failures.add("@id", str(e))
-
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
+        if error.has_error():
+            raise error
 
 
 class File(BaseFile):
-    def __init__(self, id_: str, props: Optional[Dict[str, Any]] = None):
-        super(BaseFile, self).__init__(id_=id_, props=props, schema_name=SCHEMA_NAME)
+    def __init__(self, id_: str, props: Dict[str, Any] = {},
+                 schema_name: str = SCHEMA_NAME,
+                 entity_def: EntityDef = SCHEMA_DEF["File"]):
+        super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
-        prop_errors = EntityError(self)
-        entity_def = load_entity_def_from_schema_file(self.schema_name, self.entity_name)
+        super().check_props()
 
-        for func in [check_unexpected_props, check_required_props, check_all_prop_types]:
-            try:
-                func(self, entity_def)
-            except PropsError as e:
-                prop_errors.add_by_dict(str(e))
+        error = EntityError(self)
 
-        try:
-            if classify_uri(self.id) == "abs_path":
-                prop_errors.add("@type", f"The @id value in {self} MUST be URL or relative path to the file, not absolute path.")
-        except ValueError as error:
-            prop_errors.add("@id", str(error))
+        if is_absolute_path(self.id):
+            error.add("@id", "The value MUST be a URL or a relative path.")
 
-        try:
-            check_content_formats(self, {
-                "contentSize": check_content_size,
-                "encodingFormat": check_mime_type,
-                "sha256": check_sha256,
-                "url": check_url,
-                "sdDatePublished": check_isodate
-            })
-        except PropsError as e:
-            prop_errors.add_by_dict(str(e))
+        if error.has_error():
+            raise error
 
-        if self.type != self.entity_name:
-            prop_errors.add("@type", f"The value MUST be '{self.entity_name}'.")
+    def validate(self, crate: "ROCrate") -> None:
+        super().validate(crate)
 
-        try:
-            if verify_is_past_date(self, "sdDatePublished") is False:
-                prop_errors.add("sdDatePublished", "The value MUST be the date of past.")
-        except (TypeError, ValueError):
-            prop_errors.add("sdDatePublished", "The value is invalid date format. MUST be 'YYYY-MM-DD'.")
+        error = EntityError(self)
 
-        if len(prop_errors.message_dict) > 0:
-            raise prop_errors
+        if is_url(self.id):
+            if "sdDatePublished" not in self:
+                error.add("sdDatePublished", "This property is required, but not found.")
 
-    def validate(self, crate: ROCrate) -> None:
-        try:
-            super(BaseFile, self).validate(crate)
-            validation_failures = EntityError(self)
-        except EntityError as ent_err:
-            validation_failures = ent_err
-
-        if classify_uri(self.id) == "URL" and "sdDatePublished" not in self.keys():
-            validation_failures.add("sdDatePublished", "This property is required, but not found.")
-
-        if len(validation_failures.message_dict) > 0:
-            raise validation_failures
+        if error.has_error():
+            raise error

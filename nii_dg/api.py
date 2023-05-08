@@ -11,8 +11,7 @@ from uuid import uuid4
 from flask import Blueprint, Flask, Response, abort, jsonify, request
 from waitress import serve
 
-from nii_dg.error import (CheckPropsError, CrateError, EntityError,
-                          GovernanceError)
+from nii_dg.error import CrateError, CrateValidationError, EntityError
 from nii_dg.ro_crate import ROCrate
 
 if TYPE_CHECKING:
@@ -48,7 +47,7 @@ def result_wrapper(error_list: List[EntityError]) -> List[Dict[str, str]]:
         entity_dict = {}
         entity_dict["entityId"] = entity_error.entity.id
         entity_dict["props"] = entity_error.entity.schema_name + "." + entity_error.entity.type + ":"  # type:ignore
-        for prop, reason in entity_error.message_dict.items():
+        for prop, reason in entity_error.errors.items():
             reason_dict = entity_dict.copy()
             reason_dict["props"] += prop
             reason_dict["reason"] = reason
@@ -70,7 +69,7 @@ def invalid_request(err: Exception) -> Response:
 
 @app_bp.errorhandler(500)
 def internal_error(err: Exception) -> Response:
-    response: Response = jsonify(message='An internal error occurred.')
+    response: Response = jsonify(message="An internal error occurred.")
     response.status_code = 500
     return response
 
@@ -89,8 +88,6 @@ def request_validation() -> Response:
         crate.as_jsonld()
     except CrateError as crateerr:
         abort(400, crateerr)
-    except CheckPropsError:
-        abort(400, "RO-Crate has invalid property.")
 
     target_entities: List[Entity] = []
     if entity_ids:
@@ -131,7 +128,7 @@ def get_results(request_id: str) -> Response:
         if job.exception() is None:
             status = "COMPLETE"
             results = job.result()
-        elif isinstance(job.exception(), GovernanceError):
+        elif isinstance(job.exception(), CrateValidationError):
             status = "FAILED"
             results = result_wrapper(job.exception().entity_errors)  # type:ignore
         else:
@@ -163,7 +160,7 @@ def cancel_validation(request_id: str) -> Response:
     return response
 
 
-@app_bp.route('/healthcheck', methods=['GET'])
+@app_bp.route("/healthcheck", methods=["GET"])
 def check_health() -> Response:
     response: Response = jsonify({"message": "OK"})
     response.status_code = GET_STATUS_CODE
@@ -175,15 +172,15 @@ def check_health() -> Response:
 
 def validate(crate: ROCrate, entities: List["Entity"]) -> List[Any]:
     if len(entities) > 0:
-        governance_error = GovernanceError()
+        error = CrateValidationError()
         for entity in entities:
             try:
                 entity.validate(crate)
             except EntityError as err:
-                governance_error.add_error(err)
+                error.add(err)
 
-        if len(governance_error.entity_errors) > 0:
-            raise governance_error
+        if error.has_error():
+            raise error
     else:
         crate.validate()
     return []
@@ -204,8 +201,10 @@ def main() -> None:
     if os.getenv("WSGI_SERVER") == "waitress":
         import logging
         waitress_logger = logging.getLogger("waitress")
+        # TODO log level
         waitress_logger.setLevel(logging.INFO)
-        serve(app, host='0.0.0.0', port=5000, threads=1)
+        # TODO thread
+        serve(app, host="0.0.0.0", port=5000, threads=1)
     else:
         # for debug
         app.config["DEBUG"] = True

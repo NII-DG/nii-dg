@@ -37,7 +37,7 @@ $ docker run -it --rm ghcr.io/NII-DG/nii-dg:latest bash
 
 ## Usage
 
-上記の通り、本ライブラリは 3つの機能に分かれている。
+上記の通り、本ライブラリは 3 つの機能に分かれている。
 
 1. Schema definition: Metadata Schema とその検証ルールの定義
 2. Packaging: パッケージング (RO-Crate 化)
@@ -99,10 +99,10 @@ ro_crate.dump("ro-crate-metadata.json")
 
 - [./tests/examples/example.py](./tests/examples/example.py)
 
-#### RO-Crate Metadata File DescriptorとRoot Data Entity
+#### RO-Crate Metadata File Descriptor と Root Data Entity
 
 上述の Minimal example における 2 つの Entity は、RO-Crate における [必須のエンティティ](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html) である。
-以下の2つが必須のエンティティである:
+以下の 2 つが必須のエンティティである:
 
 - RO-Crate Metadata File Descriptor
   - `@type`: `CreativeWork`
@@ -221,7 +221,7 @@ Packaging における型検査 (`entity.check_props()`) と、Validation にお
 
 - `entity.check_props()`:
   - 各 prop の型検査を行う
-     -  例: 型定義str に対して int が設定されているなど、型の不一致を検出する
+    - 例: 型定義 str に対して int が設定されているなど、型の不一致を検出する
   - required の prop が設定されているか、などの検査を行う
 - `entity.validate()`:
   - より高度な検証を行う
@@ -233,6 +233,58 @@ Packaging における型検査 (`entity.check_props()`) と、Validation にお
 REST API の仕様として、[open-api_spec.yml](./open-api_spec.yml) を参照。
 
 また、API Server の起動・実行に関して、[api-quick-start.md](./api-quick-start.md) を参照。
+
+## JSON-LD Context を用いた schema の外部参照
+
+本ライブラリは、ライブラリに含まれる YAML schema (e.g., [`nii_dg/schema/base.yml`](./nii_dg/schema/base.yml))と Python module (e.g., [`nii_dg/schema/base.py`](./nii_dg/schema/base.yml)) を用いて、研究データのパッケージと検証が行われる。
+検証における入力は RO-Crate であるが、パッケージ時と検証時のライブラリバージョンが異なる場合、schema や検証ルールが異なる状態での検証が行われる可能性がある。
+この問題を解決するため、JSON-LD の `@context` property を用いて、schema (i.e., yaml schema and python module) の外部参照を行う。
+
+例として、[`nii_dg/schema/base.yml`](./nii_dg/schema/base.yml) と [`nii_dg/schema/base.py`](./nii_dg/schema/base.yml) を用いると、生成される `File` entity は以下のようになる。
+
+```json
+{
+  "@id": "file_1.txt",
+  "@type": "File",
+  "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/schema/context/base.jsonld",
+  "name": "Sample File",
+  "contentSize": "128GB",
+},
+```
+
+ここで、`@context` property により、`https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/schema/context/base.jsonld` にて、`File` entity の schema が定義されていることを示している。
+更に、参照先の JSON-LD Context においては、下記のように定義されている。
+
+```json
+"File": {
+  "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File",
+  "@context": {
+    "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:@id",
+    "name": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:name",
+    "contentSize": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:contentSize",
+    "encodingFormat": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:encodingFormat",
+    "sha256": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:sha256",
+    "url": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:url",
+    "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:sdDatePublished"
+  }
+},
+```
+
+これにより、`File` entity 自体、及びその各 property について、schema の外部参照が行われることになる。
+
+![System architecture extended](https://user-images.githubusercontent.com/26019402/228390256-5dcc5c81-3ba9-4be6-b0ab-1f6622c1fd2d.png)
+
+実際の検証時には、RO-Crate 内の各 entity に記述されている `@context` を辿り、パッケージ時の Yaml schema と Python module を参照する。
+ライブラリ内で、それらの file を読み込み、entity の instance を生成する。
+その後、生成された entity の instance に含まれる schema や検証ルールを用いて、検証が行われる。
+
+---
+
+JSON-LD Context の生成については、[`./schema/REAMED.md`](./schema/REAMED.md) を参照。
+
+また、JSON-LD の公開性がこの実装においては、重要な要素である。
+そのため、本ライブラリでは、GitHub Actions により、JSON-LD Context の生成と公開を行っている。
+GitHub Actions として、[`./.github/workflows/release.yml`](./.github/workflows/release.yml) が用意されている。
 
 ## Development
 
@@ -276,6 +328,22 @@ $ pytest -s ./tests/unit_test
 
 - [pytest](./.github/workflows/pytest.yml)
 
+### Documentation
+
+`sphinx` を用いて、ドキュメントを生成する。
+
+```bash
+# 初期設定
+$ sudo apt install python3-sphinx
+$ sphinx-apidoc -F -H nii-dg -A NII -V 1.0.0 -o docs nii_dg
+
+# ドキュメントの生成
+$ sphinx-build ./docs ./docs/_build
+
+# ドキュメントの確認
+$ npx http-server ./docs/_build -a 0.0.0.0 -p 3000
+```
+
 ## Branch and Release
 
 Branch 管理として、
@@ -295,4 +363,5 @@ Release 用の GitHub actions として、以下のように設定されてい�
 
 ## License
 
-[TODO: not set yet]
+[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
+See the [LICENSE](https://github.com/sapporo-wes/yevis-cli/blob/main/LICENSE).

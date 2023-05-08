@@ -21,6 +21,15 @@ mypy --strict \
     --implicit-reexport \
     ${BASE_DIR}/nii_dg
 
+echo "--- ${BASE_DIR}/schema/scripts ---"
+mypy --strict \
+    --allow-untyped-calls \
+    --allow-untyped-decorators \
+    --ignore-missing-imports \
+    --no-warn-unused-ignores \
+    --implicit-reexport \
+    ${BASE_DIR}/schema/scripts
+
 echo "--- ${BASE_DIR}/tests ---"
 mypy --strict \
     --allow-untyped-calls \

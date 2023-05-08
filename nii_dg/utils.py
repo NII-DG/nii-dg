@@ -1,486 +1,386 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import datetime
-import hashlib
+"""\
+This module provides utility functions for nii_dg.
+"""
+
+import ast
 import importlib
-import mimetypes
 import re
-import time
-from pathlib import Path, PurePosixPath, PureWindowsPath
-from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Literal, NewType,
-                    Optional, Tuple, TypedDict, Union)
-from urllib.parse import quote, urlparse
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import (TYPE_CHECKING, Any, Dict, List, Literal, NewType, Optional,
+                    Tuple, TypedDict, Union, get_args, get_origin)
+from urllib.error import HTTPError
+from urllib.request import urlopen
 
-import requests
 import yaml
-from typeguard import TypeCheckError, check_type
 
-from nii_dg.error import PropsError, UnexpectedImplementationError
+from nii_dg.const import DOWNLOADED_SCHEMA_DIR_NAME, RO_CRATE_CONTEXT
+from nii_dg.module_info import GH_REF, GH_REPO
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
-    from nii_dg.schema.sapporo import SapporoRun
+
+NOW = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
 
-class EntityDefDict(TypedDict):
-    expected_type: str
-    required: bool
-
-
-EntityDef = NewType("EntityDef", Dict[str, EntityDefDict])
-
-
-def load_entity_def_from_schema_file(schema_name: Optional[str] = None, entity_name: str = "") -> EntityDef:
-    schema_file = Path(__file__).resolve().parent.joinpath(f"schema/{schema_name}.yml")
-    if not schema_file.exists():
-        raise PropsError(f"Tried to load {entity_name} from schema/{schema_name}.yml, but this file is not found.")
-    with schema_file.open(mode="r", encoding="utf-8") as f:
-        schema_obj = yaml.safe_load(f)
-    if entity_name not in schema_obj:
-        raise PropsError(f"Tried to load {entity_name} from schema/{schema_name}.yml, but this entity is not found.")
-
-    entity_def: EntityDef = {}  # type: ignore
-    for p_name, p_obj in schema_obj[entity_name]["props"].items():
-        entity_def[p_name] = {
-            "expected_type": p_obj["expected_type"],
-            "required": p_obj["required"] == "Required."
-        }
-
-    return entity_def
-
-
-def import_entity_class(schema_name: str, entity_name: str) -> Any:
+def generate_ctx(gh_repo: str = GH_REPO, gh_ref: str = GH_REF, schema_name: str = "ro-crate") -> str:
     """\
-    Import entity class from schema module.
-    e.g., import_entity_class("base", "File") ->
+        Generate a context string for a given schema name.
 
-    from nii_dg.schema.base import File
-    return File
+    Args:
+        gh_repo (str, optional): The name of the GitHub repository. Defaults to GH_REPO.
+        gh_ref (str, optional): The name of the GitHub reference. Defaults to GH_REF.
+        schema_name (str, optional): The name of the schema. Defaults to "ro-crate".
+
+    Returns:
+        str: The context string.
     """
-    schema_file = Path(__file__).resolve().parent.joinpath(f"schema/{schema_name}.py")
-    if not schema_file.exists():
-        raise PropsError(f"Tried to import {entity_name} from schema/{schema_name}.py, but this file is not found.")
-    module_name = f"nii_dg.schema.{schema_name}"
-    module = importlib.import_module(module_name)
-    try:
-        return getattr(module, entity_name)
-    except AttributeError:
-        raise PropsError(f"Tried to import {entity_name} from schema/{schema_name}.py, but this entity is not found.") from None
+    if schema_name == "ro-crate":
+        # Called from DefaultEntities; returns RO-Crate Context
+        return RO_CRATE_CONTEXT  # type: ignore
+
+    template = "https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/schema/context/{schema}.jsonld"
+    return template.format(
+        gh_repo=gh_repo,
+        gh_ref=gh_ref,
+        schema=schema_name,
+    )
 
 
-def convert_string_type_to_python_type(type_str: str, schema_name: Optional[str] = None) -> Tuple[Any, int]:
+def parse_ctx(ctx: str) -> Tuple[str, str, str]:
     """\
-    Convert string type to python type.
-    At the same time, it determines whether entity subclasses are included in it and returns a flag.
-    e.g. "List[Union[str, int]]" -> List[Union[str, int]], 0
+    Parse the given context string and return a tuple of (gh_repo, gh_ref, schema_name).
+
+    Args:
+        ctx (str): The context string to be parsed.
+
+    Returns:
+        Tuple[str, str, str]: A tuple of (gh_repo, gh_ref, schema_name).
+
+    Raises:
+        ValueError: If the given context string does not match the expected format, e.g., https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/base.jsonld
     """
-    if type_str == "bool":
-        return bool, 0
-    elif type_str == "str":
-        return str, 0
-    elif type_str == "int":
-        return int, 0
-    elif type_str == "float":
-        return float, 0
-    elif type_str == "Any":
-        return Any, 0
-    elif type_str.startswith("List["):
-        type_, flg = convert_string_type_to_python_type(type_str[5:-1], schema_name)
-        return List[type_], flg  # type: ignore
-    elif type_str.startswith("Optional["):
-        type_, flg = convert_string_type_to_python_type(type_str[9:-1], schema_name)
-        return Optional[type_], flg
-    elif type_str.startswith("Union["):
-        child_types = tuple([convert_string_type_to_python_type(t, schema_name)[0] for t in type_str[6:-1].split(", ")])
-        flg_list = [convert_string_type_to_python_type(t, schema_name)[1] for t in type_str[6:-1].split(", ")]
-        if flg_list.count(flg_list[0]) != len(flg_list):
-            raise PropsError(f"Unexpected type: {type_str}")
-        return Union[child_types], flg_list[0]  # type: ignore
-    elif type_str.startswith("Literal["):
-        child_list = [t.strip('"').strip("'") for t in type_str[8:-1].split(", ")]
-        return Literal[tuple(child_list)], 0  # type: ignore
-    else:
-        if "[" in type_str:
-            raise PropsError(f"Unexpected type: {type_str}")
-        else:
-            # Entity subclass in schema module
-            schema_name = schema_name or "base"
-            entity_class = None
-            try:
-                entity_class = import_entity_class(schema_name, type_str)
-            except PropsError:
-                if schema_name != "base":
-                    try:
-                        entity_class = import_entity_class("base", type_str)
-                    except PropsError:
-                        pass
-            if entity_class is None:
-                if type_str in ["ROCrateMetadata", "RootDataEntity"]:
-                    module = importlib.import_module("nii_dg.entity")
-                    return getattr(module, type_str), 1
-                raise PropsError(f"Unexpected type: {type_str}")
-            else:
-                return entity_class, 1
+    if ctx == RO_CRATE_CONTEXT:
+        return GH_REPO, GH_REF, "ro-crate"
+
+    pattern = r"https://raw\.githubusercontent\.com/(?P<gh_repo>[^/]+/[^/]+)/(?P<gh_ref>[^/]+)/schema/context/(?P<schema>[^/]+)\.jsonld"
+    match = re.match(pattern, ctx)
+
+    if match:
+        gh_repo = match.group("gh_repo")
+        gh_ref = match.group("gh_ref")
+        schema_name = match.group("schema")
+        return (gh_repo, gh_ref, schema_name)
+
+    raise ValueError("Context does not match the expected format, e.g., https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/base.jsonld")
 
 
-def check_value_type(value: Any, expected_python_type: Any) -> None:
-    """
-    Check the type of each property by referring schema.yml.
-    When the type includes entity subclass, the check is skipped.
-    """
-    try:
-        check_type(value, expected_python_type)
-    except TypeCheckError as e:
-        ori_msg = str(e)
-        if "is not an instance of" in ori_msg:
-            msg = "got " + ori_msg[:ori_msg.find("is not an instance of") - 1] + " instead"
-        else:
-            msg = ori_msg
-        raise PropsError(f"The type of this property MUST be {expected_python_type}; {msg}.") from None
-    except Exception as e:
-        raise UnexpectedImplementationError(e) from None
+# === Definition for schema file ===
+
+PropDef = TypedDict("PropDef", {
+    "expected_type": str,
+    "example": Optional[str],
+    "required": str,
+    "description": str
+})
+# {"prop_name": PropDef}
+PropsDef = NewType("PropsDef", Dict[str, PropDef])
+EntityDef = TypedDict("EntityDef", {
+    "description": str,
+    "props": PropsDef
+})
+# {"entity_name": EntityDef}
+SchemaDef = NewType("SchemaDef", Dict[str, EntityDef])
+
+# ==================================
 
 
-def check_all_prop_types(entity: "Entity", entity_def: EntityDef) -> None:
-    """
-    Check the type of all property in the entity by referring schema.yml.
-    When the type of property includes entity subclass, the check of the property is skipped.
-    Called after check_unexpected_props().
-    """
-    error_dict = {}
-    for prop, prop_def in entity_def.items():
-        if prop in entity:
-            expected_python_type, flg = convert_string_type_to_python_type(prop_def["expected_type"], entity.schema_name)
-            if flg == 0:
-                try:
-                    check_value_type(entity[prop], expected_python_type)
-                except PropsError as e:
-                    error_dict[prop] = str(e)
-    if len(error_dict) > 0:
-        raise PropsError(error_dict)
-
-
-def check_instance_type_from_id(entity_list: List["Entity"], expected_python_type: Any, list_flg: Optional[str] = None) -> None:
-    correct_type_ents = []
-    for ent in entity_list:
-        try:
-            if list_flg == "list":
-                check_value_type([ent], expected_python_type)
-            else:
-                check_value_type(ent, expected_python_type)
-            correct_type_ents.append(ent)
-        except PropsError:
-            pass
-    if len(correct_type_ents) == 0:
-        raise PropsError("The entity liked by @id dict in this property is invalid type.")
-
-
-def check_unexpected_props(entity: "Entity", entity_def: EntityDef) -> None:
-    error_dict = {}
-    for actual_prop in entity.keys():
-        if actual_prop not in entity_def:
-            if isinstance(actual_prop, str) and actual_prop.startswith("@"):
-                continue
-            error_dict[actual_prop] = "Unexpected property"
-    if len(error_dict) > 0:
-        raise PropsError(error_dict)
-
-
-def check_required_props(entity: "Entity", entity_def: EntityDef) -> None:
-    """
-    Check required prop is existing or not.
-    If not, raise PropsError.
-    """
-    error_dict = {}
-    required_props = [k for k, v in entity_def.items() if v["required"]]
-    for prop in required_props:
-        if prop not in entity.keys():
-            error_dict[prop] = "This property is required, but not found."
-
-    if len(error_dict) > 0:
-        raise PropsError(error_dict)
-
-
-def check_content_formats(entity: "Entity", format_rules: Dict[str, Callable[[str], None]]) -> None:
+def load_schema_file(schema_path: Path) -> SchemaDef:
     """\
-    expected as called after check_required_props(), check_all_prop_types(), check_unexpected_props()
+    Load a schema file and return a SchemaDef object.
+
+    Args:
+        schema_path (Path): The path to the schema file.
+
+    Returns:
+        SchemaDef: The schema definition.
+
+    Raises:
+        FileNotFoundError: If the schema file is not found.
     """
-    error_dict = {}
-    for prop, check_method in format_rules.items():
-        if prop in entity:
-            try:
-                check_method(entity[prop])
-            except (TypeError, ValueError):
-                error_dict[prop] = "The value is invalid format."
-        else:
-            # Because optional field
-            pass
-    if len(error_dict) > 0:
-        raise PropsError(error_dict)
+    if not schema_path.exists():
+        raise FileNotFoundError(f"Schema file not found: {schema_path}")
+    with schema_path.open(mode="r", encoding="utf-8") as f:
+        return yaml.safe_load(f)  # type: ignore
 
 
-def classify_uri(value: str) -> str:
-    """
-    Check the value is URI.
-    Return 'URL' when the value starts with 'http' or 'https'
-    When it is not URL, return 'abs_path' or 'rel_path.
-    """
-    try:
-        encoded_uri = quote(value, safe="!#$&'()*+,/:;=?@[]\\")
-        parsed = urlparse(encoded_uri)
-    except (TypeError, ValueError):
-        raise ValueError(f"The value {value} is invalid URI.") from None
+def import_custom_class(module_name: str, class_name: str) -> Any:
+    """\
+    Import a custom class from a module.
 
-    if parsed.scheme in ["http", "https"] and parsed.netloc != "":
-        return "URL"
-    if PurePosixPath(encoded_uri).is_absolute() or PureWindowsPath(encoded_uri).is_absolute() or parsed.scheme == "file":
-        return "abs_path"
-    return "rel_path"
+    Args:
+    module_name (str): The name of the module containing the class.
+    class_name (str): The name of the class to be imported.
 
-
-def check_url(value: str) -> None:
-    """
-    Check the value is URL.
-    If not, raise ValueError.
+    Returns:
+        Any: The imported class if found, None otherwise.
     """
     try:
-        encoded_url = quote(value, safe="!#$&'()*+,/:;=?@[]\\")
-        parsed = urlparse(encoded_url)
-    except TypeError:
-        raise ValueError from None
-
-    if parsed.scheme not in ["http", "https"]:
-        raise ValueError
-    if parsed.netloc == "":
-        raise ValueError
-
-
-def check_content_size(value: str) -> None:
-    """
-    Check file size value is in the defined format.
-    If not, raise ValueError.
-    """
-    if not isinstance(value, str):
-        raise TypeError
-
-    pattern = r"^\d+[KMGTP]?B$"
-    size_match = re.compile(pattern)
-
-    if size_match.fullmatch(value) is None:
-        raise ValueError
-
-
-def check_mime_type(value: str) -> None:
-    """
-    Check encoding format value is in MIME type format.
-    """
-    # TODO: mimetypeの辞書がOSによって差分があるのをどう吸収するか, 例えばtext/markdown
-    if not isinstance(value, str):
-        raise TypeError
-
-    if mimetypes.guess_extension(value) is None:
-        raise ValueError
-
-
-def check_sha256(value: str) -> None:
-    """
-    Check sha256 value is in SHA256 format.
-    """
-    if not isinstance(value, str):
-        raise TypeError
-
-    pattern = r"(?:[^a-fA-F\d]|\b)([a-fA-F\d]{64})(?:[^a-fA-F\d]|\b)"
-    sha_match = re.compile(pattern)
-
-    if sha_match.fullmatch(value) is None:
-        raise ValueError
-
-
-def check_isodate(value: str) -> None:
-    """
-    Check date is in ISO 8601 format "YYYY-MM-DD".
-    """
-    datetime.date.fromisoformat(value)
-
-
-def check_email(value: str) -> None:
-    """
-    Check email format.
-    """
-    pattern = r"^[\w\-_]+(.[\w\-_]+)*@([\w][\w\-]*[\w]\.)+[A-Za-z]{2,}$"
-    email_match = re.compile(pattern)
-
-    if email_match.fullmatch(value) is None:
-        raise ValueError
-
-
-def check_phonenumber(value: str) -> None:
-    """
-    Check phone-number format.
-    """
-    pattern = r"(^0(\d{1}\-?\d{4}|\d{2}\-?\d{3}|\d{3}\-?\d{2}|\d{4}\-?\d{1})\-?\d{4}$|^0[5789]0\-?\d{4}\-?\d{4}$)"
-    phone_match = re.compile(pattern)
-
-    if phone_match.fullmatch(value) is None:
-        raise ValueError
-
-
-def check_erad_researcher_number(value: str) -> None:
-    """
-    Confirm check digit
-    """
-    if len(value) != 8:
-        raise ValueError
-
-    check_digit = int(value[0])
-    sum_val = 0
-    for i, num in enumerate(value):
-        if i == 0:
-            continue
-        if i % 2 == 0:
-            sum_val += int(num) * 2
-        else:
-            sum_val += int(num)
-
-    if (sum_val % 10) != check_digit:
-        raise ValueError
-
-
-def check_orcid_id(value: str) -> None:
-    """
-    Check orcid id format and checksum.
-    """
-    pattern = r"^(\d{4}-){3}\d{3}[\dX]$"
-    orcidid_match = re.compile(pattern)
-
-    if orcidid_match.fullmatch(value) is None:
-        raise ValueError(f"Orcid ID {value} is invalid.")
-
-    if value[-1] == "X":
-        checksum = 10
-    else:
-        checksum = int(value[-1])
-    sum_val = 0
-    for num in value.replace("-", "")[:-1]:
-        sum_val = (sum_val + int(num)) * 2
-    if (12 - (sum_val % 11)) % 11 != checksum:
-        raise ValueError(f"Orcid ID {value} is invalid.")
-
-
-def verify_is_past_date(entity: "Entity", key: str) -> Optional[bool]:
-    """
-    Check the date is past or not.
-    """
-    if key not in entity.keys():
+        module = importlib.import_module(module_name)
+        return getattr(module, class_name)
+    except (ModuleNotFoundError, AttributeError):
         return None
 
-    iso_date = datetime.date.fromisoformat(entity[key])
-    today = datetime.date.today()
 
-    if (today - iso_date).days < 0:
-        return False
-    return True
+def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
+    """\
+    Check if a given value is an instance of a given expected type.
 
+    Args:
+        value (Any): The value to be checked.
+        expected_type (str): The expected type.
 
-def access_url(url: str) -> requests.Response:
+    Returns:
+        bool: True if the given value is an instance of the given expected type, False otherwise.
     """
-    Check the url is accessible.
-    """
-    try:
-        res = requests.get(url, timeout=(10.0, 30.0))
-        res.raise_for_status()
-    except Exception as err:
-        raise ValueError(f"Unable to access {url} due to {err}") from None
 
-    return res
+    def parse_type_string(type_str: str) -> Any:
+        """\
+        Parse a type string and return the corresponding type object.
 
+        Args:
+            type_str (str): The type string to be parsed.
 
-def get_name_from_ror(ror_id: str) -> List[str]:
-    """
-    Get organization name from ror.
-    """
-    api_url = "https://api.ror.org/organizations/" + ror_id
-    res = access_url(api_url)
+        Returns:
+            Any: The type object corresponding to the given type string. e.g., "List[int]" -> typing.List[int]
 
-    body = res.json()
-    name_list: List[str] = body["aliases"]
-    name_list.append(body["name"])
-    return name_list
+        Notes:
+            ast.parse returns a ast.Module object as follows:
 
+            "List[int]" ->
+                Subscript(value=Name(id='List', ctx=Load()), slice=Index(value=Name(id='int', ctx=Load())), ctx=Load())
+            "Dict[str, int]" ->
+                Subscript(value=Name(id='Dict', ctx=Load()), slice=Index(value=Tuple(
+                    elts=[Name(id='str', ctx=Load()), Name(id='int', ctx=Load())], ctx=Load())), ctx=Load())
+            "str" -> Name(id='str', ctx=Load())
+            "List" -> Name(id='List', ctx=Load())
+            "Entity" -> Name(id='Entity', ctx=Load())
 
-def sum_file_size(size_unit: str, entity_list: List["Entity"]) -> float:
-    """
-    Sum size of file entities in the specified unit.
-    """
-    units = ["B", "KB", "MB", "GB", "TB", "PB"]
-    file_size_sum: float = 0
-    target_prop = "contentSize"
+            ---
 
-    try:
-        unit = units.index(size_unit)
-    except ValueError as err:
-        raise UnexpectedImplementationError from err
+            Optional[str] -> Union[str, NoneType]
+        """
+        type_node = ast.parse(type_str).body[0].value  # type: ignore
+        return ast_to_type(type_node)
 
-    for ent in entity_list:
-        if ent[target_prop][-2:] in units:
-            file_unit = units.index(ent[target_prop][-2:])
-            file_size = int(ent[target_prop][:-2])
-        elif ent[target_prop][-1:] in units:
-            file_unit = 0
-            file_size = int(ent[target_prop][:-1])
+    def ast_to_type(node: ast.AST) -> Any:
+        """\
+        Convert an AST node to a type object.
+
+        Args:
+            node (ast.AST): The AST node to be converted.
+
+        Returns:
+            Any: The type object corresponding to the given AST node.
+        """
+        if isinstance(node, ast.Name):
+            if node.id in ("List", "Dict", "Tuple", "Union", "Optional", "Literal"):
+                return getattr(importlib.import_module("typing"), node.id)
+            elif node.id in ("str", "int", "float", "bool"):
+                return eval(node.id)
+            else:
+                custom_class = import_custom_class("nii_dg.entity", node.id)
+                if custom_class is None:
+                    return Any
+                return custom_class
+        elif isinstance(node, ast.Subscript):
+            origin = ast_to_type(node.value)  # e.g., typing.List
+            args = []
+            if isinstance(node.slice.value, ast.Tuple):  # type: ignore
+                args = [ast_to_type(arg) for arg in node.slice.value.elts]  # type: ignore
+            else:
+                args.append(ast_to_type(node.slice.value))  # type: ignore
+
+            return origin[tuple(args) if len(args) > 1 else args[0]]
+        elif isinstance(node, ast.Constant):
+            # for Literal
+            return node.value
         else:
-            raise UnexpectedImplementationError
+            return Any
 
-        file_size_sum += round(file_size / 1000 ** (unit - file_unit), 3)
+    def check_type(value: Any, expected_type: Any) -> bool:
+        """\
+        Check if a given value is an instance of a given expected type.
 
-    return file_size_sum
+        Args:
+            value (Any): The value to be checked.
+            expected_type (Any): The expected type.
+
+        Returns:
+            bool: True if the given value is an instance of the given expected type, False otherwise.
+        """
+        origin = get_origin(expected_type)  # typing.List -> list
+        args = get_args(expected_type)  # typing.List[int] -> (int,)
+
+        if origin is Union:
+            # including Optional
+            return any(check_type(value, t) for t in args)
+        elif origin is dict:
+            if not isinstance(value, dict):
+                return False
+            key_type, value_type = args
+            return all(check_type(k, key_type) and check_type(v, value_type) for k, v in value.items())
+        elif origin is list:
+            if not isinstance(value, list):
+                return False
+            item_type = args[0]
+            return all(check_type(item, item_type) for item in value)
+        elif origin is tuple:
+            if not isinstance(value, tuple):
+                return False
+            item_types = args
+            if len(item_types) != len(value):
+                return False
+            return all(check_type(item, item_type) for item, item_type in zip(value, item_types))
+        elif origin is Literal:
+            return value in args
+        elif expected_type is Any:
+            return True
+        elif expected_type in (str, int, float, bool):
+            return isinstance(value, expected_type)
+        else:
+            # custom class, e.g., Entity
+            if isinstance(value, dict):
+                # Skip check for custom classes if value is a dictionary, e.g., {"@id": "foo", "@type": "Entity"}
+                return True
+
+            # Check if value is an instance of expected_type or its subclasses
+            for cls in value.__class__.__mro__:
+                if cls.__name__ == expected_type.__name__:
+                    return True
+
+            return isinstance(value, expected_type)
+
+    parsed_expected_type = parse_type_string(expected_type)
+    # parsed_expected_type: e.g., typing.List[int], typing.Dict[str, int], int, etc.
+
+    return check_type(value, parsed_expected_type)
 
 
-def get_entity_list_to_validate(entity: "Entity") -> Dict[str, Any]:
-    entity_def = load_entity_def_from_schema_file(entity.schema_name, entity.entity_name)
-    instance_type_dict = {}
-    for prop, prop_def in entity_def.items():
-        if prop in entity:
-            expected_python_type, flg = convert_string_type_to_python_type(prop_def["expected_type"], entity.schema_name)
-            if flg == 1:
-                instance_type_dict[prop] = expected_python_type
-    return instance_type_dict
+def is_semantic_version(version: str) -> bool:
+    """
+    Check if a given string is a semantic version.
+
+    Args:
+        version (str): The string to be checked.
+
+    Returns:
+        bool: True if the given string is a semantic version, False otherwise.
+    """
+    return re.fullmatch(r"\d+\.\d+\.\d+", version) is not None
 
 
-def get_sapporo_run_status(run_id: str, endpoint: str) -> Any:
-    unknown_count = 0
-    while True:
-        run_status = requests.get(endpoint + "/runs/" + run_id + "/status", timeout=(10, 30))
-        if run_status.json()["state"] not in ["QUEUED", "INITIALIZING", "RUNNING", "CANCELING"]:
-            if run_status.json()["state"] == "UNKNOWN":
-                unknown_count += 1
-            break
-        if unknown_count > 5:
-            raise TimeoutError("Aborted as the status remains `UNKNOWN` for a while")
-        time.sleep(30)
-    return run_status.json()["state"]
+def is_version_newer(ver1: str, ver2: str) -> bool:
+    """
+    Compare two version strings in semantic versioning format.
+
+    Args:
+        ver1 (str): The first version.
+        ver2 (str): The second version.
+
+    Returns:
+        bool: True if the first version is newer than the second version, False otherwise.
+    """
+    ver1_split = ver1.split(".")
+    ver2_split = ver2.split(".")
+
+    while len(ver1_split) < len(ver2_split):
+        ver1_split.append("0")
+    while len(ver2_split) < len(ver1_split):
+        ver2_split.append("0")
+
+    for i in range(len(ver1_split)):
+        if int(ver1_split[i]) > int(ver2_split[i]):
+            return True
+        elif int(ver1_split[i]) < int(ver2_split[i]):
+            return False
+
+    return False
 
 
-def download_file_from_url(url: str, file_path: Path) -> None:
-    request = requests.get(url, timeout=(10, 120))
-    with open(file_path, 'w', encoding="utf_8") as f:
-        f.write(request.text)
+def download_schema(gh_repo: str, gh_ref: str, schema_module_name: str) -> None:
+    """\
+    Download a schema module from a GitHub repository.
+
+    Args:
+        gh_repo (str): The GitHub repository from which the schema module is to be downloaded.
+        gh_ref (str): The reference (branch, tag, or commit) of the GitHub repository.
+        schema_module_name (str): The name of the schema module to be downloaded.
+
+    Note:
+        Downloaded schema modules are stored in the 'nii_dg/downloaded_schema' directory.
+    """
+    schema_module_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.py"
+    schema_file_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.yml"
+
+    schema_dir = Path(f"./{DOWNLOADED_SCHEMA_DIR_NAME}/{gh_repo}/{gh_ref}")
+    schema_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        schema_module_path = schema_dir.joinpath(f"{schema_module_name}.py")
+        if not schema_module_path.exists():
+            with urlopen(schema_module_url) as res:
+                schema_module = res.read().decode("utf-8")
+            with schema_module_path.open("w") as f:
+                f.write(schema_module)
+        schema_file_path = schema_dir.joinpath(f"{schema_module_name}.yml")
+        if not schema_file_path.exists():
+            with urlopen(schema_file_url) as res:
+                schema_file = res.read().decode("utf-8")
+            with schema_file_path.open("w") as f:
+                f.write(schema_file)
+    except HTTPError as e:
+        if e.code == 404:
+            raise ValueError(f"Schema module '{schema_module_name}' does not exist in the given GitHub repository.")
+        else:
+            raise e
 
 
-def get_file_sha256(file_path: Path) -> str:
-    with open(file_path, "rb") as f:
-        return hashlib.sha256(f.read()).hexdigest()
+# TODO: update
+def sum_file_size(size_unit: str, entities: List["Entity"]) -> float:
+    """\
+    Sum the file sizes of the given entities and convert the result to the specified unit.
 
+    Args:
+        size_unit (str): The unit of the file size to be summed. e.g., "B", "KB", "MB", "GB", "TB", "PB"
+        entities (List[Entity]): The entities whose file sizes are to be summed.
 
-def generate_run_request_json(sapporo_run: "SapporoRun") -> Dict[str, Optional[str]]:
-    key_list = ["workflow_params", "workflow_type", "workflow_type_version", "tags", "workflow_engine_name", "workflow_engine_parameters",
-                "workflow_url", "workflow_name", "workflow_attachment"]
-    value_list = [None] * len(key_list)
-    run_request: Dict[str, Optional[str]] = dict(zip(key_list, value_list))
+    Returns:
+        float: The sum of the file sizes of the given entities in the specified unit.
+    """
+    unit_conversion_table = {
+        "B": 1,
+        "KB": 1024,
+        "MB": 1024 ** 2,
+        "GB": 1024 ** 3,
+        "TB": 1024 ** 4,
+        "PB": 1024 ** 5,
+    }
+    if size_unit not in unit_conversion_table:
+        raise ValueError(f"Invalid size unit: {size_unit}")
 
-    for key in key_list:
-        if key in sapporo_run:
-            run_request[key] = sapporo_run[key]
+    total_size = 0
+    for entity in entities:
+        if "contentSize" not in entity:
+            raise ValueError(f"contentSize is not defined for {entity}")
+        match = re.match(r"^(?P<size>\d+)(?P<unit>[KMGTP]?B)$", entity["contentSize"])
+        if match is None:
+            raise ValueError(f"Invalid content size: {entity['contentSize']}")
+        size = int(match.group("size"))
+        unit = match.group("unit")
+        total_size += size * unit_conversion_table[unit]
 
-    return run_request
+    # round to 2 decimal places
+    return round(total_size / unit_conversion_table[size_unit], 3)

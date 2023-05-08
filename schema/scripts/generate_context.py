@@ -9,7 +9,7 @@ $ python3 generate_context.py -h
 Example:
 
 # at <repo root>/schema
-$ python3 scripts/generate_context.py --repo NII-DG/nii-dg --gh-ref main ../nii_dg/schema/base.yml ./context/base.jsonld
+$ python3 scripts/generate_context.py ../nii_dg/schema/base.yml ./context/base.jsonld
 """
 
 import argparse
@@ -19,6 +19,8 @@ from pathlib import Path
 from typing import Dict, List, Optional, TypedDict
 
 import yaml
+
+from nii_dg.module_info import GH_REF, GH_REPO
 
 Prop = TypedDict("Prop", {
     "expected_type": str,
@@ -46,16 +48,6 @@ def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
         "ctx_file_dst",
         type=Path,
         help="Destination path for generated context file. File name must be <schema_name>.jsonld (e.g., base.jsonld)"
-    )
-    parser.add_argument(
-        "--repo",
-        required=True,
-        help="GitHub repository name (e.g., NII-DG/nii-dg)"
-    )
-    parser.add_argument(
-        "--gh-ref",
-        required=True,
-        help="GitHub reference (e.g., main, 0.1.0, commit hash, etc.)"
     )
 
     return parser.parse_args(args)
@@ -91,7 +83,7 @@ def main(args: List[str]) -> None:
         with schema_file.open("r", encoding="utf-8") as f:
             schema = yaml.safe_load(f)
         schema_name = schema_file.stem
-        ctx = generate_ctx(schema, parsed_args.repo, parsed_args.gh_ref, schema_name)
+        ctx = generate_ctx(schema, GH_REPO, GH_REF, schema_name)
         ctx_file_dst: Path = parsed_args.ctx_file_dst.resolve()
         with ctx_file_dst.open("w", encoding="utf-8") as f:
             f.write(ctx)

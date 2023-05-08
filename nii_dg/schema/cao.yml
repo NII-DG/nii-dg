@@ -1,9 +1,9 @@
 DMPMetadata:
   description: Metadata of research project that is the subject of this data management plan.
   props:
-    '@id':
+    "@id":
       expected_type: str
-      example: '#CAO-DMP'
+      example: "#CAO-DMP"
       required: Required.
       description: MUST be the name with prefix `#`.
     about:
@@ -38,7 +38,7 @@ DMPMetadata:
       description: Indicates research field of the project.
     eradProjectId:
       expected_type: str
-      example: '123456'
+      example: "123456"
       required: Required when your project has e-Rad project ID.
       description: Indicates e-Rad project ID.
     hasPart:
@@ -49,9 +49,9 @@ DMPMetadata:
 DMP:
   description: Contents from data management plan that is (will be) submitted to the funding agency.
   props:
-    '@id':
+    "@id":
       expected_type: str
-      example: '#dmp:1'
+      example: "#dmp:1"
       required: Required.
       description: MUST be data No. with the prefix `#dmp:`. Indicates data number in the DMP list.
     dataNumber:
@@ -86,12 +86,12 @@ DMP:
       description: MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicates the availability of the data set.
     availabilityStarts:
       expected_type: str
-      example: '2030-04-01'
+      example: "2030-04-01"
       required: Required when accessRights has `embargoed access`.
       description: MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
     isAccessibleForFree:
       expected_type: bool
-      example: 'True'
+      example: True
       required: Required when accessRights has `open access` or `restricted access`.
       description: MUST be a boolean. `True` means the data set is free to access, while `False` means consideration. When accessRights has `open access`, MUST be `True`.
     license:
@@ -132,7 +132,7 @@ DMP:
 Person:
   description: A person who contributes to the research project, e.g. researcher.
   props:
-    '@id':
+    "@id":
       expected_type: str
       example: https://orcid.org/0000-0001-2345-6789
       required: Required.
@@ -159,18 +159,18 @@ Person:
       description: Email address of the person.
     telephone:
       expected_type: str
-      example: '03-0000-0000'
+      example: "03-0000-0000"
       required: Optional.
       description: Phone number of the person.
     eradResearcherNumber:
       expected_type: str
-      example: '01234567'
+      example: "01234567"
       required: Required when the person is data manager or has e-Rad researcher number.
       description: Indicates e-Rad researcher number.
 File:
   description: A file included in the research project, e.g. text file, script file and images.
   props:
-    '@id':
+    "@id":
       expected_type: str
       example: config/setting.txt
       required: Required.
@@ -207,6 +207,6 @@ File:
       description: MUST be a direct URL to the file.
     sdDatePublished:
       expected_type: str
-      example: '2022-12-01'
+      example: "2022-12-01"
       required: Required when the file is from outside this research project.
       description: Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
