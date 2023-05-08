@@ -143,6 +143,6 @@ jobs:
           echo "TAG_NAME=${{ needs.load_release_version.outputs.version }}" >> $GITHUB_ENV
       - name: Create release
         run: |
-          gh release --repo ${{ github.repository }} create ${{ env.TAG_NAME }} --title ${{ env.TAG_NAME }} --generate-notes nii_dg-1.0.0.tar.gz nii_dg-1.0.0-py3-none-any.whl
+          gh release --repo ${{ github.repository }} create ${{ env.TAG_NAME }} --title ${{ env.TAG_NAME }} --generate-notes nii_dg-${{ env.TAG_NAME }}.tar.gz nii_dg-${{ env.TAG_NAME }}-py3-none-any.whl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
