@@ -151,6 +151,19 @@ class ROCrate():
         """
         return [entity for entity in self.all_entities if entity.type == type_]
 
+    def get_by_id_and_type(self, id_: str, type_: str) -> List[Entity]:
+        """\
+        Get entities by ID and type.
+
+        Args:
+            id_: The ID of the entity.
+            type_: The type of the entity.
+
+        Returns:
+            A list of entities with the specified ID and type.
+        """
+        return [entity for entity in self.all_entities if entity.id == id_ and entity.type == type_]
+
     def from_jsonld(self, jsonld: Dict[str, Any]) -> None:
         """\
         Deserialize an RO-Crate from JSON-LD.

@@ -1,9 +1,9 @@
-version: '3.5'
+version: "3.5"
 services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile-api
+      dockerfile: Dockerfile
     image: nii-dg
     container_name: nii-dg
     volumes:
@@ -12,4 +12,4 @@ services:
     working_dir: /app
     ports:
       - 5000:5000
-    command: ['python', '/app/nii_dg/api.py']
+    command: [ "python", "/app/nii_dg/api.py" ]

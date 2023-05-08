@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 # coding: utf-8
+import importlib
+import importlib.util
 from pathlib import Path
 
 from setuptools import setup
 
-from .nii_dg.module_info import GH_REF
+spec = importlib.util.spec_from_file_location("module_info", "./nii_dg/module_info.py")
+nii_dg_module_info = importlib.util.module_from_spec(spec)  # type: ignore
+spec.loader.exec_module(nii_dg_module_info)  # type: ignore
+GH_REF = nii_dg_module_info.GH_REF
 
 BASE_DIR: Path = Path(__file__).parent.resolve()
 LONG_DESCRIPTION: Path = BASE_DIR.joinpath("README.md")
