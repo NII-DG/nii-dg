@@ -3,12 +3,13 @@ services:
   nii-dg:
     build:
       context: ..
-      dockerfile: Dockerfile-api
+      dockerfile: Dockerfile
     image: nii-dg
     container_name: nii-dg
     ports:
       - 0.0.0.0:5000:5000
     restart: on-failure
+    command: [ "python", "/app/nii_dg/api.py" ]
     networks:
       - nii-dg-network
   sapporo-service:

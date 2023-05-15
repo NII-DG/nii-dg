@@ -131,7 +131,7 @@ def get_results(request_id: str) -> Response:
             results = job.result()
         elif isinstance(job.exception(), CrateValidationError):
             status = "FAILED"
-            results = result_wrapper(job.exception().entity_errors)  # type:ignore
+            results = result_wrapper(job.exception().errors)  # type:ignore
         else:
             status = "EXECUTOR_ERROR"
             results = [{"err_msg": str(job.exception())}]
