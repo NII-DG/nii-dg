@@ -21,10 +21,7 @@ jobs:
       - name: Load release version
         id: load_release_version
         run: |
-          echo "VERSION=$(python3 ./nii_dg/module_info.py)" >> $GITHUB_ENV
-      - name: Print release version
-        run: |
-          echo ${{ env.VERSION }}
+          echo "version=$(python3 ./nii_dg/module_info.py)" >> $GITHUB_OUTPUT
 
   generate_and_push_context:
     runs-on: ubuntu-latest
@@ -52,10 +49,12 @@ jobs:
             schema_name=$(basename $schema .yml)
             python3 ./schema/scripts/generate_docs.py ./nii_dg/schema/${schema_name}.yml ./schema/docs/${schema_name}.md
           done
-      - name: Commit and push to main
+      - name: Setup git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Commit and push to main
+        run: |
           git add ./schema/context/*.jsonld
           git add ./schema/docs/*.md
           git diff --quiet && git diff --staged --quiet ||
@@ -63,9 +62,7 @@ jobs:
           git push origin main
       - name: Commit and push to develop
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout develop
+          git checkout -B develop
           git merge main
           git push origin develop
           git checkout main
@@ -73,6 +70,8 @@ jobs:
   build_wheel:
     runs-on: ubuntu-latest
     needs: [load_release_version, generate_and_push_context]
+    env:
+      VERSION: ${{ steps.load_release_version.outputs.version }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -104,6 +103,8 @@ jobs:
   deploy_ghcr:
     runs-on: ubuntu-latest
     needs: [load_release_version, generate_and_push_context]
+    env:
+      VERSION: ${{ steps.load_release_version.outputs.version }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -131,6 +132,8 @@ jobs:
   create_release:
     runs-on: ubuntu-latest
     needs: [load_release_version, generate_and_push_context]
+    env:
+      VERSION: ${{ steps.load_release_version.outputs.version }}
     steps:
       - uses: actions/checkout@v3
         with:
