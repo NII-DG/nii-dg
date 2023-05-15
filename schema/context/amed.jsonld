@@ -1,62 +1,62 @@
 {
-  "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/schema/context/amed.jsonld",
+  "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/schema/context/amed.jsonld",
   "@version": 1.1,
   "@context": {
     "DMPMetadata": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata:@id",
-        "about": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata:about",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata:name",
-        "funder": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata:funder",
-        "funding": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata:funding",
-        "chiefResearcher": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata:chiefResearcher",
-        "creator": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata:creator",
-        "hostingInstitution": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata:hostingInstitution",
-        "dataManager": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata:dataManager",
-        "repository": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata:repository",
-        "distribution": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata:distribution",
-        "hasPart": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMPMetadata:hasPart"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata:@id",
+        "about": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata:about",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata:name",
+        "funder": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata:funder",
+        "funding": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata:funding",
+        "chiefResearcher": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata:chiefResearcher",
+        "creator": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata:creator",
+        "hostingInstitution": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata:hostingInstitution",
+        "dataManager": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata:dataManager",
+        "repository": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata:repository",
+        "distribution": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata:distribution",
+        "hasPart": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMPMetadata:hasPart"
       }
     },
     "DMP": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:@id",
-        "dataNumber": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:dataNumber",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:name",
-        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:description",
-        "keyword": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:keyword",
-        "accessRights": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:accessRights",
-        "availabilityStarts": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:availabilityStarts",
-        "reasonForConcealment": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:reasonForConcealment",
-        "repository": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:repository",
-        "distribution": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:distribution",
-        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:contentSize",
-        "gotInformedConsent": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:gotInformedConsent",
-        "informedConsentFormat": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:informedConsentFormat",
-        "identifier": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#DMP:identifier"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:@id",
+        "dataNumber": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:dataNumber",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:name",
+        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:description",
+        "keyword": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:keyword",
+        "accessRights": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:accessRights",
+        "availabilityStarts": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:availabilityStarts",
+        "reasonForConcealment": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:reasonForConcealment",
+        "repository": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:repository",
+        "distribution": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:distribution",
+        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:contentSize",
+        "gotInformedConsent": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:gotInformedConsent",
+        "informedConsentFormat": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:informedConsentFormat",
+        "identifier": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#DMP:identifier"
       }
     },
     "File": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#File",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#File",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#File:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#File:name",
-        "dmpDataNumber": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#File:dmpDataNumber",
-        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#File:contentSize",
-        "encodingFormat": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#File:encodingFormat",
-        "sha256": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#File:sha256",
-        "url": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#File:url",
-        "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#File:sdDatePublished"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#File:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#File:name",
+        "dmpDataNumber": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#File:dmpDataNumber",
+        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#File:contentSize",
+        "encodingFormat": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#File:encodingFormat",
+        "sha256": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#File:sha256",
+        "url": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#File:url",
+        "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#File:sdDatePublished"
       }
     },
     "ClinicalResearchRegistration": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#ClinicalResearchRegistration",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#ClinicalResearchRegistration",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#ClinicalResearchRegistration:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#ClinicalResearchRegistration:name",
-        "value": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.1/nii_dg/schema/amed.yml#ClinicalResearchRegistration:value"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#ClinicalResearchRegistration:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#ClinicalResearchRegistration:name",
+        "value": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.2/nii_dg/schema/amed.yml#ClinicalResearchRegistration:value"
       }
     }
   }
