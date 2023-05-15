@@ -85,7 +85,7 @@ class File(DataEntity):
         # Packaging で呼び出される各 props の型検査処理
         pass
 
-    def validate(self, crate: ROCrate) -> None:
+    def validate(self, crate: "ROCrate") -> None:
         # Validation で呼び出されるより高度な検証処理
         pass
 ```

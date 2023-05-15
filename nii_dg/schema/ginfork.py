@@ -38,7 +38,7 @@ class GinMonitoring(ContextualEntity):
     def check_props(self) -> None:
         super().check_props()
 
-    def validate(self, crate: ROCrate) -> None:
+    def validate(self, crate: "ROCrate") -> None:
         super().validate(crate)
 
         error = EntityError(self)

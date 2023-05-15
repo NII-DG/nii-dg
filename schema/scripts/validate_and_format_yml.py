@@ -8,8 +8,6 @@ from typing import Any, Dict, List, TypedDict
 
 import yaml
 
-from nii_dg.utils import convert_string_type_to_python_type
-
 Prop = TypedDict("Prop", {
     "description": str,
     "example": str,
@@ -58,15 +56,6 @@ def validate_and_format(schema_name: str, schema: Any) -> Schema:
             "description": entity["description"],
             "props": formatted_props,
         }
-
-    # # Check expected_type field
-    for entity_name, entity in formatted_schema.items():
-        for prop_name, prop in entity["props"].items():
-            expected_type = prop["expected_type"]
-            try:
-                convert_string_type_to_python_type(expected_type, schema_name)
-            except Exception as e:
-                raise ValidateError(f"Invalid expected_type: {expected_type} in prop: {prop_name} in entity: {entity_name}") from e
 
     return formatted_schema  # type: ignore
 
