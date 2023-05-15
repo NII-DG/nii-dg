@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Dict
 from nii_dg.check_functions import is_absolute_path, is_url
 from nii_dg.entity import ContextualEntity, EntityDef
 from nii_dg.error import EntityError
+from nii_dg.schema.base import Dataset
 from nii_dg.schema.base import File as BaseFile
 from nii_dg.utils import load_schema_file, sum_file_size
 
@@ -47,14 +48,13 @@ class GinMonitoring(ContextualEntity):
             error.add(
                 "about", "The value of this property MUST be the RootDataEntity of this crate.")
 
-        targets = [ent for ent in crate.get_by_type(
-            "File") if ent["experimentPackageFlag"] is True]
+        targets = [ent for ent in crate.get_by_type(File) if ent["experimentPackageFlag"] is True]
         sum_size = sum_file_size(self["contentSize"][-2:], targets)
         if sum_size > int(self["contentSize"][:-2]):
             error.add(
                 "contentSize", "The total file size of ginfork.File labeled as an experimental package is larger than the defined size.")
 
-        dir_paths = [Path(dir_.id) for dir_ in crate.get_by_type("Dataset")]
+        dir_paths = [Path(dir_.id) for dir_ in crate.get_by_type(Dataset)]
         required_dirs = [Path(experiment_dir).joinpath(required_dir_name)
                          for experiment_dir in self["experimentPackageList"]
                          for required_dir_name in self.REQUIRED_DIRECTORIES[self["datasetStructure"]]]

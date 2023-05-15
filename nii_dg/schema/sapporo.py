@@ -57,7 +57,7 @@ class File(BaseFile):
 
         error = EntityError(self)
 
-        sapporo_run_ents = crate.get_by_type("SapporoRun")
+        sapporo_run_ents = crate.get_by_type(SapporoRun)
         if len(sapporo_run_ents) == 0:
             error.add("AnotherEntity", "Entity `SapporoRun` MUST be required with sapporo.File entity.")
 
@@ -89,7 +89,7 @@ class Dataset(BaseDataset):
 
         error = EntityError(self)
 
-        sapporo_run_ents = crate.get_by_type("SapporoRun")
+        sapporo_run_ents = crate.get_by_type(SapporoRun)
         if len(sapporo_run_ents) == 0:
             error.add("AnotherEntity", "Entity `SapporoRun` MUST be required with sapporo.File entity.")
 
@@ -210,7 +210,7 @@ class SapporoRun(ContextualEntity):
             raise error
 
         if isinstance(self["outputs"], dict):
-            outputs = crate.get_by_id_and_type(self["outputs"]["@id"], "Dataset")
+            outputs = crate.get_by_id_and_type(self["outputs"]["@id"], Dataset)
             if len(outputs) > 0:
                 self["outputs"] = outputs[0]
             else:
@@ -219,7 +219,7 @@ class SapporoRun(ContextualEntity):
         outputs_entities: List[Entity] = []
         for ent in self["outputs"]["hasPart"]:
             if isinstance(ent, dict):
-                file = crate.get_by_id_and_type(ent["@id"], "File")
+                file = crate.get_by_id_and_type(ent["@id"], File)
                 if len(file) > 0:
                     outputs_entities.append(file[0])
                 else:

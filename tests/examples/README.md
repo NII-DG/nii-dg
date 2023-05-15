@@ -58,12 +58,26 @@ This example demonstrates the process of validating a RO-Crate.
 
 ```bash
 $ python3 validate_crate.py sample_crate.json
+# no output
 ```
 
 If an invalid or "broken" RO-Crate is loaded, the validation process will fail.
 
 ```bash
 $ python3 validate_crate.py broken_crate1.json
+Traceback (most recent call last):
+  File "validate_crate.py", line 30, in <module>
+    main()
+  File "validate_crate.py", line 26, in main
+    validate_crate(crate)
+  File "validate_crate.py", line 12, in validate_crate
+    crate.validate()
+  File "/home/ubuntu/git/github.com/NII-DG/nii-dg/nii_dg/ro_crate.py", line 317, in validate
+    raise crate_error
+nii_dg.error.CrateValidationError: CrateValidationError: Errors occurred in validate() for entities:
+
+- EntityError: Errors occurred in <cao.Person https://example.com/person>: {'@id': 'Failed to access the URL.'}
+- EntityError: Errors occurred in <ginfork.GinMonitoring #ginmonitoring>: {'experimentPackageList': "Required Dataset entity is missing; @id '[PosixPath('experiments/exp1/source'), PosixPath('experiments/exp1/input_data'), PosixPath('experiments/exp1/output_data')]'."}
 
 $ python3 validate_crate.py broken_crate2.json
 ```
