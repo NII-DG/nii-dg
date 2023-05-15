@@ -58,7 +58,7 @@ class DMPMetadata(ContextualEntity):
                 error.add("hostingInstitution", "The hostingInstitution property is required when the hasPart property is not empty.")
             if "dataManager" not in self:
                 error.add("dataManager", "The dataManager property is required when the hasPart property is not empty.")
-        if len(self["hasPart"]) > len(crate.get_by_type("DMP")):
+        if len(self["hasPart"]) > len(crate.get_by_type(DMP)):
             error.add("hasPart", "The number of the hasPart property MUST be equal to the number of DMP entities.")
 
         if error.has_error():
@@ -89,7 +89,7 @@ class DMP(ContextualEntity):
 
         error = EntityError(self)
 
-        dmp_metadata_ents = crate.get_by_type("DMPMetadata")
+        dmp_metadata_ents = crate.get_by_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
             error.add("AnotherEntity", "Entity `DMPMetadata` MUST be required with DMP entity.")
         else:
@@ -113,7 +113,7 @@ class DMP(ContextualEntity):
 
         if "contentSize" in self:
             target_files = []
-            for ent in crate.get_by_type("File"):
+            for ent in crate.get_by_type(File):
                 if ent["dmpDataNumber"] == self:
                     target_files.append(ent)
 

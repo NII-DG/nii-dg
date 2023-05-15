@@ -122,7 +122,7 @@ class Organization(ContextualEntity):
             if self["name"] not in name_list:
                 error.add("name", f"The name MUST be one of {name_list} registered in ROR.")
         else:
-            if is_url_accessible(self.id):
+            if not is_url_accessible(self.id):
                 error.add("@id", "Failed to access the URL.")
 
         if error.has_error():
@@ -155,7 +155,7 @@ class Person(ContextualEntity):
 
         error = EntityError(self)
 
-        if is_url_accessible(self.id):
+        if not is_url_accessible(self.id):
             error.add("@id", "Failed to access the URL.")
 
         if error.has_error():
@@ -183,7 +183,7 @@ class License(ContextualEntity):
 
         error = EntityError(self)
 
-        if is_url_accessible(self.id):
+        if not is_url_accessible(self.id):
             error.add("@id", "Failed to access the URL.")
 
         if error.has_error():
@@ -230,7 +230,7 @@ class DataDownload(ContextualEntity):
 
         error = EntityError(self)
 
-        if is_url_accessible(self.id):
+        if not is_url_accessible(self.id):
             error.add("@id", "Failed to access the URL.")
 
         if error.has_error():

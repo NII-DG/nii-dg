@@ -7,7 +7,7 @@ Implementation of the RO-Crate class.
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Type, Union
 
 from nii_dg.const import DOWNLOADED_SCHEMA_DIR_NAME, RO_CRATE_CONTEXT
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
@@ -140,7 +140,7 @@ class ROCrate():
         """
         return [entity for entity in self.all_entities if entity.id == id_]
 
-    def get_by_type(self, type_: str) -> List[Entity]:
+    def get_by_type(self, type_: Type[Entity]) -> List[Entity]:
         """\
         Get entities by type.
 
@@ -150,9 +150,9 @@ class ROCrate():
         Returns:
             A list of entities with the specified type.
         """
-        return [entity for entity in self.all_entities if entity.type == type_]
+        return [entity for entity in self.all_entities if type(entity) == type_]
 
-    def get_by_id_and_type(self, id_: str, type_: str) -> List[Entity]:
+    def get_by_id_and_type(self, id_: str, type_: Type[Entity]) -> List[Entity]:
         """\
         Get entities by ID and type.
 
@@ -163,7 +163,7 @@ class ROCrate():
         Returns:
             A list of entities with the specified ID and type.
         """
-        return [entity for entity in self.all_entities if entity.id == id_ and entity.type == type_]
+        return [entity for entity in self.all_entities if entity.id == id_ and type(entity) == type_]
 
     def from_jsonld(self, jsonld: Dict[str, Any]) -> None:
         """\
@@ -250,7 +250,7 @@ class ROCrate():
             "@graph": [entity.as_jsonld() for entity in self.all_entities]
         }
 
-    def dump(self, path: str) -> None:
+    def dump(self, path: Union[str, Path]) -> None:
         """\
         Dump the RO-Crate to a file.
 

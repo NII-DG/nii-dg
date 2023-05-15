@@ -258,8 +258,8 @@ $ curl localhost:5000/32012249-d8f7-4f64-b20d-853ea5be67b5
   "results": [
     {
       "entityId": "#sapporo-run",
-      "props": "sapporo.SapporoRun:outputs_ERR034597_1.small_fastqc.html",
-      "reason": "The file ERR034597_1.small_fastqc.html is included in the result of re-execution, so File entity with @id ERR034597_1.small_fastqc.html is required in this crate."
+      "props": "sapporo.SapporoRun:outputs",
+      "reason": "The file ERR034597_1.small_fastqc.html is included in the result of re-execution, but this crate does not have File entity with @id ERR034597_1.small_fastqc.html."
     }
   ],
   "status": "FAILED"

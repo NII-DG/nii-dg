@@ -50,9 +50,9 @@ class DMPMetadata(ContextualEntity):
 
         if self["about"] != crate.root and self["about"] != {"@id": "./"}:
             error.add("about", "The value of this property MUST be the RootDataEntity of this crate.")
-        if len(self["hasPart"]) != len(crate.get_by_type("DMP")):
+        if len(self["hasPart"]) != len(crate.get_by_type(DMP)):
             diff = []
-            for dmp in crate.get_by_type("DMP"):
+            for dmp in crate.get_by_type(DMP):
                 if dmp not in self["hasPart"]:
                     diff.append(dmp)
             error.add("hasPart", f"There is an omission of DMP entity in the list: {diff}.")
@@ -85,7 +85,7 @@ class DMP(ContextualEntity):
 
         error = EntityError(self)
 
-        dmp_metadata_ents = crate.get_by_type("DMPMetadata")
+        dmp_metadata_ents = crate.get_by_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
             error.add("AnotherEntity", "Entity 'DMPMetadata' MUST be required with DMP entity.")
         else:
@@ -121,7 +121,7 @@ class DMP(ContextualEntity):
 
         if "contentSize" in self:
             target_files = []
-            for ent in crate.get_by_type("File"):
+            for ent in crate.get_by_type(File):
                 if ent["dmpDataNumber"] == self:
                     target_files.append(ent)
 

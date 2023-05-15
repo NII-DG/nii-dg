@@ -12,7 +12,7 @@ import logging
 import tempfile
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
@@ -57,7 +57,7 @@ class File(BaseFile):
 
         error = EntityError(self)
 
-        sapporo_run_ents = crate.get_by_type("SapporoRun")
+        sapporo_run_ents = crate.get_by_type(SapporoRun)
         if len(sapporo_run_ents) == 0:
             error.add("AnotherEntity", "Entity `SapporoRun` MUST be required with sapporo.File entity.")
 
@@ -78,7 +78,7 @@ class Dataset(BaseDataset):
 
         if not self.id.endswith("/"):
             error.add("@id", "The value MUST end with '/'.")
-        if is_relative_path(self.id):
+        if not is_relative_path(self.id):
             error.add("@id", "The value MUST be relative path to the directory, neither absolute path nor URL.")
 
         if error.has_error():
@@ -89,7 +89,7 @@ class Dataset(BaseDataset):
 
         error = EntityError(self)
 
-        sapporo_run_ents = crate.get_by_type("SapporoRun")
+        sapporo_run_ents = crate.get_by_type(SapporoRun)
         if len(sapporo_run_ents) == 0:
             error.add("AnotherEntity", "Entity `SapporoRun` MUST be required with sapporo.File entity.")
 
@@ -119,10 +119,10 @@ class SapporoRun(ContextualEntity):
             raise error
 
     @classmethod
-    def generate_run_request_json(cls, sapporo_run: "SapporoRun") -> Dict[str, Optional[str]]:
+    def generate_run_request_json(cls, sapporo_run: "SapporoRun") -> Dict[str, str]:
         request_keys = ["workflow_params", "workflow_type", "workflow_type_version", "tags", "workflow_engine_name",
                         "workflow_engine_parameters", "workflow_url", "workflow_name", "workflow_attachment"]
-        run_request: Dict[str, Optional[str]] = {key: None for key in request_keys}
+        run_request: Dict[str, str] = {}
         for key in request_keys:
             if key in sapporo_run:
                 run_request[key] = sapporo_run[key]
@@ -130,11 +130,10 @@ class SapporoRun(ContextualEntity):
         return run_request
 
     @classmethod
-    def execute_wf(cls, run_request: Dict[str, Optional[str]], endpoint: str) -> str:
+    def execute_wf(cls, run_request: Dict[str, str], endpoint: str) -> str:
         data = urlencode(run_request).encode("utf-8")  # type: ignore
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
         # remove trailing slash from endpoint
-        request = Request(f"{endpoint.rstrip('/')}/runs", data=data, headers=headers)  # type: ignore
+        request = Request(f"{endpoint.rstrip('/')}/runs", data=data)  # type: ignore
 
         with urlopen(request) as response:
             result = json.load(response)
@@ -210,7 +209,7 @@ class SapporoRun(ContextualEntity):
             raise error
 
         if isinstance(self["outputs"], dict):
-            outputs = crate.get_by_id_and_type(self["outputs"]["@id"], "Dataset")
+            outputs = crate.get_by_id_and_type(self["outputs"]["@id"], Dataset)
             if len(outputs) > 0:
                 self["outputs"] = outputs[0]
             else:
@@ -219,7 +218,7 @@ class SapporoRun(ContextualEntity):
         outputs_entities: List[Entity] = []
         for ent in self["outputs"]["hasPart"]:
             if isinstance(ent, dict):
-                file = crate.get_by_id_and_type(ent["@id"], "File")
+                file = crate.get_by_id_and_type(ent["@id"], File)
                 if len(file) > 0:
                     outputs_entities.append(file[0])
                 else:
