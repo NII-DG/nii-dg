@@ -1,9 +1,11 @@
 # Ignore everything
 **
 
-# TODO update
+!LICENSE
 !nii_dg
+!open-api_spec.yml
 !README.md
+!sapporo_example
 !schema
 !setup.py
 !tests

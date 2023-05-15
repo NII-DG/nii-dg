@@ -13,6 +13,7 @@ from waitress import serve
 
 from nii_dg.error import CrateError, CrateValidationError, EntityError
 from nii_dg.ro_crate import ROCrate
+from nii_dg.utils import DG_CONFIG
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
@@ -198,18 +199,20 @@ def create_app() -> Flask:
 def main() -> None:
     app = create_app()
 
-    if os.getenv("WSGI_SERVER") == "waitress":
+    if os.getenv("DG_WSGI_SERVER") == "waitress":
         import logging
         waitress_logger = logging.getLogger("waitress")
-        # TODO log level
         waitress_logger.setLevel(logging.INFO)
-        # TODO thread
-        serve(app, host="0.0.0.0", port=5000, threads=1)
+        serve(app,
+              host=DG_CONFIG["DG_HOST"],
+              port=DG_CONFIG["DG_PORT"],
+              threads=DG_CONFIG["DG_WSGI_THREADS"])
     else:
         # for debug
+        app.config["FLASK_ENV"] = "development"
         app.config["DEBUG"] = True
         app.config["TESTING"] = True
-        app.run(host="0.0.0.0", port=5000)
+        app.run(host=DG_CONFIG["DG_HOST"], port=DG_CONFIG["DG_PORT"])
 
 
 if __name__ == "__main__":

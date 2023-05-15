@@ -13,7 +13,16 @@ COPY . .
 RUN python3 -m pip install --no-cache-dir --progress-bar off -U pip setuptools wheel && \
     python3 -m pip install --no-cache-dir --progress-bar off -e .[tests]
 
-ENV WSGI_SERVER "flask"
+EXPOSE 5000
+
+ENV DG_HOST 0.0.0.0
+ENV DG_PORT 5000
+ENV DG_USE_EXTERNAL_CTX False
+ENV DG_ALLOW_OTHER_GH_REPO False
+ENV DG_WSGI_SERVER flask
+ENV DG_WSGI_THREADS 1
+
+ENV PYTHONUNBUFFERED 1
 
 ENTRYPOINT ["tini", "--"]
 CMD ["sleep", "infinity"]

@@ -17,4 +17,4 @@ services:
     working_dir: /app
     ports:
       - 0.0.0.0:5000:5000
-    command: [ "python", "/app/nii_dg/api.py" ]
+    command: [ "sleep", "infinity" ]

@@ -7,6 +7,7 @@ This module provides utility functions for nii_dg.
 
 import ast
 import importlib
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,6 +25,41 @@ if TYPE_CHECKING:
     from nii_dg.entity import Entity
 
 NOW = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+
+
+def load_config() -> Dict[str, Any]:
+    DEFAULT_CONFIG = {
+        "DG_HOST": "0.0.0.0",
+        "DG_PORT": 5000,
+        "DG_USE_EXTERNAL_CTX": False,
+        "DG_ALLOW_OTHER_GH_REPO": False,
+        "DG_WSGI_SERVER": "waitress",
+        "DG_WSGI_THREADS": 1,
+    }
+
+    def str2bool(val: Union[str, bool]) -> bool:
+        if isinstance(val, bool):
+            return val
+        if val.lower() in ("yes", "true", "t", "y", "1"):
+            return True
+        if val.lower() in ("no", "false", "f", "n", "0"):
+            return False
+        return bool(val)
+
+    config = DEFAULT_CONFIG.copy()
+    for key in DEFAULT_CONFIG.keys():
+        if key in os.environ:
+            if key in ("DG_USE_EXTERNAL_CTX", "DG_ALLOW_OTHER_GH_REPO"):
+                config[key] = str2bool(os.environ[key])
+            elif key in ("DG_PORT", "DG_WSGI_THREADS"):
+                config[key] = int(os.environ[key])
+            else:
+                config[key] = os.environ[key]
+
+    return config
+
+
+DG_CONFIG = load_config()
 
 
 def generate_ctx(gh_repo: str = GH_REPO, gh_ref: str = GH_REF, schema_name: str = "ro-crate") -> str:
