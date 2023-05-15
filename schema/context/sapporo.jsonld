@@ -1,41 +1,41 @@
 {
-  "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/schema/context/sapporo.jsonld",
+  "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/schema/context/sapporo.jsonld",
   "@version": 1.1,
   "@context": {
     "File": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#File",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#File",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#File:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#File:name",
-        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#File:contentSize",
-        "sha256": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#File:sha256",
-        "contents": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#File:contents"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#File:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#File:name",
+        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#File:contentSize",
+        "sha256": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#File:sha256",
+        "contents": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#File:contents"
       }
     },
     "Dataset": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#Dataset",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#Dataset",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#Dataset:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#Dataset:name",
-        "hasPart": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#Dataset:hasPart"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#Dataset:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#Dataset:name",
+        "hasPart": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#Dataset:hasPart"
       }
     },
     "SapporoRun": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:@id",
-        "workflow_params": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_params",
-        "workflow_type": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_type",
-        "workflow_type_version": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_type_version",
-        "tags": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:tags",
-        "workflow_engine_name": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_engine_name",
-        "workflow_engine_parameters": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_engine_parameters",
-        "workflow_url": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_url",
-        "workflow_name": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_name",
-        "workflow_attachment": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_attachment",
-        "sapporo_location": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:sapporo_location",
-        "state": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:state",
-        "outputs": "https://raw.githubusercontent.com/NII-DG/nii_dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:outputs"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:@id",
+        "workflow_params": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_params",
+        "workflow_type": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_type",
+        "workflow_type_version": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_type_version",
+        "tags": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:tags",
+        "workflow_engine_name": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_engine_name",
+        "workflow_engine_parameters": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_engine_parameters",
+        "workflow_url": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_url",
+        "workflow_name": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_name",
+        "workflow_attachment": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:workflow_attachment",
+        "sapporo_location": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:sapporo_location",
+        "state": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:state",
+        "outputs": "https://raw.githubusercontent.com/NII-DG/nii-dg/0.1.0/nii_dg/schema/sapporo.yml#SapporoRun:outputs"
       }
     }
   }
