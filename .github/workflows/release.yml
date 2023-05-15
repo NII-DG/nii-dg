@@ -9,6 +9,8 @@ on:
 jobs:
   load_release_version:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.load_release_version.outputs.version }}
     steps:
       - uses: actions/checkout@v3
         with:
