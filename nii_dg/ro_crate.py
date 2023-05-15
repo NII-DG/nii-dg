@@ -7,7 +7,7 @@ Implementation of the RO-Crate class.
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from nii_dg.const import DOWNLOADED_SCHEMA_DIR_NAME, RO_CRATE_CONTEXT
 from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
@@ -250,7 +250,7 @@ class ROCrate():
             "@graph": [entity.as_jsonld() for entity in self.all_entities]
         }
 
-    def dump(self, path: str) -> None:
+    def dump(self, path: Union[str, Path]) -> None:
         """\
         Dump the RO-Crate to a file.
 

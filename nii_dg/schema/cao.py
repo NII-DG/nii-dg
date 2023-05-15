@@ -148,7 +148,7 @@ class Person(BasePerson):
 
         error = EntityError(self)
 
-        if is_url_accessible(self.id) is False:
+        if not is_url_accessible(self.id):
             error.add("@id", "The value MUST be a valid URL.")
 
         if error.has_error():

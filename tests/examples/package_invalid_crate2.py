@@ -6,17 +6,17 @@ import json
 from nii_dg.ro_crate import ROCrate
 from nii_dg.schema.base import HostingInstitution, RepositoryObject
 from nii_dg.schema.cao import DMP, DMPMetadata, File, Person
-from nii_dg.schema.ginfork import File as GinFile
-from nii_dg.schema.ginfork import GinMonitoring
+
+# from pathlib import Path
 
 
-def main() -> None:
+def package_invalid_crate() -> ROCrate:
     ro_crate = ROCrate()
     ro_crate.root["name"] = "example research project"
 
     org = HostingInstitution("https://www.nii.ac.jp/",
                              {"name": "National Institute of Informatics", "address": "Tokyo Japan"})
-    creator = Person("https://example.com/person",
+    creator = Person("https://ja.wikipedia.org/wiki/%E3%82%A4%E3%83%81%E3%83%AD%E3%83%BC",
                      {"name": "Ichiro Suzuki", "affiliation": org, "email": "ichiro@example.com"})
     repo = RepositoryObject("https://example.com/repository", {"name": "sample repository"})
 
@@ -39,13 +39,22 @@ def main() -> None:
 
     file_cao = File("file_1.txt",
                     {"name": "Sample File", "contentSize": "156GB", "dmpDataNumber": dmp_1})
-    file_gin = GinFile("file_1.txt",
-                       {"name": "Sample File", "contentSize": "156GB", "experimentPackageFlag": True})
-    gin = GinMonitoring("#ginmonitoring",
-                        {"about": ro_crate.root, "contentSize": "1TB", "workflowIdentifier": "basic", "datasetStructure": "with_code", "experimentPackageList": ["experiments/exp1/"]})
 
-    ro_crate.add(org, creator, repo, dmp_1, dmp_meta, file_cao, file_gin, gin)
+    ro_crate.add(org, creator, repo, dmp_1, dmp_meta, file_cao)
 
+    return ro_crate
+
+
+def main() -> None:
+    ro_crate = package_invalid_crate()
+
+    crate_json = ro_crate.as_jsonld()
+    # edit ro-crate-metadata.json after packaging
+    crate_json["@graph"][2]["contentSize"] = 156
+
+    # HERE = Path(__file__).parent
+    # with HERE.joinpath("broken_crate2.json").open("w") as f:
+    #     json.dump(crate_json, f, indent=2)
     print(json.dumps(ro_crate.as_jsonld(), indent=2))
 
 

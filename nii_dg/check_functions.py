@@ -233,7 +233,7 @@ def is_url_accessible(url: str) -> bool:
         bool: True if the URL is accessible, False otherwise.
     """
     try:
-        req = Request(url, method='HEAD')
+        req = Request(url, method="HEAD")
         res = urlopen(req)
         return res.status < 400  # type: ignore
     except Exception:
