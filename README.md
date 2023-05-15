@@ -246,26 +246,26 @@ REST API の仕様として、[open-api_spec.yml](./open-api_spec.yml) を参照
 {
   "@id": "file_1.txt",
   "@type": "File",
-  "@context": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/schema/context/base.jsonld",
+  "@context": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/base.jsonld",
   "name": "Sample File",
   "contentSize": "128GB",
 },
 ```
 
-ここで、`@context` property により、`https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/schema/context/base.jsonld` にて、`File` entity の schema が定義されていることを示している。
+ここで、`@context` property により、`https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/base.jsonld` にて、`File` entity の schema が定義されていることを示している。
 更に、参照先の JSON-LD Context においては、下記のように定義されている。
 
 ```json
 "File": {
-  "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File",
+  "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/nii_dg/schema/base.yml#File",
   "@context": {
-    "@id": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:@id",
-    "name": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:name",
-    "contentSize": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:contentSize",
-    "encodingFormat": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:encodingFormat",
-    "sha256": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:sha256",
-    "url": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:url",
-    "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii_dg/1.0.0/nii_dg/schema/base.yml#File:sdDatePublished"
+    "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/nii_dg/schema/base.yml#File:@id",
+    "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/nii_dg/schema/base.yml#File:name",
+    "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/nii_dg/schema/base.yml#File:contentSize",
+    "encodingFormat": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/nii_dg/schema/base.yml#File:encodingFormat",
+    "sha256": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/nii_dg/schema/base.yml#File:sha256",
+    "url": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/nii_dg/schema/base.yml#File:url",
+    "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/nii_dg/schema/base.yml#File:sdDatePublished"
   }
 },
 ```
