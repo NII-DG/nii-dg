@@ -8,7 +8,7 @@ Configuration parameters for the nii_dg package.
 GH_REPO: str = "NII-DG/nii-dg"
 """str: The GitHub repository name for the nii_dg package."""
 
-GH_REF: str = "0.1.0"
+GH_REF: str = "0.1.1"
 """str: The GitHub reference (tag or branch) for the nii_dg package."""
 
 
