@@ -10,9 +10,9 @@
 # - Dockerfile
 #    - `LABEL org.opencontainers.image.version="0.1.0"`
 # - compose.yml
-#    - `image: ghcr.io/NII-DG/nii-dg:0.1.0`
+#    - `image: ghcr.io/nii-dg/nii-dg:0.1.0`
 # - compose.api.yml
-#    - `image: ghcr.io/NII-DG/nii-dg:0.1.0`
+#    - `image: ghcr.io/nii-dg/nii-dg:0.1.0`
 
 set -euxo pipefail
 
@@ -44,10 +44,10 @@ echo "Rewriting Dockerfile ..."
 sed -i "s/LABEL org.opencontainers.image.version=\"${PREV_VERSION}\"/LABEL org.opencontainers.image.version=\"${NEW_VERSION}\"/g" ./Dockerfile
 
 echo "Rewriting compose.yml ..."
-sed -i "s/image: ghcr.io\/NII-DG\/nii-dg:${PREV_VERSION}/image: ghcr.io\/NII-DG\/nii-dg:${NEW_VERSION}/g" ./compose.yml
+sed -i "s/image: ghcr.io\/nii-dg\/nii-dg:${PREV_VERSION}/image: ghcr.io\/nii-dg\/nii-dg:${NEW_VERSION}/g" ./compose.yml
 
 echo "Rewriting compose.api.yml ..."
-sed -i "s/image: ghcr.io\/NII-DG\/nii-dg:${PREV_VERSION}/image: ghcr.io\/NII-DG\/nii-dg:${NEW_VERSION}/g" ./compose.api.yml
+sed -i "s/image: ghcr.io\/nii-dg\/nii-dg:${PREV_VERSION}/image: ghcr.io\/nii-dg\/nii-dg:${NEW_VERSION}/g" ./compose.api.yml
 
 echo "Done."
 

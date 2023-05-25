@@ -1,51 +1,65 @@
-## Deploy NII-DG API Server
+# Quick Start Guide for NII-DG API Server
 
-Clone this Github repository.
+## Setting Up the NII-DG API Server
 
-Then run docker-compose up to launch the server:
+To deploy the API server, start by cloning this Github repository or downloading the source code from the [releases page](https://github.com/NII-DG/nii-dg/releases). Once you have the source code, you can initiate the server by executing the following command:
 
 ```bash
-$ docker compose -f compose.api.yml up
-Attaching to nii-dg
+$ docker compose -f compose.api.yml up -d
+[+] Running 10/10
+ ✔ app 9 layers [⣿⣿⣿⣿⣿⣿⣿⣿⣿]      0B/0B      Pulled                            4.9s
+   ✔ 6eab20599fab Already exists                                              0.0s
+   ✔ f790e9177a85 Already exists                                              0.0s
+   ✔ 6dbe8744009a Already exists                                              0.0s
+   ✔ 176e3d22ecf5 Already exists                                              0.0s
+   ✔ 0e85dc1c893f Already exists                                              0.0s
+   ✔ 9989f65613d8 Pull complete                                               0.7s
+   ✔ b06a617fc75b Pull complete                                               3.2s
+   ✔ d6616e9627d9 Pull complete                                               3.2s
+   ✔ 5e28fee49148 Pull complete                                               3.3s
+[+] Building 0.0s (0/0)
+[+] Running 2/2
+ ✔ Network nii-dg_default  Created                                            0.1s
+ ✔ Container nii-dg        Started                                            1.0s
+```
+
+Upon successful execution, the server will be operational and accessible at localhost:5000. The following message indicates a successful launch:
+
+```bash
+$ docker compose -f compose.api.yml logs app
 nii-dg  | INFO:waitress:Serving on http://0.0.0.0:5000
 ```
 
-Server launched successfully and accessible at the address `localhost:5000`.
-
-To check if the server is working, use the endpoint `/healthcheck`.
-You get `OK` in the message from running server.
+To ensure the server is functioning as expected, access the /healthcheck endpoint. A successful check will yield the message OK.
 
 ```bash
 $ curl localhost:5000/healthcheck
 {"message":"OK"}
 ```
 
-## Request RO-Crate validation to the server
+## Validating RO-Crate with the Server
 
-### Prepare ro-crate-metadata.json
+### Setting Up ro-crate-metadata.json
 
-You need `ro-crate-metadata.json`, RO-Crate json file created by using NII-DG library.
-Data governance is performed based on the RO-Crate as an input.
+A JSON file named ro-crate-metadata.json is needed to perform data governance. This file is an RO-Crate JSON file generated using the NII-DG library, and it forms the basis of the input data for validation.
 
-### POST /validate
+### Using POST /validate Endpoint
 
-Access the POST endpoint `/validate` with your RO-Crate as a request body to request governance.
+You can request data governance by submitting your RO-Crate data to the /validate endpoint via a POST request.
 
 ```bash
 $ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @path/to/ro-crate-metadata
 {"request_id":"a84d2318-8b57-49c4-848d-b1935e4a1224"}
 ```
 
-Several RO-Crates are prepared for testing under [./tests/example](./tests/example); so use `example_complete.json` as follows:
+For testing purposes, several RO-Crates are provided in the [./tests/example](./tests/example) directory. To use [`./tests/example/sample_crate.json`](./tests/example/sample_crate.json), perform the following:
 
 ```bash
-$ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @./tests/example/example_complete.json
-{"request_id":"e502a052-d261-4795-8fef-22ee66cf07cd"}
+$ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @./tests/example/sample_crate.json
+{"request_id":"e141c2a2-317d-44c3-bdae-c0683d1c6d88"}
 ```
 
-You get `request_id` in uuid4 when your request is successfully applied to the server.
-
-In the case your ro-crate is in wrong format, governance request is denied.
+Upon a successful request, the server responds with a request_id in uuid4 format. If your RO-Crate data is not in the correct format, the governance request will be rejected.
 
 ```bash
 $ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @path/to/wrong-ro-crate
@@ -54,49 +68,38 @@ $ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @p
 }
 ```
 
-### Governance with only specified entities
+### Specifying Entities for Governance
 
-If you want to limit the entities to be governed for reasons such as time-consuming verification, you can specify the target entities by sending entity ID as a query parameter `entityIds`.
-Please make sure that the entity id is percent-encoded format and the URI is enclosed with single/double quotes.
+If you wish to limit the entities for governance (perhaps due to lengthy verification times), you can specify the target entities by appending the entityIds query parameter. Ensure that the entity ID is percent-encoded and the URI is enclosed in single/double quotes.
 
 ```bash
 $ curl -X POST "localhost:5000/validate?entityIds=file_1.txt&entityIds=https%3A%2F%2Fexample.com%2Fperson" -H "Content-Type: application/json" -d @path/to/ro-crate-metadata
 {"request_id":"bd453ed1-30b9-4873-b240-e459467ea9dc"}
 ```
 
-## Get Governance Result
+## Retrieving Governance Results
 
-You can get the status of the governance by using the request_id.
-The status `COMPLETE` means the governance check finished successfully and no problem is found. The `results` value is empty list.
-The status `FAILED` also means the governance check finished successfully, but found the problems. The `results` value is problem list of dictionaries consisting of entity ID, property and failed reason.
+You can check the status of governance using the provided `request_id`. A `COMPLETE` status indicates successful completion of the governance check without any issues, and the `results` field will be an empty list. A `FAILED` status indicates that the check was completed but problems were discovered, and the `results` field will contain a list of dictionaries detailing the problematic entity ID, property, and the reason for failure.
 
 ```bash
-$ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
+$ curl -s localhost:5000/e141c2a2-317d-44c3-bdae-c0683d1c6d88 | jq .
 {
   "request": {
     "entityIds": [],
     "roCrate": {
-      ...,
+      "@context": "https://w3id.org/ro/crate/1.1/context",
+      "@graph": [
+        ...
+      ]
     }
   },
-  "requestId": "a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc",
-  "results": [
-    {
-      "entityId": "https://example.com/person",
-      "props": "cao.Person:@id",
-      "reason": "Unable to access https://example.com/person due to 404 Client Error: Not Found for url: https://example.com/person"
-    },
-    {
-      "entityId": "#ginmonitoring",
-      "props": "ginfork.GinMonitoring:datasetStructure",
-      "reason": "Couldn't find required directories: named ['source', 'input_data', 'output_data']."
-    }
-  ],
-  "status": "FAILED"
+  "requestId": "e141c2a2-317d-44c3-bdae-c0683d1c6d88",
+  "results": [],
+  "status": "COMPLETE"
 }
 ```
 
-When you specified entities, `request` property has target list.
+When specific entities were targeted, the `request` property will contain a list of the targeted entities.
 
 ```bash
 $ curl localhost:5000/bd453ed1-30b9-4873-b240-e459467ea9dc
@@ -121,18 +124,16 @@ $ curl localhost:5000/bd453ed1-30b9-4873-b240-e459467ea9dc
 }
 ```
 
-## POST Cancel Governance Request
+## Cancelling Governance Request via POST
 
-Only when your request is in statue `QUEUED`, you can cancel it. If the request successfully canceled, its status id changed to `CANCELED`.
-
-When cancel request is successfully applied, you get your request ID.
+You can cancel your governance request only if its status is `QUEUED`. Upon successful cancellation, the request status changes to `CANCELED` and the server responds with your request ID.
 
 ```bash
-$ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc/cancel -X POST
+$ $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc/cancel -X POST
 {"request_id": "a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc"}
 ```
 
-After a moment:
+After a brief period:
 
 ```bash
 $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
@@ -142,3 +143,5 @@ $ curl localhost:5000/a2216a8d-a9d1-4aa3-ab01-1dc0e7c85ccc
   "results":[],
   "status":"CANCELED"}
 ```
+
+This concludes the quick start guide for setting up and using the NII-DG API Server.

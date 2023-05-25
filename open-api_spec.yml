@@ -2,18 +2,18 @@ openapi: "3.0.0"
 info:
   title: "NII-DG REST API Specification"
   version: "1.0.0"
-  description: "A REST API specification for performing data governance in research"
+  description: "A REST API specification for performing data governance in the context of research."
   license:
     name: "Apache 2.0"
     url: "https://raw.githubusercontent.com/NII-DG/nii-dg/main/Licence.txt"
 paths:
   /validate:
     post:
-      summary: Validate an RO-Crate created with the nii-dg library.
+      summary: Validate an RO-Crate using NII-DG library.
       description: |
-        Validate an RO-Crate that was created using the nii-dg library or based on the NII-DG schema.
-        The RO-Crate must be sent in the request body.
-        To validate only specific entities, include the entity IDs in the query parameters.
+        Validates an RO-Crate produced using the NII-DG library or compliant with the NII-DG schema.
+        The RO-Crate needs to be supplied in the request body.
+        For validation of specific entities only, include the entity IDs in the query parameters.
       responses:
         200:
           $ref: "#/components/responses/RequestIdResponse"
@@ -31,9 +31,9 @@ paths:
         - $ref: "#/components/parameters/entityIds"
   /{requestId}:
     get:
-      summary: Get the validation results.
+      summary: Retrieve validation results.
       description: |
-        Get the status and results of a validation process for the specified request ID.
+        Obtain the status and results of a validation procedure for the specified request ID.
       responses:
         200:
           $ref: "#/components/responses/ResultResponse"
@@ -45,9 +45,9 @@ paths:
         - $ref: "#/components/parameters/requestId"
   /{requestId}/cancel:
     post:
-      summary: Cancel a validation process.
+      summary: Abort a validation procedure.
       description: |
-        Submit a request to cancel a running validation process.
+        Issue a request to terminate an ongoing validation procedure.
       responses:
         200:
           $ref: "#/components/responses/RequestIdResponse"
@@ -59,9 +59,9 @@ paths:
         - $ref: "#/components/parameters/requestId"
   /healthcheck:
     get:
-      summary: Health check for this endpoint.
+      summary: Endpoint health check.
       description: |
-        Returns `OK` if the application server is healthy.
+        Responds with `OK` if the application server is operating normally.
       responses:
         200:
           $ref: "#/components/responses/HealthCheck"
@@ -81,7 +81,7 @@ components:
     ROCrate:
       type: object
       additionalProperties: true
-      description: RO-Crate object. The schema for RO-Crate is depended on nii-dg library.
+      description: RO-Crate object. The RO-Crate schema is dependent on the NII-DG library.
       example:
         {
           "@context": "https://w3id.org/ro/crate/1.1/context",
@@ -141,7 +141,7 @@ components:
           type: string
           example: Unable to fetch remote URL.
     ResultResponse:
-      description: Result of the validation process. The schema for result is dependent on nii-dg library.
+      description: Result of the validation procedure. The schema for the result is determined by the NII-DG library.
       type: object
       properties:
         requestId:
@@ -165,53 +165,53 @@ components:
       properties:
         message:
           type: string
-          example: Requested path is not found.
+          example: Requested path not found.
     InternalServerError:
       type: object
       properties:
         message:
           type: string
-          example: An error occurred on the server.
+          example: Server encountered an error.
     HealthCheck:
       type: object
       properties:
         message:
           type: string
           example: OK.
-          description: Status of the service.
+          description: Service status.
   responses:
     RequestIdResponse:
-      description: Response with request ID.
+      description: Response includes the request ID.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/RequestIdResponse"
     ResultResponse:
-      description: Response with validation results.
+      description: Response contains validation outcomes.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ResultResponse"
     BadRequest:
-      description: Bad request response.
+      description: Response to a malformed request.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/BadRequest"
     NotFound:
-      description: Not found response.
+      description: Response for a request to a non-existent path.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/NotFound"
     InternalServerError:
-      description: Internal server error response.
+      description: Response to a server error.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/InternalServerError"
     HealthCheck:
-      description: Health check response.
+      description: Health status response.
       content:
         application/json:
           schema:
@@ -220,7 +220,7 @@ components:
     entityIds:
       name: entityIds
       in: query
-      description: List of entity IDs to perform partial validation. When this parameter is not specified, all entities in the RO-Crate are validated.
+      description: Entity ID list for selective validation. If this parameter is not supplied, all entities in the RO-Crate will be validated.
       required: false
       schema:
         $ref: "#/components/schemas/EntityIds"
@@ -230,7 +230,7 @@ components:
     requestId:
       name: requestId
       in: path
-      description: ID of the validation request.
+      description: Identifier of the validation request.
       required: true
       schema:
         $ref: "#/components/schemas/RequestId"
