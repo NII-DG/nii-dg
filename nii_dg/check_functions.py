@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 def check_entity_values(entity: "Entity", check_rules: Dict[str, Callable[[Any], bool]]) -> EntityError:
-    """\
+    """
     Check if the values of the given Entity object are valid.
 
     Args:
@@ -42,7 +42,7 @@ def check_entity_values(entity: "Entity", check_rules: Dict[str, Callable[[Any],
 
 
 def is_content_size(value: str) -> bool:
-    """\
+    """
     Check if the value is a valid content size format.
 
     Args:
@@ -55,7 +55,7 @@ def is_content_size(value: str) -> bool:
 
 
 def is_encoding_format(value: str) -> bool:
-    """\
+    """
     Check if the value is a valid encoding format.
 
     Args:
@@ -68,7 +68,7 @@ def is_encoding_format(value: str) -> bool:
 
 
 def is_sha256(value: str) -> bool:
-    """\
+    """
     Check if the value is a valid SHA256 format.
 
     Args:
@@ -81,7 +81,7 @@ def is_sha256(value: str) -> bool:
 
 
 def is_url(value: str) -> bool:
-    """\
+    """
     Check if the value is a valid URL format.
 
     Args:
@@ -94,7 +94,7 @@ def is_url(value: str) -> bool:
 
 
 def is_relative_path(value: str) -> bool:
-    """\
+    """
     Check if the value is a valid relative path format.
 
     Args:
@@ -123,7 +123,7 @@ def is_relative_path(value: str) -> bool:
 
 
 def is_absolute_path(value: str) -> bool:
-    """\
+    """
     Check if the value is a valid absolute path format.
 
     Args:
@@ -153,7 +153,7 @@ def is_absolute_path(value: str) -> bool:
 
 
 def is_iso8601(value: str) -> bool:
-    """\
+    """
     Check if the value is a valid ISO 8601 format.
 
     Args:
@@ -166,7 +166,7 @@ def is_iso8601(value: str) -> bool:
 
 
 def is_email(value: str) -> bool:
-    """\
+    """
     Check if the value is a valid email format.
 
     Args:
@@ -179,7 +179,7 @@ def is_email(value: str) -> bool:
 
 
 def is_phone_number(value: str) -> bool:
-    """\
+    """
     Check if the value is a valid phone number format.
 
     Args:
@@ -210,7 +210,7 @@ def is_phone_number(value: str) -> bool:
 
 
 def is_orcid(value: str) -> bool:
-    """\
+    """
     Check if the value is a valid ORCID format.
 
     Args:

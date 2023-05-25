@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-"""\
+"""
 This module provides utility functions for nii_dg.
 """
 
 import ast
 import importlib
+import importlib.util
 import os
 import re
 from datetime import datetime, timezone
@@ -23,6 +24,10 @@ from nii_dg.module_info import GH_REF, GH_REPO
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
+
+
+HERE = Path(__file__).parent.resolve()
+
 
 NOW = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
@@ -63,7 +68,7 @@ DG_CONFIG = load_config()
 
 
 def generate_ctx(gh_repo: str = GH_REPO, gh_ref: str = GH_REF, schema_name: str = "ro-crate") -> str:
-    """\
+    """
         Generate a context string for a given schema name.
 
     Args:
@@ -87,7 +92,7 @@ def generate_ctx(gh_repo: str = GH_REPO, gh_ref: str = GH_REF, schema_name: str 
 
 
 def parse_ctx(ctx: str) -> Tuple[str, str, str]:
-    """\
+    """
     Parse the given context string and return a tuple of (gh_repo, gh_ref, schema_name).
 
     Args:
@@ -135,7 +140,7 @@ SchemaDef = NewType("SchemaDef", Dict[str, EntityDef])
 
 
 def load_schema_file(schema_path: Path) -> SchemaDef:
-    """\
+    """
     Load a schema file and return a SchemaDef object.
 
     Args:
@@ -154,7 +159,7 @@ def load_schema_file(schema_path: Path) -> SchemaDef:
 
 
 def import_custom_class(module_name: str, class_name: str) -> Any:
-    """\
+    """
     Import a custom class from a module.
 
     Args:
@@ -171,8 +176,43 @@ def import_custom_class(module_name: str, class_name: str) -> Any:
         return None
 
 
+# Cache for imported external modules
+_module_cache: Dict[Path, Any] = {}
+
+
+def import_external_class(module_path: Path, class_name: str) -> Any:
+    """
+    Import a class from an external module.
+
+    Args:
+    module_path (Path): The path to the module.
+    class_name (str): The name of the class to be imported.
+
+    Returns:
+        Any: The imported class if found, None otherwise.
+    """
+    try:
+        module_path = module_path.resolve()
+
+        # Check if the module has already been imported
+        if module_path in _module_cache:
+            external_module = _module_cache[module_path]
+            return getattr(external_module, class_name)
+
+        spec = importlib.util.spec_from_file_location("external_module", module_path)
+        external_module = importlib.util.module_from_spec(spec)  # type: ignore
+        spec.loader.exec_module(external_module)  # type: ignore
+
+        # Cache the imported module
+        _module_cache[module_path] = external_module
+
+        return getattr(external_module, class_name)
+    except (ModuleNotFoundError, AttributeError):
+        return None
+
+
 def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
-    """\
+    """
     Check if a given value is an instance of a given expected type.
 
     Args:
@@ -184,7 +224,7 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
     """
 
     def parse_type_string(type_str: str) -> Any:
-        """\
+        """
         Parse a type string and return the corresponding type object.
 
         Args:
@@ -213,7 +253,7 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
         return ast_to_type(type_node)
 
     def ast_to_type(node: ast.AST) -> Any:
-        """\
+        """
         Convert an AST node to a type object.
 
         Args:
@@ -248,7 +288,7 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
             return Any
 
     def check_type(value: Any, expected_type: Any) -> bool:
-        """\
+        """
         Check if a given value is an instance of a given expected type.
 
         Args:
@@ -348,7 +388,7 @@ def is_version_newer(ver1: str, ver2: str) -> bool:
 
 
 def download_schema(gh_repo: str, gh_ref: str, schema_module_name: str) -> None:
-    """\
+    """
     Download a schema module from a GitHub repository.
 
     Args:
@@ -362,7 +402,7 @@ def download_schema(gh_repo: str, gh_ref: str, schema_module_name: str) -> None:
     schema_module_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.py"
     schema_file_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.yml"
 
-    schema_dir = Path(f"./{DOWNLOADED_SCHEMA_DIR_NAME}/{gh_repo}/{gh_ref}")
+    schema_dir = HERE.joinpath(f"./{DOWNLOADED_SCHEMA_DIR_NAME}/{gh_repo}/{gh_ref}").resolve()
     schema_dir.mkdir(parents=True, exist_ok=True)
     try:
         schema_module_path = schema_dir.joinpath(f"{schema_module_name}.py")
@@ -384,9 +424,8 @@ def download_schema(gh_repo: str, gh_ref: str, schema_module_name: str) -> None:
             raise e
 
 
-# TODO: update
 def sum_file_size(size_unit: str, entities: List["Entity"]) -> float:
-    """\
+    """
     Sum the file sizes of the given entities and convert the result to the specified unit.
 
     Args:

@@ -98,7 +98,7 @@ class Organization(ContextualEntity):
 
     @classmethod
     def fetch_organization_names_from_ror_api(cls, ror_id: str) -> List[str]:
-        """\
+        """
         Fetch organization names from ROR API.
 
         Raises:

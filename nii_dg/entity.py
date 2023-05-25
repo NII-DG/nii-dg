@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-"""\
+"""
 Defines the Entity class and its subclasses used in the nii_dg package.
 """
 
@@ -23,7 +23,7 @@ else:
 
 
 class Entity(TypedMutableMapping):
-    """\
+    """
     Represents an Entity that can be included in an RO-Crate.
 
     An Entity is a JSON-LD object that must have an "@id" property, an "@type" property, and an "@context" property.
@@ -34,7 +34,7 @@ class Entity(TypedMutableMapping):
     entity_def: EntityDef
 
     def __init__(self, id_: str, props: Dict[str, Any], schema_name: str, entity_def: EntityDef) -> None:
-        """\
+        """
         Initialize the Entity.
 
         Args:
@@ -56,7 +56,7 @@ class Entity(TypedMutableMapping):
         self.update(props)
 
     def __setitem__(self, key: str, value: Any) -> None:
-        """\
+        """
         Set the value of a property of the Entity.
 
         Args:
@@ -71,7 +71,7 @@ class Entity(TypedMutableMapping):
         self.data[key] = value
 
     def _set_special_item(self, key: str, value: Any) -> None:
-        """\
+        """
         Set a special item, which key starts with '@' (e.g. "@id", "@type", "@context").
 
         Args:
@@ -122,7 +122,7 @@ class Entity(TypedMutableMapping):
 
     @classmethod
     def from_jsonld(cls: Type["Entity"], jsonld: Dict[str, Any]) -> "Entity":
-        """\
+        """
         Create an instance of the subclass of Entity from a JSON-LD object.
 
         Args:
@@ -153,7 +153,7 @@ class Entity(TypedMutableMapping):
         return entity
 
     def as_jsonld(self) -> Dict[str, Any]:
-        """\
+        """
         Return the JSON-LD representation of the Entity.
 
         Returns:
@@ -181,7 +181,7 @@ class Entity(TypedMutableMapping):
         return ref_data
 
     def _check_unexpected_props(self) -> None:
-        """\
+        """
         Check if there are unexpected properties in the Entity.
 
         Raises:
@@ -198,7 +198,7 @@ class Entity(TypedMutableMapping):
             raise entity_error
 
     def _check_required_props(self) -> None:
-        """\
+        """
         Check if all required properties are in the Entity.
 
         Raises:
@@ -214,7 +214,7 @@ class Entity(TypedMutableMapping):
             raise entity_error
 
     def _check_prop_types(self) -> None:
-        """\
+        """
         Check if all properties have the expected type.
 
         Raises:
@@ -234,7 +234,7 @@ class Entity(TypedMutableMapping):
             raise entity_error
 
     def check_props(self) -> None:
-        """\
+        """
         Called at Package validation time.
         Check if the properties of the Entity are valid.
         Implementation of this method is required in each subclass.
@@ -250,7 +250,7 @@ class Entity(TypedMutableMapping):
         self._check_prop_types()
 
     def validate(self, crate: "ROCrate") -> None:
-        """\
+        """
         Called at Data Governance validation time.
         Comprehensive validation including the value of props.
         Implementation of this method is required in each subclass.
@@ -266,20 +266,20 @@ class Entity(TypedMutableMapping):
 
 
 class DefaultEntity(Entity):
-    """\
+    """
     A entity that is always included in the RO-Crate. For example, ROCrateMetadata, RootDataEntity, etc.
     """
 
 
 class DataEntity(Entity):
-    """\
+    """
     A entity that represents a file or directory. For example, File, Dataset, etc.
     This entity is always included in RootDataset entity.
     """
 
 
 class ContextualEntity(Entity):
-    """\
+    """
     A entity that represents a metadata. For example, Person, License, etc.
     """
 
@@ -303,7 +303,7 @@ props:
 
 
 class RootDataEntity(DefaultEntity):
-    """\
+    """
     A Dataset that represents the RO-Crate.
 
     For more information, see https://www.researchobject.org/ro-crate/1.1/root-data-entity.html .
@@ -347,7 +347,7 @@ props:
 
 
 class ROCrateMetadata(DefaultEntity):
-    """\
+    """
     The RO-Crate metadata file descriptor.
 
     See https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#ro-crate-metadata-file-descriptor.

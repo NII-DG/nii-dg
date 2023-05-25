@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-"""\
+"""
 Error classes for the RO-Crate and its entities.
 
 This module contains the following error classes:
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 class EntityError(Exception):
-    """\
+    """
     Error class for entities (checking entities in the crate).
 
     This error is raised during the Data Governance validation time, in the Entity 'check_props()' and 'validate()' methods.
@@ -33,7 +33,7 @@ class EntityError(Exception):
         return f"EntityError: Errors occurred in {self.entity}: {self.errors}"
 
     def add(self, prop: str, msg: str) -> None:
-        """\
+        """
         Add an error message to the error dictionary.
 
         Args:
@@ -43,7 +43,7 @@ class EntityError(Exception):
         self.errors[prop] = msg
 
     def has_error(self) -> bool:
-        """\
+        """
         Return a boolean indicating whether there are errors.
 
         Returns:
@@ -53,7 +53,7 @@ class EntityError(Exception):
 
 
 class CrateError(Exception):
-    """\
+    """
     Error class for the RO-Crate (checking the crate).
 
     This error is raised during the Data Governance validation time.
@@ -61,7 +61,7 @@ class CrateError(Exception):
 
 
 class CrateCheckPropsError(CrateError):
-    """\
+    """
     Error class for 'check_props()' method in the RO-Crate.
 
     This error is raised during the Data Governance validation time, during the validation performed by the 'check_props()' method of the ROCrate class.
@@ -78,7 +78,7 @@ class CrateCheckPropsError(CrateError):
         self.errors.extend(errors)
 
     def has_error(self) -> bool:
-        """\
+        """
         Return a boolean indicating whether there are errors.
 
         Returns:
@@ -88,7 +88,7 @@ class CrateCheckPropsError(CrateError):
 
 
 class CrateValidationError(CrateError):
-    """\
+    """
     Error class for 'validate()' method in the RO-Crate.
 
     This error is raised during the Data Governance validation time, during the validation performed by the 'validate()' method of the ROCrate class.
@@ -106,7 +106,7 @@ class CrateValidationError(CrateError):
         self.errors.extend(errors)
 
     def has_error(self) -> bool:
-        """\
+        """
         Return a boolean indicating whether there are errors.
 
         Returns:
