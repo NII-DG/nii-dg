@@ -97,7 +97,7 @@ ro_crate.dump("ro-crate-metadata.json")
 
 また、使用例として、以下が用意されている。
 
-- [./tests/examples/example.py](./tests/examples/example.py)
+- [./tests/example/example.py](./tests/example/example.py)
 
 #### RO-Crate Metadata File Descriptor と Root Data Entity
 

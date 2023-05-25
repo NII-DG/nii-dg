@@ -16,7 +16,7 @@ def package_crate() -> ROCrate:
 
     org = HostingInstitution("https://www.nii.ac.jp/",
                              {"name": "National Institute of Informatics", "address": "Tokyo Japan"})
-    creator = Person("https://ja.wikipedia.org/wiki/%E3%82%A4%E3%83%81%E3%83%AD%E3%83%BC",
+    creator = Person("https://en.wikipedia.org/wiki/Ichiro_Suzuki",
                      {"name": "Ichiro Suzuki", "affiliation": org, "email": "ichiro@example.com"})
     repo = RepositoryObject("https://example.com/repository", {"name": "sample repository"})
 
@@ -29,13 +29,15 @@ def package_crate() -> ROCrate:
         "accessRights": "metadata only access",
         "repository": repo,
         "hostingInstitution": org,
-        "dataManager": creator})
+        "dataManager": creator
+    })
 
     dmp_meta = DMPMetadata(props={
         "about": ro_crate.root,
         "funder": org,
         "keyword": "Informatics",
-        "hasPart": [dmp_1]})
+        "hasPart": [dmp_1]
+    })
 
     file_cao = File("file_1.txt",
                     {"name": "Sample File", "contentSize": "156GB", "dmpDataNumber": dmp_1})

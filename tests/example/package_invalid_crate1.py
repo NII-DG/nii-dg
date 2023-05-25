@@ -31,13 +31,15 @@ def package_invalid_crate() -> ROCrate:
         "accessRights": "metadata only access",
         "repository": repo,
         "hostingInstitution": org,
-        "dataManager": creator})
+        "dataManager": creator
+    })
 
     dmp_meta = DMPMetadata(props={
         "about": ro_crate.root,
         "funder": org,
         "keyword": "Informatics",
-        "hasPart": [dmp_1]})
+        "hasPart": [dmp_1]
+    })
 
     file_cao = File("file_1.txt",
                     {"name": "Sample File", "contentSize": "156GB", "dmpDataNumber": dmp_1})
@@ -55,7 +57,7 @@ def main() -> None:
     ro_crate = package_invalid_crate()
 
     # HERE = Path(__file__).parent
-    # ro_crate.dump(HERE.joinpath("broken_crate1.json"))
+    # ro_crate.dump(HERE.joinpath("invalid_crate1.json"))
     print(json.dumps(ro_crate.as_jsonld(), indent=2))
 
 

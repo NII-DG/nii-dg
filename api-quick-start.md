@@ -36,10 +36,10 @@ $ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @p
 {"request_id":"a84d2318-8b57-49c4-848d-b1935e4a1224"}
 ```
 
-Several RO-Crates are prepared for testing under [./tests/examples](./tests/examples); so use `example_complete.json` as follows:
+Several RO-Crates are prepared for testing under [./tests/example](./tests/example); so use `example_complete.json` as follows:
 
 ```bash
-$ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @./tests/examples/example_complete.json
+$ curl -X POST localhost:5000/validate -H "Content-Type: application/json" -d @./tests/example/example_complete.json
 {"request_id":"e502a052-d261-4795-8fef-22ee66cf07cd"}
 ```
 

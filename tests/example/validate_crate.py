@@ -9,6 +9,7 @@ from nii_dg.ro_crate import ROCrate
 
 
 def validate_crate(crate: ROCrate) -> None:
+    crate.check_props()
     crate.validate()
 
 

@@ -23,16 +23,16 @@ def main() -> None:
     with jsonld_path.open("r", encoding="utf-8") as f:
         jsonld = json.load(f)
 
-    crate = load_crate(jsonld)
+    ro_crate = load_crate(jsonld)
 
     print("=== Root ===")
-    pprint(crate.root)
+    pprint(ro_crate.root)
     print("=== Default ===")
-    pprint(crate.default_entities)
+    pprint(ro_crate.default_entities)
     print("=== Data ===")
-    pprint(crate.data_entities)
+    pprint(ro_crate.data_entities)
     print("=== Contextual ===")
-    pprint(crate.contextual_entities)
+    pprint(ro_crate.contextual_entities)
 
 
 if __name__ == "__main__":
