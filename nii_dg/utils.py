@@ -10,6 +10,7 @@ import importlib
 import importlib.util
 import os
 import re
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import (TYPE_CHECKING, Any, Dict, List, Literal, NewType, Optional,
@@ -19,7 +20,7 @@ from urllib.request import urlopen
 
 import yaml
 
-from nii_dg.const import DOWNLOADED_SCHEMA_DIR_NAME, RO_CRATE_CONTEXT
+from nii_dg.const import RO_CRATE_CONTEXT
 from nii_dg.module_info import GH_REF, GH_REPO
 
 if TYPE_CHECKING:
@@ -176,35 +177,80 @@ def import_custom_class(module_name: str, class_name: str) -> Any:
         return None
 
 
+def download_schema(gh_repo: str, gh_ref: str, schema_module_name: str) -> Tuple[Path, Path]:
+    """
+    Download a schema module from a GitHub repository.
+
+    Args:
+        gh_repo (str): The GitHub repository from which the schema module is to be downloaded.
+        gh_ref (str): The reference (branch, tag, or commit) of the GitHub repository.
+        schema_module_name (str): The name of the schema module to be downloaded.
+
+    Returns:
+        Tuple of paths to the downloaded Python and YAML files.
+
+    Note:
+        Downloaded schema modules are stored in a temporary directory.
+    """
+    schema_module_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.py"
+    schema_file_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.yml"
+
+    schema_dir = tempfile.mkdtemp(prefix="nii_dg")
+
+    try:
+        schema_module_path = Path(schema_dir).joinpath(f"{schema_module_name}.py")
+        with urlopen(schema_module_url) as res:
+            schema_module = res.read().decode("utf-8")
+        with schema_module_path.open("w") as f:
+            f.write(schema_module)
+        schema_file_path = Path(schema_dir).joinpath(f"{schema_module_name}.yml")
+        with urlopen(schema_file_url) as res:
+            schema_file = res.read().decode("utf-8")
+        with schema_file_path.open("w") as f:
+            f.write(schema_file)
+    except HTTPError as e:
+        if e.code == 404:
+            raise ValueError(f"Schema module '{schema_module_name}' does not exist in the given GitHub repository.")
+        else:
+            raise e
+
+    return schema_module_path, schema_file_path
+
+
 # Cache for imported external modules
-_module_cache: Dict[Path, Any] = {}
+_module_cache: Dict[str, Any] = {}
 
 
-def import_external_class(module_path: Path, class_name: str) -> Any:
+def import_external_class(gh_repo: str, gh_ref: str, schema_module_name: str, class_name: str) -> Any:
     """
     Import a class from an external module.
 
     Args:
-    module_path (Path): The path to the module.
-    class_name (str): The name of the class to be imported.
+        gh_repo (str): The GitHub repository from which the schema module is to be downloaded.
+        gh_ref (str): The reference (branch, tag, or commit) of the GitHub repository.
+        schema_module_name (str): The name of the schema module to be downloaded.
+        class_name (str): The name of the class to be imported.
 
     Returns:
         Any: The imported class if found, None otherwise.
     """
-    try:
-        module_path = module_path.resolve()
+    module_key = f"{gh_repo}/{gh_ref}/{schema_module_name}"
 
+    try:
         # Check if the module has already been imported
-        if module_path in _module_cache:
-            external_module = _module_cache[module_path]
+        if module_key in _module_cache:
+            external_module = _module_cache[module_key]
             return getattr(external_module, class_name)
 
-        spec = importlib.util.spec_from_file_location("external_module", module_path)
+        # Download the schema module
+        schema_module_path, _ = download_schema(gh_repo, gh_ref, schema_module_name)
+
+        spec = importlib.util.spec_from_file_location("external_module", schema_module_path)
         external_module = importlib.util.module_from_spec(spec)  # type: ignore
         spec.loader.exec_module(external_module)  # type: ignore
 
         # Cache the imported module
-        _module_cache[module_path] = external_module
+        _module_cache[module_key] = external_module
 
         return getattr(external_module, class_name)
     except (ModuleNotFoundError, AttributeError):
@@ -385,43 +431,6 @@ def is_version_newer(ver1: str, ver2: str) -> bool:
             return False
 
     return False
-
-
-def download_schema(gh_repo: str, gh_ref: str, schema_module_name: str) -> None:
-    """
-    Download a schema module from a GitHub repository.
-
-    Args:
-        gh_repo (str): The GitHub repository from which the schema module is to be downloaded.
-        gh_ref (str): The reference (branch, tag, or commit) of the GitHub repository.
-        schema_module_name (str): The name of the schema module to be downloaded.
-
-    Note:
-        Downloaded schema modules are stored in the 'nii_dg/downloaded_schema' directory.
-    """
-    schema_module_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.py"
-    schema_file_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.yml"
-
-    schema_dir = HERE.joinpath(f"./{DOWNLOADED_SCHEMA_DIR_NAME}/{gh_repo}/{gh_ref}").resolve()
-    schema_dir.mkdir(parents=True, exist_ok=True)
-    try:
-        schema_module_path = schema_dir.joinpath(f"{schema_module_name}.py")
-        if not schema_module_path.exists():
-            with urlopen(schema_module_url) as res:
-                schema_module = res.read().decode("utf-8")
-            with schema_module_path.open("w") as f:
-                f.write(schema_module)
-        schema_file_path = schema_dir.joinpath(f"{schema_module_name}.yml")
-        if not schema_file_path.exists():
-            with urlopen(schema_file_url) as res:
-                schema_file = res.read().decode("utf-8")
-            with schema_file_path.open("w") as f:
-                f.write(schema_file)
-    except HTTPError as e:
-        if e.code == 404:
-            raise ValueError(f"Schema module '{schema_module_name}' does not exist in the given GitHub repository.")
-        else:
-            raise e
 
 
 def sum_file_size(size_unit: str, entities: List["Entity"]) -> float:
