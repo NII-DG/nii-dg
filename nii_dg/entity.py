@@ -12,11 +12,11 @@ import yaml
 
 from nii_dg.const import RO_CRATE_SPEC
 from nii_dg.error import EntityError
-from nii_dg.utils import (NOW, EntityDef, generate_ctx,
-                          is_instance_of_expected_type)
+from nii_dg.utils import NOW, EntityDef, generate_ctx, is_instance_of_expected_type
 
 if TYPE_CHECKING:
     from nii_dg.ro_crate import ROCrate
+
     TypedMutableMapping = MutableMapping[str, Any]
 else:
     TypedMutableMapping = MutableMapping
@@ -29,11 +29,14 @@ class Entity(TypedMutableMapping):
     An Entity is a JSON-LD object that must have an "@id" property, an "@type" property, and an "@context" property.
     The properties and their expected types of an Entity are defined in its schema definition.
     """
+
     data: Dict[str, Any]
     schema_name: str
     entity_def: EntityDef
 
-    def __init__(self, id_: str, props: Dict[str, Any], schema_name: str, entity_def: EntityDef) -> None:
+    def __init__(
+        self, id_: str, props: Dict[str, Any], schema_name: str, entity_def: EntityDef
+    ) -> None:
         """
         Initialize the Entity.
 
@@ -137,7 +140,9 @@ class Entity(TypedMutableMapping):
             Entity: An instance of the subclass of Entity.
         """
         if cls.__name__ == "Entity":
-            raise NotImplementedError("This method is not implemented for Entity class, but for its subclasses.")
+            raise NotImplementedError(
+                "This method is not implemented for Entity class, but for its subclasses."
+            )
 
         if not isinstance(jsonld, dict):
             raise ValueError("The JSON-LD object must be a dictionary.")
@@ -205,10 +210,16 @@ class Entity(TypedMutableMapping):
             EntityError: If there are missing required properties.
         """
         entity_error = EntityError(self)
-        required_keys = [k for k, v in self.entity_def["props"].items() if v.get("required") == "Required."]
+        required_keys = [
+            k
+            for k, v in self.entity_def["props"].items()
+            if v.get("required") == "Required."
+        ]
         for key in required_keys:
             if key not in self:
-                entity_error.add(key, "This property is required; however, it is not found.")
+                entity_error.add(
+                    key, "This property is required; however, it is not found."
+                )
 
         if entity_error.has_error():
             raise entity_error
@@ -228,7 +239,9 @@ class Entity(TypedMutableMapping):
                 continue
             expected_type = self.entity_def["props"][key]["expected_type"]
             if not is_instance_of_expected_type(val, expected_type):
-                entity_error.add(key, f"The type of this property MUST be {expected_type}.")
+                entity_error.add(
+                    key, f"The type of this property MUST be {expected_type}."
+                )
 
         if entity_error.has_error():
             raise entity_error
@@ -243,7 +256,9 @@ class Entity(TypedMutableMapping):
             EntityError: If there is an error in the Entity.
         """
         if self.entity_name == "Entity":
-            raise NotImplementedError("This method must be implemented in subclasses of Entity in schema modules.")
+            raise NotImplementedError(
+                "This method must be implemented in subclasses of Entity in schema modules."
+            )
 
         self._check_unexpected_props()
         self._check_required_props()
@@ -262,7 +277,9 @@ class Entity(TypedMutableMapping):
             EntityError: If there is an error in the Entity.
         """
         if self.entity_name == "Entity":
-            raise NotImplementedError("This method must be implemented in subclasses of Entity in schema modules.")
+            raise NotImplementedError(
+                "This method must be implemented in subclasses of Entity in schema modules."
+            )
 
 
 class DefaultEntity(Entity):
@@ -286,7 +303,8 @@ class ContextualEntity(Entity):
 
 # === DefaultEntities ===
 
-RootDataEntity_DEF: EntityDef = yaml.safe_load("""\
+RootDataEntity_DEF: EntityDef = yaml.safe_load(
+    """\
 description: A Dataset that represents the RO-Crate.
 props:
   hasPart:
@@ -299,7 +317,8 @@ props:
     example: 2023-01-01T00:00:00.000+00:00
     required: Required.
     description: The date when the RO-Crate was published. It should be in the format of ISO 8601.
-""")
+"""
+)
 
 
 class RootDataEntity(DefaultEntity):
@@ -309,13 +328,14 @@ class RootDataEntity(DefaultEntity):
     For more information, see https://www.researchobject.org/ro-crate/1.1/root-data-entity.html .
     """
 
-    def __init__(self, id_: str = "./", props: Dict[str, Any] = {},
-                 schema_name: str = "ro-crate",
-                 entity_def: EntityDef = RootDataEntity_DEF):
-        default_props = {
-            "hasPart": [],
-            "datePublished": NOW
-        }
+    def __init__(
+        self,
+        id_: str = "./",
+        props: Dict[str, Any] = {},
+        schema_name: str = "ro-crate",
+        entity_def: EntityDef = RootDataEntity_DEF,
+    ):
+        default_props = {"hasPart": [], "datePublished": NOW}
         default_props.update(props)
         super().__init__(id_, default_props, schema_name, entity_def)
 
@@ -330,7 +350,8 @@ class RootDataEntity(DefaultEntity):
         pass
 
 
-ROCrateMetadata_DEF: EntityDef = yaml.safe_load("""\
+ROCrateMetadata_DEF: EntityDef = yaml.safe_load(
+    """\
 description: The RO-Crate metadata file descriptor.
 props:
   conformsTo:
@@ -343,7 +364,8 @@ props:
     example: '{ "@id": "./" }'
     required: Required.
     description: The RootDataEntity of the RO-Crate.
-""")
+"""
+)
 
 
 class ROCrateMetadata(DefaultEntity):
@@ -353,9 +375,13 @@ class ROCrateMetadata(DefaultEntity):
     See https://www.researchobject.org/ro-crate/1.1/root-data-entity.html#ro-crate-metadata-file-descriptor.
     """
 
-    def __init__(self, id_: str = "ro-crate-metadata.json", props: Dict[str, Any] = {},
-                 schema_name: str = "ro-crate",
-                 entity_def: EntityDef = ROCrateMetadata_DEF):
+    def __init__(
+        self,
+        id_: str = "ro-crate-metadata.json",
+        props: Dict[str, Any] = {},
+        schema_name: str = "ro-crate",
+        entity_def: EntityDef = ROCrateMetadata_DEF,
+    ):
         default_props = {
             "conformsTo": {"@id": RO_CRATE_SPEC},
             "about": {"@id": "./"},

@@ -14,7 +14,9 @@ if TYPE_CHECKING:
     from nii_dg.entity import Entity
 
 
-def check_entity_values(entity: "Entity", check_rules: Dict[str, Callable[[Any], bool]]) -> EntityError:
+def check_entity_values(
+    entity: "Entity", check_rules: Dict[str, Callable[[Any], bool]]
+) -> EntityError:
     """
     Check if the values of the given Entity object are valid.
 
@@ -206,7 +208,13 @@ def is_phone_number(value: str) -> bool:
             1 555.123.4567
             555.123.4567.890
     """
-    return re.match(r"^\+?\d{1,4}?[-. ]?\(?(?:\d{1,3}?\)?[-. ]?\d{1,4})(?:[-. ]?\d{1,4}){0,2}$", value) is not None
+    return (
+        re.match(
+            r"^\+?\d{1,4}?[-. ]?\(?(?:\d{1,3}?\)?[-. ]?\d{1,4})(?:[-. ]?\d{1,4}){0,2}$",
+            value,
+        )
+        is not None
+    )
 
 
 def is_orcid(value: str) -> bool:

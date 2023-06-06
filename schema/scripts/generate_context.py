@@ -22,16 +22,22 @@ import yaml
 
 from nii_dg.module_info import GH_REF, GH_REPO
 
-Prop = TypedDict("Prop", {
-    "expected_type": str,
-    "example": str,
-    "required": str,
-    "description": str,
-})
-Entity = TypedDict("Entity", {
-    "description": str,
-    "props": Dict[str, Prop],
-})
+Prop = TypedDict(
+    "Prop",
+    {
+        "expected_type": str,
+        "example": str,
+        "required": str,
+        "description": str,
+    },
+)
+Entity = TypedDict(
+    "Entity",
+    {
+        "description": str,
+        "props": Dict[str, Prop],
+    },
+)
 Schema = Dict[str, Entity]
 
 
@@ -39,15 +45,11 @@ def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Generate JSON-LD context file from schema file"
     )
-    parser.add_argument(
-        "schema_file",
-        type=Path,
-        help="Path to the input schema file"
-    )
+    parser.add_argument("schema_file", type=Path, help="Path to the input schema file")
     parser.add_argument(
         "ctx_file_dst",
         type=Path,
-        help="Destination path for generated context file. File name must be <schema_name>.jsonld (e.g., base.jsonld)"
+        help="Destination path for generated context file. File name must be <schema_name>.jsonld (e.g., base.jsonld)",
     )
 
     return parser.parse_args(args)
@@ -60,13 +62,10 @@ def generate_ctx(schema: Schema, repo: str, gh_ref: str, schema_name: str) -> st
     ctx = {
         "@id": f"{uri_base}/schema/context/{schema_name}.jsonld",
         "@version": 1.1,
-        "@context": {}
+        "@context": {},
     }
     for entity_name, entity in schema.items():
-        entity_ctx = {
-            "@id": f"{schema_base}#{entity_name}",
-            "@context": {}
-        }
+        entity_ctx = {"@id": f"{schema_base}#{entity_name}", "@context": {}}
         for prop_name, _ in entity["props"].items():
             entity_ctx["@context"][prop_name] = f"{schema_base}#{entity_name}:{prop_name}"  # type: ignore
         ctx["@context"][entity_name] = entity_ctx  # type: ignore

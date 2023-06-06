@@ -97,7 +97,7 @@ ro_crate.dump("ro-crate-metadata.json")
 
 また、使用例として、以下が用意されている。
 
-- [./tests/example/example.py](./tests/example/example.py)
+- [./tests/examples/example.py](./tests/examples/example.py)
 
 #### RO-Crate Metadata File Descriptor と Root Data Entity
 
@@ -327,6 +327,16 @@ $ pytest -s ./tests/unit_test
 また、GitHub actions として、以下のように設定されている。
 
 - [pytest](./.github/workflows/pytest.yml)
+
+---
+
+for coverage:
+
+```bash
+$ coverage run --source=nii_dg -m pytest ./tests
+$ coverage html
+$ python3 -m http.server --directory ./htmlcov 8080
+```
 
 ### Documentation
 

@@ -7,15 +7,16 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
-from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity,
-                           RootDataEntity)
+from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, RootDataEntity
 from nii_dg.ro_crate import ROCrate
 
 # === load test module ===
 
 here = Path(__file__).parent.resolve()
 test_module_path = here.joinpath("../example/package_invalid_crate2.py").resolve()
-spec = importlib.util.spec_from_file_location("package_invalid_crate2", test_module_path)
+spec = importlib.util.spec_from_file_location(
+    "package_invalid_crate2", test_module_path
+)
 test_module = importlib.util.module_from_spec(spec)  # type: ignore
 spec.loader.exec_module(test_module)  # type: ignore
 
@@ -23,7 +24,8 @@ package_invalid_crate = test_module.package_invalid_crate
 
 # === test ===
 
-expect_jsonld = json.loads("""\
+expect_jsonld = json.loads(
+    """\
 {
   "@context": "https://w3id.org/ro/crate/1.1/context",
   "@graph": [
@@ -127,10 +129,13 @@ expect_jsonld = json.loads("""\
     }
   ]
 }
-""")
+"""
+)
 
 
-def compare_jsonld_graph(expect: List[Dict[str, Any]], actual: List[Dict[str, Any]]) -> None:
+def compare_jsonld_graph(
+    expect: List[Dict[str, Any]], actual: List[Dict[str, Any]]
+) -> None:
     """\
     exclude:
         - @context

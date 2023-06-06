@@ -47,13 +47,16 @@ def result_wrapper(error_list: List[EntityError]) -> List[Dict[str, str]]:
     for entity_error in error_list:
         entity_dict = {}
         entity_dict["entityId"] = entity_error.entity.id
-        entity_dict["props"] = entity_error.entity.schema_name + "." + entity_error.entity.type + ":"  # type:ignore
+        entity_dict["props"] = (
+            entity_error.entity.schema_name + "." + entity_error.entity.type + ":"
+        )  # type:ignore
         for prop, reason in entity_error.errors.items():
             reason_dict = entity_dict.copy()
             reason_dict["props"] += prop
             reason_dict["reason"] = reason
             result_array.append(reason_dict)
     return result_array
+
 
 # --- controller ---
 
@@ -99,9 +102,7 @@ def request_validation() -> Response:
 
     job = executor.submit(validate, crate, target_entities)
 
-    request_map[request_id] = {
-        "roCrate": request_body,
-        "entityIds": entity_ids}
+    request_map[request_id] = {"roCrate": request_body, "entityIds": entity_ids}
     job_map[request_id] = job
 
     response: Response = jsonify({"request_id": request_id})
@@ -136,12 +137,9 @@ def get_results(request_id: str) -> Response:
             status = "EXECUTOR_ERROR"
             results = [{"err_msg": str(job.exception())}]
 
-    response: Response = jsonify({
-        "requestId": request_id,
-        "request": req,
-        "status": status,
-        "results": results
-    })
+    response: Response = jsonify(
+        {"requestId": request_id, "request": req, "status": status, "results": results}
+    )
     response.status_code = GET_STATUS_CODE
 
     return response
@@ -186,6 +184,7 @@ def validate(crate: ROCrate, entities: List["Entity"]) -> List[Any]:
         crate.validate()
     return []
 
+
 # --- app ---
 
 
@@ -201,12 +200,15 @@ def main() -> None:
 
     if os.getenv("DG_WSGI_SERVER") == "waitress":
         import logging
+
         waitress_logger = logging.getLogger("waitress")
         waitress_logger.setLevel(logging.INFO)
-        serve(app,
-              host=DG_CONFIG["DG_HOST"],
-              port=DG_CONFIG["DG_PORT"],
-              threads=DG_CONFIG["DG_WSGI_THREADS"])
+        serve(
+            app,
+            host=DG_CONFIG["DG_HOST"],
+            port=DG_CONFIG["DG_PORT"],
+            threads=DG_CONFIG["DG_WSGI_THREADS"],
+        )
     else:
         # for debug
         app.config["FLASK_ENV"] = "development"

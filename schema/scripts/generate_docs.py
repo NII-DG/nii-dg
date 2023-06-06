@@ -7,11 +7,7 @@ from typing import Dict, List, TypedDict
 
 import yaml
 
-Prop = TypedDict("Prop", {
-    "description": str,
-    "example": str,
-    "expected_type": str
-})
+Prop = TypedDict("Prop", {"description": str, "example": str, "expected_type": str})
 prop_keys = set(Prop.__annotations__.keys())
 Entity = Dict[str, Prop]
 Schema = Dict[str, Entity]
@@ -50,7 +46,9 @@ def main(args: List[str]) -> None:
         schema_name = schema_file.stem
         docs = TEMPLATE_DOCS.format(schema_name=schema_name, repo=REPO_NAME)
         for entity_name, entity in schema.items():
-            docs += TEMPLATE_ENTITY.format(entity_name=entity_name, description=entity["description"])
+            docs += TEMPLATE_ENTITY.format(
+                entity_name=entity_name, description=entity["description"]
+            )
             for prop_name, prop in entity["props"].items():
                 docs += TEMPLATE_PROP.format(
                     prop_name=prop_name,

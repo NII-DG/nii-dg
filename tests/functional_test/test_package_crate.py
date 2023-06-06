@@ -7,8 +7,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
-from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity,
-                           RootDataEntity)
+from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, RootDataEntity
 from nii_dg.ro_crate import ROCrate
 
 # === load test module ===
@@ -28,7 +27,9 @@ with sample_crate_jsonld_path.open("r", encoding="utf-8") as f:
     expect_jsonld = json.load(f)
 
 
-def compare_jsonld_graph(expect: List[Dict[str, Any]], actual: List[Dict[str, Any]]) -> None:
+def compare_jsonld_graph(
+    expect: List[Dict[str, Any]], actual: List[Dict[str, Any]]
+) -> None:
     """\
     exclude:
         - @context

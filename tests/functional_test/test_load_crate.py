@@ -17,10 +17,15 @@ sample_crate_jsonld_path = here.joinpath("../example/sample_crate.json").resolve
 invalid_crate1_jsonld_path = here.joinpath("../example/invalid_crate1.json").resolve()
 invalid_crate2_jsonld_path = here.joinpath("../example/invalid_crate2.json").resolve()
 
-test_cases = [(jsonld_path, use_external_ctx)
-              for jsonld_path in [sample_crate_jsonld_path, invalid_crate1_jsonld_path, invalid_crate2_jsonld_path]
-              for use_external_ctx in [True]
-              ]
+test_cases = [
+    (jsonld_path, use_external_ctx)
+    for jsonld_path in [
+        sample_crate_jsonld_path,
+        invalid_crate1_jsonld_path,
+        invalid_crate2_jsonld_path,
+    ]
+    for use_external_ctx in [True]
+]
 
 
 @pytest.mark.parametrize("jsonld_path, use_external_ctx", test_cases)

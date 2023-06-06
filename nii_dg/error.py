@@ -72,7 +72,10 @@ class CrateCheckPropsError(CrateError):
 
     def __str__(self) -> str:
         error_msg = "\n".join([f"- {e}" for e in self.errors])
-        return "CrateCheckPropsError: Errors occurred in check_props() for entities:\n\n" + error_msg
+        return (
+            "CrateCheckPropsError: Errors occurred in check_props() for entities:\n\n"
+            + error_msg
+        )
 
     def add(self, *errors: EntityError) -> None:
         self.errors.extend(errors)
@@ -93,6 +96,7 @@ class CrateValidationError(CrateError):
 
     This error is raised during the Data Governance validation time, during the validation performed by the 'validate()' method of the ROCrate class.
     """
+
     errors: List[EntityError]
 
     def __init__(self, errors: List[EntityError] = []):
@@ -100,7 +104,10 @@ class CrateValidationError(CrateError):
 
     def __str__(self) -> str:
         error_msg = "\n".join([f"- {e}" for e in self.errors])
-        return "CrateValidationError: Errors occurred in validate() for entities:\n\n" + error_msg
+        return (
+            "CrateValidationError: Errors occurred in validate() for entities:\n\n"
+            + error_msg
+        )
 
     def add(self, *errors: EntityError) -> None:
         self.errors.extend(errors)

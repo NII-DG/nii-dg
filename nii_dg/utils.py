@@ -13,8 +13,20 @@ import re
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import (TYPE_CHECKING, Any, Dict, List, Literal, NewType, Optional,
-                    Tuple, TypedDict, Union, get_args, get_origin)
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Literal,
+    NewType,
+    Optional,
+    Tuple,
+    TypedDict,
+    Union,
+    get_args,
+    get_origin,
+)
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
@@ -68,7 +80,9 @@ def load_config() -> Dict[str, Any]:
 DG_CONFIG = load_config()
 
 
-def generate_ctx(gh_repo: str = GH_REPO, gh_ref: str = GH_REF, schema_name: str = "ro-crate") -> str:
+def generate_ctx(
+    gh_repo: str = GH_REPO, gh_ref: str = GH_REF, schema_name: str = "ro-crate"
+) -> str:
     """
         Generate a context string for a given schema name.
 
@@ -117,23 +131,25 @@ def parse_ctx(ctx: str) -> Tuple[str, str, str]:
         schema_name = match.group("schema")
         return (gh_repo, gh_ref, schema_name)
 
-    raise ValueError("Context does not match the expected format, e.g., https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/base.jsonld")
+    raise ValueError(
+        "Context does not match the expected format, e.g., https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/base.jsonld"
+    )
 
 
 # === Definition for schema file ===
 
-PropDef = TypedDict("PropDef", {
-    "expected_type": str,
-    "example": Optional[str],
-    "required": str,
-    "description": str
-})
+PropDef = TypedDict(
+    "PropDef",
+    {
+        "expected_type": str,
+        "example": Optional[str],
+        "required": str,
+        "description": str,
+    },
+)
 # {"prop_name": PropDef}
 PropsDef = NewType("PropsDef", Dict[str, PropDef])
-EntityDef = TypedDict("EntityDef", {
-    "description": str,
-    "props": PropsDef
-})
+EntityDef = TypedDict("EntityDef", {"description": str, "props": PropsDef})
 # {"entity_name": EntityDef}
 SchemaDef = NewType("SchemaDef", Dict[str, EntityDef])
 
@@ -177,7 +193,9 @@ def import_custom_class(module_name: str, class_name: str) -> Any:
         return None
 
 
-def download_schema(gh_repo: str, gh_ref: str, schema_module_name: str) -> Tuple[Path, Path]:
+def download_schema(
+    gh_repo: str, gh_ref: str, schema_module_name: str
+) -> Tuple[Path, Path]:
     """
     Download a schema module from a GitHub repository.
 
@@ -210,7 +228,9 @@ def download_schema(gh_repo: str, gh_ref: str, schema_module_name: str) -> Tuple
             f.write(schema_file)
     except HTTPError as e:
         if e.code == 404:
-            raise ValueError(f"Schema module '{schema_module_name}' does not exist in the given GitHub repository.")
+            raise ValueError(
+                f"Schema module '{schema_module_name}' does not exist in the given GitHub repository."
+            )
         else:
             raise e
 
@@ -221,7 +241,9 @@ def download_schema(gh_repo: str, gh_ref: str, schema_module_name: str) -> Tuple
 _module_cache: Dict[str, Any] = {}
 
 
-def import_external_class(gh_repo: str, gh_ref: str, schema_module_name: str, class_name: str) -> Any:
+def import_external_class(
+    gh_repo: str, gh_ref: str, schema_module_name: str, class_name: str
+) -> Any:
     """
     Import a class from an external module.
 
@@ -245,7 +267,9 @@ def import_external_class(gh_repo: str, gh_ref: str, schema_module_name: str, cl
         # Download the schema module
         schema_module_path, _ = download_schema(gh_repo, gh_ref, schema_module_name)
 
-        spec = importlib.util.spec_from_file_location("external_module", schema_module_path)
+        spec = importlib.util.spec_from_file_location(
+            "external_module", schema_module_path
+        )
         external_module = importlib.util.module_from_spec(spec)  # type: ignore
         spec.loader.exec_module(external_module)  # type: ignore
 
@@ -354,7 +378,10 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
             if not isinstance(value, dict):
                 return False
             key_type, value_type = args
-            return all(check_type(k, key_type) and check_type(v, value_type) for k, v in value.items())
+            return all(
+                check_type(k, key_type) and check_type(v, value_type)
+                for k, v in value.items()
+            )
         elif origin is list:
             if not isinstance(value, list):
                 return False
@@ -366,7 +393,10 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
             item_types = args
             if len(item_types) != len(value):
                 return False
-            return all(check_type(item, item_type) for item, item_type in zip(value, item_types))
+            return all(
+                check_type(item, item_type)
+                for item, item_type in zip(value, item_types)
+            )
         elif origin is Literal:
             return value in args
         elif expected_type is Any:
@@ -447,10 +477,10 @@ def sum_file_size(size_unit: str, entities: List["Entity"]) -> float:
     unit_conversion_table = {
         "B": 1,
         "KB": 1024,
-        "MB": 1024 ** 2,
-        "GB": 1024 ** 3,
-        "TB": 1024 ** 4,
-        "PB": 1024 ** 5,
+        "MB": 1024**2,
+        "GB": 1024**3,
+        "TB": 1024**4,
+        "PB": 1024**5,
     }
     if size_unit not in unit_conversion_table:
         raise ValueError(f"Invalid size unit: {size_unit}")
