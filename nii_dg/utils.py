@@ -195,7 +195,7 @@ def download_schema(gh_repo: str, gh_ref: str, schema_module_name: str) -> Tuple
     schema_module_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.py"
     schema_file_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.yml"
 
-    schema_dir = tempfile.mkdtemp(prefix="nii_dg")
+    schema_dir = tempfile.mkdtemp(prefix="nii_dg_")
 
     try:
         schema_module_path = Path(schema_dir).joinpath(f"{schema_module_name}.py")
