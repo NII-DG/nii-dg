@@ -20,12 +20,13 @@ SCHEMA_FILE_PATH = Path(__file__).resolve().parent.joinpath(f"{SCHEMA_NAME}.yml"
 SCHEMA_DEF = load_schema_file(SCHEMA_FILE_PATH)
 
 
-class GinMonitoring(ContextualEntity):
-    REQUIRED_DIRECTORIES = {
-        "with_code": ["source", "input_data", "output_data"],
-        "for_parameters": ["source", "input_data"],
-    }
+REQUIRED_DIRECTORIES = {
+    "with_code": ["source", "input_data", "output_data"],
+    "for_parameters": ["source", "input_data"],
+}
 
+
+class GinMonitoring(ContextualEntity):
     def __init__(
         self,
         id_: str = "#ginmonitoring",
@@ -69,7 +70,7 @@ class GinMonitoring(ContextualEntity):
         required_dirs = [
             Path(experiment_dir).joinpath(required_dir_name)
             for experiment_dir in self["experimentPackageList"]
-            for required_dir_name in self.REQUIRED_DIRECTORIES[self["datasetStructure"]]
+            for required_dir_name in REQUIRED_DIRECTORIES[self["datasetStructure"]]
         ]
         missing_dirs = [
             dir_path for dir_path in required_dirs if dir_path not in dir_paths

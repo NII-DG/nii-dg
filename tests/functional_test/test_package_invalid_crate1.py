@@ -7,7 +7,8 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
-from nii_dg.entity import ContextualEntity, DataEntity, DefaultEntity, RootDataEntity
+from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity,
+                           RootDataEntity)
 from nii_dg.ro_crate import ROCrate
 
 # === load test module ===

@@ -13,20 +13,8 @@ import re
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    List,
-    Literal,
-    NewType,
-    Optional,
-    Tuple,
-    TypedDict,
-    Union,
-    get_args,
-    get_origin,
-)
+from typing import (TYPE_CHECKING, Any, Dict, List, Literal, NewType, Optional,
+                    Tuple, TypedDict, Union, get_args, get_origin)
 from urllib.error import HTTPError
 from urllib.request import urlopen
 

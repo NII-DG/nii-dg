@@ -12,7 +12,8 @@ import yaml
 
 from nii_dg.const import RO_CRATE_SPEC
 from nii_dg.error import EntityError
-from nii_dg.utils import NOW, EntityDef, generate_ctx, is_instance_of_expected_type
+from nii_dg.utils import (NOW, EntityDef, generate_ctx,
+                          is_instance_of_expected_type)
 
 if TYPE_CHECKING:
     from nii_dg.ro_crate import ROCrate
@@ -29,10 +30,6 @@ class Entity(TypedMutableMapping):
     An Entity is a JSON-LD object that must have an "@id" property, an "@type" property, and an "@context" property.
     The properties and their expected types of an Entity are defined in its schema definition.
     """
-
-    data: Dict[str, Any]
-    schema_name: str
-    entity_def: EntityDef
 
     def __init__(
         self, id_: str, props: Dict[str, Any], schema_name: str, entity_def: EntityDef

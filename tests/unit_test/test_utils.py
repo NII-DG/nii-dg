@@ -20,9 +20,7 @@ def test_is_instance_of_expected_type() -> None:
     assert is_instance_of_expected_type(1, "Any")
     assert is_instance_of_expected_type("foo", "Literal['foo', 'bar']")
     assert is_instance_of_expected_type([1, "a"], "List[Union[int, str]]")
-    assert is_instance_of_expected_type(
-        {"a": [1, 2], "b": [3, 4]}, "Dict[str, List[int]]"
-    )
+    assert is_instance_of_expected_type({"a": [1, 2], "b": [3, 4]}, "Dict[str, List[int]]")
 
     assert is_instance_of_expected_type(RootDataEntity(), "RootDataEntity")
 
@@ -39,8 +37,6 @@ def test_is_instance_of_expected_type() -> None:
     assert not is_instance_of_expected_type(1, "Literal['foo', 'bar']")
     assert not is_instance_of_expected_type("foo", "Literal['bar']")
     assert not is_instance_of_expected_type([1, "a"], "List[Union[int, float]]")
-    assert not is_instance_of_expected_type(
-        {"a": [1, 2], "b": [3, 4]}, "Dict[str, List[str]]"
-    )
+    assert not is_instance_of_expected_type({"a": [1, 2], "b": [3, 4]}, "Dict[str, List[str]]")
 
     assert not is_instance_of_expected_type(RootDataEntity(), "str")

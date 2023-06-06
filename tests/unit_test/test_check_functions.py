@@ -1,19 +1,11 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-from nii_dg.check_functions import (
-    is_absolute_path,
-    is_content_size,
-    is_email,
-    is_encoding_format,
-    is_iso8601,
-    is_orcid,
-    is_phone_number,
-    is_relative_path,
-    is_sha256,
-    is_url,
-    is_url_accessible,
-)
+from nii_dg.check_functions import (is_absolute_path, is_content_size,
+                                    is_email, is_encoding_format, is_iso8601,
+                                    is_orcid, is_phone_number,
+                                    is_relative_path, is_sha256, is_url,
+                                    is_url_accessible)
 
 
 def test_is_content_size() -> None:

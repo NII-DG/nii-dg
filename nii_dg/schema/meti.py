@@ -4,12 +4,8 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict
 
-from nii_dg.check_functions import (
-    check_entity_values,
-    is_absolute_path,
-    is_iso8601,
-    is_url,
-)
+from nii_dg.check_functions import (check_entity_values, is_absolute_path,
+                                    is_iso8601, is_url)
 from nii_dg.entity import ContextualEntity, EntityDef
 from nii_dg.error import EntityError
 from nii_dg.schema.base import File as BaseFile

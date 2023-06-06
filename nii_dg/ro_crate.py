@@ -10,27 +10,13 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Type, Union
 
 from nii_dg.const import RO_CRATE_CONTEXT
-from nii_dg.entity import (
-    ContextualEntity,
-    DataEntity,
-    DefaultEntity,
-    Entity,
-    ROCrateMetadata,
-    RootDataEntity,
-)
-from nii_dg.error import (
-    CrateCheckPropsError,
-    CrateError,
-    CrateValidationError,
-    EntityError,
-)
+from nii_dg.entity import (ContextualEntity, DataEntity, DefaultEntity, Entity,
+                           ROCrateMetadata, RootDataEntity)
+from nii_dg.error import (CrateCheckPropsError, CrateError,
+                          CrateValidationError, EntityError)
 from nii_dg.module_info import GH_REPO
-from nii_dg.utils import (
-    DG_CONFIG,
-    import_custom_class,
-    import_external_class,
-    parse_ctx,
-)
+from nii_dg.utils import (DG_CONFIG, import_custom_class,
+                          import_external_class, parse_ctx)
 
 
 class ROCrate:
@@ -52,16 +38,11 @@ class ROCrate:
     For more details on the RO-Crate specification, please refer to https://www.researchobject.org/ro-crate/.
 
     Attributes:
-        default_entities (List[DefaultEntity]): A list of default entities.
-        data_entities (List[DataEntity]): A list of data entities.
-        contextual_entities (List[ContextualEntity]): A list of contextual entities.
-        root (RootDataEntity): The root data entity.
+        root (RootDataEntity): The RootDataEntity of the RO-Crate.
+        default_entities (List[DefaultEntity]): The DefaultEntity list of the RO-Crate.
+        data_entities (List[DataEntity]): The DataEntity list of the RO-Crate.
+        contextual_entities (List[ContextualEntity]): The ContextualEntity list of the RO-Crate.
     """
-
-    default_entities: List[DefaultEntity]
-    data_entities: List[DataEntity]
-    contextual_entities: List[ContextualEntity]
-    root: RootDataEntity
 
     def __init__(self, jsonld: Optional[Dict[str, Any]] = None) -> None:
         """
@@ -77,9 +58,9 @@ class ROCrate:
             self.from_jsonld(jsonld)
         else:
             self.root = RootDataEntity()
-            self.default_entities = [self.root, ROCrateMetadata()]
-            self.data_entities = []
-            self.contextual_entities = []
+            self.default_entities: List[DefaultEntity] = [self.root, ROCrateMetadata()]
+            self.data_entities: List[DataEntity] = []
+            self.contextual_entities: List[ContextualEntity] = []
 
         self.root["hasPart"] = self.data_entities
 

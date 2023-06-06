@@ -97,8 +97,6 @@ class CrateValidationError(CrateError):
     This error is raised during the Data Governance validation time, during the validation performed by the 'validate()' method of the ROCrate class.
     """
 
-    errors: List[EntityError]
-
     def __init__(self, errors: List[EntityError] = []):
         self.errors = errors
 

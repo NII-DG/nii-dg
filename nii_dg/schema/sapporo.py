@@ -16,12 +16,8 @@ from typing import TYPE_CHECKING, Any, Dict, List
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from nii_dg.check_functions import (
-    check_entity_values,
-    is_absolute_path,
-    is_relative_path,
-    is_url,
-)
+from nii_dg.check_functions import (check_entity_values, is_absolute_path,
+                                    is_relative_path, is_url)
 from nii_dg.entity import ContextualEntity, Entity, EntityDef
 from nii_dg.error import EntityError
 from nii_dg.schema.base import Dataset as BaseDataset
@@ -121,11 +117,12 @@ class Dataset(BaseDataset):
             raise error
 
 
-class SapporoRun(ContextualEntity):
-    RUNNING = ["QUEUED", "INITIALIZING", "RUNNING", "PAUSED"]
-    COMPLETE = ["COMPLETE"]
-    FAILED = ["EXECUTOR_ERROR", "SYSTEM_ERROR", "CANCELED", "CANCELING", "UNKNOWN"]
+RUNNING = ["QUEUED", "INITIALIZING", "RUNNING", "PAUSED"]
+COMPLETE = ["COMPLETE"]
+FAILED = ["EXECUTOR_ERROR", "SYSTEM_ERROR", "CANCELED", "CANCELING", "UNKNOWN"]
 
+
+class SapporoRun(ContextualEntity):
     def __init__(
         self,
         id_: str = "#sapporo-run",
@@ -235,7 +232,7 @@ class SapporoRun(ContextualEntity):
         status = self.get_run_status(endpoint, run_id)
         iter_num = 0
 
-        while status in self.RUNNING:
+        while status in RUNNING:
             self.sleep(iter_num)
             status = self.get_run_status(endpoint, run_id)
             flask_log.debug(f"Status of sapporo run {run_id} is {status}.")

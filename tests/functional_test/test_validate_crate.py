@@ -9,7 +9,8 @@ from unittest.mock import patch
 import pytest
 
 import nii_dg
-from nii_dg.error import CrateCheckPropsError, CrateValidationError, EntityError
+from nii_dg.error import (CrateCheckPropsError, CrateValidationError,
+                          EntityError)
 from nii_dg.ro_crate import ROCrate
 
 here = Path(__file__).parent.resolve()
