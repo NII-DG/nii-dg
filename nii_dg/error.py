@@ -12,7 +12,7 @@ This module contains the following error classes:
 - CrateValidationError: Error class for 'validate()' method in the RO-Crate.
 """
 
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
@@ -67,7 +67,9 @@ class CrateCheckPropsError(CrateError):
     This error is raised during the Data Governance validation time, during the validation performed by the 'check_props()' method of the ROCrate class.
     """
 
-    def __init__(self, errors: List[EntityError] = []) -> None:
+    def __init__(self, errors: Optional[List[EntityError]] = None):
+        if errors is None:
+            errors = []
         self.errors = errors
 
     def __str__(self) -> str:
@@ -97,7 +99,9 @@ class CrateValidationError(CrateError):
     This error is raised during the Data Governance validation time, during the validation performed by the 'validate()' method of the ROCrate class.
     """
 
-    def __init__(self, errors: List[EntityError] = []):
+    def __init__(self, errors: Optional[List[EntityError]] = None):
+        if errors is None:
+            errors = []
         self.errors = errors
 
     def __str__(self) -> str:

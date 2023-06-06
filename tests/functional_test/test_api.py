@@ -85,46 +85,46 @@ def test_validation_complete(client: Any) -> None:
     assert len(json_data["results"]) == 0
 
 
-# def test_validation_failed_1(client: Any) -> None:
-#     # post request first
-#     with PAYLOAD_INVALID_CRATE_1_PATH.open("r", encoding="utf-8") as f:
-#         payload = f.read()
-#     res = client.post("/validate", data=payload, content_type="application/json")
-#     json_data = res.get_json()
-#     request_id = json_data["request_id"]
+def test_validation_failed_1(client: Any) -> None:
+    # post request first
+    with PAYLOAD_INVALID_CRATE_1_PATH.open("r", encoding="utf-8") as f:
+        payload = f.read()
+    res = client.post("/validate", data=payload, content_type="application/json")
+    json_data = res.get_json()
+    request_id = json_data["request_id"]
 
-#     # get results
-#     for _ in range(10):
-#         sleep(2)
-#         res = client.get(f"/{request_id}")
-#         json_data = res.get_json()
-#         if json_data["status"] == "FAILED":
-#             break
+    # get results
+    for _ in range(10):
+        sleep(2)
+        res = client.get(f"/{request_id}")
+        json_data = res.get_json()
+        if json_data["status"] == "FAILED":
+            break
 
-#     assert json_data["status"] == "FAILED"
-#     assert len(json_data["results"]) == 2
+    assert json_data["status"] == "FAILED"
+    assert len(json_data["results"]) == 2
 
-#     assert json_data["results"][0]["entityId"] == "https://example.com/person"
-#     assert json_data["results"][0]["props"] == "cao.Person:@id"
-#     assert "Failed to access the URL." in json_data["results"][0]["reason"]
-#     assert json_data["results"][1]["entityId"] == "#ginmonitoring"
-#     assert (
-#         json_data["results"][1]["props"]
-#         == "ginfork.GinMonitoring:experimentPackageList"
-#     )
-#     assert "Required Dataset entity is missing" in json_data["results"][1]["reason"]
+    assert json_data["results"][0]["entityId"] == "https://example.com/person"
+    assert json_data["results"][0]["props"] == "cao.Person:@id"
+    assert "Failed to access the URL." in json_data["results"][0]["reason"]
+    assert json_data["results"][1]["entityId"] == "#ginmonitoring"
+    assert (
+        json_data["results"][1]["props"]
+        == "ginfork.GinMonitoring:experimentPackageList"
+    )
+    assert "Required Dataset entity is missing" in json_data["results"][1]["reason"]
 
 
-# def test_validation_failed_2(client: Any) -> None:
-#     """
-#     Failed with check_props error. Therefore, 400 error is returned at the POST request.
-#     """
-#     with PAYLOAD_INVALID_CRATE_2_PATH.open("r", encoding="utf-8") as f:
-#         payload = f.read()
-#     res = client.post("/validate", data=payload, content_type="application/json")
-#     assert res.status_code == 400
-#     json_data = res.get_json()
-#     assert "message" in json_data
-#     assert "400 Bad Request" in json_data["message"]
-#     assert "CrateCheckPropsError" in json_data["message"]
-#     assert "Errors occurred in <cao.File file_1.txt>" in json_data["message"]
+def test_validation_failed_2(client: Any) -> None:
+    """
+    Failed with check_props error. Therefore, 400 error is returned at the POST request.
+    """
+    with PAYLOAD_INVALID_CRATE_2_PATH.open("r", encoding="utf-8") as f:
+        payload = f.read()
+    res = client.post("/validate", data=payload, content_type="application/json")
+    assert res.status_code == 400
+    json_data = res.get_json()
+    assert "message" in json_data
+    assert "400 Bad Request" in json_data["message"]
+    assert "CrateCheckPropsError" in json_data["message"]
+    assert "Errors occurred in <cao.File file_1.txt>" in json_data["message"]
