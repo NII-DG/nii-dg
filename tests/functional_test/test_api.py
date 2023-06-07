@@ -85,6 +85,26 @@ def test_validation_complete(client: Any) -> None:
     assert len(json_data["results"]) == 0
 
 
+def test_validation_complete_with_entity_ids(client: Any) -> None:
+    # post request first
+    with PAYLOAD_SAMPLE_CRATE_PATH.open("r", encoding="utf-8") as f:
+        payload = f.read()
+    res = client.post("/validate?entityIds=file_1.txt", data=payload, content_type="application/json")
+    json_data = res.get_json()
+    request_id = json_data["request_id"]
+
+    # get results
+    for _ in range(10):
+        sleep(2)
+        res = client.get(f"/{request_id}")
+        json_data = res.get_json()
+        if json_data["status"] == "COMPLETE":
+            break
+
+    assert json_data["status"] == "COMPLETE"
+    assert len(json_data["results"]) == 0
+
+
 def test_validation_failed_1(client: Any) -> None:
     # post request first
     with PAYLOAD_INVALID_CRATE_1_PATH.open("r", encoding="utf-8") as f:
@@ -108,10 +128,7 @@ def test_validation_failed_1(client: Any) -> None:
     assert json_data["results"][0]["props"] == "cao.Person:@id"
     assert "Failed to access the URL." in json_data["results"][0]["reason"]
     assert json_data["results"][1]["entityId"] == "#ginmonitoring"
-    assert (
-        json_data["results"][1]["props"]
-        == "ginfork.GinMonitoring:experimentPackageList"
-    )
+    assert json_data["results"][1]["props"] == "ginfork.GinMonitoring:experimentPackageList"
     assert "Required Dataset entity is missing" in json_data["results"][1]["reason"]
 
 
