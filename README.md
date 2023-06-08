@@ -38,7 +38,7 @@ The library is divided into three main functionalities:
 2. Packaging: Packaging of research data (RO-Crate)
 3. Validation: Data validation
 
-![System architecture](https://user-images.githubusercontent.com/26019402/215007490-6f7b10b1-4e0d-4286-b7c6-6882a9c32948.png)
+![System architecture](https://github.com/NII-DG/nii-dg/assets/26019402/b062bb9e-c937-408d-98a6-ced2be909e3a)
 
 ### Usage: 1. Schema definition
 
@@ -267,7 +267,7 @@ Here, the `@context` property indicates that the schema for the `File` entity is
 
 This allows for external referencing of the schema and its properties for the `File` entity.
 
-![System architecture extended](https://user-images.githubusercontent.com/26019402/228390256-5dcc5c81-3ba9-4be6-b0ab-1f6622c1fd2d.png)
+![System architecture extended](https://github.com/NII-DG/nii-dg/assets/26019402/fdbddf39-2e94-41bd-9167-1e8c1833e897)
 
 During the actual validation process, the `@context` specified in each entity within the RO-Crate is followed to reference the YAML schema and Python module used during packaging. The library loads these files and generates entity instances. Then, using the schema and validation rules provided by the generated entity instances, the validation process is performed.
 
