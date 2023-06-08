@@ -1,21 +1,20 @@
-# nii-dg を利用したガバナンス事例
+# Governance Case using NII-DG and Sapporo
 
-以下では、nii-dg 機能を利用した研究データガバナンスの一例として、 Sapporo によるワークフロー実行結果の検証を行う流れを示す。
-Sapporo については [GitHub - sapporo-wes/sapporo-service](https://github.com/sapporo-wes/sapporo-service) を参照のこと。
+This document provides a step-by-step guide on using the NII-DG library to package the results of a workflow executed by Sapporo as an RO-Crate. For more information on Sapporo, refer to the GitHub repository at [sapporo-wes/sapporo-service](https://github.com/sapporo-wes/sapporo-service).
 
-## 前提
+## Preparations
 
-- Sapporo を用いたワークフロー実行の結果を、研究データとしてパッケージングし RO-Crate を生成する
-- Sapporo と NII-DG REST API server は、Docker container として起動し、同一ネットワークに接続されている
-- 検証として、以下の三点を確認する
-  1. RO-Crate 内の値に基づいて、ワークフローが再実行可能である
-  2. 再実行のステータスが、RO-Crate に記載されているステータスと同一である
-  3. 再実行で得られた結果ファイルのサイズ・チェックサムが、RO-Crate の値と同一である (RO-Crate に記載がある場合のみ)
+- We will package the workflow execution results from Sapporo as research data to generate a RO-Crate.
+- Sapporo and the NII-DG REST API server will be launched as Docker containers, connected on the same network.
+- We will perform a validation that checks:
+  1. The workflow is re-executable based on the values in the RO-Crate.
+  2. The status of the re-execution matches the status stated in the RO-Crate.
+  3. The size and checksum of the result files obtained from re-execution match the values in the RO-Crate (if recorded in the RO-Crate).
 
-## 0.1. Sapporo and NII-DG REST API Server の起動
+## Step 1: Launch Sapporo and the NII-DG REST API Server
 
-```bash
-# At this directory (sapporo_example)
+````bash
+# In the sapporo_example directory
 $ docker compose up -d
 [+] Running 2/2
  ✔ Container sapporo-service  Running                                                                0.0s
@@ -24,9 +23,8 @@ $ docker compose ps
 NAME                IMAGE                                       COMMAND                  SERVICE             CREATED              STATUS              PORTS
 nii-dg              nii-dg                                      "tini -- python /app…"   nii-dg              12 seconds ago       Up 11 seconds       0.0.0.0:5000->5000/tcp
 sapporo-service     ghcr.io/sapporo-wes/sapporo-service:1.4.9   "tini -- uwsgi --yam…"   sapporo-service     About a minute ago   Up About a minute   0.0.0.0:1122->1122/tcp
-```
-
-疎通確認として、
+```<!-- ja 疎通確認として、 -->
+As a communication check:
 
 ```bash
 # Host -> Sapporo
@@ -48,15 +46,14 @@ $ curl sapporo-service:1122/service-info
 {
   "auth_instructions_url"...
 }
-```
+````
 
-## 0.2. NII-DG library の install
+## Step 2: Install the NII-DG Library
 
-`0.1. Sapporo and NII-DG REST API Server の起動` にて、起動した NII-DG container は、validation のためのものである。
-この項では、packaging 用の nii-dg library を install する。
+The NII-DG container launched in the previous step is for validation. In this step, we'll install the NII-DG library for packaging.
 
 ```bash
-# root directory に移動する
+# Move to root directory
 $ cd ../
 $ ls setup.py
 setup.py
@@ -66,12 +63,11 @@ $ python3 -m pip list | grep nii-dg
 nii-dg                 1.0.0
 ```
 
-## 1. Sapporo でのワークフロー実行 (`execute_workflow.py`)
+## Step 3: Execute a Workflow in Sapporo (`execute_workflow.py`)
 
-実行する workflow として、[trimming_and_qc.cwl](https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/trimming_and_qc.cwl) を用いる。
-この workflow は CommonWorkflowLanguage (CWL) によって書かれており、FASTQ ファイル (塩基配列ファイル) を入力とし、FASTQC による QC と、Trimmomatic によるトリミングを行う。
+We will use the workflow [trimming_and_qc.cwl](https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/trimming_and_qc.cwl) as the workflow to be executed by Sapporo. This workflow is written in CommonWorkflowLanguage (CWL) and performs QC using FASTQC and trimming using Trimmomatic on FASTQ files (nucleotide sequence files) as input.
 
-workflow を `curl` を用いて実行する場合、以下のようになる。(下のコマンドの実行は skip してよい)
+en: To execute the workflow using `curl`, use the following command (you can skip the command below):
 
 ```bash
 $ curl -X POST \
@@ -82,10 +78,10 @@ $ curl -X POST \
      -F 'workflow_engine_name=cwltool' \
      -F 'workflow_attachment=[{"file_url": "https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/ERR034597_2.small.fq.gz","file_name": "ERR034597_2.small.fq.gz"},{"file_url": "https://raw.githubusercontent.com/sapporo-wes/sapporo-service/main/tests/resources/cwltool/ERR034597_1.small.fq.gz","file_name": "ERR034597_1.small.fq.gz"}]' \
      http://localhost:1122/runs
-{'run_id': 'd45a404e-8d8a-43ac-bbf8-b686ee426062'}
+{"run_id": "d45a404e-8d8a-43ac-bbf8-b686ee426062"}
 ```
 
-この command を python で実装したものとして、`execute_workflow.py` であり、これを用いて、ワークフローを実行する。
+The `execute_workflow.py` script is an implementation of this command in Python, and is used to execute the workflow.
 
 ```bash
 $ python3 execute_workflow.py -h
@@ -98,26 +94,24 @@ optional arguments:
   -h, --help  show this help message and exit
 
 $ python3 execute_workflow.py http://localhost:1122
-{'run_id': 'd45a404e-8d8a-43ac-bbf8-b686ee426062'}
+{"run_id": "d45a404e-8d8a-43ac-bbf8-b686ee426062"}
 ```
 
-Sapporo の `RUN_ID` は、出力される `d45a404e-8d8a-43ac-bbf8-b686ee426062` などである。
-実際に Sapporo における run の状態の確認は、この `RUN_ID` を用いて行う。
-(run の状態などの元の source は、`${PWD}/run` 以下に配置されている)
+The `RUN_ID` in Sapporo is `d45a404e-8d8a-43ac-bbf8-b686ee426062` as output. To check the status of the run in Sapporo, use this `RUN_ID`.
+(The original source of the run status is located in `${PWD}/run`.)
 
 ```bash
 $ curl localhost:1122/runs/d45a404e-8d8a-43ac-bbf8-b686ee426062 | jq .state
 "COMPLETE"
 ```
 
-この state が `COMPLETE` になったら、次のステップに進む。
+Once the state is `COMPLETE`, proceed to the next step.
 
-## 2. Sapporo でのワークフロー実行結果の取得 (`download_results.py`)
+## Step 4: Retrieve the Workflow Execution Results from Sapporo (`download_results.py`)
 
-想定として、Sapporo は REST API Server として、例えばどこかの cloud instance にデプロイされている。
-そのため、実行結果 (e.g., 出力ファイル, etc.) を Sapporo からダウンロードする必要がある。
+Sapporo is expected to be deployed as a REST API Server in a cloud instance. Therefore, it is necessary to download the execution results (e.g., output files, etc.) from Sapporo.
 
-そのためのスクリプトとして、`download_results.py` が用意されている。
+The `download_results.py` script is provided as a script for this purpose.
 
 ```bash
 $ python3 download_results.py -h
@@ -147,9 +141,9 @@ results/
 1 directory, 7 files
 ```
 
-結果が `results` 以下にダウンロードされる。
+The results are downloaded to `./results`.
 
-## 3. NII-DG による RO-Crate の生成 (`package_ro_crate.py`)
+## Step 5: Generate a RO-Crate with NII-DG (`package_ro_crate.py`)
 
 前項で download した結果を、nii-dg library を用いて RO-Crate として packaging する。
 
@@ -183,25 +177,26 @@ $ head ro-crate-metadata.json
         },
 ```
 
-## 4. NII-DG API Server による RO-Crate の検証
+## Step 6: Validate the RO-Crate with NII-DG API Server
 
-NII-DG API Server の詳細については、[api-quick-start.md](../api-quick-start.md)を参照のこと。
-`0.1. Sapporo and NII-DG REST API Server の起動` より、`localhost:5000` に NII-DG API Server が起動している。
+Details of the NII-DG API Server can be found at [api-quick-start.md](../api-quick-start.md).
+From `Step 1: Launch Sapporo and the NII-DG REST API Server`, the NII-DG API Server is running at `localhost:5000`.
 
 ```bash
 $ curl localhost:5000/healthcheck
 {"message": "OK"}
 ```
 
-`/validate` に生成した `ro-crate-metadata.json` を POST する。
+POST the generated `ro-crate-metadata.json` to `/validate` as follows.:
 
-```
+```bash
 $ curl -X POST -H "Content-Type: application/json" -d @./ro-crate-metadata.json http://localhost:5000/validate
 {"request_id":"bd6f18a4-1599-41d2-bcbd-75f2cda2209d"}
 ```
 
-レスポンスとして、`request_id` が返ってくる。
-この `request_id` を用いて、`/{request_id}` に GET し、検証結果を取得する。
+The response will return a `request_id`.
+
+Use this `request_id` to GET `/{request_id}` and retrieve the validation results.
 
 ```bash
 $ curl localhost:5000/bd6f18a4-1599-41d2-bcbd-75f2cda2209d
@@ -223,11 +218,11 @@ $ curl localhost:5000/bd6f18a4-1599-41d2-bcbd-75f2cda2209d
 }
 ```
 
-検証に問題がなかったため、`status` が `COMPLETE` 、`results` は空のリストになっている。
+Since there were no problems with the validation, `status` is `COMPLETE` and `results` is an empty list.
 
 ---
 
-検証に問題がある例 (例えば、出力ファイルの名前が一致しないなど) として、`./ro-crate-metadata.json` を編集する。
+As an example of a problem with the validation (e.g., the output file name does not match), edit `./ro-crate-metadata.json`.
 
 ```bash
 $ cp ./ro-crate-metadata.json ./ro-crate-metadata_failed.json
@@ -235,7 +230,7 @@ $ sed -i 's/ERR034597_1.small_fastqc.html/ERR034597_1.small_fastqc_failed.html/'
 $ diff -u ./ro-crate-metadata.json ./ro-crate-metadata_failed.json
 ```
 
-編集した RO-Crate `ro-crate-metadata_failed.json` を用いて、検証を実行する。
+Use the edited RO-Crate `ro-crate-metadata_failed.json` to perform the validation.
 
 ```bash
 $ curl -X POST -H "Content-Type: application/json" -d @./ro-crate-metadata_failed.json http://localhost:5000/validate
@@ -266,4 +261,4 @@ $ curl localhost:5000/32012249-d8f7-4f64-b20d-853ea5be67b5
 }
 ```
 
-検証に問題があったため、`status` が `FAILED` 、`results` に問題があることが示されている。
+Since there was a problem with the validation, `status` is `FAILED` and `results` indicates that there is a problem.
