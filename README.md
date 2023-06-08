@@ -5,31 +5,26 @@
 [![mypy](https://github.com/NII-DG/nii-dg/actions/workflows/mypy.yml/badge.svg?branch=main&event=push)](https://github.com/NII-DG/nii-dg/actions/workflows/mypy.yml)
 [![pytest](https://github.com/NII-DG/nii-dg/actions/workflows/pytest.yml/badge.svg?branch=main&event=push)](https://github.com/NII-DG/nii-dg/actions/workflows/pytest.yml)
 
-データガバナンス: `データ管理に対して、組織として、明確な理念のもとに体制を構築し、具体的に実施するようにする`
+The NII Data Governance Library (NII-DG) provides the following functionalities to achieve "Data Governance: The establishment of a system under clear organizational principles and the concrete implementation of data management."
 
-を達成するため、本ライブラリは以下の機能を提供する。
-
-- 研究データ管理のための Metadata Schema とその検証ルールの定義
-- 研究データのパッケージング (RO-Crate 化)
-- 研究データの検証
+- Definition of metadata schema and validation rules for research data management
+- Packaging of research data (RO-Crate)
+- Validation of research data
 
 ## Installation
 
-Python 3.8 以上を推奨。
+Python 3.8 or higher is recommended.
 
 ```bash
-# Install from PyPI [TODO: not available yet]
-$ pip install nii-dg
+# Clone this repository (main branch) or download the source code from the release page
 
-# Or install from source
-$ git clone <this repo>
-$ cd nii-dg
+# Install the library
 $ python3 -m pip install .
 ```
 
 ### Docker
 
-Docker を用いた実行も可能。
+Execution using Docker is also possible.
 
 ```bash
 $ docker run -it --rm ghcr.io/NII-DG/nii-dg:latest bash
@@ -37,36 +32,35 @@ $ docker run -it --rm ghcr.io/NII-DG/nii-dg:latest bash
 
 ## Usage
 
-上記の通り、本ライブラリは 3 つの機能に分かれている。
+The library is divided into three main functionalities:
 
-1. Schema definition: Metadata Schema とその検証ルールの定義
-2. Packaging: パッケージング (RO-Crate 化)
-3. Validation: 検証
+1. Schema definition: Definition of metadata schema and validation rules
+2. Packaging: Packaging of research data (RO-Crate)
+3. Validation: Data validation
 
 ![System architecture](https://user-images.githubusercontent.com/26019402/215007490-6f7b10b1-4e0d-4286-b7c6-6882a9c32948.png)
 
 ### Usage: 1. Schema definition
 
-Document として [./schema/README.md](./schema/README.md) を参照。
+Please refer to [./schema/README.md](./schema/README.md) for the schema definition.
 
 ### Usage: 2. Packaging
 
-研究データ (実データやメタデータ) のパッケージング、つまり RO-Crate 化を行う。
-そのため、入力としては、研究データとそのメタデータ、出力としては RO-Crate (ro-crate-metadata.json) を生成する。
+Packaging involves the process of packaging research data (actual data and metadata) into an RO-Crate. The input includes research data and its metadata, and the output is the generated RO-Crate file (`ro-crate-metadata.json`).
 
-Packaging には、Python library `nii_dg` を用いる。
+To package, use the Python library `nii_dg`.
 
-Minimal example:
+As a minimal example:
 
 ```python
 from nii_dg.ro_crate import ROCrate
 
-ro_crate = ROCrate()
-ro_crate.root["name"] = "Sample RO-Crate"
-ro_crate.dump("ro-crate-metadata.json")
+crate = ROCrate()
+crate.root["name"] = "Sample RO-Crate"
+crate.dump("ro-crate-metadata.json")
 ```
 
-出力として:
+The output will be:
 
 ```json
 {
@@ -75,13 +69,15 @@ ro_crate.dump("ro-crate-metadata.json")
     {
       "@id": "./",
       "@type": "Dataset",
+      "@context": "https://w3id.org/ro/crate/1.1/context",
       "hasPart": [],
-      "name": "Sample RO-Crate",
-      "datePublished": "2023-01-27T04:16:02.470+00:00"
+      "datePublished": "2023-06-08T10:47:25.390+00:00",
+      "name": "Sample RO-Crate"
     },
     {
       "@id": "ro-crate-metadata.json",
       "@type": "CreativeWork",
+      "@context": "https://w3id.org/ro/crate/1.1/context",
       "conformsTo": {
         "@id": "https://w3id.org/ro/crate/1.1"
       },
@@ -93,35 +89,30 @@ ro_crate.dump("ro-crate-metadata.json")
 }
 ```
 
-より詳細な説明として、以下の項目を参照。
+For more detailed explanations, see the following items. In addition, [./tests/examples](./tests/examples) is provided as an example of use.
 
-また、使用例として、以下が用意されている。
+#### RO-Crate Metadata File Descriptor and Root Data Entity
 
-- [./tests/examples/example.py](./tests/examples/example.py)
-
-#### RO-Crate Metadata File Descriptor と Root Data Entity
-
-上述の Minimal example における 2 つの Entity は、RO-Crate における [必須のエンティティ](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html) である。
-以下の 2 つが必須のエンティティである:
+The two entities mentioned in the minimal example above are the [required entities](https://www.researchobject.org/ro-crate/1.1/root-data-entity.html) in RO-Crate. They are as follows:
 
 - RO-Crate Metadata File Descriptor
   - `@type`: `CreativeWork`
   - > The RO-Crate JSON-LD MUST contain a self-describing RO-Crate Metadata File Descriptor with the @id value ro-crate-metadata.json (or ro-crate-metadata.jsonld in legacy crates) and @type CreativeWork.
-  - Called as `ROCrateMetadata` in this library.
-  - RO-Crate metadata file に対する自己記述的な Entity
-  - RO-Crate 自体の様々な metadata が記述される
+  - Referred to as ROCrateMetadata in this library.
+  - A self-describing entity for the RO-Crate metadata file
+  - Various metadata of RO-Crate itself are described
 - Root Data Entity
   - `@type`: `Dataset`
   - > This descriptor MUST have an about property referencing the Root Data Entity, which SHOULD have an @id of ./.
-  - Called as `RootDataEntity` in this library.
-  - RO-Crate が持つ file を取りまとめる Entity
-  - Data Entity (e.g., `File`, `Dataset`) が `hasPart` として自動的に追加される
+  - Referred to as `RootDataEntity` in this library.
+  - An entity that summarizes the files contained in the RO-Crate
+  - Data entities (e.g., `File`, `Dataset`) are automatically added as `hasPart`
 
-この 2 つの Entity は、`ROCrate` インスタンスの生成時に自動的に生成される。`ROCrate.root` により、`RootDataEntity` に対応する Entity にアクセスできる。
+These two entities are automatically generated when creating an instance of `ROCrate`. Access to the Entity corresponding to RootDataEntity can be done using `ROCrate.root`.
 
-#### 各 Entity の作成と RO-Crate への追加
+#### Creating and Adding Entities to RO-Crate
 
-Entity は、各 Entity クラスを用いて生成する。
+Entities are created using their respective entity classes.
 
 ```python
 from nii_dg.schema.base import File
@@ -130,76 +121,78 @@ from nii_dg.schema.base import Organization
 file = File("https://example.com/path/to/file", props={"name": "Example file"})
 organization = Organization("https://example.com/path/to/organization", props={"name": "Example organization"})
 
-# 生成後、Entity を ROCrate に追加する
+# After creation, the entities are added to the ROCrate
 from nii_dg.ro_crate import ROCrate
 crate = ROCrate()
 crate.add(file, organization)
 ```
 
-これらの Entity クラスにおいて、第一引数として `@id` が渡される。また、`props` として、Entity に対する metadata が渡される。
+In these entity classes, the first argument passed is the `@id`. The `props` argument is used to provide metadata for the entity.
 
-これらの `props` は、Python class の `__set__` として、設定することも可能である。
+The `props` can also be set using the `__set__` method of the Python class.
 
 ```python
 file["name"] = "Example file"
 organization["name"] = "Example organization"
 
-# entity を set する場合、`@id` として set される
+# If an entity is set, it will be set as `@id`
 crate.root["funder"] = [organization]
 
 # -> {"funder": [{"@id": "https://example.com/path/to/organization"}]}
 ```
 
-`base` 以外の schema の Entity においても、同様の操作が可能である。
+The same operations can be performed on entities of schemas other than `base`.
 
 ```python
 from nii_dg.schema.amed import File as AmedFile
+
 amed_file = AmedFile("https://example.com/path/to/file", props={"name": "Example amed file"})
 ```
 
-#### Entity における同一 `@id` の取り扱い
+#### Handling Entities with the Same `@id`
 
-複数の schema を利用する場合、同一の `@id` を持つ Entity が存在する可能性がある。
-これらの Entity は、JSON-LD における別ノードとして扱われるが、内部的には別 `@context` を持つため、別々の Entity として扱われる。
+When using multiple schemas, there is a possibility of having entities with the same `@id`. Although these entities are treated as separate nodes in JSON-LD, they are considered as separate entities with different contexts.
 
 ```python
-from nii_dg.schame.amed import File as AmedFile
+from nii_dg.schema.amed import File as AmedFile
 from nii_dg.schema.ginfork import File as GinforkFile
 
 amed_file = AmedFile("path/to/file.txt", props={"name": "Example amed file"})
 ginfork_file = GinforkFile("path/to/file.txt", props={"name": "Example ginfork file"})
 ```
 
-この場合、JSON-LD において、
+In this case, in JSON-LD:
 
 ```json
 {
-  ...,
+  "@context": "https://w3id.org/ro/crate/1.1/context",
   "@graph": [
+    ...,
     {
       "@id": "path/to/file.txt",
-      "@context": "https://example.com/path/to/context/amed.jsonld",
-      "name": "Example amed file"
+      "@type": "File",
+      "@context": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/amed.jsonld",
+      "name": "Example amed file",
     },
     {
       "@id": "path/to/file.txt",
-      "@context": "https://example.com/path/to/context/ginfork.jsonld",
-      "name": "Example ginfork file"
+      "@type": "File",
+      "@context": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/ginfork.jsonld",
+      "name": "Example ginfork file",
     }
   ]
 }
 ```
 
-のように表現される。metadata の properties などは、`@context` により別の prop として扱われるため (e.g., `amed.File:name`, `ginfork.File:name`)、同一の `@id` が存在しても、それぞれ別の metadata が保持される。
+The entities are represented as separate nodes in JSON-LD, and they have separate metadata due to different contexts.
 
-#### Entity 単位での型検査と property の検証
+#### Type Checking and Property Validation at the Entity Level
 
-本ライブラリでは、JSON-LD 生成時に (`ROCrate.dump`)、Entity が持つ各 prop の型検査が行われる。
-この処理は、別途 `entity.check_props()` として、Entity 単位で行うことも可能である。
+In this library, type checking of each property is performed during JSON-LD generation (`ROCrate.dump`). This process can also be performed at the entity level using `entity.check_props()`.
 
 ### Usage: 3. Validation
 
-Validation として、`ROCrate.validate()` が用意されている。
+Validation is performed using `ROCrate.validate()`.
 
 ```python
 import json
@@ -211,36 +204,39 @@ crate = ROCrate(jsonld=jsonld)
 crate.validate()
 ```
 
-仕様として、:
+- This process calls the `entity.validate()` method for each entity to perform the validation.
+  - Validation rules are defined in each schema file (YAML file) as natural language descriptions and implemented in `entity.validate()`.
+- The validation process collects the results of each entity and displays them collectively.
 
-- この処理は、各 Entity の `entity.validate()` 処理を呼び出すことにより、行われる
-  - Validation rule は、自然言語では各 schema file (YAML file) にて、実際の処理としては `entity.validate()` にて、定義されている
-- Validation 処理は、最終的に各 entity の結果を取りまとめた後、まとめて結果が表示される
+Type checking (`entity.check_props()`) during packaging and validation (`entity.validate()`) are fundamentally different processes. The differences between these processes are as follows:
 
-Packaging における型検査 (`entity.check_props()`) と、Validation における検証 (`entity.validate()`) は、基本的に異なる処理である。それぞれの処理の違いとして、:
-
-- `entity.check_props()`:
-  - 各 prop の型検査を行う
-    - 例: 型定義 str に対して int が設定されているなど、型の不一致を検出する
-  - required の prop が設定されているか、などの検査を行う
-- `entity.validate()`:
-  - より高度な検証を行う
-  - 各 prop の「値」が正しいかを検証する
-  - 複数の Entity 間の relation を用いてこれらの値の検証を行う
+- `entity.check_props()`
+  - Performs type checking for each property.
+    - Example: Detects type mismatches, such as assigning an int to a str type.
+  - Performs checks for required properties.
+- `entity.validate()`
+  - Performs more advanced validation.
+  - Validates the "values" of each property.
+  - Validates these values using relations between multiple entities.
 
 #### Using REST API Server
 
-REST API の仕様として、[open-api_spec.yml](./open-api_spec.yml) を参照。
+For the REST API specifications, please refer to [open-api_spec.yml](./open-api_spec.yml).
 
-また、API Server の起動・実行に関して、[api-quick-start.md](./api-quick-start.md) を参照。
+For a quick start, please refer to [api-quick-start.md](./api-quick-start.md).
 
-## JSON-LD Context を用いた schema の外部参照
+The environment variables for the behavior of the REST API Server are as follows:
 
-本ライブラリは、ライブラリに含まれる YAML schema (e.g., [`nii_dg/schema/base.yml`](./nii_dg/schema/base.yml))と Python module (e.g., [`nii_dg/schema/base.py`](./nii_dg/schema/base.yml)) を用いて、研究データのパッケージと検証が行われる。
-検証における入力は RO-Crate であるが、パッケージ時と検証時のライブラリバージョンが異なる場合、schema や検証ルールが異なる状態での検証が行われる可能性がある。
-この問題を解決するため、JSON-LD の `@context` property を用いて、schema (i.e., yaml schema and python module) の外部参照を行う。
+- `DG_HOST`: Host name of the REST API Server (default: `0.0.0.0`)
+- `DG_PORT`: Port number of the REST API Server (default: `5000`)
+- `DG_WSGI_SERVER`: WSGI server to use (`flask` or `waitress`) (default: `flask`)
+- `DG_WSGI_THREADS`: Number of threads to use for the WSGI server (default: `1`)
 
-例として、[`nii_dg/schema/base.yml`](./nii_dg/schema/base.yml) と [`nii_dg/schema/base.py`](./nii_dg/schema/base.yml) を用いると、生成される `File` entity は以下のようになる。
+## External Referencing of Schemas Using JSON-LD Context
+
+This library uses YAML schemas (e.g., [`nii_dg/schema/base.yml`](./nii_dg/schema/base.yml)) and Python modules (e.g., [`nii_dg/schema/base.py`](./nii_dg/schema/base.yml)) included in the library for research data packaging and validation. While the input for validation is the RO-Crate, there is a possibility of validating with different versions of the library where schemas and validation rules might differ. To resolve this issue, external referencing of schemas is performed using the JSON-LD `@context` property.
+
+For example, using [`nii_dg/schema/base.yml`](./nii_dg/schema/base.yml) and [`nii_dg/schema/base.py`](./nii_dg/schema/base.yml), the generated `File` entity will be as follows:
 
 ```json
 {
@@ -252,8 +248,7 @@ REST API の仕様として、[open-api_spec.yml](./open-api_spec.yml) を参照
 },
 ```
 
-ここで、`@context` property により、`https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/base.jsonld` にて、`File` entity の schema が定義されていることを示している。
-更に、参照先の JSON-LD Context においては、下記のように定義されている。
+Here, the `@context` property indicates that the schema for the `File` entity is defined in [`https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/base.jsonld`](https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/base.jsonld).
 
 ```json
 "File": {
@@ -267,28 +262,29 @@ REST API の仕様として、[open-api_spec.yml](./open-api_spec.yml) を参照
     "url": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/nii_dg/schema/base.yml#File:url",
     "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/nii_dg/schema/base.yml#File:sdDatePublished"
   }
-},
+}
 ```
 
-これにより、`File` entity 自体、及びその各 property について、schema の外部参照が行われることになる。
+This allows for external referencing of the schema and its properties for the `File` entity.
 
 ![System architecture extended](https://user-images.githubusercontent.com/26019402/228390256-5dcc5c81-3ba9-4be6-b0ab-1f6622c1fd2d.png)
 
-実際の検証時には、RO-Crate 内の各 entity に記述されている `@context` を辿り、パッケージ時の Yaml schema と Python module を参照する。
-ライブラリ内で、それらの file を読み込み、entity の instance を生成する。
-その後、生成された entity の instance に含まれる schema や検証ルールを用いて、検証が行われる。
+During the actual validation process, the `@context` specified in each entity within the RO-Crate is followed to reference the YAML schema and Python module used during packaging. The library loads these files and generates entity instances. Then, using the schema and validation rules provided by the generated entity instances, the validation process is performed.
+
+Due to security issues, these external references are off by default. By setting the following two environment variables to True, external references can be enabled.
+
+- `DG_USE_EXTERNAL_CTX`: Enables external referencing of schemas and validation rules (default: `False`)
+- `DG_ALLOW_OTHER_GH_REPO`: Enables external referencing of schemas and validation rules from other GitHub repositories (default: `False`)
 
 ---
 
-JSON-LD Context の生成については、[`./schema/REAMED.md`](./schema/REAMED.md) を参照。
+For more information on JSON-LD Context generation, see [`./schema/REAMED.md`](./schema/REAMED.md).
 
-また、JSON-LD の公開性がこの実装においては、重要な要素である。
-そのため、本ライブラリでは、GitHub Actions により、JSON-LD Context の生成と公開を行っている。
-GitHub Actions として、[`./.github/workflows/release.yml`](./.github/workflows/release.yml) が用意されている。
+The visibility of JSON-LD is an important element in this implementation. Therefore, this library uses GitHub Actions to generate and publish JSON-LD Context. The GitHub Actions for this purpose are defined in [`./.github/workflows/release.yml`](./.github/workflows/release.yml).
 
 ## Development
 
-開発環境として Docker を利用する。
+For development, use Docker and Docker Compose.
 
 ```bash
 $ docker compose -f compose.dev.yml up -d --build
@@ -298,80 +294,30 @@ $ docker compose -f compose.dev.yml exec app bash
 $ something you want to do
 ```
 
-### Linter
-
-Linter として、`flake8`, `isort`, `mypy` をそれぞれ用いている。
-
-```bash
-$ bash ./tests/lint_and_style_check/flake8.sh
-$ bash ./tests/lint_and_style_check/isort.sh
-$ bash ./tests/lint_and_style_check/mypy.sh
-
-$ bash ./tests/lint_and_style_check/run_all.sh
-```
-
-また、それぞれの GitHub actions として、以下のように設定されている。
-
-- [flake8](./.github/workflows/flake8.yml)
-- [isort](./.github/workflows/isort.yml)
-- [mypy](./.github/workflows/mypy.yml)
-
 ### Testing
 
-`pytest` を用いた Unit Test が用意されている。
-
-```bash
-$ pytest -s ./tests/unit_test
-```
-
-また、GitHub actions として、以下のように設定されている。
-
-- [pytest](./.github/workflows/pytest.yml)
-
----
-
-for coverage:
-
-```bash
-$ coverage run --source=nii_dg -m pytest ./tests
-$ coverage html
-$ python3 -m http.server --directory ./htmlcov 8080
-```
-
-### Documentation
-
-`sphinx` を用いて、ドキュメントを生成する。
-
-```bash
-# 初期設定
-$ sudo apt install python3-sphinx
-$ sphinx-apidoc -F -H nii-dg -A NII -V 1.0.0 -o docs nii_dg
-
-# ドキュメントの生成
-$ sphinx-build ./docs ./docs/_build
-
-# ドキュメントの確認
-$ npx http-server ./docs/_build -a 0.0.0.0 -p 3000
-```
+Please refer to [./tests](./tests).
 
 ## Branch and Release
 
-Branch 管理として、
+The branch management and release process are as follows:
 
-- `main`: Release の最新
-  - main への直接の push は禁止とする
-- `develop`: 開発用 branch
-- `<other>`: それぞれの機能・修正用の branch
-  - 基本的に、`develop` から `<other>` を切って開発を行い、`develop` にマージする
+- `main`: Latest Release
+  - Direct push to `main` is prohibited
+- `develop`: Development branch
+- `<other>`: Branch for each feature or fix
+  - Basically, development is done by branching from `develop` to `<other>` and merging to `develop`
 
-Release 作業として、`develop` から `main` への PR を作成し、マージする。
-それぞれの Release は、`YYMMDD-<short_commit_hash>` という形式で tag が付与される。[TODO `setup.py` の version をどうするか]
+Before creating a pull request for a new release, use the `rewrite_version.sh` script to update the version hardcoded in the library.
 
-Release 用の GitHub actions として、以下のように設定されている。
+```bash
+$ bash ./rewrite_version.sh <version>
+```
 
-- [release](./.github/workflows/release.yml)
+Then create a pull request from `develop` to `main` and merge it.
+
+Each release is tagged according to semantic versioning, such as `1.0.0`. And the version information is obtained in the release process by `./nii_dg/module_info.py`. Release and deployment are performed by [.github/workflows/release.yml](./.github/workflows/release.yml).
 
 ## License
 
-[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
-See the [LICENSE](https://github.com/sapporo-wes/yevis-cli/blob/main/LICENSE).
+[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0). See [LICENSE](https://github.com/sapporo-wes/yevis-cli/blob/main/LICENSE) for more information.

@@ -151,3 +151,4 @@ jobs:
           gh release --repo ${{ github.repository }} create ${{ env.VERSION }} --title ${{ env.VERSION }} --generate-notes nii_dg-${{ env.VERSION }}.tar.gz nii_dg-${{ env.VERSION }}-py3-none-any.whl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
