@@ -1,167 +1,167 @@
 DMPMetadata:
-  description: Metadata of research project that is the subject of this data management plan.
+  description: Metadata pertaining to the research project that this data management plan concerns.
   props:
     "@id":
       expected_type: str
       example: "#AMED-DMP"
       required: Required.
-      description: MUST be the name with prefix `#`.
+      description: MUST be a string prefixed with '#'.
     about:
       expected_type: RootDataEntity
       example: '{"@id": "./"}'
       required: Required.
-      description: 'MUST be `{"@id": "./"}`. Indicates this DMP is about research project that the data stated in RootDataEntity are generated.'
+      description: 'MUST be `{"@id": "./"}`. This represents the research project producing the data encapsulated in the RootDataEntity.'
     name:
       expected_type: str
       example: AMED-DMP
       required: Required.
-      description: MUST be `AMED-DMP`. Indicates the DMP format used by your project.
+      description: MUST be `AMED-DMP`. This signifies the DMP format employed by your project.
     funder:
       expected_type: Organization
       example: '{"@id": "https://ror.org/01b9y6c26"}'
       required: Required.
-      description: Funding agency of the research project (AMED in most cases). MUST be @id dictionary of Organization entity.
+      description: The funding entity for the research project, typically AMED. MUST be the @id dictionary of an Organization entity.
     funding:
       expected_type: str
       example: Acceleration Transformative Research for Medical Innovation
       required: Required.
-      description: Indicates the name of funding program.
+      description: Denotes the name of the funding program.
     chiefResearcher:
       expected_type: Person
       example: '{"@id": "https://orcid.org/0000-0001-2345-6789"}'
       required: Required.
-      description: MUST be @id dictionary of Person entity. Indicates chief researcher or representative of the research project.
+      description: MUST be the @id dictionary of a Person entity. Indicates the principal researcher or project representative.
     creator:
       expected_type: List[Person]
       example: '[{"@id": "https://orcid.org/0000-0001-2345-6789"}]'
-      required: Required when hasPart property has DMP entities.
-      description: MUST be an array of @id dictionary of Person entity. Indicates all data creators involved in this research project.
+      required: Required when the hasPart property contains DMP entities.
+      description: MUST be an array of @id dictionaries of Person entities. Identifies all data creators participating in this research project.
     hostingInstitution:
       expected_type: HostingInstitution
       example: '{ "@id": "https://ror.org/04ksd4g47" }'
-      required: Required when hasPart property has DMP entities.
-      description: Indicates hosting institution of the data set.
+      required: Required when the hasPart property contains DMP entities.
+      description: Specifies the institution hosting the data set.
     dataManager:
       expected_type: Person
       example: '{ "@id": "https://orcid.org/0000-0001-2345-6789" }'
-      required: Required when hasPart property has DMP entities.
-      description: Indicates data manager of data set.
+      required: Required when the hasPart property contains DMP entities.
+      description: Denotes the data set's manager.
     repository:
       expected_type: RepositoryObject
       example: '{ "@id": "https://doi.org/xxxxxxxx" }'
-      required: Can be added when all data set is managed in a single repository.
-      description: MUST be @id dictionary of RepositoryObject entity. Indicates repository where the data is managed.
+      required: Can be added when the entire data set is managed in a single repository.
+      description: MUST be the @id dictionary of a RepositoryObject entity. Indicates the repository where the data is managed.
     distribution:
       expected_type: DataDownload
       example: '{"@id": "https://zenodo.org/record/example"}'
-      required: Can be added when accessRights in tied DMP entity has `Unrestricted Open Sharing` and all Unrestricted-Open-Sharing data set is available from a single URL.
-      description: MUST be @id dictionary of DataDownload entity. Indicates where the download URL of the data set.
+      required: Can be added when the accessRights in the associated DMP entity is set to `Unrestricted Open Sharing` and all Unrestricted-Open-Sharing data set is accessible from a single URL.
+      description: MUST be the @id dictionary of a DataDownload entity. Specifies the data set's download URL.
     hasPart:
       expected_type: List[DMP]
       example: '[{ "@id": "#dmp:1" }, { "@id": "#dmp:2" }]'
       required: Required.
-      description: MUST be an array of DMP entity, which is included in this DMP. If no data is created yet, MUST be empty list.
+      description: MUST be an array of DMP entities included in this DMP. If no DMP is included, it MUST be an empty array.
 DMP:
-  description: Data management plan for each data collection, e.g. creators of the data collection, access rights, and how to cite the data collection.
+  description: A data management plan (DMP) detailing individual data collections, inclusive of information on data collection creators, access rights, and data citation guidelines.
   props:
     "@id":
       expected_type: str
       example: "#dmp:1"
       required: Required.
-      description: MUST be data number with the prefix `#dmp:`. Indicates data number in the DMP list.
+      description: MUST be a data identifier prefixed by `#dmp:`. Denotes the data number within the DMP list.
     dataNumber:
       expected_type: int
       example: 1
       required: Required.
-      description: Indicates data number of DMP. MUST be the same as the number included in the value of @id property.
+      description: Represents the DMP data number. MUST coincide with the number included in the value of the @id property.
     name:
       expected_type: str
-      example: calculated data
+      example: Calculated Data
       required: Required.
-      description: Indicates data title in DMP.
+      description: Specifies the title of the data in the DMP.
     description:
       expected_type: str
-      example: Result data calculated by Newton's method
+      example: Data derived through Newton's method
       required: Required.
-      description: Indicates data description in DMP.
+      description: Provides a detailed description of the data in the DMP.
     keyword:
       expected_type: str
-      example: biological origin data
+      example: Biological Origin Data
       required: Required.
-      description: Indicates category of the data set.
+      description: Indicates the specific category of the data set.
     accessRights:
       expected_type: Literal["Unshared", "Restricted Closed Sharing", "Restricted Open Sharing", "Unrestricted Open Sharing"]
       example: Unrestricted Open Sharing
       required: Required.
-      description: MUST choose one from `Unshared`, `Restricted Closed Sharing`, `Restricted Open Sharing` and `Unrestricted Open Sharing`. Indicates the availability of the data set.
+      description: MUST select one from `Unshared`, `Restricted Closed Sharing`, `Restricted Open Sharing`, or `Unrestricted Open Sharing`. This signifies the data set's availability.
     availabilityStarts:
       expected_type: str
       example: "2030-04-01"
-      required: Required when accessRights has `Unshared` or `Restricted Closed Sharing`. If the dataset will not be open sharing because it contains personal information or for some other reason, this value is not required, but instead the reason of unshared or closed sharing MUST be described in the following property, reasonForConcealment.
-      description: MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification. Indicates when the data will be open sharing status.
+      required: Required when accessRights is either `Unshared` or `Restricted Closed Sharing`. If the dataset cannot be openly shared due to the presence of personal information or other similar reasons, this value isn't needed. However, the reason for the unshared or closed sharing status MUST be detailed in the following property, reasonForConcealment.
+      description: MUST be a string in ISO 8601 date format. DG-Core will confirm that the value is set to a future date at the time of verification. Specifies when the data will transition to an open sharing status.
     reasonForConcealment:
       expected_type: str
-      example: Because the dataset contains personal information.
-      required: Required when accessRights has `Unshared` or `Restricted Closed Sharing` and availabilityStarts property is not included in this entity.
-      description: Reason of keep unshared or closed sharing status.
+      example: The dataset includes personal information.
+      required: Required when accessRights is either `Unshared` or `Restricted Closed Sharing` and the availabilityStarts property isn't included in this entity.
+      description: Explains the reason for maintaining an unshared or closed sharing status.
     repository:
       expected_type: RepositoryObject
       example: '{ "@id": "https://doi.org/xxxxxxxx" }'
-      required: Required. When all data set is managed in a single repository, it can be omitted instead of adding to DMPMetadata entity.
-      description: Indicates repository where the data is managed.
+      required: Required. Can be omitted when the entire dataset is managed in a single repository, instead of being added to the DMPMetadata entity.
+      description: Identifies the repository where the data is managed.
     distribution:
       expected_type: DataDownload
       example: '{ "@id": "https://zenodo.org/record/example" }'
-      required: Required when accessRights has `Unrestricted Open Sharing`. When all Unrestricted-Open-Sharing data set is available from a single URL, it can be omitted instead of adding to DMPMetadata entity.
-      description: MUST be @id dictionary of the DataDownload entity. Indicates where the download URL of the data set.
+      required: Required when accessRights is `Unrestricted Open Sharing`. Can be omitted when all unrestricted open-sharing data sets are available from a single URL, instead of being added to the DMPMetadata entity.
+      description: MUST be an @id dictionary of the DataDownload entity. Specifies the data set's download URL.
     contentSize:
       expected_type: Literal["1GB", "10GB", "100GB", "over100GB"]
       example: 100GB
       required: Optional.
-      description: MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition.
+      description: MUST select one from `1GB`, `10GB`, `100GB`, and `over100GB`. Denotes the maximum cumulative file size encompassed in this DMP.
     gotInformedConsent:
       expected_type: Literal["yes", "no", "unknown"]
       example: "yes"
       required: Required.
-      description: MUST choose one from `yes`, `no` or `unknown`. Indicates whether you got informed consent from subjects.
+      description: MUST select one from `yes`, `no`, or `unknown`. Specifies whether informed consent was obtained from the subjects.
     informedConsentFormat:
       expected_type: Literal["AMED", "other"]
       example: AMED
-      required: Required when gotInformedConsent has `yes`.
-      description: MUST be either `AMED` or `others`. Indicates format of informed consent you used in this research to collect data. Whichever format you used, it must include the agreement for possibility that the data, including personal information, will be provided to third parties for purposes other than academic research.
+      required: Required when gotInformedConsent is `yes`.
+      description: MUST be either `AMED` or `other`. Denotes the format of the informed consent utilized in this research for data collection. Regardless of the format employed, it MUST include an agreement acknowledging the potential provision of data, including personal information, to third parties for purposes beyond academic research.
     identifier:
       expected_type: List[ClinicalResearchRegistration]
       example: '[{"@id": "https://jrct.niph.go.jp/latest-detail/jRCT202211111111"}]'
       required: Optional.
-      description: MUST be array of @id dictionary of ClinicalResearchRegistration entity. When you use clinical research registry service (e.g. jRCT, UMIN-CTR), it can be added @id dictionary of ClinicalResearchRegistration entity of them. Indicates identifier of data set.
+      description: MUST be an array of @id dictionary of the ClinicalResearchRegistration entity. When using a clinical research registry service (e.g., jRCT, UMIN-CTR), an @id dictionary of the ClinicalResearchRegistration entity from those services can be added. This represents the identifier of the data set.
 File:
-  description: A file included in the research project, e.g. text file, script file and images.
+  description: A file associated with the research project, such as a text file, script file, or images.
   props:
     "@id":
       expected_type: str
       example: config/setting.txt
       required: Required.
-      description: MUST be either a URI Path relative to the top directory of your repository (stated in DMP entity) or an absolute URI. When the file is from outside this research project, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication.
+      description: MUST be either a URI Path relative to the root directory of your repository (specified in DMP entity) or an absolute URI. If the file originates from outside this research project, the @id SHOULD facilitate direct download via a simple retrieval (e.g., HTTP GET), including redirections and HTTP/HTTPS authentication.
     name:
       expected_type: str
       example: setting.txt
       required: Required.
-      description: Indicates the file name.
+      description: Denotes the file name.
     dmpDataNumber:
       expected_type: DMP
       example: '{"@id": "#dmp:1"}'
       required: Required.
-      description: MUST be @id dictionary of the DMP entity. Indicates data number in DMP that includes this file.
+      description: MUST be an @id dictionary of the DMP entity. Denotes the data number in the DMP that includes this file.
     contentSize:
       expected_type: str
       example: 1560B
       required: Required.
-      description: MUST be an integer of the file size with the suffix `B` as a unit, bytes. If necessary, you can also use "KB", "MB", "GB", "TB" and "PB" as a unit. It will be used in the validation of the size listed in DMP.
+      description: MUST be an integer followed by the `B` suffix denoting bytes as the unit of file size. Other permissible units include "KB", "MB", "GB", "TB", and "PB". This property is utilized during validation of the size listed in the DMP.
     encodingFormat:
       expected_type: str
       example: text/plain
       required: Optional.
-      description: MUST be MIME type. Do not use "x-" prefix in MIME type. Indicates file format.
+      description: MUST be a MIME type. Avoid using the "x-" prefix in MIME types. Specifies the file format.
     sha256:
       expected_type: str
       example: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -176,22 +176,22 @@ File:
       expected_type: str
       example: "2022-12-01"
       required: Required when the file is from outside this research project.
-      description: Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
+      description: Denotes the date the file was obtained. MUST be a string in ISO 8601 date format.
 ClinicalResearchRegistration:
-  description: Identifier information that is registered to clinical research Registration service.
+  description: Identifier information registered with a clinical research registration service.
   props:
     "@id":
       expected_type: str
       example: https://jrct.niph.go.jp/latest-detail/jRCT202211111111
       required: Required.
-      description: MUST be URL where your registered information is available.
+      description: MUST be the URL where your registered information can be accessed.
     name:
       expected_type: str
       example: Japan Registry of Clinical Trials
       required: Required.
-      description: Name of the registry service.
+      description: Specifies the name of the registration service.
     value:
       expected_type: str
       example: "1234567"
       required: Required.
-      description: Indicates ID you got from the registry service.
+      description: Denotes the ID received from the registration service.

@@ -1,5 +1,5 @@
 GinMonitoring:
-  description: Monitoring function for the GIN-fork platform.
+  description: Monitoring functionality for the GIN-fork platform.
   props:
     "@id":
       description: MUST be `#ginmonitoring`.
@@ -7,55 +7,55 @@ GinMonitoring:
       required: Required.
       expected_type: str
     about:
-      description: 'MUST be `{"@id": "./"}`. Indicates this rule applies to the research project stated in RootDataEntity.'
+      description: 'MUST be `{"@id": "./"}`. This rule applies to the research project declared in RootDataEntity.'
       example: '{"@id": "./"}'
       required: Required.
       expected_type: RootDataEntity
     contentSize:
-      description: MUST choose one from `1GB`, `10GB`, `100GB`, `1TB` and `1PB`. Indicates maximum of sum total file size included in the experiment package.
+      description: MUST select one from `1GB`, `10GB`, `100GB`, `1TB` or `1PB`. Specifies the maximum total file size included in the experiment package.'
       example: 100GB
       required: Required.
       expected_type: Literal["1GB", "10GB", "100GB", "1TB", "1PB"]
     workflowIdentifier:
-      description: MUST choose one from `basic`, `bio` and `neuro`. Indicates a kind of workflow used in the research workflow.
+      description: MUST select one from `basic`, `bio`, or `neuro`. Determines the type of workflow employed in the research workflow.
       example: bio
       required: Required.
       expected_type: Literal["basic", "bio", "neuro"]
     datasetStructure:
-      description: MUST choose either `with_code` or `for_parameters`. Indicates a kind of dataset structure used in the research workflow.
+      description: MUST select either `with_code` or `for_parameters`. Defines the type of dataset structure used in the research workflow.
       example: with_code
       required: Required.
       expected_type: Literal["with_code", "for_parameters"]
     experimentPackageList:
-      description: MUST be an array of directory path of experimental package.
+      description: MUST be an array representing the directory paths of experimental packages.
       example: '["experiments/exp1/", "experiments/exp2/"]'
       required: Required.
       expected_type: List[str]
     parameterExperimentList:
-      description: MUST be an array of directory path of the parameter folder under the experimental package. The path MUST be one of the child directories in the experimentPackageList.
+      description: MUST be an array of directory paths pointing to the parameter folders within the experimental package. The path MUST be a subdirectory of one of the directories in the experimentPackageList.
       example: '["experiments/exp1/ex_param1/", "experiments/exp1/ex_param2/", "experiments/exp2/paramX/"]'
       required: Required when datasetStructure is "for_parameters".
       expected_type: List[str]
 File:
-  description: A file monitored in the GIN-fork platform.
+  description: A file under monitoring in the GIN-fork platform.
   props:
     "@id":
-      description: MUST be either a URI Path relative to the RO-Crate root or an absolute URI. When the file is from outside this research project, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+      description: MUST be either a URI Path relative to the RO-Crate root or an absolute URI. If the file originates outside of this research project, @id SHOULD be directly retrievable (e.g., HTTP GET), allowing for redirections and HTTP/HTTPS authentication. The RO-Crate metadata file (ro-crate-metadata.json) is excluded.
       example: config/setting.txt
       required: Required.
       expected_type: str
     name:
-      description: Indicates the file name.
+      description: Denotes the name of the file.
       example: setting.txt
       required: Required.
       expected_type: str
     contentSize:
-      description: MUST be an integer of the file size with the suffix `B` as a unit, bytes. If necessary, you can also use "KB", "MB", "GB", "TB" and "PB" as a unit. It will be used in the validation of the size stated in GinMonitoring entity.
+      description: MUST be a numerical value followed by the suffix `B` denoting bytes. If needed, "KB", "MB", "GB", "TB", and "PB" can also be used. This will be utilized to validate the file size if a contentSize property is present in the GinMonitoring entity.
       example: 1560B
       required: Required.
       expected_type: str
     encodingFormat:
-      description: MUST be MIME type. Do not use "x-" prefix in MIME type. Indicates file format.
+      description: MUST be a MIME type, without the "x-" prefix, indicating the file format.
       example: text/plain
       required: Optional.
       expected_type: str
@@ -70,12 +70,12 @@ File:
       required: Optional.
       expected_type: str
     sdDatePublished:
-      description: Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
+      description: Specifies the date the file was acquired. MUST be a string following the ISO 8601 date format.
       example: "2022-12-01"
-      required: Required when the file is from outside this research project.
+      required: Required when the file originates outside this research project.
       expected_type: str
     experimentPackageFlag:
-      description: Indicates whether the file is included in an experiment package.  MUST be a boolean.
+      description: Specifies if the file is included in an experiment package. MUST be a boolean.
       example: "True"
       required: Required.
       expected_type: bool
