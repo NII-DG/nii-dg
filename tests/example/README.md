@@ -1,4 +1,4 @@
-# Example for the nii-dg Library
+# Example for the NII-DG Library
 
 ## Example1: Packaging a Research Project as a RO-Crate
 
