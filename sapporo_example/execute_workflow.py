@@ -40,8 +40,7 @@ def execute_workflow(endpoint: str) -> None:
     request = Request(f"{endpoint.rstrip('/')}/runs", data=data, headers=headers)  # type: ignore
 
     with urlopen(request) as response:
-        result = json.load(response)
-        print(result)
+        print(response.read().decode("utf-8"), end="")
 
 
 def main() -> None:
