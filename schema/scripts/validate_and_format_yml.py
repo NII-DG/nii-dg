@@ -8,12 +8,15 @@ from typing import Any, Dict, List, TypedDict
 
 import yaml
 
-Prop = TypedDict("Prop", {
-    "description": str,
-    "example": str,
-    "required": str,
-    "expected_type": str,
-})
+Prop = TypedDict(
+    "Prop",
+    {
+        "description": str,
+        "example": str,
+        "required": str,
+        "expected_type": str,
+    },
+)
 prop_keys = set(Prop.__annotations__.keys())
 Entity = Dict[str, Prop]
 Schema = Dict[str, Entity]
@@ -40,10 +43,14 @@ def validate_and_format(schema_name: str, schema: Any) -> Schema:
         formatted_props = {}
         for prop_name, prop in props.items():
             if not isinstance(prop, dict):
-                raise ValidateError(f"Prop: {prop_name} in entity: {entity_name} must be a dict")
+                raise ValidateError(
+                    f"Prop: {prop_name} in entity: {entity_name} must be a dict"
+                )
             for prop_key in prop.keys():
                 if prop_key not in prop_keys:
-                    raise ValidateError(f"Invalid prop key: {prop_key} in prop: {prop_name} in entity: {entity_name}")
+                    raise ValidateError(
+                        f"Invalid prop key: {prop_key} in prop: {prop_name} in entity: {entity_name}"
+                    )
             formatted_prop = {}
             for expected_key in prop_keys:
                 prop_val = prop.get(expected_key, "")
@@ -63,7 +70,9 @@ def validate_and_format(schema_name: str, schema: Any) -> Schema:
 def main(args: List[str]) -> None:
     try:
         if len(args) != 3:
-            raise ValidateError("Usage: validate_and_format_yml.py <schema_file> <formatted_schema_file>")
+            raise ValidateError(
+                "Usage: validate_and_format_yml.py <schema_file> <formatted_schema_file>"
+            )
         schema_file = Path(args[1]).resolve()
         dst = Path(args[2]).resolve()
         if not schema_file.exists():

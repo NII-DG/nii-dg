@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-"""\
+"""
 This module provides utility functions for nii_dg.
 """
 
 import ast
 import importlib
+import importlib.util
 import os
 import re
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import (TYPE_CHECKING, Any, Dict, List, Literal, NewType, Optional,
@@ -18,11 +20,15 @@ from urllib.request import urlopen
 
 import yaml
 
-from nii_dg.const import DOWNLOADED_SCHEMA_DIR_NAME, RO_CRATE_CONTEXT
+from nii_dg.const import RO_CRATE_CONTEXT
 from nii_dg.module_info import GH_REF, GH_REPO
 
 if TYPE_CHECKING:
     from nii_dg.entity import Entity
+
+
+HERE = Path(__file__).parent.resolve()
+
 
 NOW = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
@@ -62,8 +68,10 @@ def load_config() -> Dict[str, Any]:
 DG_CONFIG = load_config()
 
 
-def generate_ctx(gh_repo: str = GH_REPO, gh_ref: str = GH_REF, schema_name: str = "ro-crate") -> str:
-    """\
+def generate_ctx(
+    gh_repo: str = GH_REPO, gh_ref: str = GH_REF, schema_name: str = "ro-crate"
+) -> str:
+    """
         Generate a context string for a given schema name.
 
     Args:
@@ -87,7 +95,7 @@ def generate_ctx(gh_repo: str = GH_REPO, gh_ref: str = GH_REF, schema_name: str 
 
 
 def parse_ctx(ctx: str) -> Tuple[str, str, str]:
-    """\
+    """
     Parse the given context string and return a tuple of (gh_repo, gh_ref, schema_name).
 
     Args:
@@ -111,23 +119,25 @@ def parse_ctx(ctx: str) -> Tuple[str, str, str]:
         schema_name = match.group("schema")
         return (gh_repo, gh_ref, schema_name)
 
-    raise ValueError("Context does not match the expected format, e.g., https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/base.jsonld")
+    raise ValueError(
+        "Context does not match the expected format, e.g., https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.0/schema/context/base.jsonld"
+    )
 
 
 # === Definition for schema file ===
 
-PropDef = TypedDict("PropDef", {
-    "expected_type": str,
-    "example": Optional[str],
-    "required": str,
-    "description": str
-})
+PropDef = TypedDict(
+    "PropDef",
+    {
+        "expected_type": str,
+        "example": Optional[str],
+        "required": str,
+        "description": str,
+    },
+)
 # {"prop_name": PropDef}
 PropsDef = NewType("PropsDef", Dict[str, PropDef])
-EntityDef = TypedDict("EntityDef", {
-    "description": str,
-    "props": PropsDef
-})
+EntityDef = TypedDict("EntityDef", {"description": str, "props": PropsDef})
 # {"entity_name": EntityDef}
 SchemaDef = NewType("SchemaDef", Dict[str, EntityDef])
 
@@ -135,7 +145,7 @@ SchemaDef = NewType("SchemaDef", Dict[str, EntityDef])
 
 
 def load_schema_file(schema_path: Path) -> SchemaDef:
-    """\
+    """
     Load a schema file and return a SchemaDef object.
 
     Args:
@@ -154,7 +164,7 @@ def load_schema_file(schema_path: Path) -> SchemaDef:
 
 
 def import_custom_class(module_name: str, class_name: str) -> Any:
-    """\
+    """
     Import a custom class from a module.
 
     Args:
@@ -171,8 +181,96 @@ def import_custom_class(module_name: str, class_name: str) -> Any:
         return None
 
 
+def download_schema(
+    gh_repo: str, gh_ref: str, schema_module_name: str
+) -> Tuple[Path, Path]:
+    """
+    Download a schema module from a GitHub repository.
+
+    Args:
+        gh_repo (str): The GitHub repository from which the schema module is to be downloaded.
+        gh_ref (str): The reference (branch, tag, or commit) of the GitHub repository.
+        schema_module_name (str): The name of the schema module to be downloaded.
+
+    Returns:
+        Tuple of paths to the downloaded Python and YAML files.
+
+    Note:
+        Downloaded schema modules are stored in a temporary directory.
+    """
+    schema_module_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.py"
+    schema_file_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.yml"
+
+    schema_dir = tempfile.mkdtemp(prefix="nii_dg_")
+
+    try:
+        schema_module_path = Path(schema_dir).joinpath(f"{schema_module_name}.py")
+        with urlopen(schema_module_url) as res:
+            schema_module = res.read().decode("utf-8")
+        with schema_module_path.open("w") as f:
+            f.write(schema_module)
+        schema_file_path = Path(schema_dir).joinpath(f"{schema_module_name}.yml")
+        with urlopen(schema_file_url) as res:
+            schema_file = res.read().decode("utf-8")
+        with schema_file_path.open("w") as f:
+            f.write(schema_file)
+    except HTTPError as e:
+        if e.code == 404:
+            raise ValueError(
+                f"Schema module '{schema_module_name}' does not exist in the given GitHub repository."
+            )
+        else:
+            raise e
+
+    return schema_module_path, schema_file_path
+
+
+# Cache for imported external modules
+_module_cache: Dict[str, Any] = {}
+
+
+def import_external_class(
+    gh_repo: str, gh_ref: str, schema_module_name: str, class_name: str
+) -> Any:
+    """
+    Import a class from an external module.
+
+    Args:
+        gh_repo (str): The GitHub repository from which the schema module is to be downloaded.
+        gh_ref (str): The reference (branch, tag, or commit) of the GitHub repository.
+        schema_module_name (str): The name of the schema module to be downloaded.
+        class_name (str): The name of the class to be imported.
+
+    Returns:
+        Any: The imported class if found, None otherwise.
+    """
+    module_key = f"{gh_repo}/{gh_ref}/{schema_module_name}"
+
+    try:
+        # Check if the module has already been imported
+        if module_key in _module_cache:
+            external_module = _module_cache[module_key]
+            return getattr(external_module, class_name)
+
+        # Download the schema module
+        schema_module_path, _ = download_schema(gh_repo, gh_ref, schema_module_name)
+
+        spec = importlib.util.spec_from_file_location(
+            "external_module", schema_module_path
+        )
+        external_module = importlib.util.module_from_spec(spec)  # type: ignore
+        spec.loader.exec_module(external_module)  # type: ignore
+
+        # Cache the imported module
+        _module_cache[module_key] = external_module
+
+        return getattr(external_module, class_name)
+    except (ModuleNotFoundError, AttributeError):
+        return None
+
+
 def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
-    """\
+    """
     Check if a given value is an instance of a given expected type.
 
     Args:
@@ -184,7 +282,7 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
     """
 
     def parse_type_string(type_str: str) -> Any:
-        """\
+        """
         Parse a type string and return the corresponding type object.
 
         Args:
@@ -213,7 +311,7 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
         return ast_to_type(type_node)
 
     def ast_to_type(node: ast.AST) -> Any:
-        """\
+        """
         Convert an AST node to a type object.
 
         Args:
@@ -235,10 +333,14 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
         elif isinstance(node, ast.Subscript):
             origin = ast_to_type(node.value)  # e.g., typing.List
             args = []
-            if isinstance(node.slice.value, ast.Tuple):  # type: ignore
-                args = [ast_to_type(arg) for arg in node.slice.value.elts]  # type: ignore
+            if isinstance(node.slice, ast.Index):  # use for python3.8
+                slice_value = node.slice.value  # type: ignore
+            else:  # use for python3.9 and later
+                slice_value = node.slice  # type: ignore
+            if isinstance(slice_value, ast.Tuple):
+                args = [ast_to_type(arg) for arg in slice_value.elts]
             else:
-                args.append(ast_to_type(node.slice.value))  # type: ignore
+                args.append(ast_to_type(slice_value))
 
             return origin[tuple(args) if len(args) > 1 else args[0]]
         elif isinstance(node, ast.Constant):
@@ -248,7 +350,7 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
             return Any
 
     def check_type(value: Any, expected_type: Any) -> bool:
-        """\
+        """
         Check if a given value is an instance of a given expected type.
 
         Args:
@@ -268,7 +370,10 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
             if not isinstance(value, dict):
                 return False
             key_type, value_type = args
-            return all(check_type(k, key_type) and check_type(v, value_type) for k, v in value.items())
+            return all(
+                check_type(k, key_type) and check_type(v, value_type)
+                for k, v in value.items()
+            )
         elif origin is list:
             if not isinstance(value, list):
                 return False
@@ -280,7 +385,10 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
             item_types = args
             if len(item_types) != len(value):
                 return False
-            return all(check_type(item, item_type) for item, item_type in zip(value, item_types))
+            return all(
+                check_type(item, item_type)
+                for item, item_type in zip(value, item_types)
+            )
         elif origin is Literal:
             return value in args
         elif expected_type is Any:
@@ -347,46 +455,8 @@ def is_version_newer(ver1: str, ver2: str) -> bool:
     return False
 
 
-def download_schema(gh_repo: str, gh_ref: str, schema_module_name: str) -> None:
-    """\
-    Download a schema module from a GitHub repository.
-
-    Args:
-        gh_repo (str): The GitHub repository from which the schema module is to be downloaded.
-        gh_ref (str): The reference (branch, tag, or commit) of the GitHub repository.
-        schema_module_name (str): The name of the schema module to be downloaded.
-
-    Note:
-        Downloaded schema modules are stored in the 'nii_dg/downloaded_schema' directory.
-    """
-    schema_module_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.py"
-    schema_file_url = f"https://raw.githubusercontent.com/{gh_repo}/{gh_ref}/nii_dg/schema/{schema_module_name}.yml"
-
-    schema_dir = Path(f"./{DOWNLOADED_SCHEMA_DIR_NAME}/{gh_repo}/{gh_ref}")
-    schema_dir.mkdir(parents=True, exist_ok=True)
-    try:
-        schema_module_path = schema_dir.joinpath(f"{schema_module_name}.py")
-        if not schema_module_path.exists():
-            with urlopen(schema_module_url) as res:
-                schema_module = res.read().decode("utf-8")
-            with schema_module_path.open("w") as f:
-                f.write(schema_module)
-        schema_file_path = schema_dir.joinpath(f"{schema_module_name}.yml")
-        if not schema_file_path.exists():
-            with urlopen(schema_file_url) as res:
-                schema_file = res.read().decode("utf-8")
-            with schema_file_path.open("w") as f:
-                f.write(schema_file)
-    except HTTPError as e:
-        if e.code == 404:
-            raise ValueError(f"Schema module '{schema_module_name}' does not exist in the given GitHub repository.")
-        else:
-            raise e
-
-
-# TODO: update
 def sum_file_size(size_unit: str, entities: List["Entity"]) -> float:
-    """\
+    """
     Sum the file sizes of the given entities and convert the result to the specified unit.
 
     Args:
@@ -399,10 +469,10 @@ def sum_file_size(size_unit: str, entities: List["Entity"]) -> float:
     unit_conversion_table = {
         "B": 1,
         "KB": 1024,
-        "MB": 1024 ** 2,
-        "GB": 1024 ** 3,
-        "TB": 1024 ** 4,
-        "PB": 1024 ** 5,
+        "MB": 1024**2,
+        "GB": 1024**3,
+        "TB": 1024**4,
+        "PB": 1024**5,
     }
     if size_unit not in unit_conversion_table:
         raise ValueError(f"Invalid size unit: {size_unit}")

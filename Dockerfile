@@ -10,7 +10,7 @@ FROM python:3.8.15-slim-buster
 LABEL org.opencontainers.image.authors="National Institute of Informatics, Japan"
 LABEL org.opencontainers.image.url="https://github.com/NII-DG/nii-dg"
 LABEL org.opencontainers.image.source="https://raw.githubusercontent.com/NII-DG/nii-dg/main/Dockerfile"
-LABEL org.opencontainers.image.version="0.1.2"
+LABEL org.opencontainers.image.version="1.0.0"
 LABEL org.opencontainers.image.licenses="Apache2.0"
 
 RUN apt update && \

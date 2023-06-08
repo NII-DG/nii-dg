@@ -21,9 +21,13 @@ SCHEMA_DEF = load_schema_file(SCHEMA_FILE_PATH)
 
 
 class DMPMetadata(ContextualEntity):
-    def __init__(self, id_: str = "#AMED-DMP", props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["DMPMetadata"]):
+    def __init__(
+        self,
+        id_: str = "#AMED-DMP",
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["DMPMetadata"],
+    ):
         default_props = {
             "name": "AMED-DMP",
         }
@@ -33,9 +37,12 @@ class DMPMetadata(ContextualEntity):
     def check_props(self) -> None:
         super().check_props()
 
-        error = check_entity_values(self, {
-            "sdDatePublished": is_iso8601,
-        })
+        error = check_entity_values(
+            self,
+            {
+                "sdDatePublished": is_iso8601,
+            },
+        )
         if self.id != "#AMED-DMP":
             error.add("@id", "The id MUST be '#AMED-DMP'.")
         if self["name"] != "AMED-DMP":
@@ -50,33 +57,55 @@ class DMPMetadata(ContextualEntity):
         error = EntityError(self)
 
         if self["about"] != crate.root and self["about"] != {"@id": "./"}:
-            error.add("about", "The value of the about property MUST be the RootDataEntity of this crate.")
+            error.add(
+                "about",
+                "The value of the about property MUST be the RootDataEntity of this crate.",
+            )
         if len(self["hasPart"]) > 0:
             if "creator" not in self:
-                error.add("creator", "The creator property is required when the hasPart property is not empty.")
+                error.add(
+                    "creator",
+                    "The creator property is required when the hasPart property is not empty.",
+                )
             if "hostingInstitution" not in self:
-                error.add("hostingInstitution", "The hostingInstitution property is required when the hasPart property is not empty.")
+                error.add(
+                    "hostingInstitution",
+                    "The hostingInstitution property is required when the hasPart property is not empty.",
+                )
             if "dataManager" not in self:
-                error.add("dataManager", "The dataManager property is required when the hasPart property is not empty.")
+                error.add(
+                    "dataManager",
+                    "The dataManager property is required when the hasPart property is not empty.",
+                )
         if len(self["hasPart"]) > len(crate.get_by_type(DMP)):
-            error.add("hasPart", "The number of the hasPart property MUST be equal to the number of DMP entities.")
+            error.add(
+                "hasPart",
+                "The number of the hasPart property MUST be equal to the number of DMP entities.",
+            )
 
         if error.has_error():
             raise error
 
 
 class DMP(ContextualEntity):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["DMP"]):
+    def __init__(
+        self,
+        id_: str,
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["DMP"],
+    ):
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
 
-        error = check_entity_values(self, {
-            "availabilityStarts": is_iso8601,
-        })
+        error = check_entity_values(
+            self,
+            {
+                "availabilityStarts": is_iso8601,
+            },
+        )
         if "dataNumber" in self:
             if self.id != f"#dmp:{self['dataNumber']}":
                 error.add("@id", "The id MUST be '#dmp:<dataNumber>'.")
@@ -91,25 +120,49 @@ class DMP(ContextualEntity):
 
         dmp_metadata_ents = crate.get_by_type(DMPMetadata)
         if len(dmp_metadata_ents) == 0:
-            error.add("AnotherEntity", "Entity `DMPMetadata` MUST be required with DMP entity.")
+            error.add(
+                "AnotherEntity",
+                "Entity `DMPMetadata` MUST be required with DMP entity.",
+            )
         else:
             dmp_metadata_ent = dmp_metadata_ents[0]
             if "repository" not in [*self.keys(), *dmp_metadata_ent.keys()]:
                 error.add("repository", "This property is required, but not found.")
 
-            if self["accessRights"] == "Unrestricted Open Sharing" and "distribution" not in [*self.keys(), *dmp_metadata_ent.keys()]:
+            if self[
+                "accessRights"
+            ] == "Unrestricted Open Sharing" and "distribution" not in [
+                *self.keys(),
+                *dmp_metadata_ent.keys(),
+            ]:
                 error.add("distribution", "This property is required, but not found.")
 
-        if self["accessRights"] in ["Unshared", "Restricted Closed Sharing"] and\
-                not any(map(self.keys().__contains__, ("availabilityStarts", "reasonForConcealment"))):
-            error.add("availabilityStarts",
-                      "This property is required, but not found. If the dataset remains unshared, add reasonForConcealment property instead.")
+        if self["accessRights"] in [
+            "Unshared",
+            "Restricted Closed Sharing",
+        ] and not any(
+            map(
+                self.keys().__contains__, ("availabilityStarts", "reasonForConcealment")
+            )
+        ):
+            error.add(
+                "availabilityStarts",
+                "This property is required, but not found. If the dataset remains unshared, add reasonForConcealment property instead.",
+            )
 
-        if "availabilityStarts" in self and self["accessRights"] in ["Restricted Open Sharing", "Unrestricted Open Sharing"]:
-            error.add("availabilityStarts", "This property is not required because the data is accessible at this time.")
+        if "availabilityStarts" in self and self["accessRights"] in [
+            "Restricted Open Sharing",
+            "Unrestricted Open Sharing",
+        ]:
+            error.add(
+                "availabilityStarts",
+                "This property is not required because the data is accessible at this time.",
+            )
 
         if self["gotInformedConsent"] == "yes" and "informedConsentFormat" not in self:
-            error.add("informedConsentFormat", "This property is required, but not found.")
+            error.add(
+                "informedConsentFormat", "This property is required, but not found."
+            )
 
         if "contentSize" in self:
             target_files = []
@@ -119,20 +172,32 @@ class DMP(ContextualEntity):
 
             sum_size = sum_file_size(self["contentSize"][-2:], target_files)
 
-            if self["contentSize"] != "over100GB" and sum_size > int(self["contentSize"][:-2]):
-                error.add("contentSize", "The total file size included in this DMP is larger than the defined size.")
+            if self["contentSize"] != "over100GB" and sum_size > int(
+                self["contentSize"][:-2]
+            ):
+                error.add(
+                    "contentSize",
+                    "The total file size included in this DMP is larger than the defined size.",
+                )
 
             if self["contentSize"] == "over100GB" and sum_size < 100:
-                error.add("contentSize", "The total file size included in this DMP is smaller than 100GB.")
+                error.add(
+                    "contentSize",
+                    "The total file size included in this DMP is smaller than 100GB.",
+                )
 
         if error.has_error():
             raise error
 
 
 class File(BaseFile):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["File"]):
+    def __init__(
+        self,
+        id_: str,
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["File"],
+    ):
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
@@ -153,24 +218,33 @@ class File(BaseFile):
 
         if is_url(self.id):
             if "sdDatePublished" not in self:
-                error.add("sdDatePublished", "This property is required, but not found.")
+                error.add(
+                    "sdDatePublished", "This property is required, but not found."
+                )
 
         if error.has_error():
             raise error
 
 
 class ClinicalResearchRegistration(ContextualEntity):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["ClinicalResearchRegistration"]):
+    def __init__(
+        self,
+        id_: str,
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["ClinicalResearchRegistration"],
+    ):
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
 
-        error = check_entity_values(self, {
-            "@id": is_url,
-        })
+        error = check_entity_values(
+            self,
+            {
+                "@id": is_url,
+            },
+        )
 
         if error.has_error():
             raise error

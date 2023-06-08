@@ -24,21 +24,28 @@ SCHEMA_DEF = load_schema_file(SCHEMA_FILE_PATH)
 
 
 class File(DataEntity):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["File"]):
+    def __init__(
+        self,
+        id_: str,
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["File"],
+    ):
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
 
-        error = check_entity_values(self, {
-            "contentSize": is_content_size,
-            "encodingFormat": is_encoding_format,
-            "sha256": is_sha256,
-            "url": is_url,
-            "sdDatePublished": is_iso8601,
-        })
+        error = check_entity_values(
+            self,
+            {
+                "contentSize": is_content_size,
+                "encodingFormat": is_encoding_format,
+                "sha256": is_sha256,
+                "url": is_url,
+                "sdDatePublished": is_iso8601,
+            },
+        )
         if is_absolute_path(self.id):
             error.add("@id", "The id MUST be a URL or a relative path.")
 
@@ -52,24 +59,34 @@ class File(DataEntity):
 
         if is_url(self.id):
             if "sdDataPublished" not in self:
-                error.add("sdDataPublished", "The property `sdDataPublished` is required when the id is a URL.")
+                error.add(
+                    "sdDataPublished",
+                    "The property `sdDataPublished` is required when the id is a URL.",
+                )
 
         if error.has_error():
             raise error
 
 
 class Dataset(DataEntity):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["Dataset"]):
+    def __init__(
+        self,
+        id_: str,
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["Dataset"],
+    ):
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
 
-        error = check_entity_values(self, {
-            "url": is_url,
-        })
+        error = check_entity_values(
+            self,
+            {
+                "url": is_url,
+            },
+        )
         if not self.id.endswith("/"):
             error.add("@id", "The id MUST end with `/`.")
         if not is_relative_path(self.id):
@@ -80,25 +97,32 @@ class Dataset(DataEntity):
 
 
 class Organization(ContextualEntity):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["Organization"]):
+    def __init__(
+        self,
+        id_: str,
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["Organization"],
+    ):
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
 
-        error = check_entity_values(self, {
-            "@id": is_url,
-            "url": is_url,
-        })
+        error = check_entity_values(
+            self,
+            {
+                "@id": is_url,
+                "url": is_url,
+            },
+        )
 
         if error.has_error():
             raise error
 
     @classmethod
     def fetch_organization_names_from_ror_api(cls, ror_id: str) -> List[str]:
-        """\
+        """
         Fetch organization names from ROR API.
 
         Raises:
@@ -120,7 +144,9 @@ class Organization(ContextualEntity):
             ror_id = self.id.replace("https://ror.org/", "")
             name_list = self.fetch_organization_names_from_ror_api(ror_id)
             if self["name"] not in name_list:
-                error.add("name", f"The name MUST be one of {name_list} registered in ROR.")
+                error.add(
+                    "name", f"The name MUST be one of {name_list} registered in ROR."
+                )
         else:
             if not is_url_accessible(self.id):
                 error.add("@id", "Failed to access the URL.")
@@ -130,19 +156,26 @@ class Organization(ContextualEntity):
 
 
 class Person(ContextualEntity):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["Person"]):
+    def __init__(
+        self,
+        id_: str,
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["Person"],
+    ):
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
 
-        error = check_entity_values(self, {
-            "@id": is_url,
-            "email": is_email,
-            "telephone": is_phone_number,
-        })
+        error = check_entity_values(
+            self,
+            {
+                "@id": is_url,
+                "email": is_email,
+                "telephone": is_phone_number,
+            },
+        )
         if str(self.id).startswith("https://orcid.org/"):
             if is_orcid(str(self.id).replace("https://orcid.org/", "")):
                 error.add("@id", "The id MUST be a valid ORCID.")
@@ -163,17 +196,24 @@ class Person(ContextualEntity):
 
 
 class License(ContextualEntity):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["License"]):
+    def __init__(
+        self,
+        id_: str,
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["License"],
+    ):
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
 
-        error = check_entity_values(self, {
-            "@id": is_url,
-        })
+        error = check_entity_values(
+            self,
+            {
+                "@id": is_url,
+            },
+        )
 
         if error.has_error():
             raise error
@@ -191,36 +231,50 @@ class License(ContextualEntity):
 
 
 class RepositoryObject(ContextualEntity):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["RepositoryObject"]):
+    def __init__(
+        self,
+        id_: str,
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["RepositoryObject"],
+    ):
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
 
-        error = check_entity_values(self, {
-            "@id": is_url,
-        })
+        error = check_entity_values(
+            self,
+            {
+                "@id": is_url,
+            },
+        )
 
         if error.has_error():
             raise error
 
 
 class DataDownload(ContextualEntity):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["DataDownload"]):
+    def __init__(
+        self,
+        id_: str,
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["DataDownload"],
+    ):
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
 
-        error = check_entity_values(self, {
-            "@id": is_url,
-            "sha256": is_sha256,
-            "uploadDate": is_iso8601,
-        })
+        error = check_entity_values(
+            self,
+            {
+                "@id": is_url,
+                "sha256": is_sha256,
+                "uploadDate": is_iso8601,
+            },
+        )
 
         if error.has_error():
             raise error
@@ -238,9 +292,13 @@ class DataDownload(ContextualEntity):
 
 
 class HostingInstitution(Organization):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["HostingInstitution"]):
+    def __init__(
+        self,
+        id_: str,
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["HostingInstitution"],
+    ):
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
@@ -253,18 +311,25 @@ class HostingInstitution(Organization):
 
 
 class ContactPoint(ContextualEntity):
-    def __init__(self, id_: str, props: Dict[str, Any] = {},
-                 schema_name: str = SCHEMA_NAME,
-                 entity_def: EntityDef = SCHEMA_DEF["ContactPoint"]):
+    def __init__(
+        self,
+        id_: str,
+        props: Dict[str, Any] = {},
+        schema_name: str = SCHEMA_NAME,
+        entity_def: EntityDef = SCHEMA_DEF["ContactPoint"],
+    ):
         super().__init__(id_, props, schema_name, entity_def)
 
     def check_props(self) -> None:
         super().check_props()
 
-        error = check_entity_values(self, {
-            "email": is_email,
-            "telephone": is_phone_number,
-        })
+        error = check_entity_values(
+            self,
+            {
+                "email": is_email,
+                "telephone": is_phone_number,
+            },
+        )
         if not self.id.startswith("#mailto:") and not self.id.startswith("#callto:"):
             error.add("@id", "The id MUST start with '#mailto:' or '#callto:'.")
 
@@ -281,15 +346,27 @@ class ContactPoint(ContextualEntity):
             if self.get("email") is None:
                 error.add("email", "This property is required.")
             elif self.get("email") != email:
-                error.add("@id", "The email address MUST be the same as the value of the email property.")
-                error.add("email", "The email address MUST be the same as the value of the @id property.")
+                error.add(
+                    "@id",
+                    "The email address MUST be the same as the value of the email property.",
+                )
+                error.add(
+                    "email",
+                    "The email address MUST be the same as the value of the @id property.",
+                )
         elif self.id.startswith("#callto:"):
             phone_number = self.id.replace("#callto:", "")
             if self.get("telephone") is None:
                 error.add("telephone", "This property is required.")
             elif self.get("telephone") != phone_number:
-                error.add("@id", "The phone number MUST be the same as the value of the telephone property.")
-                error.add("telephone", "The phone number MUST be the same as the value of the @id property.")
+                error.add(
+                    "@id",
+                    "The phone number MUST be the same as the value of the telephone property.",
+                )
+                error.add(
+                    "telephone",
+                    "The phone number MUST be the same as the value of the @id property.",
+                )
 
         if error.has_error():
             raise error

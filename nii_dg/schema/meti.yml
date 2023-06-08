@@ -1,167 +1,167 @@
 DMPMetadata:
-  description: Metadata of research project that is the subject of this data management plan.
+  description: Metadata related to the research project which is the focal point of this data management plan.
   props:
     "@id":
       expected_type: str
       example: "#METI-DMP"
       required: Required.
-      description: MUST be the name with prefix `#`.
+      description: MUST be a name prefixed by `#`.
     about:
       expected_type: RootDataEntity
       example: '{"@id": "./"}'
       required: Required.
-      description: 'MUST be `{"@id": "./"}`. Indicates this DMP is about research project that the data stated in RootDataEntity are generated.'
+      description: 'MUST be `{"@id": "./"}`. Indicates that this DMP pertains to the research project generating the data described in RootDataEntity.'
     name:
       expected_type: str
       example: METI-DMP
       required: Required.
-      description: MUST be `METI-DMP`. Indicates the DMP format used by your project.
+      description: MUST be `METI-DMP`. Specifies the DMP format utilized by your project.
     funder:
       expected_type: Organization
       example: '{"@id": "https://ror.org/01b9y6c26"}'
       required: Required.
-      description: Funding agency of the research project. MUST be @id dictionary of Organization entity.
+      description: The funding agency supporting the research project. MUST be an @id dictionary of the Organization entity.
     creator:
       expected_type: List[Person]
       example: '[{"@id": "https://orcid.org/0000-0001-2345-6789"}]'
       required: Optional.
-      description: MUST be an array of @id dictionary of Person entity. Indicates all data creators involved in this research project.
+      description: MUST be an array of @id dictionaries of Person entities. Represents all data creators involved in this research project.
     repository:
       expected_type: RepositoryObject
       example: '{ "@id": "https://doi.org/xxxxxxxx" }'
-      required: Can be added when all data set is managed in a single repository.
-      description: MUST be @id dictionary of RepositoryObject entity. Indicates repository where the data is managed.
+      required: Applicable when all dataset management is consolidated in a single repository.
+      description: MUST be an @id dictionary of the RepositoryObject entity. Identifies the repository managing the data.
     distribution:
       expected_type: DataDownload
       example: '{"@id": "https://zenodo.org/record/example"}'
-      required: Can be added when accessRights has `open access` and all open-access data set is available from a single URL.
-      description: MUST be @id dictionary of DataDownload entity. Indicates where the download URL of the data set.
+      required: Applicable when accessRights provide `open access` and all open-access data sets are accessible from a single URL.
+      description: MUST be an @id dictionary of the DataDownload entity. Specifies the download URL of the data set.
     hasPart:
       expected_type: List[DMP]
       example: '[{ "@id": "#dmp:1" }, { "@id": "#dmp:2" }]'
       required: Required.
-      description: MUST be an array of DMP entity, which is included in this DMP. If no data is created yet, MUST be empty list.
+      description: MUST be an array of DMP entities encompassed within this DMP. If no data has been generated yet, it MUST be an empty list.
 DMP:
-  description: Contents from data management plan that is (will be) submitted to the funding agency.
+  description: Constitutes the content of a Data Management Plan (DMP) that is or will be submitted to the funding agency.
   props:
     "@id":
       expected_type: str
       example: "#dmp:1"
       required: Required.
-      description: MUST be data No. with the prefix `#dmp:`. Indicates data number in the DMP list.
+      description: MUST be a data number prefixed by `#dmp:`. Denotes the data number in the DMP list.
     dataNumber:
       expected_type: int
       example: 1
       required: Required.
-      description: Indicates data number of DMP. MUST be the same as the number included in the value of @id property.
+      description: Signifies the data number in the DMP. MUST match the number embedded in the value of the @id property.
     name:
       expected_type: str
-      example: calculated data
+      example: Calculated Data
       required: Required.
-      description: Indicates data title in DMP.
+      description: Represents the data title in the DMP.
     description:
       expected_type: str
-      example: Result data calculated by Newton's method
+      example: Result data calculated using Newton's method
       required: Required.
-      description: Indicates data description in DMP.
+      description: Describes the nature of the data in the DMP.
     hostingInstitution:
       expected_type: HostingInstitution
       example: '{ "@id": "https://ror.org/04ksd4g47" }'
       required: Required.
-      description: Indicates hosting institution of the data set.
+      description: Identifies the institution hosting the data set.
     wayOfManage:
       expected_type: Literal["commissioned", "self-managed"]
       example: commissioned
       required: Required.
-      description: Indicated how the data set is managed.
+      description: Specifies the management style for the data set.
     accessRights:
       expected_type: Literal["open access", "restricted access", "embargoed access", "metadata only access"]
       example: open access
       required: Required.
-      description: MUST choose one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Indicates the availability of the data set.
+      description: MUST select one from `open access`, `restricted access`, `embargoed access` and `metadata-only access`. Reveals the availability status of the data set.
     reasonForConcealment:
       expected_type: str
-      example: To ensure market competitiveness for commercialization
-      required: Required when accessRights has `restricted access`, `embargoed access` or `metadata only access`.
-      description: Indicates why access to the data set is restricted or embargoed.
+      example: To preserve market competitiveness for commercialization
+      required: Required when accessRights is set to `restricted access`, `embargoed access` or `metadata only access`.
+      description: Elucidates the reason behind any restrictions or embargo on the data set.
     availabilityStarts:
       expected_type: str
       example: "2030-04-01"
-      required: Required when accessRights has `embargoed access`.
-      description: MUST be a string in ISO 8601 date format. It will be verified in DG-Core that the value is the future than the time of verification.
+      required: Required when accessRights is set to `embargoed access`.
+      description: MUST be a string in ISO 8601 date format. DG-Core verifies that the provided value is a future date at the time of verification.
     creator:
       expected_type: List[Organization]
       example: '[{"@id": "https://ror.org/04ksd4g47"}]'
       required: Required.
-      description: MUST be an array of Organization entities. Indicates the organization which created the data set.
+      description: MUST be an array of Organization entities. Signifies the organization that created the data set.
     measurementTechnique:
       expected_type: str
-      example: Obtained using simulation software.
+      example: Data obtained using simulation software.
       required: Optional.
-      description: An explanation of the technique for collecting data.
+      description: Explains the technique used for data collection.
     isAccessibleForFree:
       expected_type: bool
       example: "True"
-      required: Required when accessRights has `open access` or `restricted access`.
-      description: MUST be a boolean. `True` means the data set is free to access, while `False` means consideration. When accessRights has `open access`, MUST be `True`.
+      required: Required when accessRights is `open access` or `restricted access`.
+      description: MUST be a boolean. `True` implies free access to the data set, while `False` denotes paid access. For `open access`, the value MUST be `True`.
     license:
       expected_type: License
       example: '{"@id": "https://www.apache.org/licenses/LICENSE-2.0"}'
-      required: Required when accessRights has `open access`.
-      description: MUST be a @id dictionary of License entity. Indicates the license applied for the data.
+      required: Required when accessRights is `open access`.
+      description: MUST be an @id dictionary of a License entity. Identifies the license applied to the data.
     usageInfo:
       expected_type: str
-      example: Contact data manager before usage of this data set.
+      example: Please contact the data manager prior to using this data set.
       required: Optional.
-      description: An explanation for citation.
+      description: Offers guidance for citing the data set.
     repository:
       expected_type: RepositoryObject
       example: '{ "@id": "https://doi.org/xxxxxxxx" }'
-      required: Required. When all data set is managed in a single repository, it can be omitted instead of adding to DMPMetadata entity.
-      description: MUST be @id dictionary of the RepositoryObject entity. Indicates repository where the data is managed.
+      required: Required. If the entire data set is managed in a single repository, this can be omitted and added to the DMPMetadata entity instead.
+      description: MUST be an @id dictionary of the RepositoryObject entity. Specifies the repository housing the data.
     contentSize:
       expected_type: Literal["1GB", "10GB", "100GB", "over100GB"]
       example: 100GB
-      required: Required when accessRights has `open access`.
-      description: MUST choose one from `1GB`, `10GB`, `100GB` and `over100GB`. Indicates maximum of sum total file size included in this DMP condition.
+      required: Required when accessRights is `open access`.
+      description: MUST select one from `1GB`, `10GB`, `100GB`, and `over100GB`. Defines the maximum cumulative file size for this DMP condition.
     distribution:
       expected_type: DataDownload
       example: '{"@id": "https://zenodo.org/record/example"}'
-      required: Required when accessRights in tied DMP entity has `open access`. When all open-access data set is available from a single URL, it can be omitted instead of adding to DMPMetadata entity.
-      description: MUST be @id dictionary of the DataDownload entity.Indicates where the download URL of the data set.
+      required: Required when accessRights in the tied DMP entity is `open access`. When all open-access data sets are available from a single URL, this can be omitted and added to the DMPMetadata entity instead.
+      description: MUST be an @id dictionary of the DataDownload entity. Provides the download URL for the data set.
     contactPoint:
       expected_type: ContactPoint
       example: '{ "@id": "#mailto:contact@example.com" }'
-      required: Required when accessRights has `open access`, `restricted access` or `embargoed access`.
-      description: MUST be @id dictionary of ContactPoint entity. Indicates contact information.
+      required: Required when accessRights is `open access`, `restricted access` or `embargoed access`.
+      description: MUST be an @id dictionary of the ContactPoint entity. Indicates the contact information.
 File:
-  description: A file included in the research project, e.g. text file, script file and images.
+  description: Represents a file associated with the research project, such as a text file, script file, or image.
   props:
     "@id":
       expected_type: str
       example: config/setting.txt
       required: Required.
-      description: MUST be either a URI Path relative to the top directory of your repository (stated in DMP entity) or an absolute URI. When the file is from outside this research project, @id SHOULD be directly downloadable by a simple retrieval (e.g., HTTP GET), permitting redirections and HTTP/HTTPS authentication. RO-Crate itself (ro-crate-metadata.json) is excluded.
+      description: MUST be either a URI Path relative to the root directory of your repository (specified in DMP entity) or an absolute URI. If the file originates from outside the research project, @id SHOULD be a directly downloadable link enabling simple retrieval (e.g., HTTP GET), allowing redirections and HTTP/HTTPS authentication. The RO-Crate itself (ro-crate-metadata.json) is exempted.
     name:
       expected_type: str
       example: setting.txt
       required: Required.
-      description: Indicates the file name.
+      description: Represents the name of the file.
     dmpDataNumber:
       expected_type: DMP
       example: '{"@id": "#dmp:1"}'
       required: Required.
-      description: MUST be @id dictionary of the DMP entity. Indicates data number in DMP that includes this file.
+      description: MUST be an @id dictionary of the DMP entity. Denotes the data number in the DMP that encompasses this file.
     contentSize:
       expected_type: str
       example: 1560B
       required: Required.
-      description: MUST be an integer of the file size with the suffix `B` as a unit, bytes. If necessary, you can also use "KB", "MB", "GB", "TB" and "PB" as a unit. It will be used in the validation of the size listed in DMP.
+      description: MUST be an integer representing the file size suffixed by `B` as the unit, bytes. If necessary, use "KB", "MB", "GB", "TB", or "PB" as units. This value will be utilized to validate the size listed in the DMP.
     encodingFormat:
       expected_type: str
       example: text/plain
       required: Optional.
-      description: Optional. MUST be MIME type. Indicates file format.
+      description: Optional. MUST be a MIME type. Specifies the file format.
     sha256:
       expected_type: str
       example: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -171,9 +171,9 @@ File:
       expected_type: str
       example: https://github.com/username/repository/file
       required: Optional.
-      description: MUST be a direct URL to the file.
+      description: MUST be a direct URL leading to the file.
     sdDatePublished:
       expected_type: str
       example: "2022-12-01"
-      required: Required when the file is from outside this research project.
-      description: Indicates the date that the file was obtained. MUST be a string in ISO 8601 date format.
+      required: Required when the file originates from outside this research project.
+      description: Denotes the date when the file was procured. MUST be a string in ISO 8601 date format.

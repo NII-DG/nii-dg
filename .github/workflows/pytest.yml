@@ -14,22 +14,27 @@ on:
 jobs:
   pytest:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 1
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.8
-      - uses: actions/cache@v2
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
       - name: Install dependencies
         run: |
           python3 -m pip install --no-cache-dir --progress-bar off -U pip setuptools wheel
           python3 -m pip install --no-cache-dir --progress-bar off -U .[tests]
       - name: Check with pytest
         run: |
-          pytest -s ./tests/unit_test
+          pytest -s ./tests
