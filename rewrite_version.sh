@@ -16,8 +16,6 @@ NEW_VERSION=$1
 # Define the locations and current version patterns to replace
 declare -A LOCATIONS=(
   ["./nii_dg/module_info.py"]="GH_REF: str = \"[0-9]*\.[0-9]*\.[0-9]*\""
-  ["./docs/conf.py"]="version = '[0-9]*\.[0-9]*\.[0-9]*'"
-  ["./docs/conf.py"]="release = '[0-9]*\.[0-9]*\.[0-9]*'"
   ["./Dockerfile"]="LABEL org.opencontainers.image.version=\"[0-9]*\.[0-9]*\.[0-9]*\""
   ["./compose.yml"]="image: ghcr.io\/nii-dg\/nii-dg:[0-9]*\.[0-9]*\.[0-9]*"
   ["./compose.api.yml"]="image: ghcr.io\/nii-dg\/nii-dg:[0-9]*\.[0-9]*\.[0-9]*"
