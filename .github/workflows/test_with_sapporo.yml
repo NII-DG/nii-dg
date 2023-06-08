@@ -1,0 +1,36 @@
+name: Test with Sapporo
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  test_with_sapporo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --no-cache-dir --progress-bar off -U pip setuptools wheel
+          python3 -m pip install --no-cache-dir --progress-bar off -U .[tests]
+      - name: Test with Sapporo
+        run: |
+          bash ./tests/test_with_sapporo.sh
