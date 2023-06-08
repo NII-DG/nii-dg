@@ -333,10 +333,14 @@ def is_instance_of_expected_type(value: Any, expected_type: str) -> bool:
         elif isinstance(node, ast.Subscript):
             origin = ast_to_type(node.value)  # e.g., typing.List
             args = []
-            if isinstance(node.slice.value, ast.Tuple):  # type: ignore
-                args = [ast_to_type(arg) for arg in node.slice.value.elts]  # type: ignore
+            if isinstance(node.slice, ast.Index):  # use for python3.8
+                slice_value = node.slice.value  # type: ignore
+            else:  # use for python3.9 and later
+                slice_value = node.slice  # type: ignore
+            if isinstance(slice_value, ast.Tuple):
+                args = [ast_to_type(arg) for arg in slice_value.elts]
             else:
-                args.append(ast_to_type(node.slice.value))  # type: ignore
+                args.append(ast_to_type(slice_value))
 
             return origin[tuple(args) if len(args) > 1 else args[0]]
         elif isinstance(node, ast.Constant):
