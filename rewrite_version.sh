@@ -30,9 +30,9 @@ echo "Rewriting Dockerfile ..."
 sed -i "s/LABEL org.opencontainers.image.version=\"${PREV_VERSION}\"/LABEL org.opencontainers.image.version=\"${NEW_VERSION}\"/g" ./Dockerfile
 
 echo "Rewriting compose.yml ..."
-sed -i "s/image: ghcr.io\/NII-DG\/nii-dg:${PREV_VERSION}/image: ghcr.io\/NII-DG\/nii-dg:${NEW_VERSION}/g" ./compose.yml
+sed -i "s/image: ghcr.io\/nii-dg\/nii-dg:${PREV_VERSION}/image: ghcr.io\/nii-dg\/nii-dg:${NEW_VERSION}/g" ./compose.yml
 
 echo "Rewriting compose.api.yml ..."
-sed -i "s/image: ghcr.io\/NII-DG\/nii-dg:${PREV_VERSION}/image: ghcr.io\/NII-DG\/nii-dg:${NEW_VERSION}/g" ./compose.api.yml
+sed -i "s/image: ghcr.io\/nii-dg\/nii-dg:${PREV_VERSION}/image: ghcr.io\/nii-dg\/nii-dg:${NEW_VERSION}/g" ./compose.api.yml
 
 echo "Version update complete."
