@@ -22,7 +22,7 @@ setup(
     long_description=LONG_DESCRIPTION.open(mode="r", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     author="NII",
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     platforms="any",
     packages=["nii_dg", "nii_dg/schema"],
     package_data={"nii_dg": ["schema/*.yml"]},
