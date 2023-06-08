@@ -9,10 +9,10 @@ services:
       # Basically, these variables are set in module as default values.
       - DG_HOST=0.0.0.0
       - DG_PORT=5000
-      # - DG_USE_EXTERNAL_CTX=False
-      # - DG_ALLOW_OTHER_GH_REPO=False
-      # - DG_WSGI_SERVER=waitress
-      # - DG_WSGI_THREADS=1
+      - DG_USE_EXTERNAL_CTX=False
+      - DG_ALLOW_OTHER_GH_REPO=False
+      - DG_WSGI_SERVER=waitress
+      - DG_WSGI_THREADS=1
     restart: on-failure
     working_dir: /app
     ports:

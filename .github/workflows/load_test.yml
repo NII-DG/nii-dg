@@ -1,0 +1,23 @@
+name: Load test
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  load_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - name: Load test
+        run: |
+          bash ./tests/load_test.sh

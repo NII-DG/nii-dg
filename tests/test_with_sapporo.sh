@@ -10,8 +10,7 @@
 #   - jq
 #   - curl
 
-set -eu
-set -o pipefail
+set -euo pipefail
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT_DIR=$(cd "${HERE}/.." && pwd)
