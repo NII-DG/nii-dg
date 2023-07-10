@@ -1,0 +1,3 @@
+include LICENSE
+include nii_dg/schema/*.yml
+include open-api_spec.yml
