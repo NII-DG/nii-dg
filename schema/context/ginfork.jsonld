@@ -1,30 +1,30 @@
 {
-  "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/schema/context/ginfork.jsonld",
+  "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/schema/context/ginfork.jsonld",
   "@version": 1.1,
   "@context": {
     "GinMonitoring": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#GinMonitoring",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#GinMonitoring",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#GinMonitoring:@id",
-        "about": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#GinMonitoring:about",
-        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#GinMonitoring:contentSize",
-        "workflowIdentifier": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#GinMonitoring:workflowIdentifier",
-        "datasetStructure": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#GinMonitoring:datasetStructure",
-        "experimentPackageList": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#GinMonitoring:experimentPackageList",
-        "parameterExperimentList": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#GinMonitoring:parameterExperimentList"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#GinMonitoring:@id",
+        "about": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#GinMonitoring:about",
+        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#GinMonitoring:contentSize",
+        "workflowIdentifier": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#GinMonitoring:workflowIdentifier",
+        "datasetStructure": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#GinMonitoring:datasetStructure",
+        "experimentPackageList": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#GinMonitoring:experimentPackageList",
+        "parameterExperimentList": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#GinMonitoring:parameterExperimentList"
       }
     },
     "File": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#File",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#File",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#File:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#File:name",
-        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#File:contentSize",
-        "encodingFormat": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#File:encodingFormat",
-        "sha256": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#File:sha256",
-        "url": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#File:url",
-        "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#File:sdDatePublished",
-        "experimentPackageFlag": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/ginfork.yml#File:experimentPackageFlag"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#File:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#File:name",
+        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#File:contentSize",
+        "encodingFormat": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#File:encodingFormat",
+        "sha256": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#File:sha256",
+        "url": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#File:url",
+        "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#File:sdDatePublished",
+        "experimentPackageFlag": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/ginfork.yml#File:experimentPackageFlag"
       }
     }
   }

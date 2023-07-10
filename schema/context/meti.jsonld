@@ -1,54 +1,54 @@
 {
-  "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/schema/context/meti.jsonld",
+  "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/schema/context/meti.jsonld",
   "@version": 1.1,
   "@context": {
     "DMPMetadata": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMPMetadata",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMPMetadata",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMPMetadata:@id",
-        "about": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMPMetadata:about",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMPMetadata:name",
-        "funder": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMPMetadata:funder",
-        "creator": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMPMetadata:creator",
-        "repository": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMPMetadata:repository",
-        "distribution": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMPMetadata:distribution",
-        "hasPart": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMPMetadata:hasPart"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMPMetadata:@id",
+        "about": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMPMetadata:about",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMPMetadata:name",
+        "funder": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMPMetadata:funder",
+        "creator": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMPMetadata:creator",
+        "repository": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMPMetadata:repository",
+        "distribution": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMPMetadata:distribution",
+        "hasPart": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMPMetadata:hasPart"
       }
     },
     "DMP": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:@id",
-        "dataNumber": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:dataNumber",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:name",
-        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:description",
-        "hostingInstitution": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:hostingInstitution",
-        "wayOfManage": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:wayOfManage",
-        "accessRights": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:accessRights",
-        "reasonForConcealment": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:reasonForConcealment",
-        "availabilityStarts": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:availabilityStarts",
-        "creator": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:creator",
-        "measurementTechnique": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:measurementTechnique",
-        "isAccessibleForFree": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:isAccessibleForFree",
-        "license": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:license",
-        "usageInfo": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:usageInfo",
-        "repository": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:repository",
-        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:contentSize",
-        "distribution": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:distribution",
-        "contactPoint": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#DMP:contactPoint"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:@id",
+        "dataNumber": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:dataNumber",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:name",
+        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:description",
+        "hostingInstitution": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:hostingInstitution",
+        "wayOfManage": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:wayOfManage",
+        "accessRights": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:accessRights",
+        "reasonForConcealment": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:reasonForConcealment",
+        "availabilityStarts": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:availabilityStarts",
+        "creator": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:creator",
+        "measurementTechnique": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:measurementTechnique",
+        "isAccessibleForFree": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:isAccessibleForFree",
+        "license": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:license",
+        "usageInfo": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:usageInfo",
+        "repository": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:repository",
+        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:contentSize",
+        "distribution": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:distribution",
+        "contactPoint": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#DMP:contactPoint"
       }
     },
     "File": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#File",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#File",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#File:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#File:name",
-        "dmpDataNumber": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#File:dmpDataNumber",
-        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#File:contentSize",
-        "encodingFormat": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#File:encodingFormat",
-        "sha256": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#File:sha256",
-        "url": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#File:url",
-        "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.1/nii_dg/schema/meti.yml#File:sdDatePublished"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#File:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#File:name",
+        "dmpDataNumber": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#File:dmpDataNumber",
+        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#File:contentSize",
+        "encodingFormat": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#File:encodingFormat",
+        "sha256": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#File:sha256",
+        "url": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#File:url",
+        "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/meti.yml#File:sdDatePublished"
       }
     }
   }
