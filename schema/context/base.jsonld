@@ -1,88 +1,88 @@
 {
-  "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/schema/context/base.jsonld",
+  "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/schema/context/base.jsonld",
   "@version": 1.1,
   "@context": {
     "File": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#File",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#File",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#File:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#File:name",
-        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#File:contentSize",
-        "encodingFormat": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#File:encodingFormat",
-        "sha256": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#File:sha256",
-        "url": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#File:url",
-        "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#File:sdDatePublished"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#File:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#File:name",
+        "contentSize": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#File:contentSize",
+        "encodingFormat": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#File:encodingFormat",
+        "sha256": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#File:sha256",
+        "url": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#File:url",
+        "sdDatePublished": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#File:sdDatePublished"
       }
     },
     "Dataset": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Dataset",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Dataset",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Dataset:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Dataset:name",
-        "url": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Dataset:url"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Dataset:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Dataset:name",
+        "url": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Dataset:url"
       }
     },
     "Organization": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Organization",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Organization",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Organization:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Organization:name",
-        "alias": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Organization:alias",
-        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Organization:description"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Organization:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Organization:name",
+        "alias": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Organization:alias",
+        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Organization:description"
       }
     },
     "Person": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Person",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Person",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Person:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Person:name",
-        "alias": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Person:alias",
-        "affiliation": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Person:affiliation",
-        "email": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Person:email",
-        "telephone": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#Person:telephone"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Person:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Person:name",
+        "alias": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Person:alias",
+        "affiliation": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Person:affiliation",
+        "email": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Person:email",
+        "telephone": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#Person:telephone"
       }
     },
     "License": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#License",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#License",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#License:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#License:name",
-        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#License:description"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#License:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#License:name",
+        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#License:description"
       }
     },
     "RepositoryObject": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#RepositoryObject",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#RepositoryObject",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#RepositoryObject:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#RepositoryObject:name",
-        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#RepositoryObject:description"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#RepositoryObject:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#RepositoryObject:name",
+        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#RepositoryObject:description"
       }
     },
     "DataDownload": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#DataDownload",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#DataDownload",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#DataDownload:@id",
-        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#DataDownload:description",
-        "sha256": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#DataDownload:sha256",
-        "uploadDate": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#DataDownload:uploadDate"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#DataDownload:@id",
+        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#DataDownload:description",
+        "sha256": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#DataDownload:sha256",
+        "uploadDate": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#DataDownload:uploadDate"
       }
     },
     "HostingInstitution": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#HostingInstitution",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#HostingInstitution",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#HostingInstitution:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#HostingInstitution:name",
-        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#HostingInstitution:description",
-        "address": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#HostingInstitution:address"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#HostingInstitution:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#HostingInstitution:name",
+        "description": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#HostingInstitution:description",
+        "address": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#HostingInstitution:address"
       }
     },
     "ContactPoint": {
-      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#ContactPoint",
+      "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#ContactPoint",
       "@context": {
-        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#ContactPoint:@id",
-        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#ContactPoint:name",
-        "email": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#ContactPoint:email",
-        "telephone": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.2/nii_dg/schema/base.yml#ContactPoint:telephone"
+        "@id": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#ContactPoint:@id",
+        "name": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#ContactPoint:name",
+        "email": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#ContactPoint:email",
+        "telephone": "https://raw.githubusercontent.com/NII-DG/nii-dg/1.0.3/nii_dg/schema/base.yml#ContactPoint:telephone"
       }
     }
   }
