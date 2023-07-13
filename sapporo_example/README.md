@@ -13,7 +13,7 @@ This document provides a step-by-step guide on using the NII-DG library to packa
 
 ## Step 1: Launch Sapporo and the NII-DG REST API Server
 
-````bash
+```bash
 # In the sapporo_example directory
 $ docker compose up -d
 [+] Running 2/2
@@ -23,7 +23,8 @@ $ docker compose ps
 NAME                IMAGE                                       COMMAND                  SERVICE             CREATED              STATUS              PORTS
 nii-dg              nii-dg                                      "tini -- python /app…"   nii-dg              12 seconds ago       Up 11 seconds       0.0.0.0:5000->5000/tcp
 sapporo-service     ghcr.io/sapporo-wes/sapporo-service:1.4.9   "tini -- uwsgi --yam…"   sapporo-service     About a minute ago   Up About a minute   0.0.0.0:1122->1122/tcp
-```<!-- ja 疎通確認として、 -->
+```
+
 As a communication check:
 
 ```bash
@@ -46,7 +47,7 @@ $ curl sapporo-service:1122/service-info
 {
   "auth_instructions_url"...
 }
-````
+```
 
 ## Step 2: Install the NII-DG Library
 
@@ -145,7 +146,7 @@ The results are downloaded to `./results`.
 
 ## Step 5: Generate a RO-Crate with NII-DG (`package_ro_crate.py`)
 
-前項で download した結果を、nii-dg library を用いて RO-Crate として packaging する。
+Using the NII-DG library, package the results downloaded in the previous step as an RO-Crate.
 
 ```bash
 $ python3 package_ro_crate.py -h
